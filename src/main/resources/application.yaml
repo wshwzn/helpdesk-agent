@@ -1,3 +1,17 @@
 spring:
   application:
     name: helpdesk-agent
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
