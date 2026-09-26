@@ -37,7 +37,7 @@ mvn spring-boot:run
 
 - `tickets`：工单业务表，保存工单编号、标题、问题描述、优先级、状态、创建人和创建时间等信息。
 - `users`：用户表，保存登录账号、BCrypt 密码哈希、显示名称、角色和启用状态。
-- `ai_model_configs`：模型配置表，保存厂商地址、模型名称、能力开关和 AES-GCM 加密后的 API Key。
+- `ai_model_configs`：模型配置表，保存协议、厂商、基础地址、模型名称、能力开关和 AES-GCM 加密后的 API Key。
 - `flyway_schema_history`：Flyway 自动创建的迁移记录表，用于记录每个 SQL 迁移脚本是否执行成功，防止重复建表。请勿手动修改或删除其中的数据。
 
 ## 登录认证
@@ -77,7 +77,16 @@ Authorization: Bearer <accessToken>
 
 ## 模型配置
 
-管理员可以配置 OpenAI API 兼容模型。创建配置时的 API Key 会使用 AES-256-GCM 加密，后续接口只返回尾号掩码：
+模型统一使用 OpenAI 兼容协议。管理员选择内置厂商时，后端自动使用预设地址；选择 `CUSTOM` 时才需要填写 SDK 基础地址。创建配置时的 API Key 会使用 AES-256-GCM 加密，后续接口只返回尾号掩码。
+
+查询可选厂商及其预设地址：
+
+```http
+GET /api/admin/model-configs/vendors
+Authorization: Bearer <管理员 accessToken>
+```
+
+使用 DeepSeek 预设创建配置：
 
 ```http
 POST /api/admin/model-configs
@@ -86,9 +95,23 @@ Content-Type: application/json
 
 {
   "name": "DeepSeek 主模型",
-  "providerType": "OPENAI_COMPATIBLE",
-  "baseUrl": "https://api.deepseek.com",
+  "vendor": "DEEPSEEK",
   "modelName": "deepseek-chat",
+  "apiKey": "<真实 API Key>",
+  "supportsStreaming": true,
+  "supportsTools": true,
+  "enabled": true
+}
+```
+
+当前内置厂商为 `OPENAI`、`DEEPSEEK`、`QWEN` 和 `OLLAMA`。接入代理服务或其他兼容厂商时使用 `CUSTOM`，并填写类似 `https://proxy.example.com/v1` 的基础地址；不要填写以 `/chat/completions` 结尾的完整接口地址：
+
+```json
+{
+  "name": "自定义兼容模型",
+  "vendor": "CUSTOM",
+  "baseUrl": "https://proxy.example.com/v1",
+  "modelName": "custom-chat",
   "apiKey": "<真实 API Key>",
   "supportsStreaming": true,
   "supportsTools": true,
@@ -100,6 +123,7 @@ Content-Type: application/json
 
 ```http
 GET  /api/admin/model-configs
+GET  /api/admin/model-configs/vendors
 GET  /api/admin/model-configs/{id}
 PUT  /api/admin/model-configs/{id}
 POST /api/admin/model-configs/{id}/test
@@ -108,7 +132,7 @@ POST /api/admin/model-configs/{id}/enable
 POST /api/admin/model-configs/{id}/disable
 ```
 
-更新配置时省略 `apiKey` 会保留原密钥。默认模型必须处于启用状态，也不能直接禁用；应先切换默认模型。连接测试会向模型发送一个极短提示词，可能产生少量费用。
+更新配置时省略 `apiKey` 会保留原密钥。接口响应中的 `protocol` 固定为 `OPENAI_COMPATIBLE`，`vendor` 用于区分地址预设；它们不是不同 SDK。默认模型必须处于启用状态，也不能直接禁用；应先切换默认模型。连接测试会向模型发送一个极短提示词，可能产生少量费用。
 
 ## 工单接口
 

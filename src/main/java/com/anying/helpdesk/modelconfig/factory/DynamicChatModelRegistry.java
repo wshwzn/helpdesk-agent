@@ -1,7 +1,7 @@
 package com.anying.helpdesk.modelconfig.factory;
 
 import com.anying.helpdesk.modelconfig.domain.AiModelConfig;
-import com.anying.helpdesk.modelconfig.domain.ModelProviderType;
+import com.anying.helpdesk.modelconfig.domain.ModelProtocol;
 import com.anying.helpdesk.modelconfig.exception.InvalidModelConfigException;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Component;
@@ -14,14 +14,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DynamicChatModelRegistry {
 
-    private final Map<ModelProviderType, AiChatModelFactory> factories;
+    private final Map<ModelProtocol, AiChatModelFactory> factories;
     private final Map<Long, CachedChatModel> cache = new ConcurrentHashMap<>();
 
     public DynamicChatModelRegistry(List<AiChatModelFactory> factories) {
-        Map<ModelProviderType, AiChatModelFactory> factoryMap = new EnumMap<>(ModelProviderType.class);
+        Map<ModelProtocol, AiChatModelFactory> factoryMap = new EnumMap<>(ModelProtocol.class);
         for (AiChatModelFactory factory : factories) {
-            if (factoryMap.put(factory.providerType(), factory) != null) {
-                throw new IllegalStateException("duplicate chat model factory: " + factory.providerType());
+            if (factoryMap.put(factory.protocol(), factory) != null) {
+                throw new IllegalStateException("duplicate chat model factory: " + factory.protocol());
             }
         }
         this.factories = Map.copyOf(factoryMap);
@@ -32,10 +32,10 @@ public class DynamicChatModelRegistry {
             if (existing != null && existing.version().equals(config.getVersion())) {
                 return existing;
             }
-            AiChatModelFactory factory = factories.get(config.getProviderType());
+            AiChatModelFactory factory = factories.get(config.getProtocol());
             if (factory == null) {
                 throw new InvalidModelConfigException(
-                        "unsupported model provider type: " + config.getProviderType()
+                        "unsupported model protocol: " + config.getProtocol()
                 );
             }
             return new CachedChatModel(config.getVersion(), factory.create(config));

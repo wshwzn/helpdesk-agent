@@ -4,7 +4,9 @@ import com.anying.helpdesk.common.response.ApiResponse;
 import com.anying.helpdesk.modelconfig.dto.CreateModelConfigRequest;
 import com.anying.helpdesk.modelconfig.dto.ModelConfigResponse;
 import com.anying.helpdesk.modelconfig.dto.ModelConnectionTestResponse;
+import com.anying.helpdesk.modelconfig.dto.ModelVendorResponse;
 import com.anying.helpdesk.modelconfig.dto.UpdateModelConfigRequest;
+import com.anying.helpdesk.modelconfig.domain.ModelVendor;
 import com.anying.helpdesk.modelconfig.service.AiModelConfigService;
 import com.anying.helpdesk.security.CurrentUserProvider;
 import jakarta.validation.Valid;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Validated
@@ -43,6 +46,13 @@ public class AdminModelConfigController {
     @GetMapping
     public ApiResponse<List<ModelConfigResponse>> list() {
         return ApiResponse.ok(modelConfigService.list());
+    }
+
+    @GetMapping("/vendors")
+    public ApiResponse<List<ModelVendorResponse>> listVendors() {
+        return ApiResponse.ok(Arrays.stream(ModelVendor.values())
+                .map(ModelVendorResponse::from)
+                .toList());
     }
 
     @GetMapping("/{id}")

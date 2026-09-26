@@ -1,5 +1,5 @@
 package com.anying.helpdesk.modelconfig.domain;
 
-public enum ModelProviderType {
+public enum ModelProtocol {
     OPENAI_COMPATIBLE
 }

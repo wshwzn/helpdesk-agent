@@ -2,6 +2,8 @@ package com.anying.helpdesk.modelconfig.service;
 
 import com.anying.helpdesk.modelconfig.crypto.SecretEncryptor;
 import com.anying.helpdesk.modelconfig.domain.AiModelConfig;
+import com.anying.helpdesk.modelconfig.domain.ModelProtocol;
+import com.anying.helpdesk.modelconfig.domain.ModelVendor;
 import com.anying.helpdesk.modelconfig.dto.CreateModelConfigRequest;
 import com.anying.helpdesk.modelconfig.dto.ModelConfigResponse;
 import com.anying.helpdesk.modelconfig.dto.ModelConnectionTestResponse;
@@ -42,8 +44,9 @@ public class AiModelConfigService {
         String apiKey = request.apiKey().trim();
         AiModelConfig config = new AiModelConfig();
         config.setName(request.name().trim());
-        config.setProviderType(request.providerType());
-        config.setBaseUrl(normalizeBaseUrl(request.baseUrl()));
+        config.setProtocol(ModelProtocol.OPENAI_COMPATIBLE);
+        config.setVendor(request.vendor());
+        config.setBaseUrl(resolveBaseUrl(request.vendor(), request.baseUrl()));
         config.setModelName(request.modelName().trim());
         config.setApiKeyCiphertext(secretEncryptor.encrypt(apiKey));
         config.setApiKeyHint(maskApiKey(apiKey));
@@ -83,8 +86,9 @@ public class AiModelConfigService {
     public ModelConfigResponse update(Long id, UpdateModelConfigRequest request, Long adminId) {
         AiModelConfig config = requireConfig(id);
         config.setName(request.name().trim());
-        config.setProviderType(request.providerType());
-        config.setBaseUrl(normalizeBaseUrl(request.baseUrl()));
+        config.setProtocol(ModelProtocol.OPENAI_COMPATIBLE);
+        config.setVendor(request.vendor());
+        config.setBaseUrl(resolveBaseUrl(request.vendor(), request.baseUrl()));
         config.setModelName(request.modelName().trim());
         if (request.apiKey() != null) {
             String apiKey = request.apiKey().trim();
@@ -191,6 +195,19 @@ public class AiModelConfigService {
         }
     }
 
+    private String resolveBaseUrl(ModelVendor vendor, String requestedBaseUrl) {
+        if (!vendor.isCustomBaseUrlRequired()) {
+            if (requestedBaseUrl != null && !requestedBaseUrl.isBlank()) {
+                throw new InvalidModelConfigException("baseUrl must be omitted for a preset vendor");
+            }
+            return vendor.getPresetBaseUrl();
+        }
+        if (requestedBaseUrl == null || requestedBaseUrl.isBlank()) {
+            throw new InvalidModelConfigException("baseUrl is required for the CUSTOM vendor");
+        }
+        return normalizeBaseUrl(requestedBaseUrl);
+    }
+
     private String normalizeBaseUrl(String value) {
         try {
             URI uri = new URI(value.trim()).normalize();
@@ -203,7 +220,15 @@ public class AiModelConfigService {
                 throw new InvalidModelConfigException("baseUrl must be a valid HTTP or HTTPS URL");
             }
             String normalized = uri.toString();
-            return normalized.endsWith("/") ? normalized.substring(0, normalized.length() - 1) : normalized;
+            normalized = normalized.endsWith("/")
+                    ? normalized.substring(0, normalized.length() - 1)
+                    : normalized;
+            if (normalized.endsWith("/chat/completions")) {
+                throw new InvalidModelConfigException(
+                        "baseUrl must be an SDK base URL and must not include /chat/completions"
+                );
+            }
+            return normalized;
         } catch (URISyntaxException exception) {
             throw new InvalidModelConfigException("baseUrl must be a valid HTTP or HTTPS URL");
         }

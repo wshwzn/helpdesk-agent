@@ -17,7 +17,8 @@ public class AiModelConfig {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String name;
-    private ModelProviderType providerType;
+    private ModelProtocol protocol;
+    private ModelVendor vendor;
     private String baseUrl;
     private String modelName;
     private String apiKeyCiphertext;

@@ -1,14 +1,16 @@
 package com.anying.helpdesk.modelconfig.dto;
 
 import com.anying.helpdesk.modelconfig.domain.AiModelConfig;
-import com.anying.helpdesk.modelconfig.domain.ModelProviderType;
+import com.anying.helpdesk.modelconfig.domain.ModelProtocol;
+import com.anying.helpdesk.modelconfig.domain.ModelVendor;
 
 import java.time.LocalDateTime;
 
 public record ModelConfigResponse(
         Long id,
         String name,
-        ModelProviderType providerType,
+        ModelProtocol protocol,
+        ModelVendor vendor,
         String baseUrl,
         String modelName,
         String apiKeyMasked,
@@ -24,7 +26,8 @@ public record ModelConfigResponse(
         return new ModelConfigResponse(
                 config.getId(),
                 config.getName(),
-                config.getProviderType(),
+                config.getProtocol(),
+                config.getVendor(),
                 config.getBaseUrl(),
                 config.getModelName(),
                 config.getApiKeyHint(),

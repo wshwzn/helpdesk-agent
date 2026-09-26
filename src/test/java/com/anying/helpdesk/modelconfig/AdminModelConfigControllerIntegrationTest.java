@@ -77,6 +77,8 @@ class AdminModelConfigControllerIntegrationTest {
         mockMvc.perform(get("/api/admin/model-configs/{id}", id.longValue())
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.protocol").value("OPENAI_COMPATIBLE"))
+                .andExpect(jsonPath("$.data.vendor").value("CUSTOM"))
                 .andExpect(jsonPath("$.data.apiKeyMasked").value("****1234"))
                 .andExpect(content().string(org.hamcrest.Matchers.not(
                         org.hamcrest.Matchers.containsString(apiKey)
@@ -111,7 +113,7 @@ class AdminModelConfigControllerIntegrationTest {
                         .content("""
                                 {
                                   "name": "Primary Model Updated",
-                                  "providerType": "OPENAI_COMPATIBLE",
+                                  "vendor": "CUSTOM",
                                   "baseUrl": "https://api.example.com/v1/",
                                   "modelName": "example-chat-v2",
                                   "supportsStreaming": true,
@@ -179,6 +181,78 @@ class AdminModelConfigControllerIntegrationTest {
     }
 
     @Test
+    void presetVendorUsesBackendUrlAndListsAvailableVendors() throws Exception {
+        String token = createUserAndLogin("model_admin_five", UserRole.ADMIN);
+
+        mockMvc.perform(get("/api/admin/model-configs/vendors")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].code").value("OPENAI"))
+                .andExpect(jsonPath("$.data[1].code").value("DEEPSEEK"))
+                .andExpect(jsonPath("$.data[1].baseUrl").value("https://api.deepseek.com"))
+                .andExpect(jsonPath("$.data[4].customBaseUrlRequired").value(true));
+
+        mockMvc.perform(post("/api/admin/model-configs")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "DeepSeek Preset",
+                                  "vendor": "DEEPSEEK",
+                                  "modelName": "deepseek-chat",
+                                  "apiKey": "sk-deepseek-test",
+                                  "supportsStreaming": true,
+                                  "supportsTools": true,
+                                  "enabled": true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.protocol").value("OPENAI_COMPATIBLE"))
+                .andExpect(jsonPath("$.data.vendor").value("DEEPSEEK"))
+                .andExpect(jsonPath("$.data.baseUrl").value("https://api.deepseek.com"));
+    }
+
+    @Test
+    void customVendorRequiresBaseUrlAndPresetRejectsManualUrl() throws Exception {
+        String token = createUserAndLogin("model_admin_six", UserRole.ADMIN);
+
+        mockMvc.perform(post("/api/admin/model-configs")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Invalid Custom",
+                                  "vendor": "CUSTOM",
+                                  "modelName": "custom-chat",
+                                  "apiKey": "sk-custom-test",
+                                  "supportsStreaming": true,
+                                  "supportsTools": true,
+                                  "enabled": true
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_MODEL_CONFIG"));
+
+        mockMvc.perform(post("/api/admin/model-configs")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Invalid Preset",
+                                  "vendor": "OPENAI",
+                                  "baseUrl": "https://proxy.example.com/v1",
+                                  "modelName": "gpt-test",
+                                  "apiKey": "sk-openai-test",
+                                  "supportsStreaming": true,
+                                  "supportsTools": true,
+                                  "enabled": true
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_MODEL_CONFIG"));
+    }
+
+    @Test
     void encryptionUsesRandomIvAndDetectsTampering() {
         String first = secretEncryptor.encrypt("same-secret");
         String second = secretEncryptor.encrypt("same-secret");
@@ -197,7 +271,7 @@ class AdminModelConfigControllerIntegrationTest {
                         .content("""
                                 {
                                   "name": "%s",
-                                  "providerType": "OPENAI_COMPATIBLE",
+                                  "vendor": "CUSTOM",
                                   "baseUrl": "https://api.example.com/v1",
                                   "modelName": "example-chat",
                                   "apiKey": "%s",
