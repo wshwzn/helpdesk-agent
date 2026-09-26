@@ -3,6 +3,10 @@ package com.anying.helpdesk.common.exception;
 import com.anying.helpdesk.auth.exception.InvalidCredentialsException;
 import com.anying.helpdesk.auth.exception.UsernameAlreadyExistsException;
 import com.anying.helpdesk.common.response.ApiResponse;
+import com.anying.helpdesk.conversation.exception.ChatGenerationException;
+import com.anying.helpdesk.conversation.exception.ConcurrentConversationUpdateException;
+import com.anying.helpdesk.conversation.exception.ConversationNotActiveException;
+import com.anying.helpdesk.conversation.exception.ConversationNotFoundException;
 import com.anying.helpdesk.modelconfig.exception.InvalidModelConfigException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigNotFoundException;
@@ -26,6 +30,27 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(ConversationNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleConversationNotFound(ConversationNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("CONVERSATION_NOT_FOUND", exception.getMessage(), null));
+    }
+
+    @ExceptionHandler({ConversationNotActiveException.class, ConcurrentConversationUpdateException.class})
+    public ResponseEntity<ApiResponse<Void>> handleConversationConflict(RuntimeException exception) {
+        String code = exception instanceof ConversationNotActiveException
+                ? "CONVERSATION_NOT_ACTIVE"
+                : "CONCURRENT_CONVERSATION_UPDATE";
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(code, exception.getMessage(), null));
+    }
+
+    @ExceptionHandler(ChatGenerationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleChatGeneration(ChatGenerationException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error("CHAT_GENERATION_FAILED", exception.getMessage(), null));
+    }
 
     @ExceptionHandler(ModelConfigNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleModelConfigNotFound(ModelConfigNotFoundException exception) {

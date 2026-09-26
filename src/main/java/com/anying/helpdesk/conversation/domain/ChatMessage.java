@@ -1,0 +1,33 @@
+package com.anying.helpdesk.conversation.domain;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@TableName("chat_messages")
+public class ChatMessage {
+
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    private Long conversationId;
+    private ChatMessageRole role;
+    private String content;
+    private ChatMessageStatus status;
+    private Long modelConfigId;
+    private String modelName;
+    private Integer promptTokens;
+    private Integer completionTokens;
+    private Integer totalTokens;
+    private String errorCode;
+    @Version
+    private Integer version;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}

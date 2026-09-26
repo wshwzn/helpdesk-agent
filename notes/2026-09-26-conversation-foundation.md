@@ -1,0 +1,74 @@
+# 对话与消息基础功能变更说明
+
+## 实现的功能和业务规则
+
+- 客户可以创建、分页查询和查看自己的对话，并分页读取历史消息。
+- 客户发送消息后，系统使用唯一启用的默认模型生成非流式回答，同时持久化客户消息和 AI 消息。
+- AI 消息先以 `PENDING` 状态提交数据库；成功后更新为 `COMPLETED`，模型异常时更新为 `FAILED` 并保存脱敏错误码。
+- 模型网络调用位于数据库事务之外，避免在等待外部服务期间长期占用事务和数据库连接。
+- 对话使用乐观锁；同一对话发生并发更新时，其中一个请求回滚并返回冲突。
+- 模型上下文只包含最近的已完成客户/AI 消息，默认 20 条，可通过 `CHAT_HISTORY_LIMIT` 配置为 1 至 100。
+- 客户只能访问自己的对话；他人的对话统一按不存在处理，避免泄露对话编号是否有效。
+- 客服和管理员不能访问客户对话接口，当前仅允许 `CUSTOMER` 角色。
+- 模型失败响应不会包含厂商异常或 API Key 等敏感内容。
+
+## 新增的类和文件
+
+| 类或文件 | 作用 |
+| --- | --- |
+| `Conversation`、`ConversationStatus` | 对话实体及 `ACTIVE`、`ARCHIVED` 状态。 |
+| `ChatMessage`、`ChatMessageRole`、`ChatMessageStatus` | 消息实体、角色和生成生命周期状态。 |
+| `ConversationMapper`、`ChatMessageMapper` | 对话与消息的 MyBatis-Plus 持久化访问。 |
+| 对话请求与响应 DTO | 校验创建、发送请求并输出脱敏的对话和消息数据。 |
+| `ConversationController` | 提供五个客户对话 REST 接口和 OpenAPI 描述。 |
+| `ConversationService`、`ConversationServiceImpl` | 定义对话业务接口并编排默认模型、持久化阶段和异常处理。 |
+| `ConversationPersistenceService` | 通过独立短事务创建消息、加载上下文以及完成或标记失败。 |
+| `ConversationModelClient`、`SpringAiConversationModelClient` | 将数据库消息转换为 Spring AI Prompt，并提取回答和 Token 用量。 |
+| `ChatProperties`、`ConversationConfiguration` | 配置并校验发送给模型的历史消息数量。 |
+| 四个对话异常类 | 区分不存在、非活跃、并发冲突和模型生成失败。 |
+| `V6__create_conversations_and_messages.sql` | 创建 `conversations` 和 `chat_messages` 表及查询索引。 |
+| 两个对话测试类 | 覆盖接口、权限、事务边界、失败落库、上下文转换和 Token 用量。 |
+
+## 修改的类和文件
+
+| 类或文件 | 修改内容 |
+| --- | --- |
+| `SecurityConfig` | 将 `/api/conversations/**` 限制为 `CUSTOMER`。 |
+| `GlobalExceptionHandler` | 增加对话 404、409 和模型失败 502 响应映射。 |
+| `application.yaml` | 增加 `CHAT_HISTORY_LIMIT` 配置。 |
+| `OpenApiDocumentationIntegrationTest` | 验证新对话接口进入 OpenAPI 且声明 JWT。 |
+| `docs/database-schema.md` | 增加两张表的全部字段、索引和逻辑关系。 |
+| `README.md` | 增加数据表与对话接口使用说明。 |
+
+## API 和数据库变化
+
+新增客户接口：
+
+- `POST /api/conversations`
+- `GET /api/conversations`
+- `GET /api/conversations/{id}`
+- `GET /api/conversations/{id}/messages`
+- `POST /api/conversations/{id}/messages`
+
+Flyway V6 新增 `conversations` 和 `chat_messages`。两张表继续使用逻辑关联，不增加数据库外键。
+
+## 测试与手工验证
+
+- `mvn test`：29 个测试通过，0 失败。
+- 对话接口测试覆盖创建、列表、连续两轮消息、历史上下文、模型快照、Token 用量和角色权限。
+- 测试确认模型调用发生时没有活动数据库事务。
+- 测试确认其他客户访问返回 404，客服访问返回 403。
+- 测试确认厂商异常被脱敏为 502，客户消息和失败 AI 消息正确落库。
+- 测试确认未配置默认模型时返回 409，且不会留下客户消息或待生成消息。
+- Spring AI 客户端单元测试覆盖系统提示词、角色转换、Token 提取和空回答拒绝。
+- H2 已成功执行 V1 至 V6 迁移。
+- 本地 MySQL 9.3 已从 V5 平滑升级到 V6，并手工跑通“注册客户 → 创建对话 → 查询对话列表 → 查询空消息列表 → 检查 OpenAPI 路径和数据库记录”；临时数据已清理。
+- 手工验证没有使用虚构密钥调用真实模型，模型成功、失败和上下文行为由自动化替身覆盖。
+
+## 当前限制与后续工作
+
+- 当前为同步非流式回答，下一阶段再增加 SSE 流式输出和断线处理。
+- 尚未提供对话重命名、归档和删除接口，`ARCHIVED` 状态仅为后续能力预留。
+- 同一对话暂不支持同时生成多条回答，并发请求会有一个返回 409。
+- 当前只有基础系统提示词，尚未接入 RAG、意图路由、工具调用和人工转接。
+- 若服务在 AI 返回后、完成消息事务前异常退出，消息可能停留在 `PENDING`，后续需要增加超时恢复任务。

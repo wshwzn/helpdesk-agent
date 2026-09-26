@@ -62,6 +62,52 @@
 - 普通索引：`idx_tickets_creator_status (creator_id, status)`，支持客户按状态查询自己的工单。
 - 普通索引：`idx_tickets_assignee_status (assignee_id, status)`，支持客服查询已领取工单。
 
+## `conversations` 对话表
+
+保存客户与 AI 的对话会话，由 Flyway V6 创建。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 对话主键。 |
+| `customer_id` | `BIGINT` | 否 | 无 | 对话所属客户的 `users.id`，逻辑关联。 |
+| `title` | `VARCHAR(100)` | 否 | 无 | 客户创建对话时填写的标题。 |
+| `status` | `VARCHAR(20)` | 否 | 无 | 对话状态：`ACTIVE`、`ARCHIVED`；当前只创建 `ACTIVE` 对话。 |
+| `last_message_at` | `TIMESTAMP(6)` | 是 | `NULL` | 最近一次客户消息落库或 AI 生成结束的时间；新建空对话时为空。 |
+| `version` | `INT` | 否 | `0` | 乐观锁版本号，避免同一对话的并发发送互相覆盖。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 对话创建时间。 |
+| `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 对话最后更新时间，由应用维护。 |
+
+索引与约束：
+
+- 主键：`PRIMARY KEY (id)`。
+- 普通索引：`idx_conversations_customer_status_updated (customer_id, status, updated_at)`，支持客户分页筛选自己的对话。
+
+## `chat_messages` 对话消息表
+
+保存客户消息、AI 回答及生成状态，由 Flyway V6 创建。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 消息主键，也用于确定同一对话内的消息顺序。 |
+| `conversation_id` | `BIGINT` | 否 | 无 | 所属 `conversations.id`，逻辑关联。 |
+| `role` | `VARCHAR(20)` | 否 | 无 | 消息角色：`USER`、`ASSISTANT`；预留 `SYSTEM`、`TOOL`。 |
+| `content` | `MEDIUMTEXT` | 是 | `NULL` | 消息正文；等待生成或生成失败的 AI 消息为空。 |
+| `status` | `VARCHAR(20)` | 否 | 无 | 状态：`PENDING`、`COMPLETED`、`FAILED`。客户消息直接为 `COMPLETED`。 |
+| `model_config_id` | `BIGINT` | 是 | `NULL` | AI 消息使用的 `ai_model_configs.id` 快照，客户消息为空。 |
+| `model_name` | `VARCHAR(100)` | 是 | `NULL` | AI 消息生成时实际使用的模型名称快照。 |
+| `prompt_tokens` | `INT` | 是 | `NULL` | 厂商返回的输入 Token 数。 |
+| `completion_tokens` | `INT` | 是 | `NULL` | 厂商返回的输出 Token 数。 |
+| `total_tokens` | `INT` | 是 | `NULL` | 厂商返回的总 Token 数。 |
+| `error_code` | `VARCHAR(50)` | 是 | `NULL` | 生成失败时保存的内部脱敏错误码，例如 `MODEL_CALL_FAILED`。 |
+| `version` | `INT` | 否 | `0` | 乐观锁版本号，防止生成完成与失败状态互相覆盖。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息创建时间。 |
+| `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息状态或内容最后更新时间。 |
+
+索引与约束：
+
+- 主键：`PRIMARY KEY (id)`。
+- 普通索引：`idx_chat_messages_conversation_id (conversation_id, id)`，支持按对话顺序读取消息。
+
 ## `ai_model_configs` AI 模型配置表
 
 保存运行时模型连接配置，由 Flyway V4 创建、V5 调整协议与厂商字段。
@@ -101,6 +147,9 @@ users.id ──< tickets.creator_id
 users.id ──< tickets.assignee_id
 users.id ──< ai_model_configs.created_by
 users.id ──< ai_model_configs.updated_by
+users.id ──< conversations.customer_id
+conversations.id ──< chat_messages.conversation_id
+ai_model_configs.id ──< chat_messages.model_config_id
 ```
 
 这些关系目前均为逻辑关联，没有外键约束和级联删除行为。
@@ -118,3 +167,4 @@ users.id ──< ai_model_configs.updated_by
 | V3 | `V3__create_users.sql` | 创建用户表。 |
 | V4 | `V4__create_ai_model_configs.sql` | 创建模型配置表。 |
 | V5 | `V5__add_model_vendor_presets.sql` | 拆分模型协议和厂商预设。 |
+| V6 | `V6__create_conversations_and_messages.sql` | 创建客户对话和消息表。 |

@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/support/**").hasRole("SUPPORT")
                         .requestMatchers("/api/tickets/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/conversations/**").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions

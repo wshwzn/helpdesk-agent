@@ -55,6 +55,8 @@ $env:OPENAPI_ENABLED = "false"
 - `tickets`：工单业务表，保存工单编号、标题、问题描述、优先级、状态、创建人和创建时间等信息。
 - `users`：用户表，保存登录账号、BCrypt 密码哈希、显示名称、角色和启用状态。
 - `ai_model_configs`：模型配置表，保存协议、厂商、基础地址、模型名称、能力开关和 AES-GCM 加密后的 API Key。
+- `conversations`：客户对话表，保存对话归属、标题、状态和最近消息时间。
+- `chat_messages`：对话消息表，保存客户消息、AI 回答、生成状态、模型快照和 Token 用量。
 - `flyway_schema_history`：Flyway 自动创建的迁移记录表，用于记录每个 SQL 迁移脚本是否执行成功，防止重复建表。请勿手动修改或删除其中的数据。
 
 ## 登录认证
@@ -150,6 +152,42 @@ POST /api/admin/model-configs/{id}/disable
 ```
 
 更新配置时省略 `apiKey` 会保留原密钥。接口响应中的 `protocol` 固定为 `OPENAI_COMPATIBLE`，`vendor` 用于区分地址预设；它们不是不同 SDK。默认模型必须处于启用状态，也不能直接禁用；应先切换默认模型。连接测试会向模型发送一个极短提示词，可能产生少量费用。
+
+## 智能对话接口
+
+发送消息前需要先配置并启用一个默认模型。创建客户对话：
+
+```http
+POST /api/conversations
+Authorization: Bearer <客户 accessToken>
+Content-Type: application/json
+
+{
+  "title": "登录问题咨询"
+}
+```
+
+向对话发送消息并同步等待 AI 回答：
+
+```http
+POST /api/conversations/{id}/messages
+Authorization: Bearer <客户 accessToken>
+Content-Type: application/json
+
+{
+  "content": "为什么我无法登录控制台？"
+}
+```
+
+其他对话接口：
+
+```http
+GET /api/conversations?page=1&size=20&status=ACTIVE
+GET /api/conversations/{id}
+GET /api/conversations/{id}/messages?page=1&size=50
+```
+
+客户只能访问自己的对话。系统默认携带最近 20 条已完成消息作为模型上下文，可通过 `CHAT_HISTORY_LIMIT` 调整为 1 至 100。模型调用失败时接口返回 `502 CHAT_GENERATION_FAILED`，客户消息和一条 `FAILED` AI 消息仍会保留，厂商原始异常不会返回客户端。当前接口为非流式响应。
 
 ## 工单接口
 

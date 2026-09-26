@@ -32,3 +32,5 @@ app:
     access-token-ttl: 2h
   model-config:
     encryption-key: ${MODEL_CONFIG_ENCRYPTION_KEY}
+  chat:
+    history-limit: ${CHAT_HISTORY_LIMIT:20}
