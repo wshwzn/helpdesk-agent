@@ -40,7 +40,16 @@ class OpenApiDocumentationIntegrationTest {
                 .andExpect(jsonPath("$.paths['/api/conversations'].post.security[0].bearerAuth").isArray())
                 .andExpect(jsonPath("$.paths['/api/auth/login'].post.security").doesNotExist())
                 .andExpect(jsonPath("$.components.schemas.LoginRequest.properties.password.writeOnly")
-                        .value(true));
+                        .value(true))
+                .andExpect(jsonPath("$.components.schemas.LoginRequest.default").doesNotExist())
+                .andExpect(jsonPath("$.components.schemas.LoginRequest.properties.username.default")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.components.schemas.LoginRequest.properties.password.default")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.components.schemas.CreateModelConfigRequest.default")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.components.schemas.CreateModelConfigRequest.properties.enabled.default")
+                        .doesNotExist());
     }
 
     @Test

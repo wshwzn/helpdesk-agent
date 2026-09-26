@@ -9,20 +9,21 @@
 - 使用 `OPENAPI_ENABLED` 同时控制 JSON 文档和 Swagger UI，默认开启，生产环境可设置为 `false`。
 - 现有认证、客户工单、客服工单和模型配置接口已按业务分组，并补充用途、参数、权限和 DTO 字段说明。
 - 密码和 API Key 在文档模型中标记为只写字段。
+- 显式将 `swagger-annotations-jakarta` 与 Springdoc 使用的 Swagger Core 对齐为 2.2.47，避免 Spring AI 传递引入旧版注解后生成错误的 `default: null`、空字符串和 `false` 默认值，导致 Apifox 自动请求体显示为 `null`。
 
 ## 新增的类和文件
 
 | 类或文件 | 作用 |
 | --- | --- |
 | `OpenApiConfig` | 定义 API 标题、版本、说明和 JWT Bearer 安全方案。 |
-| `OpenApiDocumentationIntegrationTest` | 验证 OpenAPI JSON、Swagger UI、JWT 安全声明和敏感字段只写标记。 |
+| `OpenApiDocumentationIntegrationTest` | 验证 OpenAPI JSON、Swagger UI、JWT 安全声明、敏感字段只写标记，以及请求 DTO 不包含错误默认值。 |
 | `notes/2026-09-26-openapi-documentation.md` | 记录本次接口文档功能变更。 |
 
 ## 修改的类和文件
 
 | 类或文件 | 修改内容 |
 | --- | --- |
-| `pom.xml` | 引入 `springdoc-openapi-starter-webmvc-ui` 2.8.17。 |
+| `pom.xml` | 引入 `springdoc-openapi-starter-webmvc-ui` 2.8.17，并将 Swagger 注解依赖对齐到 2.2.47。 |
 | `SecurityConfig` | 匿名放行 OpenAPI JSON 和 Swagger UI 静态资源。 |
 | `application.yaml` | 增加文档开关、页面地址和排序配置。 |
 | 四个 Controller | 增加接口分组、用途、权限和参数说明。 |
@@ -36,10 +37,11 @@
 
 ## 验证结果
 
-- `mvn test`：22 个测试通过，0 失败；其中 OpenAPI 专项测试 2 个。
+- `mvn test`：29 个测试通过，0 失败；其中 OpenAPI 专项测试 2 个。
 - 确认 OpenAPI 文档包含登录、工单和模型配置路径。
 - 确认受保护接口声明 `bearerAuth`，公开登录接口不错误声明 JWT 要求。
 - 确认密码字段生成 `writeOnly: true`，Swagger UI 入口、HTML 页面和页面配置均可匿名访问。
+- 确认登录及模型配置请求 Schema 不再生成对象级 `default: null` 或字段级伪默认值，可供 Apifox 依据字段示例生成 JSON 请求体。
 
 ## 当前限制与后续工作
 
