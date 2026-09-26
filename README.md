@@ -20,7 +20,10 @@ CREATE DATABASE helpdesk_agent
 
 将 `src/main/resources/application-local.example.yml` 复制为 `application-local.yml`，然后填写本地数据库账号和密码。`application-local.yml` 已被 Git 忽略，不会提交到远程仓库。
 
+启动前通过 `JWT_SECRET` 提供至少 32 字节的随机密钥，生产环境必须使用安全随机值：
+
 ```powershell
+$env:JWT_SECRET = "请替换为至少32字节的随机密钥"
 mvn test
 mvn spring-boot:run
 ```
@@ -30,7 +33,43 @@ mvn spring-boot:run
 ## 数据库表
 
 - `tickets`：工单业务表，保存工单编号、标题、问题描述、优先级、状态、创建人和创建时间等信息。
+- `users`：用户表，保存登录账号、BCrypt 密码哈希、显示名称、角色和启用状态。
 - `flyway_schema_history`：Flyway 自动创建的迁移记录表，用于记录每个 SQL 迁移脚本是否执行成功，防止重复建表。请勿手动修改或删除其中的数据。
+
+## 登录认证
+
+公开注册只会创建 `CUSTOMER` 客户账号：
+
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "username": "customer01",
+  "password": "Password123",
+  "displayName": "测试客户"
+}
+```
+
+登录接口返回 JWT：
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "customer01",
+  "password": "Password123"
+}
+```
+
+调用受保护接口时携带访问令牌：
+
+```http
+Authorization: Bearer <accessToken>
+```
+
+当前尚未实现管理员创建客服账号的接口。本地开发时可先注册账号，再在数据库中将其 `role` 更新为 `SUPPORT`，重新登录后即可获得客服令牌。
 
 ## 工单接口
 
@@ -39,12 +78,12 @@ mvn spring-boot:run
 ```http
 POST /api/tickets
 Content-Type: application/json
+Authorization: Bearer <客户 accessToken>
 
 {
   "title": "无法连接公司 VPN",
   "description": "VPN 客户端连接时提示超时。",
-  "priority": "HIGH",
-  "creatorId": 1
+  "priority": "HIGH"
 }
 ```
 
@@ -57,10 +96,10 @@ GET /api/tickets/{id}
 分页查询工单，可按创建人和状态筛选：
 
 ```http
-GET /api/tickets?page=1&size=20&creatorId=1&status=PENDING
+GET /api/tickets?page=1&size=20&status=PENDING
 ```
 
-优先级可选值为 `LOW`、`MEDIUM`、`HIGH`；当前新工单的初始状态为 `PENDING`。
+客户只能查询自己的工单，创建人编号从 JWT 获取。优先级可选值为 `LOW`、`MEDIUM`、`HIGH`；当前新工单的初始状态为 `PENDING`。
 
 ## 工单处理流程
 
@@ -75,9 +114,9 @@ PENDING（待处理）→ PROCESSING（处理中）→ RESOLVED（已解决）
 
 ```http
 POST /api/tickets/{id}/cancel
+Authorization: Bearer <客户 accessToken>
 
 {
-  "customerId": 1,
   "reason": "问题已经自行解决"
 }
 ```
@@ -87,21 +126,18 @@ POST /api/tickets/{id}/cancel
 ```http
 GET  /api/support/tickets?status=PENDING
 POST /api/support/tickets/{id}/claim
-
-{
-  "supportId": 200
-}
+Authorization: Bearer <客服 accessToken>
 ```
 
 只有领取该工单的客服可以填写处理结果并完结工单：
 
 ```http
 POST /api/support/tickets/{id}/resolve
+Authorization: Bearer <客服 accessToken>
 
 {
-  "supportId": 200,
   "resolution": "已重置客户的上传配额"
 }
 ```
 
-当前阶段通过请求参数传递客户和客服编号。加入登录认证后，这些编号将改为从登录身份中获取，不能继续信任客户端传值。
+Spring Security 根据 JWT 中的角色限制访问：`CUSTOMER` 可以操作自己的工单，`SUPPORT` 可以访问客服处理接口。客户和客服编号均从已验证的 JWT 中获取，不接受客户端传值。

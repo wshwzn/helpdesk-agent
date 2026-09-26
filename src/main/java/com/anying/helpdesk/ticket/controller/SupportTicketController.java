@@ -2,8 +2,8 @@ package com.anying.helpdesk.ticket.controller;
 
 import com.anying.helpdesk.common.response.ApiResponse;
 import com.anying.helpdesk.common.response.PageResponse;
+import com.anying.helpdesk.security.CurrentUserProvider;
 import com.anying.helpdesk.ticket.domain.TicketStatus;
-import com.anying.helpdesk.ticket.dto.ClaimTicketRequest;
 import com.anying.helpdesk.ticket.dto.ResolveTicketRequest;
 import com.anying.helpdesk.ticket.dto.TicketResponse;
 import com.anying.helpdesk.ticket.service.TicketService;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SupportTicketController {
 
     private final TicketService ticketService;
+    private final CurrentUserProvider currentUserProvider;
 
     @GetMapping
     public ApiResponse<PageResponse<TicketResponse>> page(
@@ -39,11 +40,8 @@ public class SupportTicketController {
     }
 
     @PostMapping("/{id}/claim")
-    public ApiResponse<TicketResponse> claim(
-            @PathVariable @Min(1) Long id,
-            @Valid @RequestBody ClaimTicketRequest request
-    ) {
-        return ApiResponse.ok(ticketService.claim(id, request));
+    public ApiResponse<TicketResponse> claim(@PathVariable @Min(1) Long id) {
+        return ApiResponse.ok(ticketService.claim(id, currentUserProvider.userId()));
     }
 
     @PostMapping("/{id}/resolve")
@@ -51,6 +49,6 @@ public class SupportTicketController {
             @PathVariable @Min(1) Long id,
             @Valid @RequestBody ResolveTicketRequest request
     ) {
-        return ApiResponse.ok(ticketService.resolve(id, request));
+        return ApiResponse.ok(ticketService.resolve(id, request, currentUserProvider.userId()));
     }
 }

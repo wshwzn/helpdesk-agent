@@ -4,7 +4,6 @@ import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.ticket.domain.Ticket;
 import com.anying.helpdesk.ticket.domain.TicketStatus;
 import com.anying.helpdesk.ticket.dto.CancelTicketRequest;
-import com.anying.helpdesk.ticket.dto.ClaimTicketRequest;
 import com.anying.helpdesk.ticket.dto.CreateTicketRequest;
 import com.anying.helpdesk.ticket.dto.ResolveTicketRequest;
 import com.anying.helpdesk.ticket.dto.TicketResponse;
@@ -32,7 +31,7 @@ public class TicketService {
     private final TicketMapper ticketMapper;
 
     @Transactional
-    public TicketResponse create(CreateTicketRequest request) {
+    public TicketResponse create(CreateTicketRequest request, Long creatorId) {
         LocalDateTime now = LocalDateTime.now();
         Ticket ticket = new Ticket();
         ticket.setTicketNo(generateTicketNo(now));
@@ -40,7 +39,7 @@ public class TicketService {
         ticket.setDescription(request.description().trim());
         ticket.setPriority(request.priority());
         ticket.setStatus(TicketStatus.PENDING);
-        ticket.setCreatorId(request.creatorId());
+        ticket.setCreatorId(creatorId);
         ticket.setCreatedAt(now);
         ticket.setUpdatedAt(now);
         ticketMapper.insert(ticket);
@@ -48,14 +47,16 @@ public class TicketService {
     }
 
     @Transactional(readOnly = true)
-    public TicketResponse getById(Long id) {
-        return TicketResponse.from(requireTicket(id));
+    public TicketResponse getById(Long id, Long customerId) {
+        Ticket ticket = requireTicket(id);
+        requireCreator(ticket, customerId);
+        return TicketResponse.from(ticket);
     }
 
     @Transactional(readOnly = true)
     public PageResponse<TicketResponse> page(long page, long size, Long creatorId, TicketStatus status) {
         LambdaQueryWrapper<Ticket> query = basePageQuery(status)
-                .eq(creatorId != null, Ticket::getCreatorId, creatorId);
+                .eq(Ticket::getCreatorId, creatorId);
         return executePage(page, size, query);
     }
 
@@ -67,12 +68,12 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketResponse claim(Long id, ClaimTicketRequest request) {
+    public TicketResponse claim(Long id, Long supportId) {
         Ticket ticket = requireTicket(id);
         requireStatus(ticket, TicketStatus.PENDING, "claim");
         LocalDateTime now = LocalDateTime.now();
         ticket.setStatus(TicketStatus.PROCESSING);
-        ticket.setAssigneeId(request.supportId());
+        ticket.setAssigneeId(supportId);
         ticket.setAssignedAt(now);
         ticket.setUpdatedAt(now);
         updateWithOptimisticLock(ticket);
@@ -80,10 +81,10 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketResponse resolve(Long id, ResolveTicketRequest request) {
+    public TicketResponse resolve(Long id, ResolveTicketRequest request, Long supportId) {
         Ticket ticket = requireTicket(id);
         requireStatus(ticket, TicketStatus.PROCESSING, "resolve");
-        if (!request.supportId().equals(ticket.getAssigneeId())) {
+        if (!supportId.equals(ticket.getAssigneeId())) {
             throw new TicketAccessDeniedException("only the assigned support agent can resolve this ticket");
         }
         LocalDateTime now = LocalDateTime.now();
@@ -96,11 +97,9 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketResponse cancel(Long id, CancelTicketRequest request) {
+    public TicketResponse cancel(Long id, CancelTicketRequest request, Long customerId) {
         Ticket ticket = requireTicket(id);
-        if (!request.customerId().equals(ticket.getCreatorId())) {
-            throw new TicketAccessDeniedException("customers can only cancel their own tickets");
-        }
+        requireCreator(ticket, customerId);
         requireCancellableStatus(ticket);
         LocalDateTime now = LocalDateTime.now();
         ticket.setStatus(TicketStatus.CANCELLED);
@@ -143,6 +142,12 @@ public class TicketService {
     private void requireStatus(Ticket ticket, TicketStatus expected, String operation) {
         if (ticket.getStatus() != expected) {
             throw new InvalidTicketStatusException(operation, ticket.getStatus());
+        }
+    }
+
+    private void requireCreator(Ticket ticket, Long customerId) {
+        if (!customerId.equals(ticket.getCreatorId())) {
+            throw new TicketAccessDeniedException("customers can only access their own tickets");
         }
     }
 

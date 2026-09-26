@@ -1,5 +1,7 @@
 package com.anying.helpdesk.common.exception;
 
+import com.anying.helpdesk.auth.exception.InvalidCredentialsException;
+import com.anying.helpdesk.auth.exception.UsernameAlreadyExistsException;
 import com.anying.helpdesk.common.response.ApiResponse;
 import com.anying.helpdesk.ticket.exception.ConcurrentTicketUpdateException;
 import com.anying.helpdesk.ticket.exception.InvalidTicketStatusException;
@@ -21,6 +23,20 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(InvalidCredentialsException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("INVALID_CREDENTIALS", exception.getMessage(), null));
+    }
+
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUsernameAlreadyExists(
+            UsernameAlreadyExistsException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("USERNAME_ALREADY_EXISTS", exception.getMessage(), null));
+    }
 
     @ExceptionHandler(TicketNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleTicketNotFound(TicketNotFoundException exception) {

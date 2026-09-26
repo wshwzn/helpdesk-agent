@@ -7,3 +7,9 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+app:
+  jwt:
+    issuer: helpdesk-agent-test
+    secret: test-jwt-secret-with-at-least-thirty-two-characters
+    access-token-ttl: 30m
