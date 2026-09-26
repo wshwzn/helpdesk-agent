@@ -20,10 +20,13 @@ CREATE DATABASE helpdesk_agent
 
 将 `src/main/resources/application-local.example.yml` 复制为 `application-local.yml`，然后填写本地数据库账号和密码。`application-local.yml` 已被 Git 忽略，不会提交到远程仓库。
 
-启动前通过 `JWT_SECRET` 提供至少 32 字节的随机密钥，生产环境必须使用安全随机值：
+启动前提供 JWT 签名密钥和模型配置加密主密钥。模型配置密钥必须是 32 个随机字节的 Base64 编码；生产环境必须使用安全随机值并妥善备份：
 
 ```powershell
 $env:JWT_SECRET = "请替换为至少32字节的随机密钥"
+$keyBytes = New-Object byte[] 32
+[Security.Cryptography.RandomNumberGenerator]::Fill($keyBytes)
+$env:MODEL_CONFIG_ENCRYPTION_KEY = [Convert]::ToBase64String($keyBytes)
 mvn test
 mvn spring-boot:run
 ```
@@ -34,6 +37,7 @@ mvn spring-boot:run
 
 - `tickets`：工单业务表，保存工单编号、标题、问题描述、优先级、状态、创建人和创建时间等信息。
 - `users`：用户表，保存登录账号、BCrypt 密码哈希、显示名称、角色和启用状态。
+- `ai_model_configs`：模型配置表，保存厂商地址、模型名称、能力开关和 AES-GCM 加密后的 API Key。
 - `flyway_schema_history`：Flyway 自动创建的迁移记录表，用于记录每个 SQL 迁移脚本是否执行成功，防止重复建表。请勿手动修改或删除其中的数据。
 
 ## 登录认证
@@ -69,7 +73,42 @@ Content-Type: application/json
 Authorization: Bearer <accessToken>
 ```
 
-当前尚未实现管理员创建客服账号的接口。本地开发时可先注册账号，再在数据库中将其 `role` 更新为 `SUPPORT`，重新登录后即可获得客服令牌。
+当前尚未实现管理员创建内部账号的接口。本地开发时可先注册账号，再在数据库中将其 `role` 更新为 `SUPPORT` 或 `ADMIN`，重新登录后即可获得对应令牌。
+
+## 模型配置
+
+管理员可以配置 OpenAI API 兼容模型。创建配置时的 API Key 会使用 AES-256-GCM 加密，后续接口只返回尾号掩码：
+
+```http
+POST /api/admin/model-configs
+Authorization: Bearer <管理员 accessToken>
+Content-Type: application/json
+
+{
+  "name": "DeepSeek 主模型",
+  "providerType": "OPENAI_COMPATIBLE",
+  "baseUrl": "https://api.deepseek.com",
+  "modelName": "deepseek-chat",
+  "apiKey": "<真实 API Key>",
+  "supportsStreaming": true,
+  "supportsTools": true,
+  "enabled": true
+}
+```
+
+管理接口：
+
+```http
+GET  /api/admin/model-configs
+GET  /api/admin/model-configs/{id}
+PUT  /api/admin/model-configs/{id}
+POST /api/admin/model-configs/{id}/test
+POST /api/admin/model-configs/{id}/default
+POST /api/admin/model-configs/{id}/enable
+POST /api/admin/model-configs/{id}/disable
+```
+
+更新配置时省略 `apiKey` 会保留原密钥。默认模型必须处于启用状态，也不能直接禁用；应先切换默认模型。连接测试会向模型发送一个极短提示词，可能产生少量费用。
 
 ## 工单接口
 

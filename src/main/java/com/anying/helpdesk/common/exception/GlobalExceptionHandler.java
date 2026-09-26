@@ -3,6 +3,9 @@ package com.anying.helpdesk.common.exception;
 import com.anying.helpdesk.auth.exception.InvalidCredentialsException;
 import com.anying.helpdesk.auth.exception.UsernameAlreadyExistsException;
 import com.anying.helpdesk.common.response.ApiResponse;
+import com.anying.helpdesk.modelconfig.exception.InvalidModelConfigException;
+import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
+import com.anying.helpdesk.modelconfig.exception.ModelConfigNotFoundException;
 import com.anying.helpdesk.ticket.exception.ConcurrentTicketUpdateException;
 import com.anying.helpdesk.ticket.exception.InvalidTicketStatusException;
 import com.anying.helpdesk.ticket.exception.TicketAccessDeniedException;
@@ -23,6 +26,24 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(ModelConfigNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleModelConfigNotFound(ModelConfigNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("MODEL_CONFIG_NOT_FOUND", exception.getMessage(), null));
+    }
+
+    @ExceptionHandler(InvalidModelConfigException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidModelConfig(InvalidModelConfigException exception) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error("INVALID_MODEL_CONFIG", exception.getMessage(), null));
+    }
+
+    @ExceptionHandler(ModelConfigConflictException.class)
+    public ResponseEntity<ApiResponse<Void>> handleModelConfigConflict(ModelConfigConflictException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("MODEL_CONFIG_CONFLICT", exception.getMessage(), null));
+    }
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(InvalidCredentialsException exception) {
