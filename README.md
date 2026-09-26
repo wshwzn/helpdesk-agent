@@ -35,6 +35,8 @@ mvn spring-boot:run
 
 ## 数据库表
 
+完整字段、索引、枚举取值和表关系说明见 [`docs/database-schema.md`](docs/database-schema.md)。
+
 - `tickets`：工单业务表，保存工单编号、标题、问题描述、优先级、状态、创建人和创建时间等信息。
 - `users`：用户表，保存登录账号、BCrypt 密码哈希、显示名称、角色和启用状态。
 - `ai_model_configs`：模型配置表，保存协议、厂商、基础地址、模型名称、能力开关和 AES-GCM 加密后的 API Key。

@@ -14,3 +14,7 @@ Each summary must include:
 - known limitations or follow-up work.
 
 Keep credentials and other secrets out of notes. Documentation-only wording fixes may update the most relevant existing note instead of creating a new file.
+
+## Database Documentation
+
+Keep `docs/database-schema.md` synchronized with the Flyway migrations. Any change that creates, alters, renames, or drops a table, column, index, or constraint must update the database document in the same commit. Document field purpose, nullability, defaults, enum values, logical relationships, indexes, and important application-enforced rules. Never edit an already-applied migration; add the next `V{version}__{description}.sql` file instead.
