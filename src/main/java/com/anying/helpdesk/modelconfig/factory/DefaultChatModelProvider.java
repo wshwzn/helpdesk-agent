@@ -30,6 +30,7 @@ public class DefaultChatModelProvider {
         return new ResolvedChatModel(
                 config.getId(),
                 config.getModelName(),
+                Boolean.TRUE.equals(config.getSupportsStreaming()),
                 chatModelRegistry.get(config)
         );
     }

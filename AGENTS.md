@@ -1,5 +1,11 @@
 # Repository Guidelines
 
+## Code Comments
+
+Add a short Chinese JavaDoc comment to every newly written method. Explain the method's business purpose in one or two sentences; add `@param`, `@return`, or `@throws` only when they improve understanding.
+
+Avoid routine line-by-line comments inside methods. Add an internal comment only for non-obvious business rules, transaction boundaries, concurrency handling, or security decisions. Generated accessors and record component accessors do not require comments. Prefer a Chinese `@DisplayName` for newly added test methods.
+
 ## Change Notes
 
 After every implementation change, add or update a Chinese Markdown summary under `notes/`. Name new files with the pattern `YYYY-MM-DD-topic.md`, for example `2026-09-26-ticket-lifecycle.md`.

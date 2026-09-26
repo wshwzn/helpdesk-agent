@@ -9,6 +9,7 @@ import com.anying.helpdesk.conversation.domain.ChatMessageStatus;
 import com.anying.helpdesk.conversation.mapper.ChatMessageMapper;
 import com.anying.helpdesk.conversation.mapper.ConversationMapper;
 import com.anying.helpdesk.conversation.model.ChatCompletionResult;
+import com.anying.helpdesk.conversation.model.ChatStreamChunk;
 import com.anying.helpdesk.conversation.model.ConversationModelClient;
 import com.anying.helpdesk.modelconfig.factory.DefaultChatModelProvider;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
@@ -16,6 +17,7 @@ import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.model.ChatModel;
@@ -28,8 +30,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import reactor.core.publisher.Flux;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,13 +43,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -87,7 +95,12 @@ class ConversationControllerIntegrationTest {
     void customerChatsWithHistoryOutsideDatabaseTransaction() throws Exception {
         String token = registerCustomer("conversation_customer_one");
         long conversationId = createConversation(token, "登录问题");
-        ResolvedChatModel resolvedModel = new ResolvedChatModel(99L, "test-chat-model", mock(ChatModel.class));
+        ResolvedChatModel resolvedModel = new ResolvedChatModel(
+                99L,
+                "test-chat-model",
+                true,
+                mock(ChatModel.class)
+        );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
         when(modelClient.complete(any(ResolvedChatModel.class), anyList())).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
@@ -158,7 +171,12 @@ class ConversationControllerIntegrationTest {
     void modelFailurePersistsSanitizedFailedAssistantMessage() throws Exception {
         String token = registerCustomer("conversation_customer_failure");
         long conversationId = createConversation(token, "失败测试");
-        ResolvedChatModel resolvedModel = new ResolvedChatModel(100L, "failure-model", mock(ChatModel.class));
+        ResolvedChatModel resolvedModel = new ResolvedChatModel(
+                100L,
+                "failure-model",
+                true,
+                mock(ChatModel.class)
+        );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
         doThrow(new IllegalStateException("provider leaked sk-secret-value"))
                 .when(modelClient).complete(any(), anyList());
@@ -206,6 +224,135 @@ class ConversationControllerIntegrationTest {
         assertThat(chatMessageMapper.selectCount(new LambdaQueryWrapper<ChatMessage>()
                 .eq(ChatMessage::getConversationId, conversationId))).isZero();
         verifyNoInteractions(modelClient);
+    }
+
+    @Test
+    @DisplayName("客户应收到完整的 SSE 事件序列且最终回答正确入库")
+    void customerReceivesStreamingAnswerAndPersistsCompletion() throws Exception {
+        String token = registerCustomer("conversation_stream_success");
+        long conversationId = createConversation(token, "流式成功测试");
+        ResolvedChatModel resolvedModel = new ResolvedChatModel(
+                101L,
+                "stream-model",
+                true,
+                mock(ChatModel.class)
+        );
+        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
+        when(modelClient.stream(any(), anyList())).thenReturn(Flux.just(
+                new ChatStreamChunk("可以", null, null, null),
+                new ChatStreamChunk("重置密码", 16, 5, 21)
+        ));
+
+        MvcResult streamingRequest = mockMvc.perform(post(
+                                "/api/conversations/{id}/messages/stream",
+                                conversationId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.TEXT_EVENT_STREAM)
+                        .content("""
+                                {"content": "我忘记密码了"}
+                                """))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        String eventStream = mockMvc.perform(asyncDispatch(streamingRequest))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+
+        assertThat(eventStream)
+                .contains("event:start", "event:delta", "event:done")
+                .containsSubsequence("event:start", "event:delta", "event:delta", "event:done")
+                .contains("\"content\":\"可以\"", "\"content\":\"重置密码\"")
+                .doesNotContain("event:error");
+
+        List<ChatMessage> messages = chatMessageMapper.selectList(
+                new LambdaQueryWrapper<ChatMessage>()
+                        .eq(ChatMessage::getConversationId, conversationId)
+                        .orderByAsc(ChatMessage::getId)
+        );
+        assertThat(messages).hasSize(2);
+        assertThat(messages.getLast().getStatus()).isEqualTo(ChatMessageStatus.COMPLETED);
+        assertThat(messages.getLast().getContent()).isEqualTo("可以重置密码");
+        assertThat(messages.getLast().getTotalTokens()).isEqualTo(21);
+    }
+
+    @Test
+    @DisplayName("流式模型调用失败时应发送脱敏错误事件并保存失败状态")
+    void streamingFailureSendsSanitizedErrorAndPersistsFailure() throws Exception {
+        String token = registerCustomer("conversation_stream_failure");
+        long conversationId = createConversation(token, "流式失败测试");
+        ResolvedChatModel resolvedModel = new ResolvedChatModel(
+                102L,
+                "stream-failure-model",
+                true,
+                mock(ChatModel.class)
+        );
+        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
+        when(modelClient.stream(any(), anyList()))
+                .thenReturn(Flux.error(new IllegalStateException("provider leaked sk-stream-secret")));
+
+        MvcResult streamingRequest = mockMvc.perform(post(
+                                "/api/conversations/{id}/messages/stream",
+                                conversationId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.TEXT_EVENT_STREAM)
+                        .content("""
+                                {"content": "触发流式失败"}
+                                """))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        String eventStream = mockMvc.perform(asyncDispatch(streamingRequest))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+        assertThat(eventStream)
+                .contains("event:start", "event:error", "CHAT_GENERATION_FAILED")
+                .doesNotContain("sk-stream-secret", "event:done");
+
+        List<ChatMessage> messages = chatMessageMapper.selectList(
+                new LambdaQueryWrapper<ChatMessage>()
+                        .eq(ChatMessage::getConversationId, conversationId)
+                        .orderByAsc(ChatMessage::getId)
+        );
+        assertThat(messages).hasSize(2);
+        assertThat(messages.getLast().getStatus()).isEqualTo(ChatMessageStatus.FAILED);
+        assertThat(messages.getLast().getErrorCode()).isEqualTo("MODEL_CALL_FAILED");
+    }
+
+    @Test
+    @DisplayName("默认模型未开启流式能力时不应保存任何消息")
+    void modelWithoutStreamingSupportDoesNotPersistMessages() throws Exception {
+        String token = registerCustomer("conversation_stream_unsupported");
+        long conversationId = createConversation(token, "不支持流式测试");
+        ResolvedChatModel resolvedModel = new ResolvedChatModel(
+                103L,
+                "non-stream-model",
+                false,
+                mock(ChatModel.class)
+        );
+        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
+
+        mockMvc.perform(post("/api/conversations/{id}/messages/stream", conversationId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.TEXT_EVENT_STREAM, MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"content": "尝试流式调用"}
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MODEL_STREAMING_NOT_SUPPORTED"));
+
+        assertThat(chatMessageMapper.selectCount(new LambdaQueryWrapper<ChatMessage>()
+                .eq(ChatMessage::getConversationId, conversationId))).isZero();
+        verify(modelClient, never()).stream(any(), anyList());
     }
 
     private org.springframework.test.web.servlet.ResultActions sendMessage(

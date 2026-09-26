@@ -32,6 +32,8 @@ class OpenApiDocumentationIntegrationTest {
                 .andExpect(jsonPath("$.paths['/api/tickets'].post.summary").value("创建工单"))
                 .andExpect(jsonPath("$.paths['/api/conversations/{id}/messages'].post.summary")
                         .value("发送消息并获取 AI 回答"))
+                .andExpect(jsonPath("$.paths['/api/conversations/{id}/messages/stream'].post.summary")
+                        .value("发送消息并流式获取 AI 回答"))
                 .andExpect(jsonPath("$.paths['/api/admin/model-configs'].get.summary")
                         .value("查询全部模型配置"))
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.type").value("http"))

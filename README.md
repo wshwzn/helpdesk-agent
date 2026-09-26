@@ -179,6 +179,32 @@ Content-Type: application/json
 }
 ```
 
+默认模型配置的 `supportsStreaming` 为 `true` 时，可以通过 SSE 流式获取回答。调用方应同时声明接受 SSE 和 JSON：正常生成时返回事件流，权限、参数或模型能力预检失败时仍可接收标准 JSON 错误响应。
+
+```http
+POST /api/conversations/{id}/messages/stream
+Authorization: Bearer <客户 accessToken>
+Content-Type: application/json
+Accept: text/event-stream, application/json
+
+{
+  "content": "为什么我无法登录控制台？"
+}
+```
+
+事件按照以下顺序返回：
+
+```text
+event: start   已保存客户消息，并创建 PENDING 状态的 AI 消息
+event: delta   本次新增的回答文本，可能出现多次
+event: done    回答完成，携带最终保存的 AI 消息
+event: error   生成失败，携带脱敏错误码和说明
+```
+
+流开始后的模型异常不会改写已经发送的 HTTP 状态码，而是通过 `error` 事件通知客户端；对应 AI 消息会保存为 `FAILED`。客户端主动中断连接时，服务端会尝试将尚未完成的 AI 消息标记为 `STREAM_CANCELLED`。
+
+流式请求默认允许持续 5 分钟，可通过环境变量 `APP_CHAT_STREAM_TIMEOUT` 调整，例如设置为 `10m`。
+
 其他对话接口：
 
 ```http
@@ -187,7 +213,7 @@ GET /api/conversations/{id}
 GET /api/conversations/{id}/messages?page=1&size=50
 ```
 
-客户只能访问自己的对话。系统默认携带最近 20 条已完成消息作为模型上下文，可通过 `CHAT_HISTORY_LIMIT` 调整为 1 至 100。模型调用失败时接口返回 `502 CHAT_GENERATION_FAILED`，客户消息和一条 `FAILED` AI 消息仍会保留，厂商原始异常不会返回客户端。当前接口为非流式响应。
+客户只能访问自己的对话。系统默认携带最近 20 条已完成消息作为模型上下文，可通过 `CHAT_HISTORY_LIMIT` 调整为 1 至 100。同步接口调用失败时返回 `502 CHAT_GENERATION_FAILED`；流式接口开始传输后调用失败时返回 `error` 事件。两种方式都会保留客户消息和一条 `FAILED` AI 消息，且不会向客户端暴露厂商原始异常。
 
 ## 工单接口
 

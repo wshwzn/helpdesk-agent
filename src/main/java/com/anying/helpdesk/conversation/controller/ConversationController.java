@@ -6,6 +6,7 @@ import com.anying.helpdesk.config.OpenApiConfig;
 import com.anying.helpdesk.conversation.domain.ConversationStatus;
 import com.anying.helpdesk.conversation.dto.ChatExchangeResponse;
 import com.anying.helpdesk.conversation.dto.ChatMessageResponse;
+import com.anying.helpdesk.conversation.dto.ChatStreamEvent;
 import com.anying.helpdesk.conversation.dto.ConversationResponse;
 import com.anying.helpdesk.conversation.dto.CreateConversationRequest;
 import com.anying.helpdesk.conversation.dto.SendMessageRequest;
@@ -20,7 +21,9 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 @Validated
 @RestController
@@ -110,5 +114,24 @@ public class ConversationController {
                 request,
                 currentUserProvider.userId()
         ));
+    }
+
+    /**
+     * 发送客户消息，并通过 SSE 持续推送模型生成的回答。
+     */
+    @PostMapping(value = "/{id}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(
+            summary = "发送消息并流式获取 AI 回答",
+            description = "依次返回 start、delta、done 事件；模型失败时返回脱敏的 error 事件"
+    )
+    public Flux<ServerSentEvent<ChatStreamEvent>> streamMessage(
+            @Parameter(description = "对话主键", example = "1")
+            @PathVariable @Min(1) Long id,
+            @Valid @RequestBody SendMessageRequest request
+    ) {
+        return conversationService.streamMessage(id, request, currentUserProvider.userId())
+                .map(event -> ServerSentEvent.builder(event)
+                        .event(event.type())
+                        .build());
     }
 }

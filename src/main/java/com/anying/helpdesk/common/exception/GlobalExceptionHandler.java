@@ -7,6 +7,7 @@ import com.anying.helpdesk.conversation.exception.ChatGenerationException;
 import com.anying.helpdesk.conversation.exception.ConcurrentConversationUpdateException;
 import com.anying.helpdesk.conversation.exception.ConversationNotActiveException;
 import com.anying.helpdesk.conversation.exception.ConversationNotFoundException;
+import com.anying.helpdesk.conversation.exception.ModelStreamingNotSupportedException;
 import com.anying.helpdesk.modelconfig.exception.InvalidModelConfigException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigNotFoundException;
@@ -50,6 +51,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleChatGeneration(ChatGenerationException exception) {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(ApiResponse.error("CHAT_GENERATION_FAILED", exception.getMessage(), null));
+    }
+
+    /**
+     * 将默认模型不支持流式输出的情况转换为明确的冲突响应。
+     */
+    @ExceptionHandler(ModelStreamingNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleModelStreamingNotSupported(
+            ModelStreamingNotSupportedException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("MODEL_STREAMING_NOT_SUPPORTED", exception.getMessage(), null));
     }
 
     @ExceptionHandler(ModelConfigNotFoundException.class)
