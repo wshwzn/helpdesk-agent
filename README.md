@@ -33,6 +33,21 @@ mvn spring-boot:run
 
 应用启动时，Flyway 会自动执行 `src/main/resources/db/migration` 中尚未执行的数据库迁移。
 
+## 接口文档
+
+本地启动后可以通过 Swagger UI 查看和调试接口：
+
+- Swagger UI：`http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON：`http://localhost:8080/v3/api-docs`
+
+登录后复制响应中的 `accessToken`，点击 Swagger UI 右上角的 **Authorize**，直接粘贴令牌即可；无需手动添加 `Bearer` 前缀。接口文档页面本身可以公开访问，但执行客户、客服或管理员接口仍会校验 JWT 及角色。
+
+生产环境可以关闭接口文档：
+
+```powershell
+$env:OPENAPI_ENABLED = "false"
+```
+
 ## 数据库表
 
 完整字段、索引、枚举取值和表关系说明见 [`docs/database-schema.md`](docs/database-schema.md)。
