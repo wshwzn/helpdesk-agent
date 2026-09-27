@@ -13,6 +13,7 @@ import com.anying.helpdesk.conversation.dto.ChatMessageResponse;
 import com.anying.helpdesk.conversation.dto.ConversationResponse;
 import com.anying.helpdesk.conversation.dto.CreateConversationRequest;
 import com.anying.helpdesk.conversation.exception.ConcurrentConversationUpdateException;
+import com.anying.helpdesk.conversation.exception.ConversationGenerationInProgressException;
 import com.anying.helpdesk.conversation.exception.ConversationNotActiveException;
 import com.anying.helpdesk.conversation.exception.ConversationNotFoundException;
 import com.anying.helpdesk.conversation.mapper.ChatMessageMapper;
@@ -121,9 +122,19 @@ public class ConversationPersistenceService {
             String content,
             ResolvedChatModel model
     ) {
-        Conversation conversation = requireOwnedConversation(conversationId, customerId);
+        // 锁住对话行，使多个应用实例也只能按顺序检查和创建待生成消息。
+        Conversation conversation = requireOwnedConversationForUpdate(conversationId, customerId);
         if (conversation.getStatus() != ConversationStatus.ACTIVE) {
             throw new ConversationNotActiveException(conversationId);
+        }
+        boolean generationInProgress = chatMessageMapper.selectCount(
+                new LambdaQueryWrapper<ChatMessage>()
+                        .eq(ChatMessage::getConversationId, conversationId)
+                        .eq(ChatMessage::getRole, ChatMessageRole.ASSISTANT)
+                        .eq(ChatMessage::getStatus, ChatMessageStatus.PENDING)
+        ) > 0;
+        if (generationInProgress) {
+            throw new ConversationGenerationInProgressException(conversationId);
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -222,6 +233,21 @@ public class ConversationPersistenceService {
 
     private Conversation requireOwnedConversation(Long id, Long customerId) {
         Conversation conversation = conversationMapper.selectById(id);
+        if (conversation == null || !customerId.equals(conversation.getCustomerId())) {
+            throw new ConversationNotFoundException(id);
+        }
+        return conversation;
+    }
+
+    /**
+     * 锁定并返回客户自己的对话，供发送消息事务执行单会话并发控制。
+     */
+    private Conversation requireOwnedConversationForUpdate(Long id, Long customerId) {
+        Conversation conversation = conversationMapper.selectOne(
+                new LambdaQueryWrapper<Conversation>()
+                        .eq(Conversation::getId, id)
+                        .last("FOR UPDATE")
+        );
         if (conversation == null || !customerId.equals(conversation.getCustomerId())) {
             throw new ConversationNotFoundException(id);
         }

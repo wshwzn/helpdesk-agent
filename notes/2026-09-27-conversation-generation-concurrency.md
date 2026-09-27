@@ -1,0 +1,37 @@
+# 同一对话生成并发控制
+
+## 实现功能与业务规则
+
+- 同一对话同一时间只允许生成一条 AI 回复。
+- 创建一轮消息前，事务会先锁定对应的对话行，再检查是否存在 `PENDING` 状态的助手消息。
+- 如果上一条回复仍在生成，接口返回 HTTP 409，错误码为 `CONVERSATION_GENERATION_IN_PROGRESS`。
+- 被拒绝的请求不会保存客户消息，也不会调用大模型；上一条生成任务不受影响。
+- 数据库行锁覆盖多个浏览器页面和多个应用实例，避免仅使用进程内锁带来的实例间并发漏洞。
+
+## 新增文件
+
+- `ConversationGenerationInProgressException.java`：表示同一对话已有正在生成的 AI 回复。
+- `2026-09-27-conversation-generation-concurrency.md`：记录本次并发控制规则和验证结果。
+
+## 修改文件
+
+- `ConversationPersistenceService.java`：准备消息时锁定对话行，并在写入前拒绝已有待生成消息的对话。
+- `GlobalExceptionHandler.java`：将生成中冲突转换为明确的 409 响应。
+- `ConversationControllerIntegrationTest.java`：覆盖生成期间重复发送的拒绝行为，并验证没有多余消息和模型调用。
+
+## API 与数据库变化
+
+- 对话发送接口路径和请求体不变。
+- 新增冲突错误码 `CONVERSATION_GENERATION_IN_PROGRESS`。
+- 没有修改表、字段、索引或迁移脚本。
+
+## 验证
+
+- 运行 `ConversationControllerIntegrationTest`，验证同一对话存在 `PENDING` 助手消息时返回 409。
+- 验证冲突请求不会落库第二条客户消息，也不会调用模型客户端。
+- 运行 `mvn -q clean test`，共 47 个测试通过，确认同步对话、SSE 对话、工具调用和其他业务功能不回归。
+
+## 已知限制与后续工作
+
+- 如果应用进程异常退出，来不及把 `PENDING` 消息标记为失败，该对话会继续被阻止发送；后续可增加超时恢复任务。
+- 当前后端保证并发安全，前端仍可进一步在收到该错误码时显示“AI 正在回复，请稍候”。

@@ -9,6 +9,7 @@ import com.anying.helpdesk.auth.exception.UsernameAlreadyExistsException;
 import com.anying.helpdesk.common.response.ApiResponse;
 import com.anying.helpdesk.conversation.exception.ChatGenerationException;
 import com.anying.helpdesk.conversation.exception.ConcurrentConversationUpdateException;
+import com.anying.helpdesk.conversation.exception.ConversationGenerationInProgressException;
 import com.anying.helpdesk.conversation.exception.ConversationNotActiveException;
 import com.anying.helpdesk.conversation.exception.ConversationNotFoundException;
 import com.anying.helpdesk.conversation.exception.ModelStreamingNotSupportedException;
@@ -74,11 +75,20 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("CONVERSATION_NOT_FOUND", exception.getMessage(), null));
     }
 
-    @ExceptionHandler({ConversationNotActiveException.class, ConcurrentConversationUpdateException.class})
+    @ExceptionHandler({
+            ConversationNotActiveException.class,
+            ConversationGenerationInProgressException.class,
+            ConcurrentConversationUpdateException.class
+    })
     public ResponseEntity<ApiResponse<Void>> handleConversationConflict(RuntimeException exception) {
-        String code = exception instanceof ConversationNotActiveException
-                ? "CONVERSATION_NOT_ACTIVE"
-                : "CONCURRENT_CONVERSATION_UPDATE";
+        String code;
+        if (exception instanceof ConversationNotActiveException) {
+            code = "CONVERSATION_NOT_ACTIVE";
+        } else if (exception instanceof ConversationGenerationInProgressException) {
+            code = "CONVERSATION_GENERATION_IN_PROGRESS";
+        } else {
+            code = "CONCURRENT_CONVERSATION_UPDATE";
+        }
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error(code, exception.getMessage(), null));
     }

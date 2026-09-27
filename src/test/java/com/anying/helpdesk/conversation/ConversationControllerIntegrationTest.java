@@ -20,6 +20,7 @@ import com.anying.helpdesk.conversation.model.ChatCompletionResult;
 import com.anying.helpdesk.conversation.model.ChatStreamChunk;
 import com.anying.helpdesk.conversation.model.ConversationModelHistory;
 import com.anying.helpdesk.conversation.model.ConversationModelClient;
+import com.anying.helpdesk.conversation.service.ConversationPersistenceService;
 import com.anying.helpdesk.modelconfig.factory.DefaultChatModelProvider;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
@@ -93,6 +94,9 @@ class ConversationControllerIntegrationTest {
 
     @Autowired
     private PendingActionService pendingActionService;
+
+    @Autowired
+    private ConversationPersistenceService conversationPersistenceService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -339,6 +343,56 @@ class ConversationControllerIntegrationTest {
 
         assertThat(chatMessageMapper.selectCount(new LambdaQueryWrapper<ChatMessage>()
                 .eq(ChatMessage::getConversationId, conversationId))).isZero();
+        verifyNoInteractions(modelClient);
+    }
+
+    /**
+     * 验证上一条 AI 回复尚未生成完成时，同一对话不能创建下一轮消息。
+     */
+    @Test
+    @DisplayName("同一对话生成回复期间应拒绝再次发送消息")
+    void rejectsNewMessageWhileAssistantResponseIsPending() throws Exception {
+        String username = "conversation_busy";
+        String token = registerCustomer(username);
+        long conversationId = createConversation(token, "并发发送测试");
+        User customer = userMapper.selectOne(
+                new LambdaQueryWrapper<User>().eq(User::getUsername, username)
+        );
+        ResolvedChatModel resolvedModel = new ResolvedChatModel(
+                104L,
+                "pending-model",
+                true,
+                mock(ChatModel.class)
+        );
+        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
+        conversationPersistenceService.prepareExchange(
+                conversationId,
+                customer.getId(),
+                "第一条消息",
+                resolvedModel
+        );
+
+        sendMessage(token, conversationId, "第二条消息")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("CONVERSATION_GENERATION_IN_PROGRESS"));
+        mockMvc.perform(post("/api/conversations/{id}/messages/stream", conversationId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.TEXT_EVENT_STREAM, MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"content": "第三条消息"}
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("CONVERSATION_GENERATION_IN_PROGRESS"));
+
+        List<ChatMessage> messages = chatMessageMapper.selectList(
+                new LambdaQueryWrapper<ChatMessage>()
+                        .eq(ChatMessage::getConversationId, conversationId)
+                        .orderByAsc(ChatMessage::getId)
+        );
+        assertThat(messages).hasSize(2);
+        assertThat(messages.get(0).getContent()).isEqualTo("第一条消息");
+        assertThat(messages.get(1).getStatus()).isEqualTo(ChatMessageStatus.PENDING);
         verifyNoInteractions(modelClient);
     }
 
