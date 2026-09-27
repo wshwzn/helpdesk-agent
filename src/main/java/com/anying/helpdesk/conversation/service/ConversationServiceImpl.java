@@ -2,7 +2,6 @@ package com.anying.helpdesk.conversation.service;
 
 import com.anying.helpdesk.agent.AgentExecutionContext;
 import com.anying.helpdesk.common.response.PageResponse;
-import com.anying.helpdesk.conversation.config.ChatProperties;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ConversationStatus;
 import com.anying.helpdesk.conversation.dto.ChatExchangeResponse;
@@ -40,7 +39,6 @@ public class ConversationServiceImpl implements ConversationService {
     private final ConversationPersistenceService persistenceService;
     private final DefaultChatModelProvider defaultChatModelProvider;
     private final ConversationModelClient modelClient;
-    private final ChatProperties chatProperties;
 
     @Override
     public ConversationResponse create(CreateConversationRequest request, Long customerId) {
@@ -94,8 +92,6 @@ public class ConversationServiceImpl implements ConversationService {
             markGenerationFailed(prepared.assistantMessageId(), id, MODEL_CALL_FAILED, exception);
             throw new ChatGenerationException();
         }
-        logModelResponse(id, model, "sync", completion.content());
-
         ChatMessage assistantMessage = persistenceService.completeAssistant(
                 prepared.assistantMessageId(),
                 completion
@@ -136,7 +132,6 @@ public class ConversationServiceImpl implements ConversationService {
                 .map(chunk -> ChatStreamEvent.delta(chunk.content()));
         Mono<ChatStreamEvent> completionEvent = Mono.fromCallable(() -> {
                     ChatCompletionResult completion = accumulator.toCompletionResult();
-                    logModelResponse(id, model, "stream", completion.content());
                     ChatMessage assistantMessage = persistenceService.completeAssistant(
                             prepared.assistantMessageId(),
                             completion
@@ -169,27 +164,6 @@ public class ConversationServiceImpl implements ConversationService {
                         })
                         .subscribeOn(Schedulers.boundedElastic()))
                 .doOnCancel(() -> markCancelledStream(prepared.assistantMessageId(), id, finalized));
-    }
-
-    /**
-     * 在本地观察开关开启时记录模型最终回复，不输出认证信息和厂商请求头。
-     */
-    private void logModelResponse(
-            Long conversationId,
-            ResolvedChatModel model,
-            String mode,
-            String content
-    ) {
-        if (!chatProperties.logModelContent()) {
-            return;
-        }
-        log.info(
-                "LLM response: conversationId={}, model={}, mode={}\n{}",
-                conversationId,
-                model.modelName(),
-                mode,
-                content
-        );
     }
 
     /**

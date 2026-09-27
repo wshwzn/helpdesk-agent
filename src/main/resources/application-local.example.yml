@@ -10,5 +10,5 @@ spring:
 
 app:
   chat:
-    # 模型回复可能包含客户信息，仅建议在本地排查时临时开启。
-    log-model-content: false
+    # 协议日志包含对话、工具参数和工具结果，仅建议在本地排查时临时开启。
+    log-model-protocol: false

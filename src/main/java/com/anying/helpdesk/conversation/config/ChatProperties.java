@@ -14,6 +14,6 @@ import java.time.Duration;
 public record ChatProperties(
         @Min(1) @Max(100) int historyLimit,
         @NotNull @DefaultValue("5m") Duration streamTimeout,
-        @DefaultValue("false") boolean logModelContent
+        @DefaultValue("false") boolean logModelProtocol
 ) {
 }
