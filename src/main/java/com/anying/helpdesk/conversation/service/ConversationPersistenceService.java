@@ -122,8 +122,7 @@ public class ConversationPersistenceService {
             String content,
             ResolvedChatModel model
     ) {
-        // 锁住对话行，使多个应用实例也只能按顺序检查和创建待生成消息。
-        Conversation conversation = requireOwnedConversationForUpdate(conversationId, customerId);
+        Conversation conversation = requireOwnedConversation(conversationId, customerId);
         if (conversation.getStatus() != ConversationStatus.ACTIVE) {
             throw new ConversationNotActiveException(conversationId);
         }
@@ -233,21 +232,6 @@ public class ConversationPersistenceService {
 
     private Conversation requireOwnedConversation(Long id, Long customerId) {
         Conversation conversation = conversationMapper.selectById(id);
-        if (conversation == null || !customerId.equals(conversation.getCustomerId())) {
-            throw new ConversationNotFoundException(id);
-        }
-        return conversation;
-    }
-
-    /**
-     * 锁定并返回客户自己的对话，供发送消息事务执行单会话并发控制。
-     */
-    private Conversation requireOwnedConversationForUpdate(Long id, Long customerId) {
-        Conversation conversation = conversationMapper.selectOne(
-                new LambdaQueryWrapper<Conversation>()
-                        .eq(Conversation::getId, id)
-                        .last("FOR UPDATE")
-        );
         if (conversation == null || !customerId.equals(conversation.getCustomerId())) {
             throw new ConversationNotFoundException(id);
         }

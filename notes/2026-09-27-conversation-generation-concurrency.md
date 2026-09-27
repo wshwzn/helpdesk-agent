@@ -3,10 +3,11 @@
 ## 实现功能与业务规则
 
 - 同一对话同一时间只允许生成一条 AI 回复。
-- 创建一轮消息前，事务会先锁定对应的对话行，再检查是否存在 `PENDING` 状态的助手消息。
+- 创建一轮消息前，事务会检查是否存在 `PENDING` 状态的助手消息。
 - 如果上一条回复仍在生成，接口返回 HTTP 409，错误码为 `CONVERSATION_GENERATION_IN_PROGRESS`。
 - 被拒绝的请求不会保存客户消息，也不会调用大模型；上一条生成任务不受影响。
-- 数据库行锁覆盖多个浏览器页面和多个应用实例，避免仅使用进程内锁带来的实例间并发漏洞。
+- 两个请求在准备消息阶段同时进入时，继续由 `conversations.version` 乐观锁保证只有一个事务成功，失败事务会连同刚插入的消息一起回滚。
+- 第一个事务已经提交、AI 仍在生成时，由 `PENDING` 检查拒绝后续请求；两种机制共同覆盖完整的生成周期。
 
 ## 新增文件
 
@@ -15,7 +16,7 @@
 
 ## 修改文件
 
-- `ConversationPersistenceService.java`：准备消息时锁定对话行，并在写入前拒绝已有待生成消息的对话。
+- `ConversationPersistenceService.java`：准备消息时拒绝已有待生成消息的对话，并沿用原有乐观锁处理瞬时并发。
 - `GlobalExceptionHandler.java`：将生成中冲突转换为明确的 409 响应。
 - `ConversationControllerIntegrationTest.java`：覆盖生成期间重复发送的拒绝行为，并验证没有多余消息和模型调用。
 
@@ -24,6 +25,7 @@
 - 对话发送接口路径和请求体不变。
 - 新增冲突错误码 `CONVERSATION_GENERATION_IN_PROGRESS`。
 - 没有修改表、字段、索引或迁移脚本。
+- 不使用等待式或 `NOWAIT` 行锁，避免与已有乐观锁重复实现同一层并发控制。
 
 ## 验证
 
