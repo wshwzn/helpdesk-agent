@@ -1,5 +1,6 @@
 package com.anying.helpdesk.conversation.service;
 
+import com.anying.helpdesk.agent.AgentExecutionContext;
 import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ConversationStatus;
@@ -82,7 +83,11 @@ public class ConversationServiceImpl implements ConversationService {
 
         ChatCompletionResult completion;
         try {
-            completion = modelClient.complete(model, prepared.history());
+            completion = modelClient.complete(
+                    model,
+                    prepared.history(),
+                    new AgentExecutionContext(customerId, id)
+            );
         } catch (RuntimeException exception) {
             markGenerationFailed(prepared.assistantMessageId(), id, MODEL_CALL_FAILED, exception);
             throw new ChatGenerationException();
@@ -117,7 +122,12 @@ public class ConversationServiceImpl implements ConversationService {
 
         StreamingCompletionAccumulator accumulator = new StreamingCompletionAccumulator();
         AtomicBoolean finalized = new AtomicBoolean(false);
-        Flux<ChatStreamEvent> modelEvents = Flux.defer(() -> modelClient.stream(model, prepared.history()))
+        AgentExecutionContext executionContext = new AgentExecutionContext(customerId, id);
+        Flux<ChatStreamEvent> modelEvents = Flux.defer(() -> modelClient.stream(
+                        model,
+                        prepared.history(),
+                        executionContext
+                ))
                 .doOnNext(accumulator::append)
                 .filter(chunk -> chunk.content() != null && !chunk.content().isEmpty())
                 .map(chunk -> ChatStreamEvent.delta(chunk.content()));

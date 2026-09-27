@@ -1,11 +1,14 @@
 package com.anying.helpdesk.conversation;
 
+import com.anying.helpdesk.agent.AgentExecutionContext;
+import com.anying.helpdesk.agent.tool.CustomerTicketTools;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ChatMessageRole;
 import com.anying.helpdesk.conversation.model.ChatCompletionResult;
 import com.anying.helpdesk.conversation.model.ChatStreamChunk;
 import com.anying.helpdesk.conversation.model.SpringAiConversationModelClient;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
+import com.anying.helpdesk.ticket.service.TicketService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,6 +21,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -31,7 +35,11 @@ import static org.mockito.Mockito.when;
 
 class SpringAiConversationModelClientTest {
 
-    private final SpringAiConversationModelClient client = new SpringAiConversationModelClient();
+    private static final AgentExecutionContext EXECUTION_CONTEXT = new AgentExecutionContext(7L, 11L);
+
+    private final SpringAiConversationModelClient client = new SpringAiConversationModelClient(
+            new CustomerTicketTools(mock(TicketService.class))
+    );
 
     @Test
     void convertsHistoryAndReadsTokenUsage() {
@@ -49,7 +57,11 @@ class SpringAiConversationModelClientTest {
         ChatMessage assistant = message(ChatMessageRole.ASSISTANT, "请确认登录名");
         ChatMessage latestUser = message(ChatMessageRole.USER, "登录名是 customer01");
 
-        ChatCompletionResult result = client.complete(model, List.of(user, assistant, latestUser));
+        ChatCompletionResult result = client.complete(
+                model,
+                List.of(user, assistant, latestUser),
+                EXECUTION_CONTEXT
+        );
 
         assertThat(result.content()).isEqualTo("可以重置密码");
         assertThat(result.promptTokens()).isEqualTo(20);
@@ -67,6 +79,13 @@ class SpringAiConversationModelClientTest {
         assertThat(promptCaptor.getValue().getInstructions().get(2))
                 .isInstanceOfSatisfying(AssistantMessage.class, message ->
                         assertThat(message.getText()).isEqualTo("请确认登录名"));
+        assertThat(promptCaptor.getValue().getOptions())
+                .isInstanceOfSatisfying(ToolCallingChatOptions.class, options -> {
+                    assertThat(options.getToolCallbacks()).extracting(callback ->
+                            callback.getToolDefinition().name()
+                    ).containsExactlyInAnyOrder("list_my_tickets", "get_my_ticket");
+                    assertThat(options.getToolContext()).containsValue(EXECUTION_CONTEXT);
+                });
     }
 
     @Test
@@ -78,7 +97,8 @@ class SpringAiConversationModelClientTest {
 
         assertThatThrownBy(() -> client.complete(
                 new ResolvedChatModel(9L, "test-model", true, chatModel),
-                List.of(message(ChatMessageRole.USER, "测试"))
+                List.of(message(ChatMessageRole.USER, "测试")),
+                EXECUTION_CONTEXT
         )).isInstanceOf(IllegalStateException.class)
                 .hasMessage("model returned empty content");
     }
@@ -101,7 +121,8 @@ class SpringAiConversationModelClientTest {
 
         List<ChatStreamChunk> chunks = client.stream(
                         model,
-                        List.of(message(ChatMessageRole.USER, "我忘记密码了"))
+                        List.of(message(ChatMessageRole.USER, "我忘记密码了")),
+                        EXECUTION_CONTEXT
                 )
                 .collectList()
                 .block();
