@@ -1,6 +1,10 @@
 package com.anying.helpdesk.conversation;
 
 import com.anying.helpdesk.agent.AgentExecutionContext;
+import com.anying.helpdesk.agent.action.mapper.AgentPendingActionMapper;
+import com.anying.helpdesk.agent.action.domain.AgentPendingAction;
+import com.anying.helpdesk.agent.action.domain.PendingActionStatus;
+import com.anying.helpdesk.agent.action.service.PendingActionService;
 import com.anying.helpdesk.agent.domain.AgentToolCall;
 import com.anying.helpdesk.agent.mapper.AgentToolCallMapper;
 import com.anying.helpdesk.agent.service.AgentToolCallService;
@@ -19,6 +23,7 @@ import com.anying.helpdesk.conversation.model.ConversationModelClient;
 import com.anying.helpdesk.modelconfig.factory.DefaultChatModelProvider;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
+import com.anying.helpdesk.ticket.domain.TicketPriority;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.AfterEach;
@@ -45,7 +50,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -85,6 +89,12 @@ class ConversationControllerIntegrationTest {
     private AgentToolCallService agentToolCallService;
 
     @Autowired
+    private AgentPendingActionMapper pendingActionMapper;
+
+    @Autowired
+    private PendingActionService pendingActionService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @MockitoBean
@@ -95,6 +105,7 @@ class ConversationControllerIntegrationTest {
 
     @AfterEach
     void cleanUp() {
+        pendingActionMapper.delete(null);
         agentToolCallMapper.delete(null);
         chatMessageMapper.delete(null);
         conversationMapper.delete(null);
@@ -134,7 +145,8 @@ class ConversationControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.assistantMessage.content").value("AI: 我无法登录"))
                 .andExpect(jsonPath("$.data.assistantMessage.modelConfigId").value(99))
                 .andExpect(jsonPath("$.data.assistantMessage.modelName").value("test-chat-model"))
-                .andExpect(jsonPath("$.data.assistantMessage.totalTokens").value(18));
+                .andExpect(jsonPath("$.data.assistantMessage.totalTokens").value(18))
+                .andExpect(jsonPath("$.data.pendingActions").isEmpty());
 
         User customer = userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, "conversation_customer_one"));
@@ -219,6 +231,43 @@ class ConversationControllerIntegrationTest {
         verifyNoInteractions(defaultChatModelProvider, modelClient);
     }
 
+    /**
+     * 验证非流式接口直接返回可供前端渲染的结构化确认卡片。
+     */
+    @Test
+    @DisplayName("同步对话应在响应中返回 AI 生成的待确认操作")
+    void synchronousChatReturnsPendingAction() throws Exception {
+        String token = registerCustomer("conversation_action_sync");
+        long conversationId = createConversation(token, "创建工单");
+        ResolvedChatModel resolvedModel = new ResolvedChatModel(
+                104L,
+                "action-model",
+                true,
+                mock(ChatModel.class)
+        );
+        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
+        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
+                .thenAnswer(invocation -> {
+                    AgentExecutionContext context = invocation.getArgument(2);
+                    pendingActionService.prepareCreateTicket(
+                            context,
+                            "无法完成支付",
+                            "客户付款时持续提示支付失败，需要人工处理",
+                            TicketPriority.HIGH,
+                            "核心支付流程完全不可用"
+                    );
+                    return new ChatCompletionResult("工单草稿已经整理好，请确认。", 10, 8, 18);
+                });
+
+        sendMessage(token, conversationId, "帮我转人工处理")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.pendingActions[0].actionType").value("CREATE_TICKET"))
+                .andExpect(jsonPath("$.data.pendingActions[0].status").value("PENDING"))
+                .andExpect(jsonPath("$.data.pendingActions[0].title").value("无法完成支付"))
+                .andExpect(jsonPath("$.data.pendingActions[0].priority").value("HIGH"))
+                .andExpect(jsonPath("$.data.pendingActions[0].version").value(0));
+    }
+
     @Test
     void modelFailurePersistsSanitizedFailedAssistantMessage() throws Exception {
         String token = registerCustomer("conversation_customer_failure");
@@ -230,8 +279,18 @@ class ConversationControllerIntegrationTest {
                 mock(ChatModel.class)
         );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        doThrow(new IllegalStateException("provider leaked sk-secret-value"))
-                .when(modelClient).complete(any(), any(ConversationModelHistory.class), any());
+        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
+                .thenAnswer(invocation -> {
+                    AgentExecutionContext context = invocation.getArgument(2);
+                    pendingActionService.prepareCreateTicket(
+                            context,
+                            "失败前创建的草稿",
+                            "模型最终回答失败时该草稿必须失效",
+                            TicketPriority.MEDIUM,
+                            "一般问题"
+                    );
+                    throw new IllegalStateException("provider leaked sk-secret-value");
+                });
 
         sendMessage(token, conversationId, "触发失败")
                 .andExpect(status().isBadGateway())
@@ -250,6 +309,11 @@ class ConversationControllerIntegrationTest {
         assertThat(messages.get(1).getStatus()).isEqualTo(ChatMessageStatus.FAILED);
         assertThat(messages.get(1).getErrorCode()).isEqualTo("MODEL_CALL_FAILED");
         assertThat(messages.get(1).getContent()).isNull();
+        AgentPendingAction invalidatedAction = pendingActionMapper.selectOne(
+                new LambdaQueryWrapper<AgentPendingAction>()
+                        .eq(AgentPendingAction::getAssistantMessageId, messages.get(1).getId())
+        );
+        assertThat(invalidatedAction.getStatus()).isEqualTo(PendingActionStatus.INVALIDATED);
     }
 
     @Test
@@ -290,10 +354,20 @@ class ConversationControllerIntegrationTest {
                 mock(ChatModel.class)
         );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.stream(any(), any(ConversationModelHistory.class), any())).thenReturn(Flux.just(
-                new ChatStreamChunk("可以", null, null, null),
-                new ChatStreamChunk("重置密码", 16, 5, 21)
-        ));
+        when(modelClient.stream(any(), any(ConversationModelHistory.class), any())).thenAnswer(invocation -> {
+            AgentExecutionContext context = invocation.getArgument(2);
+            pendingActionService.prepareCreateTicket(
+                    context,
+                    "重置密码后仍无法登录",
+                    "客户重置密码后仍然无法登录，需要人工协助",
+                    TicketPriority.HIGH,
+                    "账号完全无法使用"
+            );
+            return Flux.just(
+                    new ChatStreamChunk("可以", null, null, null),
+                    new ChatStreamChunk("重置密码", 16, 5, 21)
+            );
+        });
 
         MvcResult streamingRequest = mockMvc.perform(post(
                                 "/api/conversations/{id}/messages/stream",
@@ -316,9 +390,16 @@ class ConversationControllerIntegrationTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(eventStream)
-                .contains("event:start", "event:delta", "event:done")
-                .containsSubsequence("event:start", "event:delta", "event:delta", "event:done")
+                .contains("event:start", "event:delta", "event:action_required", "event:done")
+                .containsSubsequence(
+                        "event:start",
+                        "event:delta",
+                        "event:delta",
+                        "event:action_required",
+                        "event:done"
+                )
                 .contains("\"content\":\"可以\"", "\"content\":\"重置密码\"")
+                .contains("\"title\":\"重置密码后仍无法登录\"", "\"priority\":\"HIGH\"")
                 .doesNotContain("event:error");
 
         List<ChatMessage> messages = chatMessageMapper.selectList(

@@ -1,6 +1,8 @@
 package com.anying.helpdesk.conversation.service;
 
 import com.anying.helpdesk.agent.AgentExecutionContext;
+import com.anying.helpdesk.agent.action.dto.PendingActionResponse;
+import com.anying.helpdesk.agent.action.service.PendingActionService;
 import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ConversationStatus;
@@ -25,6 +27,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -39,6 +43,7 @@ public class ConversationServiceImpl implements ConversationService {
     private final ConversationPersistenceService persistenceService;
     private final DefaultChatModelProvider defaultChatModelProvider;
     private final ConversationModelClient modelClient;
+    private final PendingActionService pendingActionService;
 
     @Override
     public ConversationResponse create(CreateConversationRequest request, Long customerId) {
@@ -96,9 +101,14 @@ public class ConversationServiceImpl implements ConversationService {
                 prepared.assistantMessageId(),
                 completion
         );
+        List<PendingActionResponse> pendingActions = pendingActionService.listPendingByAssistantMessageId(
+                prepared.assistantMessageId(),
+                customerId
+        );
         return new ChatExchangeResponse(
                 ChatMessageResponse.from(prepared.userMessage()),
-                ChatMessageResponse.from(assistantMessage)
+                ChatMessageResponse.from(assistantMessage),
+                pendingActions
         );
     }
 
@@ -134,16 +144,27 @@ public class ConversationServiceImpl implements ConversationService {
                 .doOnNext(accumulator::append)
                 .filter(chunk -> chunk.content() != null && !chunk.content().isEmpty())
                 .map(chunk -> ChatStreamEvent.delta(chunk.content()));
-        Mono<ChatStreamEvent> completionEvent = Mono.fromCallable(() -> {
+        Flux<ChatStreamEvent> completionEvents = Mono.fromCallable(() -> {
                     ChatCompletionResult completion = accumulator.toCompletionResult();
                     ChatMessage assistantMessage = persistenceService.completeAssistant(
                             prepared.assistantMessageId(),
                             completion
                     );
+                    List<PendingActionResponse> pendingActions =
+                            pendingActionService.listPendingByAssistantMessageId(
+                                    prepared.assistantMessageId(),
+                                    customerId
+                            );
+                    List<ChatStreamEvent> events = new ArrayList<>();
+                    pendingActions.stream()
+                            .map(ChatStreamEvent::actionRequired)
+                            .forEach(events::add);
+                    events.add(ChatStreamEvent.done(ChatMessageResponse.from(assistantMessage)));
                     finalized.set(true);
-                    return ChatStreamEvent.done(ChatMessageResponse.from(assistantMessage));
+                    return events;
                 })
-                .subscribeOn(Schedulers.boundedElastic());
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMapMany(Flux::fromIterable);
 
         return Flux.concat(
                         Mono.just(ChatStreamEvent.start(
@@ -151,7 +172,7 @@ public class ConversationServiceImpl implements ConversationService {
                                 prepared.assistantMessageId()
                         )),
                         modelEvents,
-                        completionEvent
+                        completionEvents
                 )
                 .onErrorResume(exception -> Mono.fromCallable(() -> {
                             markGenerationFailed(
@@ -196,6 +217,11 @@ public class ConversationServiceImpl implements ConversationService {
     ) {
         try {
             persistenceService.failAssistant(messageId, errorCode);
+        } catch (RuntimeException persistenceException) {
+            cause.addSuppressed(persistenceException);
+        }
+        try {
+            pendingActionService.invalidateByAssistantMessageId(messageId);
         } catch (RuntimeException persistenceException) {
             cause.addSuppressed(persistenceException);
         }

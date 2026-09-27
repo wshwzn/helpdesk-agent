@@ -1,10 +1,12 @@
 package com.anying.helpdesk.conversation;
 
 import com.anying.helpdesk.agent.AgentExecutionContext;
+import com.anying.helpdesk.agent.action.service.PendingActionService;
 import com.anying.helpdesk.agent.domain.AgentToolCall;
 import com.anying.helpdesk.agent.domain.AgentToolCallStatus;
 import com.anying.helpdesk.agent.service.AgentToolCallService;
 import com.anying.helpdesk.agent.tool.CustomerTicketTools;
+import com.anying.helpdesk.agent.tool.CustomerTicketActionTools;
 import com.anying.helpdesk.agent.tool.RecordingToolCallbackFactory;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ChatMessageRole;
@@ -46,6 +48,7 @@ class SpringAiConversationModelClientTest {
     private final AgentToolCallService toolCallService = mock(AgentToolCallService.class);
     private final SpringAiConversationModelClient client = new SpringAiConversationModelClient(
             new CustomerTicketTools(mock(TicketService.class)),
+            new CustomerTicketActionTools(mock(PendingActionService.class)),
             new RecordingToolCallbackFactory(toolCallService)
     );
 
@@ -91,7 +94,11 @@ class SpringAiConversationModelClientTest {
                 .isInstanceOfSatisfying(ToolCallingChatOptions.class, options -> {
                     assertThat(options.getToolCallbacks()).extracting(callback ->
                             callback.getToolDefinition().name()
-                    ).containsExactlyInAnyOrder("list_my_tickets", "get_my_ticket");
+                    ).containsExactlyInAnyOrder(
+                            "list_my_tickets",
+                            "get_my_ticket",
+                            "prepare_create_ticket"
+                    );
                     assertThat(options.getToolContext()).containsValue(EXECUTION_CONTEXT);
                 });
     }

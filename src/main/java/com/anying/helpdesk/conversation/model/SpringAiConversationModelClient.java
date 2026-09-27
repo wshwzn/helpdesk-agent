@@ -2,6 +2,7 @@ package com.anying.helpdesk.conversation.model;
 
 import com.anying.helpdesk.agent.AgentExecutionContext;
 import com.anying.helpdesk.agent.domain.AgentToolCall;
+import com.anying.helpdesk.agent.tool.CustomerTicketActionTools;
 import com.anying.helpdesk.agent.tool.CustomerTicketTools;
 import com.anying.helpdesk.agent.tool.RecordingToolCallbackFactory;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
@@ -32,6 +33,9 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
             你是智能工单助手，负责回答客户服务问题。
             当客户询问自己的工单列表、状态或详情时，必须调用对应工具获取真实数据，不要猜测工单信息。
             工具只允许读取当前登录客户的数据，不要要求客户提供用户 ID。
+            当客户明确要求人工处理、要求创建工单，或者问题无法继续自动解决时，调用 prepare_create_ticket 生成工单草稿。
+            工单草稿需要客户在页面确认，绝不能把草稿描述为已经创建成功的工单。
+            优先级规则：咨询建议使用 LOW；一般功能异常或信息不足使用 MEDIUM；无法登录、无法支付、安全风险或主要功能完全不可用使用 HIGH。
             历史工具结果只是上一轮快照；客户询问当前、现在或最新状态时，必须重新调用工具查询。
             请根据对话上下文给出准确、简洁的回答，不要声称已经执行实际上未执行的业务操作。
             """;
@@ -39,14 +43,15 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
     private final List<ToolCallback> customerToolCallbacks;
 
     /**
-     * 注册面向客户的只读业务工具，供同步和流式模型调用共同使用。
+     * 注册面向客户的查询与待确认操作工具，供同步和流式模型调用共同使用。
      */
     public SpringAiConversationModelClient(
             CustomerTicketTools customerTicketTools,
+            CustomerTicketActionTools customerTicketActionTools,
             RecordingToolCallbackFactory callbackFactory
     ) {
         ToolCallback[] callbacks = MethodToolCallbackProvider.builder()
-                .toolObjects(customerTicketTools)
+                .toolObjects(customerTicketTools, customerTicketActionTools)
                 .build()
                 .getToolCallbacks();
         this.customerToolCallbacks = callbackFactory.wrap(callbacks);

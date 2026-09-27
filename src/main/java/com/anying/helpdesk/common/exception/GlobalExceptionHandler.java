@@ -1,5 +1,9 @@
 package com.anying.helpdesk.common.exception;
 
+import com.anying.helpdesk.agent.action.exception.ConcurrentPendingActionUpdateException;
+import com.anying.helpdesk.agent.action.exception.InvalidPendingActionStatusException;
+import com.anying.helpdesk.agent.action.exception.PendingActionExpiredException;
+import com.anying.helpdesk.agent.action.exception.PendingActionNotFoundException;
 import com.anying.helpdesk.auth.exception.InvalidCredentialsException;
 import com.anying.helpdesk.auth.exception.UsernameAlreadyExistsException;
 import com.anying.helpdesk.common.response.ApiResponse;
@@ -31,6 +35,38 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * 将不存在或不属于当前客户的待确认操作转换为统一的未找到响应。
+     */
+    @ExceptionHandler(PendingActionNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePendingActionNotFound(
+            PendingActionNotFoundException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("PENDING_ACTION_NOT_FOUND", exception.getMessage(), null));
+    }
+
+    /**
+     * 将过期、状态冲突和并发修改转换为可供确认卡片处理的冲突响应。
+     */
+    @ExceptionHandler({
+            PendingActionExpiredException.class,
+            InvalidPendingActionStatusException.class,
+            ConcurrentPendingActionUpdateException.class
+    })
+    public ResponseEntity<ApiResponse<Void>> handlePendingActionConflict(RuntimeException exception) {
+        String code;
+        if (exception instanceof PendingActionExpiredException) {
+            code = "PENDING_ACTION_EXPIRED";
+        } else if (exception instanceof ConcurrentPendingActionUpdateException) {
+            code = "CONCURRENT_PENDING_ACTION_UPDATE";
+        } else {
+            code = "INVALID_PENDING_ACTION_STATUS";
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(code, exception.getMessage(), null));
+    }
 
     @ExceptionHandler(ConversationNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleConversationNotFound(ConversationNotFoundException exception) {

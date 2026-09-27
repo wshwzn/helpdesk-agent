@@ -140,6 +140,41 @@
 - `arguments_json` 和 `result_json` 保存应用标准化内容，不保存 JWT、API Key、HTTP 请求头或异常正文。
 - 生成失败或连接中断不会删除已完成的工具记录；长期停留在 `RUNNING` 的记录可用于识别进程异常中断。
 
+## `agent_pending_actions` Agent 待确认操作表
+
+保存 AI 生成、但必须由客户确认后才能执行的业务操作，由 Flyway V8 创建。当前只支持创建工单草稿，一条 AI 消息最多生成一个创建工单操作。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 待确认操作主键，也是确认、修改和取消接口使用的标识。 |
+| `conversation_id` | `BIGINT` | 否 | 无 | 所属 `conversations.id`，逻辑关联。 |
+| `assistant_message_id` | `BIGINT` | 否 | 无 | 生成草稿的 `chat_messages.id` AI 消息，逻辑关联。 |
+| `customer_id` | `BIGINT` | 否 | 无 | 操作所属客户的 `users.id`，只从服务端执行上下文写入。 |
+| `action_type` | `VARCHAR(40)` | 否 | 无 | 操作类型，当前为 `CREATE_TICKET`。 |
+| `status` | `VARCHAR(20)` | 否 | 无 | 状态：`PENDING`、`EXECUTED`、`CANCELLED`、`EXPIRED`、`INVALIDATED`。 |
+| `title` | `VARCHAR(100)` | 否 | 无 | 当前工单标题草稿；客户确认前可以修改。 |
+| `description` | `VARCHAR(2000)` | 否 | 无 | 当前问题描述草稿；客户确认前可以修改。 |
+| `priority` | `VARCHAR(20)` | 否 | 无 | AI 建议的优先级：`LOW`、`MEDIUM`、`HIGH`；缺失时应用写入 `MEDIUM`。 |
+| `priority_reason` | `VARCHAR(500)` | 是 | `NULL` | AI 给出的优先级判断理由。 |
+| `ticket_id` | `BIGINT` | 是 | `NULL` | 执行后创建的 `tickets.id`；未执行时为空，逻辑关联。 |
+| `expires_at` | `TIMESTAMP(6)` | 否 | 无 | 客户确认截止时间，当前为草稿创建后 24 小时。 |
+| `executed_at` | `TIMESTAMP(6)` | 是 | `NULL` | 确认并成功创建工单的时间。 |
+| `cancelled_at` | `TIMESTAMP(6)` | 是 | `NULL` | 客户取消草稿的时间。 |
+| `version` | `INT` | 否 | `0` | 乐观锁版本号，防止旧卡片覆盖草稿或重复执行。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 草稿创建时间。 |
+| `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 草稿内容或状态最后更新时间。 |
+
+索引与约束：
+
+- 主键：`PRIMARY KEY (id)`。
+- 唯一约束：`uk_agent_pending_actions_message_type (assistant_message_id, action_type)`，防止同一轮模型重复生成相同操作。
+- 唯一约束：`uk_agent_pending_actions_ticket_id (ticket_id)`，保证一个待确认操作最多关联一张真实工单。
+- 普通索引：`idx_agent_pending_actions_customer_conversation_status (customer_id, conversation_id, status, id)`，支持客户按对话恢复卡片。
+- 普通索引：`idx_agent_pending_actions_status_expires (status, expires_at)`，支持识别超时草稿。
+- 客户只能修改 `PENDING` 状态的标题和描述；优先级和身份关联字段不能通过客户接口修改。
+- 确认操作与创建工单处于同一事务；并发确认中只有一次能通过乐观锁，失败事务创建的工单会回滚。
+- AI 消息生成失败或流被取消时，已生成的草稿转为 `INVALIDATED`，不能继续确认。
+
 ## `ai_model_configs` AI 模型配置表
 
 保存运行时模型连接配置，由 Flyway V4 创建、V5 调整协议与厂商字段。
@@ -185,6 +220,10 @@ ai_model_configs.id ──< chat_messages.model_config_id
 users.id ──< agent_tool_calls.customer_id
 conversations.id ──< agent_tool_calls.conversation_id
 chat_messages.id ──< agent_tool_calls.assistant_message_id
+users.id ──< agent_pending_actions.customer_id
+conversations.id ──< agent_pending_actions.conversation_id
+chat_messages.id ──< agent_pending_actions.assistant_message_id
+agent_pending_actions.ticket_id >── tickets.id
 ```
 
 这些关系目前均为逻辑关联，没有外键约束和级联删除行为。
@@ -204,3 +243,4 @@ chat_messages.id ──< agent_tool_calls.assistant_message_id
 | V5 | `V5__add_model_vendor_presets.sql` | 拆分模型协议和厂商预设。 |
 | V6 | `V6__create_conversations_and_messages.sql` | 创建客户对话和消息表。 |
 | V7 | `V7__create_agent_tool_calls.sql` | 创建 Agent 工具调用记录表。 |
+| V8 | `V8__create_agent_pending_actions.sql` | 创建 Agent 待确认操作和工单草稿表。 |

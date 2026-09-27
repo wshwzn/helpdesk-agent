@@ -1,6 +1,6 @@
 # 智能工单助手
 
-一个面向 SaaS 外部客户服务场景的智能工单助手后端。当前阶段已完成工单领域基础能力，后续 Agent 将通过工具调用这些接口完成工单创建、查询和状态流转。
+一个面向 SaaS 外部客户服务场景的智能工单助手后端。Agent 可以查询客户工单，并在需要人工处理时生成可修改、可确认的工单草稿；只有客户确认后才会创建真实工单。
 
 ## 环境要求
 
@@ -57,6 +57,8 @@ $env:OPENAPI_ENABLED = "false"
 - `ai_model_configs`：模型配置表，保存协议、厂商、基础地址、模型名称、能力开关和 AES-GCM 加密后的 API Key。
 - `conversations`：客户对话表，保存对话归属、标题、状态和最近消息时间。
 - `chat_messages`：对话消息表，保存客户消息、AI 回答、生成状态、模型快照和 Token 用量。
+- `agent_tool_calls`：工具调用记录表，保存工具参数、模型可见结果、状态和执行顺序。
+- `agent_pending_actions`：待确认操作表，保存 AI 生成的工单草稿及确认、取消、过期和执行状态。
 - `flyway_schema_history`：Flyway 自动创建的迁移记录表，用于记录每个 SQL 迁移脚本是否执行成功，防止重复建表。请勿手动修改或删除其中的数据。
 
 ## 登录认证
@@ -197,6 +199,7 @@ Accept: text/event-stream, application/json
 ```text
 event: start   已保存客户消息，并创建 PENDING 状态的 AI 消息
 event: delta   本次新增的回答文本，可能出现多次
+event: action_required   AI 已生成需要客户确认的工单草稿
 event: done    回答完成，携带最终保存的 AI 消息
 event: error   生成失败，携带脱敏错误码和说明
 ```
@@ -244,6 +247,44 @@ GET /api/tickets?page=1&size=20&status=PENDING
 ```
 
 客户只能查询自己的工单，创建人编号从 JWT 获取。优先级可选值为 `LOW`、`MEDIUM`、`HIGH`；当前新工单的初始状态为 `PENDING`。
+
+## AI 工单确认流程
+
+当 AI 判断需要人工处理时，会调用 `prepare_create_ticket` 工具生成草稿。同步对话响应通过 `pendingActions` 返回草稿，流式对话通过 `action_required` 事件返回；此时真实工单尚未创建。
+
+查询对话中的操作卡片：
+
+```http
+GET /api/agent/actions?conversationId={conversationId}&status=PENDING
+Authorization: Bearer <客户 accessToken>
+```
+
+客户可以在确认前修改标题和描述，不能修改 AI 建议的优先级：
+
+```http
+PATCH /api/agent/actions/{actionId}
+Authorization: Bearer <客户 accessToken>
+Content-Type: application/json
+
+{
+  "title": "重置密码后仍无法登录",
+  "description": "今天重置两次密码后仍提示密码错误。",
+  "version": 0
+}
+```
+
+确认或取消时必须携带卡片最新的 `version`：
+
+```http
+POST /api/agent/actions/{actionId}/confirm
+POST /api/agent/actions/{actionId}/cancel
+
+{
+  "version": 1
+}
+```
+
+草稿有效期为 24 小时。确认接口具有幂等性，重复确认只返回第一次创建的工单，不会重复建单。
 
 ## 工单处理流程
 
