@@ -13,6 +13,7 @@ import java.time.Duration;
 @ConfigurationProperties("app.chat")
 public record ChatProperties(
         @Min(1) @Max(100) int historyLimit,
-        @NotNull @DefaultValue("5m") Duration streamTimeout
+        @NotNull @DefaultValue("5m") Duration streamTimeout,
+        @DefaultValue("false") boolean logModelContent
 ) {
 }
