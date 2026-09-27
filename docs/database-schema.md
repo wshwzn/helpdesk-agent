@@ -108,6 +108,38 @@
 - 主键：`PRIMARY KEY (id)`。
 - 普通索引：`idx_chat_messages_conversation_id (conversation_id, id)`，支持按对话顺序读取消息。
 
+## `agent_tool_calls` Agent 工具调用表
+
+保存 Agent 一次工具请求及其对应响应，由 Flyway V7 创建。一行表示一对 Tool Call/Tool Response；同一条最终 AI 回复可以关联多行。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 工具调用记录主键。 |
+| `conversation_id` | `BIGINT` | 否 | 无 | 所属 `conversations.id`，用于按对话审计，逻辑关联。 |
+| `assistant_message_id` | `BIGINT` | 否 | 无 | 本次工具调用最终归属的 `chat_messages.id` AI 消息，逻辑关联。 |
+| `customer_id` | `BIGINT` | 否 | 无 | 执行时已鉴权客户的 `users.id`，只由后端上下文写入。 |
+| `call_id` | `VARCHAR(64)` | 否 | 无 | 应用生成的唯一调用标识，用于回放时配对 Tool Call 与 Tool Response。 |
+| `sequence_no` | `INT` | 否 | 无 | 同一 AI 回复内从 1 开始的工具执行顺序。 |
+| `tool_name` | `VARCHAR(100)` | 否 | 无 | Spring AI 工具名称，例如 `list_my_tickets`。 |
+| `arguments_json` | `MEDIUMTEXT` | 否 | 无 | 模型提供的工具参数 JSON，不包含服务端身份上下文。 |
+| `result_json` | `MEDIUMTEXT` | 是 | `NULL` | 工具成功后模型实际收到的脱敏结果；运行中或失败时为空。 |
+| `status` | `VARCHAR(20)` | 否 | 无 | 状态：`RUNNING`、`SUCCESS`、`FAILED`。 |
+| `error_code` | `VARCHAR(50)` | 是 | `NULL` | 失败时保存固定脱敏错误码 `TOOL_EXECUTION_FAILED`。 |
+| `duration_ms` | `BIGINT` | 是 | `NULL` | 工具完成或失败后的执行耗时，单位毫秒。 |
+| `version` | `INT` | 否 | `0` | 乐观锁版本号，避免成功和失败状态互相覆盖。 |
+| `started_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 工具开始时间。 |
+| `completed_at` | `TIMESTAMP(6)` | 是 | `NULL` | 工具成功或失败的完成时间。 |
+
+索引与约束：
+
+- 主键：`PRIMARY KEY (id)`。
+- 唯一约束：`uk_agent_tool_calls_call_id (call_id)`，保证回放配对标识唯一。
+- 唯一约束：`uk_agent_tool_calls_message_sequence (assistant_message_id, sequence_no)`，保证同一回答内顺序不重复。
+- 普通索引：`idx_agent_tool_calls_conversation_id (conversation_id, id)`，支持按对话审计。
+- 普通索引：`idx_agent_tool_calls_message_status_sequence (assistant_message_id, status, sequence_no)`，支持加载上一轮成功工具结果。
+- `arguments_json` 和 `result_json` 保存应用标准化内容，不保存 JWT、API Key、HTTP 请求头或异常正文。
+- 生成失败或连接中断不会删除已完成的工具记录；长期停留在 `RUNNING` 的记录可用于识别进程异常中断。
+
 ## `ai_model_configs` AI 模型配置表
 
 保存运行时模型连接配置，由 Flyway V4 创建、V5 调整协议与厂商字段。
@@ -150,6 +182,9 @@ users.id ──< ai_model_configs.updated_by
 users.id ──< conversations.customer_id
 conversations.id ──< chat_messages.conversation_id
 ai_model_configs.id ──< chat_messages.model_config_id
+users.id ──< agent_tool_calls.customer_id
+conversations.id ──< agent_tool_calls.conversation_id
+chat_messages.id ──< agent_tool_calls.assistant_message_id
 ```
 
 这些关系目前均为逻辑关联，没有外键约束和级联删除行为。
@@ -168,3 +203,4 @@ ai_model_configs.id ──< chat_messages.model_config_id
 | V4 | `V4__create_ai_model_configs.sql` | 创建模型配置表。 |
 | V5 | `V5__add_model_vendor_presets.sql` | 拆分模型协议和厂商预设。 |
 | V6 | `V6__create_conversations_and_messages.sql` | 创建客户对话和消息表。 |
+| V7 | `V7__create_agent_tool_calls.sql` | 创建 Agent 工具调用记录表。 |

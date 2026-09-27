@@ -52,7 +52,7 @@ class CustomerTicketToolsTest {
                 .thenReturn(new PageResponse<>(1, 20, 0, 0, List.of()));
         ToolCallback callback = callback("list_my_tickets");
         ToolContext toolContext = new ToolContext(
-                new AgentExecutionContext(42L, 9L).toToolContext()
+                new AgentExecutionContext(42L, 9L, 100L).toToolContext()
         );
 
         String result = callback.call("{\"status\":\"PROCESSING\"}", toolContext);
@@ -70,7 +70,7 @@ class CustomerTicketToolsTest {
         when(ticketService.getById(91L, 73L)).thenReturn(ticketResponse(91L, 73L, 88L));
         ToolCallback callback = callback("get_my_ticket");
         ToolContext toolContext = new ToolContext(
-                new AgentExecutionContext(73L, 12L).toToolContext()
+                new AgentExecutionContext(73L, 12L, 101L).toToolContext()
         );
 
         String result = callback.call("{\"ticketId\":91}", toolContext);

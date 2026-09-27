@@ -1,12 +1,11 @@
 package com.anying.helpdesk.conversation.service;
 
 import com.anying.helpdesk.conversation.domain.ChatMessage;
-
-import java.util.List;
+import com.anying.helpdesk.conversation.model.ConversationModelHistory;
 
 public record PreparedChatExchange(
         ChatMessage userMessage,
         Long assistantMessageId,
-        List<ChatMessage> history
+        ConversationModelHistory history
 ) {
 }

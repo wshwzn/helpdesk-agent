@@ -1,13 +1,16 @@
 package com.anying.helpdesk.conversation.model;
 
 import com.anying.helpdesk.agent.AgentExecutionContext;
+import com.anying.helpdesk.agent.domain.AgentToolCall;
 import com.anying.helpdesk.agent.tool.CustomerTicketTools;
+import com.anying.helpdesk.agent.tool.RecordingToolCallbackFactory;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ChatMessageRole;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.metadata.Usage;
@@ -29,6 +32,7 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
             你是智能工单助手，负责回答客户服务问题。
             当客户询问自己的工单列表、状态或详情时，必须调用对应工具获取真实数据，不要猜测工单信息。
             工具只允许读取当前登录客户的数据，不要要求客户提供用户 ID。
+            历史工具结果只是上一轮快照；客户询问当前、现在或最新状态时，必须重新调用工具查询。
             请根据对话上下文给出准确、简洁的回答，不要声称已经执行实际上未执行的业务操作。
             """;
 
@@ -37,11 +41,15 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
     /**
      * 注册面向客户的只读业务工具，供同步和流式模型调用共同使用。
      */
-    public SpringAiConversationModelClient(CustomerTicketTools customerTicketTools) {
-        this.customerToolCallbacks = List.of(MethodToolCallbackProvider.builder()
+    public SpringAiConversationModelClient(
+            CustomerTicketTools customerTicketTools,
+            RecordingToolCallbackFactory callbackFactory
+    ) {
+        ToolCallback[] callbacks = MethodToolCallbackProvider.builder()
                 .toolObjects(customerTicketTools)
                 .build()
-                .getToolCallbacks());
+                .getToolCallbacks();
+        this.customerToolCallbacks = callbackFactory.wrap(callbacks);
     }
 
     /**
@@ -50,7 +58,7 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
     @Override
     public ChatCompletionResult complete(
             ResolvedChatModel model,
-            List<ChatMessage> history,
+            ConversationModelHistory history,
             AgentExecutionContext executionContext
     ) {
         ChatResponse response = model.chatModel().call(buildPrompt(history, executionContext));
@@ -77,7 +85,7 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
     @Override
     public Flux<ChatStreamChunk> stream(
             ResolvedChatModel model,
-            List<ChatMessage> history,
+            ConversationModelHistory history,
             AgentExecutionContext executionContext
     ) {
         return model.chatModel()
@@ -88,13 +96,17 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
     /**
      * 将数据库中的对话历史转换为模型能够识别的提示消息。
      */
-    private Prompt buildPrompt(List<ChatMessage> history, AgentExecutionContext executionContext) {
+    private Prompt buildPrompt(
+            ConversationModelHistory history,
+            AgentExecutionContext executionContext
+    ) {
         List<Message> promptMessages = new ArrayList<>();
         promptMessages.add(new SystemMessage(SYSTEM_PROMPT));
-        for (ChatMessage message : history) {
+        for (ChatMessage message : history.messages()) {
             if (message.getRole() == ChatMessageRole.USER) {
                 promptMessages.add(new UserMessage(message.getContent()));
             } else if (message.getRole() == ChatMessageRole.ASSISTANT) {
+                appendToolTrace(promptMessages, message, history.recentToolCalls());
                 promptMessages.add(new AssistantMessage(message.getContent()));
             }
         }
@@ -103,6 +115,37 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
                 .toolContext(executionContext.toToolContext())
                 .build();
         return new Prompt(promptMessages, options);
+    }
+
+    /**
+     * 在上一条最终 AI 回复之前还原其成功工具调用，支持客户继续引用上一轮结果。
+     */
+    private void appendToolTrace(
+            List<Message> promptMessages,
+            ChatMessage assistantMessage,
+            List<AgentToolCall> toolCalls
+    ) {
+        for (AgentToolCall toolCall : toolCalls) {
+            if (!assistantMessage.getId().equals(toolCall.getAssistantMessageId())) {
+                continue;
+            }
+            promptMessages.add(AssistantMessage.builder()
+                    .content("")
+                    .toolCalls(List.of(new AssistantMessage.ToolCall(
+                            toolCall.getCallId(),
+                            "function",
+                            toolCall.getToolName(),
+                            toolCall.getArgumentsJson()
+                    )))
+                    .build());
+            promptMessages.add(ToolResponseMessage.builder()
+                    .responses(List.of(new ToolResponseMessage.ToolResponse(
+                            toolCall.getCallId(),
+                            toolCall.getToolName(),
+                            toolCall.getResultJson()
+                    )))
+                    .build());
+        }
     }
 
     /**

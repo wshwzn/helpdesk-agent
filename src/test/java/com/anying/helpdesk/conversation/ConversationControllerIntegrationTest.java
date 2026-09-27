@@ -1,6 +1,9 @@
 package com.anying.helpdesk.conversation;
 
 import com.anying.helpdesk.agent.AgentExecutionContext;
+import com.anying.helpdesk.agent.domain.AgentToolCall;
+import com.anying.helpdesk.agent.mapper.AgentToolCallMapper;
+import com.anying.helpdesk.agent.service.AgentToolCallService;
 import com.anying.helpdesk.auth.domain.User;
 import com.anying.helpdesk.auth.domain.UserRole;
 import com.anying.helpdesk.auth.mapper.UserMapper;
@@ -11,6 +14,7 @@ import com.anying.helpdesk.conversation.mapper.ChatMessageMapper;
 import com.anying.helpdesk.conversation.mapper.ConversationMapper;
 import com.anying.helpdesk.conversation.model.ChatCompletionResult;
 import com.anying.helpdesk.conversation.model.ChatStreamChunk;
+import com.anying.helpdesk.conversation.model.ConversationModelHistory;
 import com.anying.helpdesk.conversation.model.ConversationModelClient;
 import com.anying.helpdesk.modelconfig.factory.DefaultChatModelProvider;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
@@ -41,7 +45,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -76,6 +79,12 @@ class ConversationControllerIntegrationTest {
     private ChatMessageMapper chatMessageMapper;
 
     @Autowired
+    private AgentToolCallMapper agentToolCallMapper;
+
+    @Autowired
+    private AgentToolCallService agentToolCallService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @MockitoBean
@@ -86,6 +95,7 @@ class ConversationControllerIntegrationTest {
 
     @AfterEach
     void cleanUp() {
+        agentToolCallMapper.delete(null);
         chatMessageMapper.delete(null);
         conversationMapper.delete(null);
         userMapper.delete(new LambdaQueryWrapper<User>()
@@ -103,9 +113,14 @@ class ConversationControllerIntegrationTest {
                 mock(ChatModel.class)
         );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.complete(any(ResolvedChatModel.class), anyList(), any())).thenAnswer(invocation -> {
+        when(modelClient.complete(
+                any(ResolvedChatModel.class),
+                any(ConversationModelHistory.class),
+                any()
+        )).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
-            List<ChatMessage> history = invocation.getArgument(1);
+            ConversationModelHistory modelHistory = invocation.getArgument(1);
+            List<ChatMessage> history = modelHistory.messages();
             String lastUserMessage = history.getLast().getContent();
             return new ChatCompletionResult("AI: " + lastUserMessage, 12, 6, 18);
         });
@@ -121,6 +136,22 @@ class ConversationControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.assistantMessage.modelName").value("test-chat-model"))
                 .andExpect(jsonPath("$.data.assistantMessage.totalTokens").value(18));
 
+        User customer = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, "conversation_customer_one"));
+        ChatMessage firstAssistantMessage = chatMessageMapper.selectList(
+                        new LambdaQueryWrapper<ChatMessage>()
+                                .eq(ChatMessage::getConversationId, conversationId)
+                                .eq(ChatMessage::getRole, ChatMessageRole.ASSISTANT)
+                                .orderByDesc(ChatMessage::getId)
+                )
+                .getFirst();
+        AgentToolCall toolCall = agentToolCallService.start(
+                new AgentExecutionContext(customer.getId(), conversationId, firstAssistantMessage.getId()),
+                "listCustomerTickets",
+                "{\"status\":\"PENDING\"}"
+        );
+        agentToolCallService.completeSuccess(toolCall.getId(), "{\"tickets\":[]}");
+
         sendMessage(token, conversationId, "还是提示密码错误")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.assistantMessage.content").value("AI: 还是提示密码错误"));
@@ -132,25 +163,36 @@ class ConversationControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.records[0].role").value("USER"))
                 .andExpect(jsonPath("$.data.records[3].role").value("ASSISTANT"));
 
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<ChatMessage>> historyCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<ConversationModelHistory> historyCaptor = ArgumentCaptor.forClass(
+                ConversationModelHistory.class
+        );
         ArgumentCaptor<AgentExecutionContext> contextCaptor = ArgumentCaptor.forClass(AgentExecutionContext.class);
         verify(modelClient, org.mockito.Mockito.times(2)).complete(
                 any(),
                 historyCaptor.capture(),
                 contextCaptor.capture()
         );
-        List<ChatMessage> secondHistory = historyCaptor.getAllValues().get(1);
+        ConversationModelHistory secondModelHistory = historyCaptor.getAllValues().get(1);
+        List<ChatMessage> secondHistory = secondModelHistory.messages();
         assertThat(secondHistory)
                 .extracting(ChatMessage::getRole)
                 .containsExactly(ChatMessageRole.USER, ChatMessageRole.ASSISTANT, ChatMessageRole.USER);
         assertThat(secondHistory)
                 .extracting(ChatMessage::getContent)
                 .containsExactly("我无法登录", "AI: 我无法登录", "还是提示密码错误");
+        assertThat(secondModelHistory.recentToolCalls())
+                .singleElement()
+                .satisfies(record -> {
+                    assertThat(record.getAssistantMessageId()).isEqualTo(firstAssistantMessage.getId());
+                    assertThat(record.getToolName()).isEqualTo("listCustomerTickets");
+                    assertThat(record.getResultJson()).isEqualTo("{\"tickets\":[]}");
+                });
         assertThat(contextCaptor.getAllValues())
                 .allSatisfy(context -> assertThat(context.conversationId()).isEqualTo(conversationId))
                 .extracting(AgentExecutionContext::customerId)
                 .containsOnly(contextCaptor.getValue().customerId());
+        assertThat(contextCaptor.getAllValues())
+                .allSatisfy(context -> assertThat(context.assistantMessageId()).isPositive());
 
         mockMvc.perform(get("/api/conversations")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
@@ -189,7 +231,7 @@ class ConversationControllerIntegrationTest {
         );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
         doThrow(new IllegalStateException("provider leaked sk-secret-value"))
-                .when(modelClient).complete(any(), anyList(), any());
+                .when(modelClient).complete(any(), any(ConversationModelHistory.class), any());
 
         sendMessage(token, conversationId, "触发失败")
                 .andExpect(status().isBadGateway())
@@ -248,7 +290,7 @@ class ConversationControllerIntegrationTest {
                 mock(ChatModel.class)
         );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.stream(any(), anyList(), any())).thenReturn(Flux.just(
+        when(modelClient.stream(any(), any(ConversationModelHistory.class), any())).thenReturn(Flux.just(
                 new ChatStreamChunk("可以", null, null, null),
                 new ChatStreamChunk("重置密码", 16, 5, 21)
         ));
@@ -302,7 +344,7 @@ class ConversationControllerIntegrationTest {
                 mock(ChatModel.class)
         );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.stream(any(), anyList(), any()))
+        when(modelClient.stream(any(), any(ConversationModelHistory.class), any()))
                 .thenReturn(Flux.error(new IllegalStateException("provider leaked sk-stream-secret")));
 
         MvcResult streamingRequest = mockMvc.perform(post(
@@ -362,7 +404,7 @@ class ConversationControllerIntegrationTest {
 
         assertThat(chatMessageMapper.selectCount(new LambdaQueryWrapper<ChatMessage>()
                 .eq(ChatMessage::getConversationId, conversationId))).isZero();
-        verify(modelClient, never()).stream(any(), anyList(), any());
+        verify(modelClient, never()).stream(any(), any(ConversationModelHistory.class), any());
     }
 
     private org.springframework.test.web.servlet.ResultActions sendMessage(

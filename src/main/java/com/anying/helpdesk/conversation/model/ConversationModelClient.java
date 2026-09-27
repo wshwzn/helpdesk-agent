@@ -1,11 +1,8 @@
 package com.anying.helpdesk.conversation.model;
 
 import com.anying.helpdesk.agent.AgentExecutionContext;
-import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import reactor.core.publisher.Flux;
-
-import java.util.List;
 
 public interface ConversationModelClient {
 
@@ -14,7 +11,7 @@ public interface ConversationModelClient {
      */
     ChatCompletionResult complete(
             ResolvedChatModel model,
-            List<ChatMessage> history,
+            ConversationModelHistory history,
             AgentExecutionContext executionContext
     );
 
@@ -23,7 +20,7 @@ public interface ConversationModelClient {
      */
     Flux<ChatStreamChunk> stream(
             ResolvedChatModel model,
-            List<ChatMessage> history,
+            ConversationModelHistory history,
             AgentExecutionContext executionContext
     );
 }

@@ -86,7 +86,7 @@ public class ConversationServiceImpl implements ConversationService {
             completion = modelClient.complete(
                     model,
                     prepared.history(),
-                    new AgentExecutionContext(customerId, id)
+                    new AgentExecutionContext(customerId, id, prepared.assistantMessageId())
             );
         } catch (RuntimeException exception) {
             markGenerationFailed(prepared.assistantMessageId(), id, MODEL_CALL_FAILED, exception);
@@ -121,7 +121,11 @@ public class ConversationServiceImpl implements ConversationService {
 
         StreamingCompletionAccumulator accumulator = new StreamingCompletionAccumulator();
         AtomicBoolean finalized = new AtomicBoolean(false);
-        AgentExecutionContext executionContext = new AgentExecutionContext(customerId, id);
+        AgentExecutionContext executionContext = new AgentExecutionContext(
+                customerId,
+                id,
+                prepared.assistantMessageId()
+        );
         Flux<ChatStreamEvent> modelEvents = Flux.defer(() -> modelClient.stream(
                         model,
                         prepared.history(),
