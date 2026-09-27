@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
  * 提供给大模型的客户工单视图，排除客户 ID、客服 ID 等内部身份字段。
  */
 public record CustomerTicketToolResult(
-        Long id,
         String ticketNo,
         String title,
         String description,
@@ -30,7 +29,6 @@ public record CustomerTicketToolResult(
      */
     public static CustomerTicketToolResult from(TicketResponse ticket) {
         return new CustomerTicketToolResult(
-                ticket.id(),
                 ticket.ticketNo(),
                 ticket.title(),
                 ticket.description(),

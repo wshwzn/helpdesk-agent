@@ -40,6 +40,9 @@ class CustomerTicketToolsTest {
                 .containsExactlyInAnyOrder("list_my_tickets", "get_my_ticket");
         assertThat(callbacks).allSatisfy(callback -> assertThat(callback.getToolDefinition().inputSchema())
                 .doesNotContain("customerId", "conversationId", "toolContext"));
+        assertThat(callback("get_my_ticket").getToolDefinition().inputSchema())
+                .contains("ticketNo")
+                .doesNotContain("ticketId");
     }
 
     /**
@@ -67,16 +70,19 @@ class CustomerTicketToolsTest {
     @Test
     @DisplayName("工单详情工具应把可信客户身份传给业务服务")
     void detailToolUsesServerInjectedCustomerId() {
-        when(ticketService.getById(91L, 73L)).thenReturn(ticketResponse(91L, 73L, 88L));
+        String ticketNo = "HD20260927012345AB12CD34";
+        when(ticketService.getByTicketNo(ticketNo, 73L)).thenReturn(ticketResponse(91L, ticketNo, 73L, 88L));
         ToolCallback callback = callback("get_my_ticket");
         ToolContext toolContext = new ToolContext(
                 new AgentExecutionContext(73L, 12L, 101L).toToolContext()
         );
 
-        String result = callback.call("{\"ticketId\":91}", toolContext);
+        String result = callback.call("{\"ticketNo\":\"HD20260927012345AB12CD34\"}", toolContext);
 
-        assertThat(result).contains("HD91").doesNotContain("creatorId", "assigneeId", "73", "88");
-        verify(ticketService).getById(91L, 73L);
+        assertThat(result)
+                .contains(ticketNo)
+                .doesNotContain("\"id\"", "creatorId", "assigneeId", "73", "88");
+        verify(ticketService).getByTicketNo(ticketNo, 73L);
     }
 
     /**
@@ -85,7 +91,7 @@ class CustomerTicketToolsTest {
     @Test
     @DisplayName("缺少可信身份上下文时应拒绝执行工具")
     void missingExecutionContextIsRejected() {
-        assertThatThrownBy(() -> ticketTools.getMyTicket(91L, new ToolContext(Map.of())))
+        assertThatThrownBy(() -> ticketTools.getMyTicket("HD20260927012345AB12CD34", new ToolContext(Map.of())))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("agent execution context is invalid");
         verifyNoInteractions(ticketService);
@@ -114,10 +120,10 @@ class CustomerTicketToolsTest {
     /**
      * 构造包含内部身份字段的工单响应，验证工具输出会主动移除这些字段。
      */
-    private TicketResponse ticketResponse(Long id, Long creatorId, Long assigneeId) {
+    private TicketResponse ticketResponse(Long id, String ticketNo, Long creatorId, Long assigneeId) {
         return new TicketResponse(
                 id,
-                "HD" + id,
+                ticketNo,
                 "登录异常",
                 "无法登录客户中心",
                 TicketStatus.PROCESSING,

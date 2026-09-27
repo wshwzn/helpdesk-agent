@@ -46,7 +46,7 @@ class AgentToolCallServiceIntegrationTest {
         AgentToolCall second = toolCallService.start(
                 context,
                 "get_my_ticket",
-                "{\"ticketId\":2}"
+                "{\"ticketNo\":\"HD20260927012345AB12CD34\"}"
         );
         toolCallService.completeFailure(second.getId());
 

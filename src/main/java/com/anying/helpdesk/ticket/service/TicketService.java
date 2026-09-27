@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -49,6 +50,24 @@ public class TicketService {
     @Transactional(readOnly = true)
     public TicketResponse getById(Long id, Long customerId) {
         Ticket ticket = requireTicket(id);
+        requireCreator(ticket, customerId);
+        return TicketResponse.from(ticket);
+    }
+
+    /**
+     * 按面向客户的唯一工单号查询详情，并继续执行客户归属校验。
+     */
+    @Transactional(readOnly = true)
+    public TicketResponse getByTicketNo(String ticketNo, Long customerId) {
+        if (ticketNo == null || ticketNo.isBlank()) {
+            throw new IllegalArgumentException("ticketNo must not be blank");
+        }
+        String normalizedTicketNo = ticketNo.trim().toUpperCase(Locale.ROOT);
+        Ticket ticket = ticketMapper.selectOne(new LambdaQueryWrapper<Ticket>()
+                .eq(Ticket::getTicketNo, normalizedTicketNo));
+        if (ticket == null) {
+            throw new TicketNotFoundException(normalizedTicketNo);
+        }
         requireCreator(ticket, customerId);
         return TicketResponse.from(ticket);
     }

@@ -52,13 +52,13 @@ public class CustomerTicketTools {
      */
     @Tool(
             name = "get_my_ticket",
-            description = "按照工单主键查询当前客户自己的工单详情。需要了解某张工单的描述、状态或处理结果时使用。"
+            description = "按照客户可见的工单号查询当前客户自己的工单详情。需要了解某张工单的描述、状态或处理结果时使用。"
     )
     public CustomerTicketToolResult getMyTicket(
-            @ToolParam(description = "工单主键 ID") Long ticketId,
+            @ToolParam(description = "完整工单号，例如 HD20260927012345AB12CD34") String ticketNo,
             ToolContext toolContext
     ) {
         AgentExecutionContext context = AgentExecutionContext.require(toolContext);
-        return CustomerTicketToolResult.from(ticketService.getById(ticketId, context.customerId()));
+        return CustomerTicketToolResult.from(ticketService.getByTicketNo(ticketNo, context.customerId()));
     }
 }

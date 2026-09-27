@@ -175,7 +175,14 @@ class SpringAiConversationModelClientTest {
         ChatMessage currentUser = message(42L, ChatMessageRole.USER, "第二张呢？");
         List<AgentToolCall> toolCalls = List.of(
                 toolCall(41L, 1, "call-list", "list_my_tickets", "{}", "{\"total\":2}"),
-                toolCall(41L, 2, "call-detail", "get_my_ticket", "{\"ticketId\":2}", "{\"status\":\"PROCESSING\"}")
+                toolCall(
+                        41L,
+                        2,
+                        "call-detail",
+                        "get_my_ticket",
+                        "{\"ticketNo\":\"HD20260927012345AB12CD34\"}",
+                        "{\"status\":\"PROCESSING\"}"
+                )
         );
 
         client.complete(

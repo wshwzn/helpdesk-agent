@@ -3,7 +3,13 @@ package com.anying.helpdesk.ticket;
 import com.anying.helpdesk.auth.domain.User;
 import com.anying.helpdesk.auth.domain.UserRole;
 import com.anying.helpdesk.auth.mapper.UserMapper;
+import com.anying.helpdesk.ticket.domain.Ticket;
+import com.anying.helpdesk.ticket.dto.TicketResponse;
+import com.anying.helpdesk.ticket.exception.TicketAccessDeniedException;
+import com.anying.helpdesk.ticket.mapper.TicketMapper;
+import com.anying.helpdesk.ticket.service.TicketService;
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -38,6 +46,12 @@ class TicketControllerIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private TicketMapper ticketMapper;
+
+    @Autowired
+    private TicketService ticketService;
 
     @Test
     void createsAndQueriesOwnTicket() throws Exception {
@@ -62,6 +76,27 @@ class TicketControllerIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, bearer(anotherCustomer.token())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("TICKET_ACCESS_DENIED"));
+    }
+
+    /**
+     * 验证业务服务使用公开工单号查询，同时仍然限制客户只能读取自己的工单。
+     */
+    @Test
+    @DisplayName("应按公开工单号查询并校验客户归属")
+    void queriesOwnTicketByPublicTicketNumber() throws Exception {
+        TestSession owner = registerCustomer("customer_ticket_no_owner");
+        TestSession other = registerCustomer("customer_ticket_no_other");
+        Long ticketId = Long.valueOf(createTicket(owner.token()));
+        Ticket ticket = ticketMapper.selectById(ticketId);
+
+        TicketResponse response = ticketService.getByTicketNo(
+                ticket.getTicketNo().toLowerCase(),
+                owner.userId()
+        );
+
+        assertThat(response.ticketNo()).isEqualTo(ticket.getTicketNo());
+        assertThatThrownBy(() -> ticketService.getByTicketNo(ticket.getTicketNo(), other.userId()))
+                .isInstanceOf(TicketAccessDeniedException.class);
     }
 
     @Test

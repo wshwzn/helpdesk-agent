@@ -57,13 +57,20 @@ class RecordingToolCallbackTest {
         ToolContext toolContext = new ToolContext(executionContext.toToolContext());
         AgentToolCall toolCall = new AgentToolCall();
         toolCall.setId(22L);
-        when(toolCallService.start(executionContext, "get_my_ticket", "{\"ticketId\":1}"))
+        when(toolCallService.start(
+                executionContext,
+                "get_my_ticket",
+                "{\"ticketNo\":\"HD20260927012345AB12CD34\"}"
+        ))
                 .thenReturn(toolCall);
         IllegalStateException failure = new IllegalStateException("provider detail");
         when(delegate.call(anyString(), same(toolContext))).thenThrow(failure);
         RecordingToolCallback callback = new RecordingToolCallback(delegate, toolCallService);
 
-        assertThatThrownBy(() -> callback.call("{\"ticketId\":1}", toolContext))
+        assertThatThrownBy(() -> callback.call(
+                "{\"ticketNo\":\"HD20260927012345AB12CD34\"}",
+                toolContext
+        ))
                 .isSameAs(failure);
         verify(toolCallService).completeFailure(22L);
     }
