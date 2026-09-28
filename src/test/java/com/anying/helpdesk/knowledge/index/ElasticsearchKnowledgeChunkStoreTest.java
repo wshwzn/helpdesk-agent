@@ -1,0 +1,154 @@
+package com.anying.helpdesk.knowledge.index;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class ElasticsearchKnowledgeChunkStoreTest {
+
+    private HttpServer server;
+
+    /**
+     * 每个测试结束后停止本地假 ES 服务，避免占用随机端口。
+     */
+    @AfterEach
+    void stopServer() {
+        if (server != null) {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    @DisplayName("创建映射后可以删除旧 Chunk 并发送 NDJSON 批量请求")
+    void createsMappingAndReplacesDocumentChunks() throws IOException {
+        AtomicBoolean indexExists = new AtomicBoolean(false);
+        AtomicReference<String> createBody = new AtomicReference<>();
+        AtomicReference<String> bulkBody = new AtomicReference<>();
+        AtomicReference<String> deleteBody = new AtomicReference<>();
+        server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> handleRequest(
+                exchange,
+                indexExists,
+                createBody,
+                bulkBody,
+                deleteBody,
+                3
+        ));
+        server.start();
+
+        ElasticsearchKnowledgeChunkStore store = createStore(server.getAddress().getPort());
+        IndexedKnowledgeChunk chunk = new IndexedKnowledgeChunk(
+                2L,
+                5L,
+                1,
+                0,
+                4,
+                "测试内容",
+                new float[]{1F, 0F, 0F},
+                "guide.md",
+                9L,
+                "embedding-model",
+                Instant.parse("2026-09-28T12:00:00Z")
+        );
+
+        store.replaceDocumentChunks(5L, 3, List.of(chunk));
+
+        assertThat(createBody.get()).contains("\"dense_vector\"").contains("\"dims\":3");
+        assertThat(deleteBody.get()).contains("\"documentId\":5");
+        assertThat(bulkBody.get())
+                .contains("\"_id\":\"5-1\"")
+                .contains("\"content\":\"测试内容\"")
+                .contains("\"contentVector\":[1.0,0.0,0.0]");
+    }
+
+    /**
+     * 创建指向本地假服务的 Chunk Store。
+     */
+    private ElasticsearchKnowledgeChunkStore createStore(int port) {
+        ElasticsearchProperties properties = new ElasticsearchProperties();
+        properties.setUri("http://127.0.0.1:" + port);
+        properties.setIndexName("test_knowledge_chunks");
+        return new ElasticsearchKnowledgeChunkStore(
+                properties,
+                new ObjectMapper().findAndRegisterModules()
+        );
+    }
+
+    /**
+     * 模拟本轮索引所需的少量 Elasticsearch REST 端点。
+     */
+    private void handleRequest(
+            HttpExchange exchange,
+            AtomicBoolean indexExists,
+            AtomicReference<String> createBody,
+            AtomicReference<String> bulkBody,
+            AtomicReference<String> deleteBody,
+            int dimensions
+    ) throws IOException {
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+        if ("HEAD".equals(method) && "/test_knowledge_chunks".equals(path)) {
+            send(exchange, indexExists.get() ? 200 : 404, "");
+            return;
+        }
+        if ("PUT".equals(method) && "/test_knowledge_chunks".equals(path)) {
+            createBody.set(readBody(exchange));
+            indexExists.set(true);
+            send(exchange, 200, "{\"acknowledged\":true}");
+            return;
+        }
+        if ("GET".equals(method) && "/test_knowledge_chunks/_mapping".equals(path)) {
+            send(exchange, 200, """
+                    {"test_knowledge_chunks":{"mappings":{"properties":{"contentVector":{"type":"dense_vector","dims":%d}}}}}
+                    """.formatted(dimensions));
+            return;
+        }
+        if ("POST".equals(method) && "/test_knowledge_chunks/_delete_by_query".equals(path)) {
+            deleteBody.set(readBody(exchange));
+            send(exchange, 200, "{\"failures\":[]}");
+            return;
+        }
+        if ("POST".equals(method) && "/test_knowledge_chunks/_bulk".equals(path)) {
+            bulkBody.set(readBody(exchange));
+            send(exchange, 200, "{\"errors\":false,\"items\":[]}");
+            return;
+        }
+        send(exchange, 404, "{}");
+    }
+
+    /**
+     * 读取测试服务收到的 UTF-8 请求正文。
+     */
+    private String readBody(HttpExchange exchange) throws IOException {
+        return new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 向测试客户端返回指定状态和 JSON 正文。
+     */
+    private void send(HttpExchange exchange, int status, String body) throws IOException {
+        if ("HEAD".equals(exchange.getRequestMethod())) {
+            exchange.sendResponseHeaders(status, -1);
+            exchange.close();
+            return;
+        }
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().set("Content-Type", "application/json");
+        exchange.sendResponseHeaders(status, bytes.length);
+        exchange.getResponseBody().write(bytes);
+        exchange.close();
+    }
+}

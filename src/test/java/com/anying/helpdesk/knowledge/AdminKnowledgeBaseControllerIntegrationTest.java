@@ -3,6 +3,9 @@ package com.anying.helpdesk.knowledge;
 import com.anying.helpdesk.auth.domain.User;
 import com.anying.helpdesk.auth.domain.UserRole;
 import com.anying.helpdesk.auth.mapper.UserMapper;
+import com.anying.helpdesk.knowledge.domain.KnowledgeDocumentStatus;
+import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
+import com.anying.helpdesk.knowledge.service.KnowledgeDocumentIndexingService;
 import com.anying.helpdesk.storage.ObjectStorageService;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +61,9 @@ class AdminKnowledgeBaseControllerIntegrationTest {
 
     @MockitoBean
     private ObjectStorageService objectStorageService;
+
+    @MockitoBean
+    private KnowledgeDocumentIndexingService knowledgeDocumentIndexingService;
 
     /**
      * 为每个测试准备稳定的对象存储标识。
@@ -197,6 +203,37 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    /**
+     * 验证管理员触发索引后立即获得 PROCESSING 状态和 202 响应。
+     */
+    @Test
+    @DisplayName("管理员可以异步触发文档索引")
+    void adminStartsDocumentIndexing() throws Exception {
+        String token = createUserAndLogin("knowledge_admin_index", UserRole.ADMIN);
+        LocalDateTime now = LocalDateTime.now();
+        when(knowledgeDocumentIndexingService.start(3L, 7L)).thenReturn(new KnowledgeDocumentResponse(
+                7L,
+                3L,
+                "guide.md",
+                "text/markdown",
+                "md",
+                1024L,
+                "abc123",
+                KnowledgeDocumentStatus.PROCESSING,
+                0,
+                null,
+                2,
+                now,
+                now
+        ));
+
+        mockMvc.perform(post("/api/admin/knowledge-bases/3/documents/7/index")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.data.id").value(7))
+                .andExpect(jsonPath("$.data.status").value("PROCESSING"));
     }
 
     /**

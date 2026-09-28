@@ -1,6 +1,7 @@
 package com.anying.helpdesk.modelconfig.factory;
 
 import com.anying.helpdesk.modelconfig.domain.AiModelConfig;
+import com.anying.helpdesk.modelconfig.domain.ModelType;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
 import com.anying.helpdesk.modelconfig.mapper.AiModelConfigMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -18,6 +19,7 @@ public class DefaultChatModelProvider {
 
     public ResolvedChatModel get() {
         List<AiModelConfig> configs = modelConfigMapper.selectList(new LambdaQueryWrapper<AiModelConfig>()
+                .eq(AiModelConfig::getModelType, ModelType.CHAT)
                 .eq(AiModelConfig::getEnabled, true)
                 .eq(AiModelConfig::getIsDefault, true));
         if (configs.isEmpty()) {

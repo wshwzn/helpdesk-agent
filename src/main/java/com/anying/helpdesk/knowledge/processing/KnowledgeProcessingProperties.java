@@ -24,4 +24,8 @@ public class KnowledgeProcessingProperties {
     @Min(0)
     @Max(5000)
     private int chunkOverlap = 150;
+
+    @Min(1)
+    @Max(128)
+    private int embeddingBatchSize = 16;
 }

@@ -1,7 +1,10 @@
 package com.anying.helpdesk.modelconfig.dto;
 
 import com.anying.helpdesk.modelconfig.domain.ModelVendor;
+import com.anying.helpdesk.modelconfig.domain.ModelType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,6 +13,8 @@ import jakarta.validation.constraints.Size;
 public record UpdateModelConfigRequest(
         @Schema(description = "配置显示名称", example = "DeepSeek 主模型")
         @NotBlank @Size(max = 100) String name,
+        @Schema(description = "模型用途；省略时保留当前类型", example = "CHAT")
+        ModelType modelType,
         @Schema(description = "模型厂商", example = "DEEPSEEK")
         @NotNull ModelVendor vendor,
         @Schema(description = "仅 CUSTOM 厂商需要的 SDK 基础地址", example = "https://proxy.example.com/v1")
@@ -21,6 +26,8 @@ public record UpdateModelConfigRequest(
         @Schema(description = "是否支持流式输出", example = "true")
         @NotNull Boolean supportsStreaming,
         @Schema(description = "是否支持工具调用", example = "true")
-        @NotNull Boolean supportsTools
+        @NotNull Boolean supportsTools,
+        @Schema(description = "Embedding 向量维度；更新向量模型时省略则保留，CHAT 模型必须省略", example = "1024")
+        @Min(1) @Max(4096) Integer embeddingDimensions
 ) {
 }

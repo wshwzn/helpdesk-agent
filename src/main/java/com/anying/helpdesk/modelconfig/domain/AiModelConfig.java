@@ -17,6 +17,7 @@ public class AiModelConfig {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String name;
+    private ModelType modelType;
     private ModelProtocol protocol;
     private ModelVendor vendor;
     private String baseUrl;
@@ -26,6 +27,7 @@ public class AiModelConfig {
     private Integer encryptionKeyVersion;
     private Boolean supportsStreaming;
     private Boolean supportsTools;
+    private Integer embeddingDimensions;
     private Boolean enabled;
     private Boolean isDefault;
     @Version

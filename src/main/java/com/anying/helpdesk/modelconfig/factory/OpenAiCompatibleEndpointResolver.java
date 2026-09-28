@@ -29,7 +29,8 @@ public class OpenAiCompatibleEndpointResolver {
             }
             return new OpenAiCompatibleEndpoint(
                     apiRoot.toString(),
-                    basePath + "/chat/completions"
+                    basePath + "/chat/completions",
+                    basePath + "/embeddings"
             );
         } catch (URISyntaxException exception) {
             throw new InvalidModelConfigException("invalid OpenAI-compatible baseUrl");

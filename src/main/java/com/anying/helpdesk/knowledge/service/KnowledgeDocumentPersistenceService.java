@@ -7,6 +7,7 @@ import com.anying.helpdesk.knowledge.domain.KnowledgeDocumentStatus;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseNotFoundException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentNotFoundException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentConflictException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeStorageException;
 import com.anying.helpdesk.knowledge.mapper.KnowledgeBaseMapper;
 import com.anying.helpdesk.knowledge.mapper.KnowledgeDocumentMapper;
@@ -88,6 +89,52 @@ public class KnowledgeDocumentPersistenceService {
     }
 
     /**
+     * 校验文档可处理后推进到 PROCESSING；重复触发的并发请求只允许一个成功。
+     */
+    @Transactional
+    public KnowledgeDocument markProcessing(Long knowledgeBaseId, Long documentId) {
+        KnowledgeDocument document = get(knowledgeBaseId, documentId);
+        if (document.getStatus() == KnowledgeDocumentStatus.UPLOADING) {
+            throw new KnowledgeDocumentConflictException("uploading document cannot be indexed");
+        }
+        if (document.getStatus() == KnowledgeDocumentStatus.PROCESSING) {
+            throw new KnowledgeDocumentConflictException("knowledge document is already being processed");
+        }
+        document.setStatus(KnowledgeDocumentStatus.PROCESSING);
+        document.setChunkCount(0);
+        document.setErrorCode(null);
+        document.setUpdatedAt(LocalDateTime.now());
+        updateWithOptimisticLock(document);
+        return document;
+    }
+
+    /**
+     * 将处理中的文档标记为可检索，并保存 ES 中的有效 Chunk 数量。
+     */
+    @Transactional
+    public void markReady(Long documentId, int chunkCount) {
+        KnowledgeDocument document = requireProcessingDocument(documentId);
+        document.setStatus(KnowledgeDocumentStatus.READY);
+        document.setChunkCount(chunkCount);
+        document.setErrorCode(null);
+        document.setUpdatedAt(LocalDateTime.now());
+        updateWithOptimisticLock(document);
+    }
+
+    /**
+     * 将处理中的文档标记为失败，并记录固定脱敏错误码。
+     */
+    @Transactional
+    public void markIndexingFailed(Long documentId, String errorCode) {
+        KnowledgeDocument document = requireProcessingDocument(documentId);
+        document.setStatus(KnowledgeDocumentStatus.FAILED);
+        document.setChunkCount(0);
+        document.setErrorCode(errorCode);
+        document.setUpdatedAt(LocalDateTime.now());
+        updateWithOptimisticLock(document);
+    }
+
+    /**
      * 分页读取指定知识库的文档，并按新到旧排序。
      */
     @Transactional(readOnly = true)
@@ -152,11 +199,22 @@ public class KnowledgeDocumentPersistenceService {
     }
 
     /**
+     * 查询并校验处于 PROCESSING 状态的文档，避免过期后台任务覆盖新状态。
+     */
+    private KnowledgeDocument requireProcessingDocument(Long documentId) {
+        KnowledgeDocument document = requireDocument(documentId);
+        if (document.getStatus() != KnowledgeDocumentStatus.PROCESSING) {
+            throw new KnowledgeDocumentConflictException("knowledge document is not being processed");
+        }
+        return document;
+    }
+
+    /**
      * 使用版本号推进文档状态，防止并发任务互相覆盖。
      */
     private void updateWithOptimisticLock(KnowledgeDocument document) {
         if (knowledgeDocumentMapper.updateById(document) == 0) {
-            throw new KnowledgeStorageException("knowledge document was updated concurrently");
+            throw new KnowledgeDocumentConflictException("knowledge document was updated concurrently");
         }
     }
 }

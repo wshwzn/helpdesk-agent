@@ -225,27 +225,30 @@
 - 唯一约束：`uk_knowledge_documents_object_key (object_key)`。
 - 普通索引：`idx_knowledge_documents_base_status_id (knowledge_base_id, status, id)`，支持按知识库和处理状态读取文档。
 - 普通索引：`idx_knowledge_documents_base_sha256 (knowledge_base_id, sha256)`，支持后续识别同一知识库中的重复内容；当前不禁止重复上传。
-- 上传时先写入 `UPLOADING`，对象保存成功后改为 `PENDING`；解析、分块和索引状态将在后续任务中推进。
+- 上传时先写入 `UPLOADING`，对象保存成功后改为 `PENDING`；触发索引后进入 `PROCESSING`，后台成功写入 ES 后改为 `READY`，失败则改为 `FAILED` 并保存固定错误码。
+- `PROCESSING` 状态禁止重复触发和删除；状态推进及并发覆盖由应用层和 `version` 乐观锁共同限制。
 
 ## `ai_model_configs` AI 模型配置表
 
-保存运行时模型连接配置，由 Flyway V4 创建、V5 调整协议与厂商字段。
+保存运行时模型连接配置，由 Flyway V4 创建、V5 调整协议与厂商字段、V10 增加模型用途和向量维度。
 
 | 字段 | 类型 | 可空 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
 | `id` | `BIGINT` | 否 | 自增 | 模型配置主键。 |
 | `name` | `VARCHAR(100)` | 否 | 无 | 管理端显示的配置名称，全局唯一。 |
+| `model_type` | `VARCHAR(20)` | 否 | `CHAT` | 模型用途：`CHAT`、`EMBEDDING`；历史配置迁移为 `CHAT`。 |
 | `protocol` | `VARCHAR(40)` | 否 | 无 | 调用协议，当前固定为 `OPENAI_COMPATIBLE`。 |
 | `vendor` | `VARCHAR(40)` | 否 | `CUSTOM` | 厂商：`OPENAI`、`DEEPSEEK`、`QWEN`、`OLLAMA`、`CUSTOM`。 |
-| `base_url` | `VARCHAR(500)` | 否 | 无 | OpenAI SDK 风格基础地址，不包含末尾 `/chat/completions`。内置厂商由后端写入预设值。 |
+| `base_url` | `VARCHAR(500)` | 否 | 无 | OpenAI SDK 风格基础地址，不包含末尾 `/chat/completions` 或 `/embeddings`。内置厂商由后端写入预设值。 |
 | `model_name` | `VARCHAR(100)` | 否 | 无 | 厂商侧模型标识，例如 `deepseek-chat`。 |
 | `api_key_ciphertext` | `VARCHAR(2048)` | 否 | 无 | AES-256-GCM 加密后的 API Key 密文。 |
 | `api_key_hint` | `VARCHAR(16)` | 否 | 无 | 用于界面识别密钥的脱敏尾号，例如 `****1234`。 |
 | `encryption_key_version` | `INT` | 否 | `1` | 加密主密钥版本，为后续密钥轮换预留。 |
 | `supports_streaming` | `BOOLEAN` | 否 | `TRUE` | 该配置是否声明支持流式输出。 |
 | `supports_tools` | `BOOLEAN` | 否 | `TRUE` | 该配置是否声明支持工具调用。 |
+| `embedding_dimensions` | `INT` | 是 | `NULL` | Embedding 输出向量维度；`EMBEDDING` 必填，`CHAT` 为空。 |
 | `enabled` | `BOOLEAN` | 否 | `TRUE` | 是否允许业务使用该模型配置。 |
-| `is_default` | `BOOLEAN` | 否 | `FALSE` | 是否为默认聊天模型；唯一性由服务事务保证。 |
+| `is_default` | `BOOLEAN` | 否 | `FALSE` | 是否为该模型用途的默认配置；唯一性由服务事务保证。 |
 | `version` | `INT` | 否 | `0` | 乐观锁版本号，也用于判断运行时模型缓存是否失效。 |
 | `created_by` | `BIGINT` | 否 | 无 | 创建管理员的 `users.id`，逻辑关联。 |
 | `updated_by` | `BIGINT` | 否 | 无 | 最近修改管理员的 `users.id`，逻辑关联。 |
@@ -257,7 +260,9 @@
 - 主键：`PRIMARY KEY (id)`。
 - 唯一约束：`uk_ai_model_configs_name (name)`。
 - 普通索引：`idx_ai_model_configs_enabled_default (enabled, is_default)`，用于解析启用的默认模型。
-- 数据库暂未强制“只能有一个默认模型”，由 `AiModelConfigService` 在事务中清除旧默认项后设置新默认项。
+- 普通索引：`idx_ai_model_configs_type_enabled_default (model_type, enabled, is_default)`，用于分别解析默认聊天和向量模型。
+- 数据库暂未强制“每种用途只能有一个默认模型”，由 `AiModelConfigService` 在事务中按 `model_type` 清除旧默认项后设置新默认项。
+- 应用层要求 `CHAT` 的 `embedding_dimensions` 为空；`EMBEDDING` 的维度必须为 1～4096，且 `supports_streaming`、`supports_tools` 必须为 `FALSE`。
 
 ## 表关系
 
@@ -300,3 +305,4 @@ users.id ──< knowledge_documents.created_by
 | V7 | `V7__create_agent_tool_calls.sql` | 创建 Agent 工具调用记录表。 |
 | V8 | `V8__create_agent_pending_actions.sql` | 创建 Agent 待确认操作和工单草稿表。 |
 | V9 | `V9__create_knowledge_bases_and_documents.sql` | 创建知识库和原始文档元数据表。 |
+| V10 | `V10__add_model_type_and_embedding_dimensions.sql` | 为模型配置增加聊天/向量用途和 Embedding 维度。 |

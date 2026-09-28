@@ -17,7 +17,9 @@ import com.anying.helpdesk.knowledge.exception.InvalidKnowledgeDocumentException
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseConflictException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseNotFoundException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentNotFoundException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentConflictException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentParsingException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeIndexException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeStorageException;
 import com.anying.helpdesk.modelconfig.exception.InvalidModelConfigException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
@@ -63,6 +65,27 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleKnowledgeBaseConflict(KnowledgeBaseConflictException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error("KNOWLEDGE_BASE_CONFLICT", exception.getMessage(), null));
+    }
+
+    /**
+     * 将文档处理状态或乐观锁冲突转换为可重试的冲突响应。
+     */
+    @ExceptionHandler(KnowledgeDocumentConflictException.class)
+    public ResponseEntity<ApiResponse<Void>> handleKnowledgeDocumentConflict(
+            KnowledgeDocumentConflictException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("KNOWLEDGE_DOCUMENT_CONFLICT", exception.getMessage(), null));
+    }
+
+    /**
+     * 将 ES 连接、映射或批量写入故障转换为脱敏的上游服务错误。
+     */
+    @ExceptionHandler(KnowledgeIndexException.class)
+    public ResponseEntity<ApiResponse<Void>> handleKnowledgeIndex(KnowledgeIndexException exception) {
+        log.error("Knowledge index operation failed: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error("KNOWLEDGE_INDEX_FAILED", exception.getMessage(), null));
     }
 
     /**

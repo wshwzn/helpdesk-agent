@@ -85,7 +85,7 @@ public class AdminModelConfigController {
     }
 
     @PostMapping("/{id}/test")
-    @Operation(summary = "测试模型连接", description = "会向模型发送一次极短请求，可能产生少量费用")
+    @Operation(summary = "测试模型连接", description = "按模型用途发送一次极短对话或向量请求，可能产生少量费用")
     public ApiResponse<ModelConnectionTestResponse> testConnection(
             @Parameter(description = "模型配置主键", example = "1")
             @PathVariable @Min(1) Long id
@@ -94,7 +94,7 @@ public class AdminModelConfigController {
     }
 
     @PostMapping("/{id}/default")
-    @Operation(summary = "设为默认模型", description = "只有启用的模型配置可以设为默认")
+    @Operation(summary = "设为默认模型", description = "只有启用的模型配置可以设为默认；CHAT 和 EMBEDDING 分别维护默认项")
     public ApiResponse<ModelConfigResponse> setDefault(
             @Parameter(description = "模型配置主键", example = "1")
             @PathVariable @Min(1) Long id

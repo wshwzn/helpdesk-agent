@@ -1,0 +1,9 @@
+package com.anying.helpdesk.knowledge.index;
+
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@EnableConfigurationProperties(ElasticsearchProperties.class)
+public class ElasticsearchConfiguration {
+}

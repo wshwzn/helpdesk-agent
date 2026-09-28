@@ -2,6 +2,7 @@ package com.anying.helpdesk.modelconfig.dto;
 
 import com.anying.helpdesk.modelconfig.domain.AiModelConfig;
 import com.anying.helpdesk.modelconfig.domain.ModelProtocol;
+import com.anying.helpdesk.modelconfig.domain.ModelType;
 import com.anying.helpdesk.modelconfig.domain.ModelVendor;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 public record ModelConfigResponse(
         @Schema(description = "配置主键", example = "1") Long id,
         @Schema(description = "配置显示名称") String name,
+        @Schema(description = "模型用途") ModelType modelType,
         @Schema(description = "调用协议") ModelProtocol protocol,
         @Schema(description = "模型厂商") ModelVendor vendor,
         @Schema(description = "最终使用的 SDK 基础地址") String baseUrl,
@@ -18,6 +20,7 @@ public record ModelConfigResponse(
         @Schema(description = "API Key 脱敏尾号", example = "****1234") String apiKeyMasked,
         @Schema(description = "是否支持流式输出") Boolean supportsStreaming,
         @Schema(description = "是否支持工具调用") Boolean supportsTools,
+        @Schema(description = "Embedding 向量维度；聊天模型为空") Integer embeddingDimensions,
         @Schema(description = "是否启用") Boolean enabled,
         @Schema(description = "是否为默认模型") Boolean isDefault,
         @Schema(description = "创建时间") LocalDateTime createdAt,
@@ -28,6 +31,7 @@ public record ModelConfigResponse(
         return new ModelConfigResponse(
                 config.getId(),
                 config.getName(),
+                config.getModelType(),
                 config.getProtocol(),
                 config.getVendor(),
                 config.getBaseUrl(),
@@ -35,6 +39,7 @@ public record ModelConfigResponse(
                 config.getApiKeyHint(),
                 config.getSupportsStreaming(),
                 config.getSupportsTools(),
+                config.getEmbeddingDimensions(),
                 config.getEnabled(),
                 config.getIsDefault(),
                 config.getCreatedAt(),

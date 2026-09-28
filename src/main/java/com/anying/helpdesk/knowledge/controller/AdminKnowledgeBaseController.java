@@ -10,6 +10,7 @@ import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
 import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentPreviewService;
+import com.anying.helpdesk.knowledge.service.KnowledgeDocumentIndexingService;
 import com.anying.helpdesk.security.CurrentUserProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,6 +48,7 @@ public class AdminKnowledgeBaseController {
     private final KnowledgeBaseService knowledgeBaseService;
     private final KnowledgeDocumentService knowledgeDocumentService;
     private final KnowledgeDocumentPreviewService knowledgeDocumentPreviewService;
+    private final KnowledgeDocumentIndexingService knowledgeDocumentIndexingService;
     private final CurrentUserProvider currentUserProvider;
 
     /**
@@ -151,6 +153,24 @@ public class AdminKnowledgeBaseController {
                 page,
                 size
         ));
+    }
+
+    /**
+     * 预检默认 Embedding 模型和 ES 索引后，异步处理或重新索引文档。
+     */
+    @PostMapping("/{knowledgeBaseId}/documents/{documentId}/index")
+    @Operation(summary = "开始或重新索引文档", description = "请求成功后文档进入 PROCESSING，后台完成向量化和 ES 写入")
+    public ResponseEntity<ApiResponse<KnowledgeDocumentResponse>> indexDocument(
+            @Parameter(description = "知识库主键", example = "1")
+            @PathVariable @Min(1) Long knowledgeBaseId,
+            @Parameter(description = "文档主键", example = "1")
+            @PathVariable @Min(1) Long documentId
+    ) {
+        KnowledgeDocumentResponse response = knowledgeDocumentIndexingService.start(
+                knowledgeBaseId,
+                documentId
+        );
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ApiResponse.ok(response));
     }
 
     /**

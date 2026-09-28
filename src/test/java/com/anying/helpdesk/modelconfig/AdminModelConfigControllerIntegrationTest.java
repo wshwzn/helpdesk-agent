@@ -7,10 +7,12 @@ import com.anying.helpdesk.modelconfig.crypto.SecretEncryptor;
 import com.anying.helpdesk.modelconfig.crypto.SecretEncryptionException;
 import com.anying.helpdesk.modelconfig.domain.AiModelConfig;
 import com.anying.helpdesk.modelconfig.factory.DefaultChatModelProvider;
+import com.anying.helpdesk.modelconfig.factory.DefaultEmbeddingModelProvider;
 import com.anying.helpdesk.modelconfig.mapper.AiModelConfigMapper;
 import com.anying.helpdesk.modelconfig.service.ModelConnectionTester;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,6 +64,9 @@ class AdminModelConfigControllerIntegrationTest {
     @Autowired
     private DefaultChatModelProvider defaultChatModelProvider;
 
+    @Autowired
+    private DefaultEmbeddingModelProvider defaultEmbeddingModelProvider;
+
     @MockitoBean
     private ModelConnectionTester modelConnectionTester;
 
@@ -77,6 +82,7 @@ class AdminModelConfigControllerIntegrationTest {
         mockMvc.perform(get("/api/admin/model-configs/{id}", id.longValue())
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.modelType").value("CHAT"))
                 .andExpect(jsonPath("$.data.protocol").value("OPENAI_COMPATIBLE"))
                 .andExpect(jsonPath("$.data.vendor").value("CUSTOM"))
                 .andExpect(jsonPath("$.data.apiKeyMasked").value("****1234"))
@@ -210,6 +216,66 @@ class AdminModelConfigControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.protocol").value("OPENAI_COMPATIBLE"))
                 .andExpect(jsonPath("$.data.vendor").value("DEEPSEEK"))
                 .andExpect(jsonPath("$.data.baseUrl").value("https://api.deepseek.com"));
+    }
+
+    @Test
+    @DisplayName("聊天模型与向量模型分别维护默认配置")
+    void chatAndEmbeddingModelsMaintainIndependentDefaults() throws Exception {
+        String token = createUserAndLogin("model_admin_embedding", UserRole.ADMIN);
+        String chatResponse = createConfig(token, "Chat Default", "sk-chat-default", true);
+        long chatId = ((Number) JsonPath.read(chatResponse, "$.data.id")).longValue();
+        mockMvc.perform(post("/api/admin/model-configs/{id}/default", chatId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk());
+
+        String embeddingResponse = mockMvc.perform(post("/api/admin/model-configs")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Embedding Default",
+                                  "modelType": "EMBEDDING",
+                                  "vendor": "CUSTOM",
+                                  "baseUrl": "https://api.example.com/v1",
+                                  "modelName": "example-embedding",
+                                  "apiKey": "sk-embedding-default",
+                                  "supportsStreaming": false,
+                                  "supportsTools": false,
+                                  "embeddingDimensions": 1024,
+                                  "enabled": true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.modelType").value("EMBEDDING"))
+                .andExpect(jsonPath("$.data.embeddingDimensions").value(1024))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long embeddingId = ((Number) JsonPath.read(embeddingResponse, "$.data.id")).longValue();
+        mockMvc.perform(post("/api/admin/model-configs/{id}/default", embeddingId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/admin/model-configs/{id}", embeddingId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Embedding Default Updated",
+                                  "vendor": "CUSTOM",
+                                  "baseUrl": "https://api.example.com/v1",
+                                  "modelName": "example-embedding-v2",
+                                  "supportsStreaming": false,
+                                  "supportsTools": false
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.modelType").value("EMBEDDING"))
+                .andExpect(jsonPath("$.data.embeddingDimensions").value(1024))
+                .andExpect(jsonPath("$.data.isDefault").value(true));
+
+        assertThat(defaultChatModelProvider.get().configId()).isEqualTo(chatId);
+        assertThat(defaultEmbeddingModelProvider.get().configId()).isEqualTo(embeddingId);
+        assertThat(defaultEmbeddingModelProvider.get().dimensions()).isEqualTo(1024);
     }
 
     @Test

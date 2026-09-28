@@ -2,9 +2,12 @@ package com.anying.helpdesk.knowledge.service;
 
 import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocument;
+import com.anying.helpdesk.knowledge.domain.KnowledgeDocumentStatus;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
 import com.anying.helpdesk.knowledge.exception.InvalidKnowledgeDocumentException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentConflictException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeStorageException;
+import com.anying.helpdesk.knowledge.index.KnowledgeChunkStore;
 import com.anying.helpdesk.storage.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -38,6 +41,7 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
 
     private final KnowledgeDocumentPersistenceService persistenceService;
     private final ObjectStorageService objectStorageService;
+    private final KnowledgeChunkStore chunkStore;
 
     /**
      * 完成文件校验、哈希计算、对象上传和文档元数据状态推进。
@@ -94,7 +98,13 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
     @Override
     public void delete(Long knowledgeBaseId, Long documentId) {
         KnowledgeDocument document = persistenceService.get(knowledgeBaseId, documentId);
+        if (document.getStatus() == KnowledgeDocumentStatus.PROCESSING) {
+            throw new KnowledgeDocumentConflictException("processing document cannot be deleted");
+        }
         requireCurrentStorageProvider(document);
+        if (document.getStatus() == KnowledgeDocumentStatus.READY) {
+            chunkStore.deleteDocument(documentId);
+        }
         objectStorageService.delete(document.getBucketName(), document.getObjectKey());
         persistenceService.delete(knowledgeBaseId, documentId);
     }

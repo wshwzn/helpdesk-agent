@@ -7,6 +7,7 @@
 - Java 21
 - Maven 3.9+
 - MySQL 8.0+，默认端口 `3306`
+- Elasticsearch 9.x，用于保存全文和向量检索 Chunk
 - 可选：阿里云 OSS，用于保存知识库原始文档；未配置时使用本地目录
 
 ## 本地启动
@@ -40,6 +41,16 @@ OSS_ENDPOINT=https://oss-cn-hangzhou.aliyuncs.com
 OSS_BUCKET=your-private-bucket
 OSS_ACCESS_KEY_ID=
 OSS_ACCESS_KEY_SECRET=
+```
+
+本地 Elasticsearch 开启 HTTPS 时，填写连接账号以及安装目录生成的 CA 证书路径：
+
+```properties
+ELASTIC_URI=https://localhost:9200
+ELASTIC_USERNAME=elastic
+ELASTIC_PASSWORD=<本地 Elasticsearch 密码>
+ELASTIC_CA_CERT_PATH=D:/elasticsearch-9.5.4/config/certs/http_ca.crt
+ELASTIC_INDEX_NAME=helpdesk_knowledge_chunks_v1
 ```
 
 应用启动时，Flyway 会自动执行 `src/main/resources/db/migration` 中尚未执行的数据库迁移。
@@ -76,7 +87,7 @@ $env:OPENAPI_ENABLED = "false"
 
 ## 知识库管理
 
-当前阶段提供管理员知识库和原始文档管理能力。上传支持 `txt`、`md`、`pdf`、`docx`，单文件最大 20 MB；成功上传后的状态为 `PENDING`，等待下一阶段的解析、分块和 Elasticsearch 索引任务。
+管理员可以管理知识库、上传原始文档并异步建立 Elasticsearch 索引。上传支持 `txt`、`md`、`pdf`、`docx`，单文件最大 20 MB；上传成功后状态为 `PENDING`，触发索引后依次进入 `PROCESSING`、`READY` 或 `FAILED`。
 
 ```http
 POST   /api/admin/knowledge-bases
@@ -87,6 +98,7 @@ POST   /api/admin/knowledge-bases/{id}/documents
 GET    /api/admin/knowledge-bases/{id}/documents?page=1&size=20
 DELETE /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}
 POST   /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/chunk-preview?page=1&size=20
+POST   /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/index
 ```
 
 文档上传接口使用 `multipart/form-data`，字段名为 `file`。知识库中存在文档时不能直接删除；应先逐个删除文档，确保对象存储内容同步清理。
@@ -97,9 +109,10 @@ POST   /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/chunk
 KNOWLEDGE_MAX_EXTRACTED_CHARACTERS=2000000
 KNOWLEDGE_CHUNK_SIZE=1000
 KNOWLEDGE_CHUNK_OVERLAP=150
+KNOWLEDGE_EMBEDDING_BATCH_SIZE=16
 ```
 
-预览只用于检查解析和切块效果，会在每次请求时重新处理文档，不会修改文档的 `PENDING` 状态。当前尚未实现向量化、Elasticsearch 写入和检索。
+预览只用于检查解析和切块效果，会在每次请求时重新处理文档，不修改处理状态。索引接口会预检默认 Embedding 模型和 ES 映射，然后返回 `202 Accepted`；后台完成下载、解析、分块、批量向量化和写入。重复触发 `READY` 或 `FAILED` 文档会覆盖该文档原有 Chunk；`PROCESSING` 文档拒绝重复触发和删除。当前尚未实现 BM25、KNN 和 RRF 查询接口。
 
 ## 登录认证
 
@@ -156,11 +169,29 @@ Content-Type: application/json
 
 {
   "name": "DeepSeek 主模型",
+  "modelType": "CHAT",
   "vendor": "DEEPSEEK",
   "modelName": "deepseek-chat",
   "apiKey": "<真实 API Key>",
   "supportsStreaming": true,
   "supportsTools": true,
+  "enabled": true
+}
+```
+
+创建 Embedding 配置时使用相同的 OpenAI 兼容基础地址，同时声明实际输出维度；流式和工具能力必须为 `false`：
+
+```json
+{
+  "name": "知识库向量模型",
+  "modelType": "EMBEDDING",
+  "vendor": "CUSTOM",
+  "baseUrl": "https://proxy.example.com/v1",
+  "modelName": "text-embedding-model",
+  "apiKey": "<真实 API Key>",
+  "supportsStreaming": false,
+  "supportsTools": false,
+  "embeddingDimensions": 1024,
   "enabled": true
 }
 ```
@@ -193,7 +224,7 @@ POST /api/admin/model-configs/{id}/enable
 POST /api/admin/model-configs/{id}/disable
 ```
 
-更新配置时省略 `apiKey` 会保留原密钥。接口响应中的 `protocol` 固定为 `OPENAI_COMPATIBLE`，`vendor` 用于区分地址预设；它们不是不同 SDK。默认模型必须处于启用状态，也不能直接禁用；应先切换默认模型。连接测试会向模型发送一个极短提示词，可能产生少量费用。
+更新配置时省略 `apiKey` 会保留原密钥，更新 Embedding 配置时省略 `embeddingDimensions` 会保留原维度。创建请求省略 `modelType` 时按 `CHAT` 兼容，更新时省略则保留当前类型。接口响应中的 `protocol` 固定为 `OPENAI_COMPATIBLE`，`vendor` 用于区分地址预设；它们不是不同 SDK。`CHAT` 和 `EMBEDDING` 分别维护一个默认模型。默认模型必须处于启用状态，也不能直接禁用；应先切换默认模型。连接测试会按类型发送一个极短对话或向量请求，可能产生少量费用。
 
 ## 智能对话接口
 
