@@ -8,7 +8,7 @@ Avoid routine line-by-line comments inside methods. Add an internal comment only
 
 ## Change Notes
 
-After every implementation change, add or update a Chinese Markdown summary under `notes/`. Name new files with the pattern `YYYY-MM-DD-topic.md`, for example `2026-09-26-ticket-lifecycle.md`.
+After every implementation change, add or update a Chinese Markdown summary under `notes/`. Use a short Chinese topic as the filename without a date prefix, for example `工单状态流转.md` or `文档解析与分块预览.md`.
 
 Each summary must include:
 
@@ -19,7 +19,7 @@ Each summary must include:
 - tests and manual verification performed;
 - known limitations or follow-up work.
 
-Keep credentials and other secrets out of notes. Documentation-only wording fixes may update the most relevant existing note instead of creating a new file.
+Keep credentials and other secrets out of notes. Prefer updating an existing note for the same topic instead of creating a duplicate file. Documentation-only wording fixes may update the most relevant existing note instead of creating a new file.
 
 ## Database Documentation
 
