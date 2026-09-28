@@ -17,7 +17,7 @@
 | --- | --- |
 | `OpenApiConfig` | 定义 API 标题、版本、说明和 JWT Bearer 安全方案。 |
 | `OpenApiDocumentationIntegrationTest` | 验证 OpenAPI JSON、Swagger UI、JWT 安全声明、敏感字段只写标记，以及请求 DTO 不包含错误默认值。 |
-| `notes/2026-09-26-openapi-documentation.md` | 记录本次接口文档功能变更。 |
+| `notes/OpenAPI接口文档.md` | 记录本次接口文档功能变更。 |
 
 ## 修改的类和文件
 
