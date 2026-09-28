@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 public record UpdateKnowledgeRetrievalSettingsRequest(
         @Schema(description = "BM25 和 KNN 各自送入 RRF 的候选数量上限", example = "50")
         @NotNull @Min(1) @Max(200) Integer candidateLimit,
-        @Schema(description = "KNN 原始向量相似度下限；为空表示关闭过滤", example = "0.650")
-        @DecimalMin("0.0") @DecimalMax("1.0") @Digits(integer = 1, fraction = 3) BigDecimal vectorMinSimilarity,
+        @Schema(description = "KNN 原始向量相似度下限，始终生效", example = "0.650")
+        @NotNull @DecimalMin("0.0") @DecimalMax("1.0") @Digits(integer = 1, fraction = 3) BigDecimal vectorMinSimilarity,
         @Schema(description = "RRF 融合后最终返回的数量上限", example = "5")
         @NotNull @Min(1) @Max(50) Integer resultLimit
 ) {

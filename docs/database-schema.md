@@ -185,7 +185,7 @@
 | `name` | `VARCHAR(100)` | 否 | 无 | 知识库名称，全局唯一。 |
 | `description` | `VARCHAR(500)` | 是 | `NULL` | 知识库用途说明。 |
 | `retrieval_candidate_limit` | `INT` | 否 | `50` | BM25 和 KNN 各自送入 RRF 的候选数量上限，应用限制为 1～200。 |
-| `vector_min_similarity` | `DECIMAL(4,3)` | 是 | `NULL` | KNN 原始向量相似度下限，范围 0～1；为空表示关闭阈值过滤。 |
+| `vector_min_similarity` | `DECIMAL(4,3)` | 否 | `0.000` | 始终生效的 KNN 原始向量相似度下限，范围 0～1；0 会过滤负相关向量。 |
 | `retrieval_result_limit` | `INT` | 否 | `5` | RRF 融合后最终返回数量上限，应用限制为 1～50。 |
 | `created_by` | `BIGINT` | 否 | 无 | 创建管理员的 `users.id`，逻辑关联。 |
 | `version` | `INT` | 否 | `0` | 乐观锁版本号，为后续知识库编辑预留。 |
@@ -312,3 +312,4 @@ users.id ──< knowledge_documents.created_by
 | V9 | `V9__create_knowledge_bases_and_documents.sql` | 创建知识库和原始文档元数据表。 |
 | V10 | `V10__add_model_type_and_embedding_dimensions.sql` | 为模型配置增加聊天/向量用途和 Embedding 维度。 |
 | V11 | `V11__add_knowledge_retrieval_settings.sql` | 为知识库增加候选窗口、向量阈值和最终结果上限。 |
+| V12 | `V12__require_vector_min_similarity.sql` | 将历史空阈值迁移为 0，并要求向量相似度下限始终存在。 |

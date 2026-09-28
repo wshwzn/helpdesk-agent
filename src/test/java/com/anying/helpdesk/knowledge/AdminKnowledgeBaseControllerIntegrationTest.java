@@ -245,7 +245,7 @@ class AdminKnowledgeBaseControllerIntegrationTest {
     }
 
     /**
-     * 验证管理员可以更新知识库级检索参数，且最终数量不能超过单路候选数量。
+     * 验证管理员可以更新知识库级检索参数，相似度必填且最终数量不能超过候选数量。
      */
     @Test
     @DisplayName("管理员可以更新知识库检索参数")
@@ -281,17 +281,30 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                         .content("""
                                 {
                                   "candidateLimit": 40,
-                                  "vectorMinSimilarity": null,
+                                  "vectorMinSimilarity": 0.000,
                                   "resultLimit": 8
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.vectorMinSimilarity").isEmpty());
+                .andExpect(jsonPath("$.data.vectorMinSimilarity").value(0.000));
 
         mockMvc.perform(get("/api/admin/knowledge-bases/{id}", knowledgeBaseId)
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.vectorMinSimilarity").isEmpty());
+                .andExpect(jsonPath("$.data.vectorMinSimilarity").value(0.000));
+
+        mockMvc.perform(put("/api/admin/knowledge-bases/{id}/retrieval-settings", knowledgeBaseId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "candidateLimit": 40,
+                                  "vectorMinSimilarity": null,
+                                  "resultLimit": 8
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
 
         mockMvc.perform(put("/api/admin/knowledge-bases/{id}/retrieval-settings", knowledgeBaseId)
                         .header(HttpHeaders.AUTHORIZATION, bearer(token))
@@ -299,7 +312,7 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                         .content("""
                                 {
                                   "candidateLimit": 5,
-                                  "vectorMinSimilarity": null,
+                                  "vectorMinSimilarity": 0.000,
                                   "resultLimit": 6
                                 }
                                 """))
@@ -369,7 +382,7 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.documentCount").value(0))
                 .andExpect(jsonPath("$.data.retrievalCandidateLimit").value(50))
-                .andExpect(jsonPath("$.data.vectorMinSimilarity").isEmpty())
+                .andExpect(jsonPath("$.data.vectorMinSimilarity").value(0.000))
                 .andExpect(jsonPath("$.data.retrievalResultLimit").value(5))
                 .andReturn()
                 .getResponse()

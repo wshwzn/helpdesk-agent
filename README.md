@@ -116,7 +116,7 @@ KNOWLEDGE_EMBEDDING_BATCH_SIZE=16
 
 预览只用于检查解析和切块效果，会在每次请求时重新处理文档，不修改处理状态。索引接口会预检默认 Embedding 模型和 ES 映射，然后返回 `202 Accepted`；后台完成下载、解析、分块、批量向量化和写入。重复触发 `READY` 或 `FAILED` 文档会覆盖该文档原有 Chunk；`PROCESSING` 文档拒绝重复触发和删除。
 
-混合检索接口会为问题生成查询向量，通过一次 Elasticsearch `_msearch` 分别执行 BM25 全文检索和 KNN 向量检索，再在应用层使用 RRF 去重融合。当前本地 ES 的 Basic 许可证不包含原生 RRF，因此应用层融合可避免商业许可证依赖。每个知识库独立维护检索参数，默认单路候选上限为 50、关闭向量相似度过滤、最终结果上限为 5：
+混合检索接口会为问题生成查询向量，通过一次 Elasticsearch `_msearch` 分别执行 BM25 全文检索和 KNN 向量检索，再在应用层使用 RRF 去重融合。当前本地 ES 的 Basic 许可证不包含原生 RRF，因此应用层融合可避免商业许可证依赖。每个知识库独立维护检索参数，默认单路候选上限为 50、向量相似度下限为 0、最终结果上限为 5：
 
 ```http
 PUT /api/admin/knowledge-bases/{id}/retrieval-settings
@@ -130,7 +130,7 @@ Content-Type: application/json
 }
 ```
 
-`candidateLimit` 允许 1～200，`vectorMinSimilarity` 允许 `0～1` 或 `null`，`resultLimit` 允许 1～50 且不能超过候选上限。KNN 的 `num_candidates` 不开放配置，由后端固定为 `candidateLimit × 2`。参数修改后立即影响后续查询，不需要重新索引。
+`candidateLimit` 允许 1～200，`vectorMinSimilarity` 必填且允许 0～1，`resultLimit` 允许 1～50 且不能超过候选上限。相似度过滤始终启用，0 表示过滤负相关向量。KNN 的 `num_candidates` 不开放配置，由后端固定为 `candidateLimit × 2`。参数修改后立即影响后续查询，不需要重新索引。
 
 ```http
 POST /api/admin/knowledge-bases/{id}/search

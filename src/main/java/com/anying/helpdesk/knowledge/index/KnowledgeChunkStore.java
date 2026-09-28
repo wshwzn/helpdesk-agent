@@ -25,7 +25,7 @@ public interface KnowledgeChunkStore {
             float[] queryVector,
             int rankWindowSize,
             int vectorNumCandidates,
-            Double vectorMinSimilarity
+            double vectorMinSimilarity
     );
 
     /**

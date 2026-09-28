@@ -48,9 +48,7 @@ public class KnowledgeRetrievalService {
                 queryVector,
                 settings.candidateLimit(),
                 settings.candidateLimit() * VECTOR_CANDIDATE_MULTIPLIER,
-                settings.vectorMinSimilarity() == null
-                        ? null
-                        : settings.vectorMinSimilarity().doubleValue()
+                settings.vectorMinSimilarity().doubleValue()
         );
         List<KnowledgeSearchResultResponse> results = fuse(candidates, settings.resultLimit());
         return new KnowledgeSearchResponse(
