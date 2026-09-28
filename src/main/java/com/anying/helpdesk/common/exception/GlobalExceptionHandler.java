@@ -14,6 +14,7 @@ import com.anying.helpdesk.conversation.exception.ConversationNotActiveException
 import com.anying.helpdesk.conversation.exception.ConversationNotFoundException;
 import com.anying.helpdesk.conversation.exception.ModelStreamingNotSupportedException;
 import com.anying.helpdesk.knowledge.exception.InvalidKnowledgeDocumentException;
+import com.anying.helpdesk.knowledge.exception.InvalidKnowledgeRetrievalSettingsException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseConflictException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseNotFoundException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentNotFoundException;
@@ -66,6 +67,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleKnowledgeBaseConflict(KnowledgeBaseConflictException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error("KNOWLEDGE_BASE_CONFLICT", exception.getMessage(), null));
+    }
+
+    /**
+     * 将检索参数之间不合法的大小关系转换为参数错误响应。
+     */
+    @ExceptionHandler(InvalidKnowledgeRetrievalSettingsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidKnowledgeRetrievalSettings(
+            InvalidKnowledgeRetrievalSettingsException exception
+    ) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error("INVALID_KNOWLEDGE_RETRIEVAL_SETTINGS", exception.getMessage(), null));
     }
 
     /**

@@ -24,7 +24,8 @@ public interface KnowledgeChunkStore {
             String query,
             float[] queryVector,
             int rankWindowSize,
-            int vectorNumCandidates
+            int vectorNumCandidates,
+            Double vectorMinSimilarity
     );
 
     /**

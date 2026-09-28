@@ -108,7 +108,8 @@ class ElasticsearchKnowledgeChunkStoreTest {
                 "如何登录",
                 new float[]{0.1F, 0.2F, 0.3F},
                 20,
-                100
+                40,
+                0.65D
         );
 
         assertThat(results.bm25Hits()).singleElement()
@@ -120,6 +121,7 @@ class ElasticsearchKnowledgeChunkStoreTest {
                 .contains("\"knn\"")
                 .contains("\"embeddingModelConfigId\":8")
                 .contains("\"embeddingModelName\":\"embedding-model\"")
+                .contains("\"similarity\":0.65")
                 .endsWith("\n");
     }
 

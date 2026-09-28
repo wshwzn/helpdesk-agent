@@ -115,7 +115,8 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
             String query,
             float[] queryVector,
             int rankWindowSize,
-            int vectorNumCandidates
+            int vectorNumCandidates,
+            Double vectorMinSimilarity
     ) {
         StringBuilder body = new StringBuilder();
         body.append("{}\n");
@@ -127,7 +128,8 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
                 embeddingModelName,
                 queryVector,
                 rankWindowSize,
-                vectorNumCandidates
+                vectorNumCandidates,
+                vectorMinSimilarity
         ))).append('\n');
         HttpResponse<String> response = send(
                 "POST",
@@ -195,13 +197,17 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
             String embeddingModelName,
             float[] queryVector,
             int rankWindowSize,
-            int vectorNumCandidates
+            int vectorNumCandidates,
+            Double vectorMinSimilarity
     ) {
         Map<String, Object> knn = new LinkedHashMap<>();
         knn.put("field", "contentVector");
         knn.put("query_vector", queryVector);
         knn.put("k", rankWindowSize);
         knn.put("num_candidates", vectorNumCandidates);
+        if (vectorMinSimilarity != null) {
+            knn.put("similarity", vectorMinSimilarity);
+        }
         knn.put("filter", Map.of("bool", Map.of("filter", List.of(
                 Map.of("term", Map.of("knowledgeBaseId", knowledgeBaseId)),
                 Map.of("term", Map.of("embeddingModelConfigId", embeddingModelConfigId)),

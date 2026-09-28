@@ -2,6 +2,7 @@ package com.anying.helpdesk.knowledge.service;
 
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchRequest;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeRetrievalSettingsResponse;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkSearchHit;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkSearchResults;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkStore;
@@ -14,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.embedding.EmbeddingModel;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,10 +56,17 @@ class KnowledgeRetrievalServiceTest {
                 embeddingModel
         ));
         when(embeddingModel.embed("如何登录")).thenReturn(queryVector);
+        when(knowledgeBaseService.getRetrievalSettings(3L)).thenReturn(new KnowledgeRetrievalSettingsResponse(
+                3L,
+                40,
+                new BigDecimal("0.650"),
+                3,
+                0
+        ));
         KnowledgeChunkSearchHit chunkA = hit("3-1", 1, "登录说明", 8.8D);
         KnowledgeChunkSearchHit chunkB = hit("3-2", 2, "密码帮助", 7.7D);
         KnowledgeChunkSearchHit chunkC = hit("3-3", 3, "账号帮助", 0.7D);
-        when(chunkStore.search(3L, 8L, "embedding-model", "如何登录", queryVector, 50, 100))
+        when(chunkStore.search(3L, 8L, "embedding-model", "如何登录", queryVector, 40, 80, 0.65D))
                 .thenReturn(new KnowledgeChunkSearchResults(
                         List.of(chunkA, chunkB),
                         List.of(
@@ -67,17 +76,20 @@ class KnowledgeRetrievalServiceTest {
                         )
                 ));
 
-        KnowledgeSearchResponse response = service.search(3L, new KnowledgeSearchRequest("  如何登录  ", 2));
+        KnowledgeSearchResponse response = service.search(3L, new KnowledgeSearchRequest("  如何登录  "));
 
+        assertThat(response.candidateLimit()).isEqualTo(40);
+        assertThat(response.vectorMinSimilarity()).isEqualByComparingTo("0.650");
+        assertThat(response.resultLimit()).isEqualTo(3);
         assertThat(response.bm25CandidateCount()).isEqualTo(2);
         assertThat(response.vectorCandidateCount()).isEqualTo(3);
-        assertThat(response.results()).hasSize(2);
+        assertThat(response.results()).hasSize(3);
         assertThat(response.results().get(0).chunkSequence()).isEqualTo(2);
         assertThat(response.results().get(0).bm25Rank()).isEqualTo(2);
         assertThat(response.results().get(0).vectorRank()).isEqualTo(1);
         assertThat(response.results().get(1).chunkSequence()).isEqualTo(1);
         verify(chunkStore).ensureIndex(3);
-        verify(knowledgeBaseService).getById(3L);
+        verify(knowledgeBaseService).getRetrievalSettings(3L);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.anying.helpdesk.knowledge.service;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchRequest;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResultResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeRetrievalSettingsResponse;
 import com.anying.helpdesk.knowledge.exception.KnowledgeRetrievalException;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkSearchHit;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkSearchResults;
@@ -23,9 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KnowledgeRetrievalService {
 
-    private static final int DEFAULT_TOP_K = 5;
-    private static final int RANK_WINDOW_SIZE = 50;
-    private static final int VECTOR_NUM_CANDIDATES = 100;
+    private static final int VECTOR_CANDIDATE_MULTIPLIER = 2;
     private static final int RRF_RANK_CONSTANT = 60;
 
     private final KnowledgeBaseService knowledgeBaseService;
@@ -36,9 +35,8 @@ public class KnowledgeRetrievalService {
      * 为查询生成向量，执行 BM25 与 KNN 双路召回，并使用标准 RRF 融合结果。
      */
     public KnowledgeSearchResponse search(Long knowledgeBaseId, KnowledgeSearchRequest request) {
-        knowledgeBaseService.getById(knowledgeBaseId);
+        KnowledgeRetrievalSettingsResponse settings = knowledgeBaseService.getRetrievalSettings(knowledgeBaseId);
         String query = request.query().trim();
-        int topK = request.topK() == null ? DEFAULT_TOP_K : request.topK();
         ResolvedEmbeddingModel embeddingModel = embeddingModelProvider.get();
         chunkStore.ensureIndex(embeddingModel.dimensions());
         float[] queryVector = embedQuery(query, embeddingModel);
@@ -48,14 +46,19 @@ public class KnowledgeRetrievalService {
                 embeddingModel.modelName(),
                 query,
                 queryVector,
-                RANK_WINDOW_SIZE,
-                VECTOR_NUM_CANDIDATES
+                settings.candidateLimit(),
+                settings.candidateLimit() * VECTOR_CANDIDATE_MULTIPLIER,
+                settings.vectorMinSimilarity() == null
+                        ? null
+                        : settings.vectorMinSimilarity().doubleValue()
         );
-        List<KnowledgeSearchResultResponse> results = fuse(candidates, topK);
+        List<KnowledgeSearchResultResponse> results = fuse(candidates, settings.resultLimit());
         return new KnowledgeSearchResponse(
                 knowledgeBaseId,
                 query,
-                topK,
+                settings.candidateLimit(),
+                settings.vectorMinSimilarity(),
+                settings.resultLimit(),
                 candidates.bm25Hits().size(),
                 candidates.vectorHits().size(),
                 results
@@ -80,9 +83,9 @@ public class KnowledgeRetrievalService {
     }
 
     /**
-     * 按各路名次累加倒数排名分数，对相同 Chunk 去重后返回前 topK 条。
+     * 按各路名次累加倒数排名分数，对相同 Chunk 去重后返回配置数量。
      */
-    private List<KnowledgeSearchResultResponse> fuse(KnowledgeChunkSearchResults candidates, int topK) {
+    private List<KnowledgeSearchResultResponse> fuse(KnowledgeChunkSearchResults candidates, int resultLimit) {
         Map<String, SearchAccumulator> accumulators = new LinkedHashMap<>();
         addBm25Ranks(accumulators, candidates.bm25Hits());
         addVectorRanks(accumulators, candidates.vectorHits());
@@ -90,7 +93,7 @@ public class KnowledgeRetrievalService {
                 .sorted(Comparator.comparingDouble((SearchAccumulator value) -> value.rrfScore)
                         .reversed()
                         .thenComparing(value -> value.hit.chunkId()))
-                .limit(topK)
+                .limit(resultLimit)
                 .toList();
         List<KnowledgeSearchResultResponse> results = new ArrayList<>(ranked.size());
         for (int index = 0; index < ranked.size(); index++) {

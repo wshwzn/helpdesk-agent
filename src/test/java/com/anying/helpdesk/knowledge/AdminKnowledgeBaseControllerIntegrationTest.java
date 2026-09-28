@@ -42,6 +42,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -244,6 +245,69 @@ class AdminKnowledgeBaseControllerIntegrationTest {
     }
 
     /**
+     * 验证管理员可以更新知识库级检索参数，且最终数量不能超过单路候选数量。
+     */
+    @Test
+    @DisplayName("管理员可以更新知识库检索参数")
+    void adminUpdatesKnowledgeRetrievalSettings() throws Exception {
+        String token = createUserAndLogin("knowledge_admin_settings", UserRole.ADMIN);
+        long knowledgeBaseId = createKnowledgeBase(token, "检索参数知识库");
+
+        mockMvc.perform(put("/api/admin/knowledge-bases/{id}/retrieval-settings", knowledgeBaseId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "candidateLimit": 40,
+                                  "vectorMinSimilarity": 0.650,
+                                  "resultLimit": 8
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.candidateLimit").value(40))
+                .andExpect(jsonPath("$.data.vectorMinSimilarity").value(0.650))
+                .andExpect(jsonPath("$.data.resultLimit").value(8));
+
+        mockMvc.perform(get("/api/admin/knowledge-bases/{id}", knowledgeBaseId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.retrievalCandidateLimit").value(40))
+                .andExpect(jsonPath("$.data.vectorMinSimilarity").value(0.650))
+                .andExpect(jsonPath("$.data.retrievalResultLimit").value(8));
+
+        mockMvc.perform(put("/api/admin/knowledge-bases/{id}/retrieval-settings", knowledgeBaseId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "candidateLimit": 40,
+                                  "vectorMinSimilarity": null,
+                                  "resultLimit": 8
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.vectorMinSimilarity").isEmpty());
+
+        mockMvc.perform(get("/api/admin/knowledge-bases/{id}", knowledgeBaseId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.vectorMinSimilarity").isEmpty());
+
+        mockMvc.perform(put("/api/admin/knowledge-bases/{id}/retrieval-settings", knowledgeBaseId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "candidateLimit": 5,
+                                  "vectorMinSimilarity": null,
+                                  "resultLimit": 6
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_KNOWLEDGE_RETRIEVAL_SETTINGS"));
+    }
+
+    /**
      * 验证管理员可以提交自然语言问题并查看双路召回的融合排名。
      */
     @Test
@@ -253,6 +317,8 @@ class AdminKnowledgeBaseControllerIntegrationTest {
         when(knowledgeRetrievalService.search(anyLong(), any())).thenReturn(new KnowledgeSearchResponse(
                 3L,
                 "如何登录",
+                50,
+                new java.math.BigDecimal("0.650"),
                 5,
                 2,
                 3,
@@ -274,9 +340,12 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, bearer(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"query":"如何登录","topK":5}
+                                {"query":"如何登录"}
                                 """))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.candidateLimit").value(50))
+                .andExpect(jsonPath("$.data.vectorMinSimilarity").value(0.650))
+                .andExpect(jsonPath("$.data.resultLimit").value(5))
                 .andExpect(jsonPath("$.data.bm25CandidateCount").value(2))
                 .andExpect(jsonPath("$.data.vectorCandidateCount").value(3))
                 .andExpect(jsonPath("$.data.results[0].rank").value(1))
@@ -299,6 +368,9 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                                 """.formatted(name)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.documentCount").value(0))
+                .andExpect(jsonPath("$.data.retrievalCandidateLimit").value(50))
+                .andExpect(jsonPath("$.data.vectorMinSimilarity").isEmpty())
+                .andExpect(jsonPath("$.data.retrievalResultLimit").value(5))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();

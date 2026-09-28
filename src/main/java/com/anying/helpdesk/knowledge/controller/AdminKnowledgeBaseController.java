@@ -9,6 +9,8 @@ import com.anying.helpdesk.knowledge.dto.KnowledgeBaseResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchRequest;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeRetrievalSettingsResponse;
+import com.anying.helpdesk.knowledge.dto.UpdateKnowledgeRetrievalSettingsRequest;
 import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentPreviewService;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,6 +89,19 @@ public class AdminKnowledgeBaseController {
             @PathVariable @Min(1) Long id
     ) {
         return ApiResponse.ok(knowledgeBaseService.getById(id));
+    }
+
+    /**
+     * 更新一个知识库的候选窗口、向量阈值和最终结果上限。
+     */
+    @PutMapping("/{id}/retrieval-settings")
+    @Operation(summary = "更新知识库检索参数", description = "参数在下次检索时立即生效，不需要重新索引文档")
+    public ApiResponse<KnowledgeRetrievalSettingsResponse> updateRetrievalSettings(
+            @Parameter(description = "知识库主键", example = "1")
+            @PathVariable @Min(1) Long id,
+            @Valid @RequestBody UpdateKnowledgeRetrievalSettingsRequest request
+    ) {
+        return ApiResponse.ok(knowledgeBaseService.updateRetrievalSettings(id, request));
     }
 
     /**

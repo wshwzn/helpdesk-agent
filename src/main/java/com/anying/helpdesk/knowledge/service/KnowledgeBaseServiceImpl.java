@@ -4,6 +4,9 @@ import com.anying.helpdesk.knowledge.domain.KnowledgeBase;
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocument;
 import com.anying.helpdesk.knowledge.dto.CreateKnowledgeBaseRequest;
 import com.anying.helpdesk.knowledge.dto.KnowledgeBaseResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeRetrievalSettingsResponse;
+import com.anying.helpdesk.knowledge.dto.UpdateKnowledgeRetrievalSettingsRequest;
+import com.anying.helpdesk.knowledge.exception.InvalidKnowledgeRetrievalSettingsException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseConflictException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseNotFoundException;
 import com.anying.helpdesk.knowledge.mapper.KnowledgeBaseMapper;
@@ -69,6 +72,40 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
     public KnowledgeBaseResponse getById(Long id) {
         KnowledgeBase knowledgeBase = requireKnowledgeBase(id);
         return KnowledgeBaseResponse.from(knowledgeBase, countDocuments(id));
+    }
+
+    /**
+     * 读取查询热路径所需的检索参数，避免额外统计知识库文档数量。
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public KnowledgeRetrievalSettingsResponse getRetrievalSettings(Long id) {
+        return KnowledgeRetrievalSettingsResponse.from(requireKnowledgeBase(id));
+    }
+
+    /**
+     * 校验三个检索参数的关系，并通过乐观锁保存知识库级配置。
+     */
+    @Override
+    @Transactional
+    public KnowledgeRetrievalSettingsResponse updateRetrievalSettings(
+            Long id,
+            UpdateKnowledgeRetrievalSettingsRequest request
+    ) {
+        if (request.resultLimit() > request.candidateLimit()) {
+            throw new InvalidKnowledgeRetrievalSettingsException(
+                    "resultLimit must not exceed candidateLimit"
+            );
+        }
+        KnowledgeBase knowledgeBase = requireKnowledgeBase(id);
+        knowledgeBase.setRetrievalCandidateLimit(request.candidateLimit());
+        knowledgeBase.setVectorMinSimilarity(request.vectorMinSimilarity());
+        knowledgeBase.setRetrievalResultLimit(request.resultLimit());
+        knowledgeBase.setUpdatedAt(LocalDateTime.now());
+        if (knowledgeBaseMapper.updateById(knowledgeBase) == 0) {
+            throw new KnowledgeBaseConflictException("knowledge base was updated concurrently");
+        }
+        return KnowledgeRetrievalSettingsResponse.from(knowledgeBase);
     }
 
     /**

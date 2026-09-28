@@ -93,6 +93,7 @@ $env:OPENAPI_ENABLED = "false"
 POST   /api/admin/knowledge-bases
 GET    /api/admin/knowledge-bases
 GET    /api/admin/knowledge-bases/{id}
+PUT    /api/admin/knowledge-bases/{id}/retrieval-settings
 DELETE /api/admin/knowledge-bases/{id}
 POST   /api/admin/knowledge-bases/{id}/documents
 GET    /api/admin/knowledge-bases/{id}/documents?page=1&size=20
@@ -115,7 +116,21 @@ KNOWLEDGE_EMBEDDING_BATCH_SIZE=16
 
 预览只用于检查解析和切块效果，会在每次请求时重新处理文档，不修改处理状态。索引接口会预检默认 Embedding 模型和 ES 映射，然后返回 `202 Accepted`；后台完成下载、解析、分块、批量向量化和写入。重复触发 `READY` 或 `FAILED` 文档会覆盖该文档原有 Chunk；`PROCESSING` 文档拒绝重复触发和删除。
 
-混合检索接口会为问题生成查询向量，通过一次 Elasticsearch `_msearch` 分别执行 BM25 全文检索和 KNN 向量检索，再在应用层使用 RRF 去重融合。当前本地 ES 的 Basic 许可证不包含原生 RRF，因此应用层融合可避免商业许可证依赖。`topK` 省略时为 5，允许范围为 1～20：
+混合检索接口会为问题生成查询向量，通过一次 Elasticsearch `_msearch` 分别执行 BM25 全文检索和 KNN 向量检索，再在应用层使用 RRF 去重融合。当前本地 ES 的 Basic 许可证不包含原生 RRF，因此应用层融合可避免商业许可证依赖。每个知识库独立维护检索参数，默认单路候选上限为 50、关闭向量相似度过滤、最终结果上限为 5：
+
+```http
+PUT /api/admin/knowledge-bases/{id}/retrieval-settings
+Authorization: Bearer <管理员 accessToken>
+Content-Type: application/json
+
+{
+  "candidateLimit": 50,
+  "vectorMinSimilarity": 0.650,
+  "resultLimit": 5
+}
+```
+
+`candidateLimit` 允许 1～200，`vectorMinSimilarity` 允许 `0～1` 或 `null`，`resultLimit` 允许 1～50 且不能超过候选上限。KNN 的 `num_candidates` 不开放配置，由后端固定为 `candidateLimit × 2`。参数修改后立即影响后续查询，不需要重新索引。
 
 ```http
 POST /api/admin/knowledge-bases/{id}/search
@@ -123,12 +138,11 @@ Authorization: Bearer <管理员 accessToken>
 Content-Type: application/json
 
 {
-  "query": "如何配置模型接口？",
-  "topK": 5
+  "query": "如何配置模型接口？"
 }
 ```
 
-响应会同时给出融合名次、RRF 分数以及 Chunk 在 BM25、KNN 两路中的名次和原始分数，便于调试召回效果。向量检索只使用由当前默认 Embedding 配置生成的 Chunk；切换默认向量模型后，应重新索引文档。
+响应会回显本次生效的三个参数，并给出融合名次、RRF 分数以及 Chunk 在 BM25、KNN 两路中的名次和原始分数，便于调试召回效果。向量检索只使用由当前默认 Embedding 配置生成的 Chunk；切换默认向量模型后，应重新索引文档并重新评估相似度阈值。
 
 ## 登录认证
 
