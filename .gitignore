@@ -32,9 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
-### Personal notes (track dated change summaries only) ###
+### Personal notes (track numbered change summaries only) ###
 notes/*
-!notes/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*.md
+!notes/[0-9][0-9]-*.md
 
 ### Local configuration ###
 src/main/resources/application-local.yml

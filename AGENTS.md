@@ -8,7 +8,7 @@ Avoid routine line-by-line comments inside methods. Add an internal comment only
 
 ## Change Notes
 
-After every implementation change, add or update a Chinese Markdown summary under `notes/`. Use a short Chinese topic as the filename without a date prefix, for example `工单状态流转.md` or `文档解析与分块预览.md`.
+After every implementation change, add or update a Chinese Markdown summary under `notes/`. Prefix new files with the next two-digit sequence number and use a short Chinese topic, for example `03-工单状态流转.md` or `17-文档解析与分块预览.md`. The number represents the development order; do not include a date.
 
 Each summary must include:
 

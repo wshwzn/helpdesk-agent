@@ -18,7 +18,7 @@
 | `ChatStreamEvent` | 定义 start、delta、done、error 四种流式事件的数据结构。 |
 | `ChatStreamChunk` | 隔离 Spring AI 响应，承载单次文本增量和 Token 用量。 |
 | `ModelStreamingNotSupportedException` | 表示默认模型配置未开启流式能力。 |
-| `notes/SSE流式对话.md` | 记录本轮流式对话实现。 |
+| `notes/10-SSE流式对话.md` | 记录本轮流式对话实现。 |
 
 ## 修改的类和文件
 
