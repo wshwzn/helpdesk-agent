@@ -5,7 +5,10 @@ import com.anying.helpdesk.auth.domain.UserRole;
 import com.anying.helpdesk.auth.mapper.UserMapper;
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocumentStatus;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResultResponse;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentIndexingService;
+import com.anying.helpdesk.knowledge.service.KnowledgeRetrievalService;
 import com.anying.helpdesk.storage.ObjectStorageService;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,6 +68,9 @@ class AdminKnowledgeBaseControllerIntegrationTest {
 
     @MockitoBean
     private KnowledgeDocumentIndexingService knowledgeDocumentIndexingService;
+
+    @MockitoBean
+    private KnowledgeRetrievalService knowledgeRetrievalService;
 
     /**
      * 为每个测试准备稳定的对象存储标识。
@@ -234,6 +241,47 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.data.id").value(7))
                 .andExpect(jsonPath("$.data.status").value("PROCESSING"));
+    }
+
+    /**
+     * 验证管理员可以提交自然语言问题并查看双路召回的融合排名。
+     */
+    @Test
+    @DisplayName("管理员可以调试知识库混合检索")
+    void adminSearchesKnowledgeBase() throws Exception {
+        String token = createUserAndLogin("knowledge_admin_search", UserRole.ADMIN);
+        when(knowledgeRetrievalService.search(anyLong(), any())).thenReturn(new KnowledgeSearchResponse(
+                3L,
+                "如何登录",
+                5,
+                2,
+                3,
+                List.of(new KnowledgeSearchResultResponse(
+                        1,
+                        7L,
+                        2,
+                        "guide.md",
+                        "请使用账号和密码登录。",
+                        0.0325D,
+                        2,
+                        4.2D,
+                        1,
+                        0.91D
+                ))
+        ));
+
+        mockMvc.perform(post("/api/admin/knowledge-bases/3/search")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"query":"如何登录","topK":5}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.bm25CandidateCount").value(2))
+                .andExpect(jsonPath("$.data.vectorCandidateCount").value(3))
+                .andExpect(jsonPath("$.data.results[0].rank").value(1))
+                .andExpect(jsonPath("$.data.results[0].bm25Rank").value(2))
+                .andExpect(jsonPath("$.data.results[0].vectorRank").value(1));
     }
 
     /**

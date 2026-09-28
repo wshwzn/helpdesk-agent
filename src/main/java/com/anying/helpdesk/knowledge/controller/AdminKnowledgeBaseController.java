@@ -7,10 +7,13 @@ import com.anying.helpdesk.knowledge.dto.CreateKnowledgeBaseRequest;
 import com.anying.helpdesk.knowledge.dto.DocumentChunkPreviewResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeBaseResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeSearchRequest;
+import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
 import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentPreviewService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentIndexingService;
+import com.anying.helpdesk.knowledge.service.KnowledgeRetrievalService;
 import com.anying.helpdesk.security.CurrentUserProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,6 +52,7 @@ public class AdminKnowledgeBaseController {
     private final KnowledgeDocumentService knowledgeDocumentService;
     private final KnowledgeDocumentPreviewService knowledgeDocumentPreviewService;
     private final KnowledgeDocumentIndexingService knowledgeDocumentIndexingService;
+    private final KnowledgeRetrievalService knowledgeRetrievalService;
     private final CurrentUserProvider currentUserProvider;
 
     /**
@@ -171,6 +175,19 @@ public class AdminKnowledgeBaseController {
                 documentId
         );
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ApiResponse.ok(response));
+    }
+
+    /**
+     * 执行 BM25、KNN 和 RRF 混合检索，供管理员调试知识库召回效果。
+     */
+    @PostMapping("/{id}/search")
+    @Operation(summary = "调试知识库混合检索", description = "生成查询向量后执行 BM25 与 KNN，并在应用层使用 RRF 融合")
+    public ApiResponse<KnowledgeSearchResponse> search(
+            @Parameter(description = "知识库主键", example = "1")
+            @PathVariable @Min(1) Long id,
+            @Valid @RequestBody KnowledgeSearchRequest request
+    ) {
+        return ApiResponse.ok(knowledgeRetrievalService.search(id, request));
     }
 
     /**

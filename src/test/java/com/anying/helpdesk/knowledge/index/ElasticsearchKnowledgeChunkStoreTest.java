@@ -75,6 +75,55 @@ class ElasticsearchKnowledgeChunkStoreTest {
     }
 
     /**
+     * 验证 BM25 和 KNN 会合并为一次 msearch 请求，并解析成两路独立候选。
+     */
+    @Test
+    @DisplayName("通过 msearch 同时执行 BM25 与 KNN 检索")
+    void searchesBm25AndKnnWithOneMsearchRequest() throws IOException {
+        AtomicReference<String> searchBody = new AtomicReference<>();
+        server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> {
+            if ("POST".equals(exchange.getRequestMethod())
+                    && "/test_knowledge_chunks/_msearch".equals(exchange.getRequestURI().getPath())) {
+                searchBody.set(readBody(exchange));
+                send(exchange, 200, """
+                        {
+                          "responses": [
+                            {"hits":{"hits":[{"_id":"5-1","_score":4.2,"_source":{"documentId":5,"chunkSequence":1,"originalName":"guide.md","content":"登录说明"}}]}},
+                            {"hits":{"hits":[{"_id":"5-2","_score":0.91,"_source":{"documentId":5,"chunkSequence":2,"originalName":"guide.md","content":"密码帮助"}}]}}
+                          ]
+                        }
+                        """);
+                return;
+            }
+            send(exchange, 404, "{}");
+        });
+        server.start();
+        ElasticsearchKnowledgeChunkStore store = createStore(server.getAddress().getPort());
+
+        KnowledgeChunkSearchResults results = store.search(
+                3L,
+                8L,
+                "embedding-model",
+                "如何登录",
+                new float[]{0.1F, 0.2F, 0.3F},
+                20,
+                100
+        );
+
+        assertThat(results.bm25Hits()).singleElement()
+                .satisfies(hit -> assertThat(hit.chunkId()).isEqualTo("5-1"));
+        assertThat(results.vectorHits()).singleElement()
+                .satisfies(hit -> assertThat(hit.score()).isEqualTo(0.91D));
+        assertThat(searchBody.get())
+                .contains("\"match\":{\"content\":\"如何登录\"}")
+                .contains("\"knn\"")
+                .contains("\"embeddingModelConfigId\":8")
+                .contains("\"embeddingModelName\":\"embedding-model\"")
+                .endsWith("\n");
+    }
+
+    /**
      * 创建指向本地假服务的 Chunk Store。
      */
     private ElasticsearchKnowledgeChunkStore createStore(int port) {

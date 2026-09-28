@@ -1,6 +1,7 @@
 package com.anying.helpdesk.knowledge.index;
 
 import com.anying.helpdesk.knowledge.exception.KnowledgeIndexException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeRetrievalException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +23,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +30,13 @@ import java.util.Map;
 
 @Component
 public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
+
+    private static final List<String> SEARCH_SOURCE_FIELDS = List.of(
+            "documentId",
+            "chunkSequence",
+            "originalName",
+            "content"
+    );
 
     private final ElasticsearchProperties properties;
     private final ObjectMapper objectMapper;
@@ -98,6 +105,51 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
     }
 
     /**
+     * 通过一次 msearch 请求执行 BM25 与 KNN，并保留两路各自的排名和原始分数。
+     */
+    @Override
+    public KnowledgeChunkSearchResults search(
+            Long knowledgeBaseId,
+            Long embeddingModelConfigId,
+            String embeddingModelName,
+            String query,
+            float[] queryVector,
+            int rankWindowSize,
+            int vectorNumCandidates
+    ) {
+        StringBuilder body = new StringBuilder();
+        body.append("{}\n");
+        body.append(toJson(buildBm25SearchBody(knowledgeBaseId, query, rankWindowSize))).append('\n');
+        body.append("{}\n");
+        body.append(toJson(buildVectorSearchBody(
+                knowledgeBaseId,
+                embeddingModelConfigId,
+                embeddingModelName,
+                queryVector,
+                rankWindowSize,
+                vectorNumCandidates
+        ))).append('\n');
+        HttpResponse<String> response = send(
+                "POST",
+                indexPath() + "/_msearch",
+                body.toString(),
+                "application/x-ndjson"
+        );
+        if (!isSuccess(response.statusCode())) {
+            throw retrievalStatusException("failed to search Elasticsearch", response.statusCode());
+        }
+        JsonNode root = readSearchJson(response.body());
+        JsonNode responses = root.path("responses");
+        if (!responses.isArray() || responses.size() != 2) {
+            throw new KnowledgeRetrievalException("Elasticsearch returned an invalid msearch response");
+        }
+        return new KnowledgeChunkSearchResults(
+                parseSearchHits(responses.get(0)),
+                parseSearchHits(responses.get(1))
+        );
+    }
+
+    /**
      * 使用 delete-by-query 清除一份文档的所有检索数据。
      */
     @Override
@@ -117,6 +169,88 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
         JsonNode result = readJson(response.body(), "invalid Elasticsearch delete response");
         if (!result.path("failures").isEmpty()) {
             throw new KnowledgeIndexException("Elasticsearch failed to delete one or more knowledge chunks");
+        }
+    }
+
+    /**
+     * 构造限定知识库范围的 BM25 全文检索请求。
+     */
+    private Map<String, Object> buildBm25SearchBody(Long knowledgeBaseId, String query, int rankWindowSize) {
+        return Map.of(
+                "size", rankWindowSize,
+                "_source", SEARCH_SOURCE_FIELDS,
+                "query", Map.of("bool", Map.of(
+                        "must", List.of(Map.of("match", Map.of("content", query))),
+                        "filter", List.of(Map.of("term", Map.of("knowledgeBaseId", knowledgeBaseId)))
+                ))
+        );
+    }
+
+    /**
+     * 构造仅使用当前默认向量模型 Chunk 的 KNN 检索请求。
+     */
+    private Map<String, Object> buildVectorSearchBody(
+            Long knowledgeBaseId,
+            Long embeddingModelConfigId,
+            String embeddingModelName,
+            float[] queryVector,
+            int rankWindowSize,
+            int vectorNumCandidates
+    ) {
+        Map<String, Object> knn = new LinkedHashMap<>();
+        knn.put("field", "contentVector");
+        knn.put("query_vector", queryVector);
+        knn.put("k", rankWindowSize);
+        knn.put("num_candidates", vectorNumCandidates);
+        knn.put("filter", Map.of("bool", Map.of("filter", List.of(
+                Map.of("term", Map.of("knowledgeBaseId", knowledgeBaseId)),
+                Map.of("term", Map.of("embeddingModelConfigId", embeddingModelConfigId)),
+                Map.of("term", Map.of("embeddingModelName", embeddingModelName))
+        ))));
+        return Map.of(
+                "size", rankWindowSize,
+                "_source", SEARCH_SOURCE_FIELDS,
+                "knn", knn
+        );
+    }
+
+    /**
+     * 解析一路 ES 命中，并在子查询失败时返回脱敏的检索异常。
+     */
+    private List<KnowledgeChunkSearchHit> parseSearchHits(JsonNode response) {
+        if (response.has("error") || response.path("status").asInt(200) >= 400) {
+            throw new KnowledgeRetrievalException("Elasticsearch rejected a knowledge search query");
+        }
+        JsonNode hitsNode = response.path("hits").path("hits");
+        if (!hitsNode.isArray()) {
+            throw new KnowledgeRetrievalException("Elasticsearch returned invalid search hits");
+        }
+        List<KnowledgeChunkSearchHit> hits = new java.util.ArrayList<>(hitsNode.size());
+        for (JsonNode hitNode : hitsNode) {
+            JsonNode source = hitNode.path("_source");
+            if (!source.isObject()) {
+                throw new KnowledgeRetrievalException("Elasticsearch returned a hit without source data");
+            }
+            hits.add(new KnowledgeChunkSearchHit(
+                    hitNode.path("_id").asText(),
+                    source.path("documentId").asLong(),
+                    source.path("chunkSequence").asInt(),
+                    source.path("originalName").asText(),
+                    source.path("content").asText(),
+                    hitNode.path("_score").asDouble()
+            ));
+        }
+        return List.copyOf(hits);
+    }
+
+    /**
+     * 解析检索响应 JSON，并将协议格式问题归类为检索失败。
+     */
+    private JsonNode readSearchJson(String value) {
+        try {
+            return objectMapper.readTree(value);
+        } catch (JsonProcessingException exception) {
+            throw new KnowledgeRetrievalException("invalid Elasticsearch search response", exception);
         }
     }
 
@@ -308,5 +442,12 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
      */
     private KnowledgeIndexException statusException(String operation, int statusCode) {
         return new KnowledgeIndexException(operation + " (HTTP " + statusCode + ")");
+    }
+
+    /**
+     * 创建只包含检索操作和状态码的脱敏异常。
+     */
+    private KnowledgeRetrievalException retrievalStatusException(String operation, int statusCode) {
+        return new KnowledgeRetrievalException(operation + " (HTTP " + statusCode + ")");
     }
 }

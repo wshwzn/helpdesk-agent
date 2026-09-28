@@ -20,6 +20,7 @@ import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentNotFoundExceptio
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentConflictException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentParsingException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeIndexException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeRetrievalException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeStorageException;
 import com.anying.helpdesk.modelconfig.exception.InvalidModelConfigException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
@@ -86,6 +87,16 @@ public class GlobalExceptionHandler {
         log.error("Knowledge index operation failed: {}", exception.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(ApiResponse.error("KNOWLEDGE_INDEX_FAILED", exception.getMessage(), null));
+    }
+
+    /**
+     * 将查询向量生成或 ES 检索故障转换为脱敏的上游服务错误。
+     */
+    @ExceptionHandler(KnowledgeRetrievalException.class)
+    public ResponseEntity<ApiResponse<Void>> handleKnowledgeRetrieval(KnowledgeRetrievalException exception) {
+        log.error("Knowledge retrieval failed: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error("KNOWLEDGE_RETRIEVAL_FAILED", exception.getMessage(), null));
     }
 
     /**

@@ -44,6 +44,8 @@ class OpenApiDocumentationIntegrationTest {
                 .andExpect(jsonPath("$.paths['/api/admin/knowledge-bases/{knowledgeBaseId}/documents/"
                         + "{documentId}/chunk-preview'].post.summary")
                         .value("预览文档分块"))
+                .andExpect(jsonPath("$.paths['/api/admin/knowledge-bases/{id}/search'].post.summary")
+                        .value("调试知识库混合检索"))
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.type").value("http"))
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
                 .andExpect(jsonPath("$.paths['/api/tickets'].post.security[0].bearerAuth").isArray())
