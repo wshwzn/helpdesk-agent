@@ -13,6 +13,11 @@ import com.anying.helpdesk.conversation.exception.ConversationGenerationInProgre
 import com.anying.helpdesk.conversation.exception.ConversationNotActiveException;
 import com.anying.helpdesk.conversation.exception.ConversationNotFoundException;
 import com.anying.helpdesk.conversation.exception.ModelStreamingNotSupportedException;
+import com.anying.helpdesk.knowledge.exception.InvalidKnowledgeDocumentException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeBaseConflictException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeBaseNotFoundException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentNotFoundException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeStorageException;
 import com.anying.helpdesk.modelconfig.exception.InvalidModelConfigException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigNotFoundException;
@@ -28,6 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,6 +42,49 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * 将知识库或知识文档不存在转换为统一的未找到响应。
+     */
+    @ExceptionHandler({KnowledgeBaseNotFoundException.class, KnowledgeDocumentNotFoundException.class})
+    public ResponseEntity<ApiResponse<Void>> handleKnowledgeNotFound(RuntimeException exception) {
+        String code = exception instanceof KnowledgeBaseNotFoundException
+                ? "KNOWLEDGE_BASE_NOT_FOUND"
+                : "KNOWLEDGE_DOCUMENT_NOT_FOUND";
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(code, exception.getMessage(), null));
+    }
+
+    /**
+     * 将知识库名称冲突或非空删除转换为冲突响应。
+     */
+    @ExceptionHandler(KnowledgeBaseConflictException.class)
+    public ResponseEntity<ApiResponse<Void>> handleKnowledgeBaseConflict(KnowledgeBaseConflictException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("KNOWLEDGE_BASE_CONFLICT", exception.getMessage(), null));
+    }
+
+    /**
+     * 将非法文件及超出上传大小限制转换为参数错误响应。
+     */
+    @ExceptionHandler({InvalidKnowledgeDocumentException.class, MaxUploadSizeExceededException.class})
+    public ResponseEntity<ApiResponse<Void>> handleInvalidKnowledgeDocument(RuntimeException exception) {
+        String message = exception instanceof MaxUploadSizeExceededException
+                ? "document file must not exceed 20 MB"
+                : exception.getMessage();
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error("INVALID_KNOWLEDGE_DOCUMENT", message, null));
+    }
+
+    /**
+     * 将对象存储故障转换为脱敏的上游服务错误响应。
+     */
+    @ExceptionHandler(KnowledgeStorageException.class)
+    public ResponseEntity<ApiResponse<Void>> handleKnowledgeStorage(KnowledgeStorageException exception) {
+        log.error("Knowledge object storage operation failed: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error("KNOWLEDGE_STORAGE_FAILED", exception.getMessage(), null));
+    }
 
     /**
      * 将不存在或不属于当前客户的待确认操作转换为统一的未找到响应。

@@ -15,3 +15,6 @@ app:
     access-token-ttl: 30m
   model-config:
     encryption-key: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+  storage:
+    provider: local
+    local-root-directory: ./target/test-object-storage

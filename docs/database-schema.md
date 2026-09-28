@@ -175,6 +175,58 @@
 - 确认操作与创建工单处于同一事务；并发确认中只有一次能通过乐观锁，失败事务创建的工单会回滚。
 - AI 消息生成失败或流被取消时，已生成的草稿转为 `INVALIDATED`，不能继续确认。
 
+## `knowledge_bases` 知识库表
+
+保存管理员创建的知识库容器，由 Flyway V9 创建。原始文件和检索分块不存入该表。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 知识库主键。 |
+| `name` | `VARCHAR(100)` | 否 | 无 | 知识库名称，全局唯一。 |
+| `description` | `VARCHAR(500)` | 是 | `NULL` | 知识库用途说明。 |
+| `created_by` | `BIGINT` | 否 | 无 | 创建管理员的 `users.id`，逻辑关联。 |
+| `version` | `INT` | 否 | `0` | 乐观锁版本号，为后续知识库编辑预留。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 创建时间。 |
+| `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 最后更新时间，由应用维护。 |
+
+索引与约束：
+
+- 主键：`PRIMARY KEY (id)`。
+- 唯一约束：`uk_knowledge_bases_name (name)`。
+- 只有不含文档记录的知识库可以删除，该规则由应用层强制。
+
+## `knowledge_documents` 知识库文档表
+
+保存原始文档的对象存储位置、完整性信息和处理状态，由 Flyway V9 创建。文件正文存放在本地开发目录或阿里云 OSS；后续生成的检索分块和向量存放在 Elasticsearch，不在 MySQL 重复保存。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 文档主键。 |
+| `knowledge_base_id` | `BIGINT` | 否 | 无 | 所属 `knowledge_bases.id`，逻辑关联。 |
+| `original_name` | `VARCHAR(255)` | 否 | 无 | 上传时经过路径清理的原始文件名。 |
+| `storage_provider` | `VARCHAR(30)` | 否 | 无 | 对象存储提供方：当前为 `local` 或 `aliyun-oss`。 |
+| `bucket_name` | `VARCHAR(128)` | 否 | 无 | OSS Bucket 名；本地开发固定为逻辑值 `local`。 |
+| `object_key` | `VARCHAR(512)` | 否 | 无 | 后端生成的对象键，不通过管理接口返回。 |
+| `content_type` | `VARCHAR(100)` | 否 | 无 | 由扩展名确定的可信 MIME 类型。 |
+| `file_extension` | `VARCHAR(20)` | 否 | 无 | 小写扩展名，当前允许 `txt`、`md`、`pdf`、`docx`。 |
+| `size_bytes` | `BIGINT` | 否 | 无 | 原始文件大小，单位字节；当前最大 20 MB。 |
+| `sha256` | `CHAR(64)` | 否 | 无 | 原始文件内容的 SHA-256 十六进制摘要。 |
+| `status` | `VARCHAR(20)` | 否 | 无 | 状态：`UPLOADING`、`PENDING`、`PROCESSING`、`READY`、`FAILED`。 |
+| `chunk_count` | `INT` | 否 | `0` | Elasticsearch 中当前有效分块数量。 |
+| `error_code` | `VARCHAR(50)` | 是 | `NULL` | 失败时的脱敏错误码，例如 `STORAGE_UPLOAD_FAILED`。 |
+| `created_by` | `BIGINT` | 否 | 无 | 上传管理员的 `users.id`，逻辑关联。 |
+| `version` | `INT` | 否 | `0` | 文档状态推进使用的乐观锁版本号。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 元数据创建时间。 |
+| `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 状态或统计信息最后更新时间。 |
+
+索引与约束：
+
+- 主键：`PRIMARY KEY (id)`。
+- 唯一约束：`uk_knowledge_documents_object_key (object_key)`。
+- 普通索引：`idx_knowledge_documents_base_status_id (knowledge_base_id, status, id)`，支持按知识库和处理状态读取文档。
+- 普通索引：`idx_knowledge_documents_base_sha256 (knowledge_base_id, sha256)`，支持后续识别同一知识库中的重复内容；当前不禁止重复上传。
+- 上传时先写入 `UPLOADING`，对象保存成功后改为 `PENDING`；解析、分块和索引状态将在后续任务中推进。
+
 ## `ai_model_configs` AI 模型配置表
 
 保存运行时模型连接配置，由 Flyway V4 创建、V5 调整协议与厂商字段。
@@ -224,6 +276,9 @@ users.id ──< agent_pending_actions.customer_id
 conversations.id ──< agent_pending_actions.conversation_id
 chat_messages.id ──< agent_pending_actions.assistant_message_id
 agent_pending_actions.ticket_id >── tickets.id
+users.id ──< knowledge_bases.created_by
+knowledge_bases.id ──< knowledge_documents.knowledge_base_id
+users.id ──< knowledge_documents.created_by
 ```
 
 这些关系目前均为逻辑关联，没有外键约束和级联删除行为。
@@ -244,3 +299,4 @@ agent_pending_actions.ticket_id >── tickets.id
 | V6 | `V6__create_conversations_and_messages.sql` | 创建客户对话和消息表。 |
 | V7 | `V7__create_agent_tool_calls.sql` | 创建 Agent 工具调用记录表。 |
 | V8 | `V8__create_agent_pending_actions.sql` | 创建 Agent 待确认操作和工单草稿表。 |
+| V9 | `V9__create_knowledge_bases_and_documents.sql` | 创建知识库和原始文档元数据表。 |

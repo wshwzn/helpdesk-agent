@@ -1,0 +1,50 @@
+# 知识库与原始文档存储底座
+
+## 实现功能与业务规则
+
+- 管理员可以创建、查询和删除知识库；非空知识库不能删除。
+- 管理员可以上传、分页查询和删除知识库文档，客户角色无权访问管理接口。
+- 上传仅支持 `txt`、`md`、`pdf`、`docx`，单文件最大 20 MB。服务端按扩展名确定 MIME 类型并计算 SHA-256。
+- 原始文件写入对象存储，MySQL 只保存元数据。上传状态从 `UPLOADING` 进入 `PENDING`；失败时记录脱敏错误码。
+- 默认使用 `./data/objects` 本地目录；配置 `STORAGE_PROVIDER=aliyun-oss` 后改用阿里云 OSS。API 不返回 Bucket、对象键或访问凭据。
+
+## 新增类和文件
+
+- `knowledge/domain`：知识库、文档实体及文档状态枚举。
+- `knowledge/dto`：创建知识库请求以及知识库、文档响应模型。
+- `knowledge/mapper`：MyBatis-Plus 数据访问接口。
+- `KnowledgeBaseService`、`KnowledgeBaseServiceImpl`：知识库创建、查询、文档计数和空库删除。
+- `KnowledgeDocumentService`、`KnowledgeDocumentServiceImpl`：文件校验、哈希计算、对象上传和删除编排。
+- `KnowledgeDocumentPersistenceService`：隔离文档状态事务，避免对象存储网络调用占用数据库事务。
+- `AdminKnowledgeBaseController`：提供 `/api/admin/knowledge-bases` 管理接口。
+- `ObjectStorageService`、`LocalObjectStorageService`、`AliyunOssObjectStorageService`：统一对象存储协议及两种实现。
+- `.env.example`：本地安全配置模板，不包含真实凭据。
+- `V9__create_knowledge_bases_and_documents.sql`：创建知识库和文档元数据表。
+
+## 修改文件
+
+- `pom.xml`：加入阿里云 OSS Java SDK 3.18.5。
+- `application-local.example.yml`、本机 `application-local.yml`：导入 `.env`，配置 20 MB 上传限制和对象存储参数。
+- `application-test.yml`：测试环境固定使用本地存储配置。
+- `GlobalExceptionHandler`：增加知识库、文件校验和对象存储错误映射。
+- `.gitignore`：忽略 `.env`、本地对象目录和环境变体，仅保留 `.env.example`。
+- `README.md`、`docs/database-schema.md`：补充启动配置、接口、字段、索引和表关系。
+
+## API 与数据库变化
+
+- 新增知识库创建、列表、详情、删除，以及文档上传、分页和删除接口。
+- 新增 `knowledge_bases`、`knowledge_documents` 两张表；业务表仍使用逻辑关联，不建立数据库外键。
+- `knowledge_documents` 记录存储提供方、Bucket、对象键、类型、大小、SHA-256、处理状态和分块数量。
+
+## 测试与验证
+
+- `mvn -DskipTests compile`：通过。
+- `mvn -Dtest=AdminKnowledgeBaseControllerIntegrationTest test`：3 个测试通过，覆盖完整管理流程、非法扩展名、非空删除和角色鉴权。
+- `mvn test`：全量 52 个测试通过，包含本地存储上传、幂等删除和目录穿越防护；OpenAPI 测试验证上传接口生成 `multipart/form-data` 二进制文件结构。
+- Flyway 在 H2 MySQL 兼容模式下成功执行 V1 至 V9。
+
+## 已知限制与后续工作
+
+- 当前不解析文档，也不生成向量；上传成功后停留在 `PENDING`。
+- 尚未接入 Elasticsearch、双路召回、RRF 融合和 Agent 知识问答工具。
+- 当前删除操作使用正在启用的存储提供方；切换存储提供方前需要迁移历史对象或增加多提供方路由。

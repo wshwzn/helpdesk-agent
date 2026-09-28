@@ -7,6 +7,7 @@
 - Java 21
 - Maven 3.9+
 - MySQL 8.0+，默认端口 `3306`
+- 可选：阿里云 OSS，用于保存知识库原始文档；未配置时使用本地目录
 
 ## 本地启动
 
@@ -18,7 +19,7 @@ CREATE DATABASE helpdesk_agent
     COLLATE utf8mb4_0900_ai_ci;
 ```
 
-将 `src/main/resources/application-local.example.yml` 复制为 `application-local.yml`，然后填写本地数据库账号和密码。`application-local.yml` 已被 Git 忽略，不会提交到远程仓库。
+将 `src/main/resources/application-local.example.yml` 复制为 `application-local.yml`，然后填写本地数据库账号和密码。再将 `.env.example` 复制为 `.env`，按需填写安全配置；这两个本地文件均已被 Git 忽略，不会提交到远程仓库。Spring Boot 通过 `optional:file:.env[.properties]` 读取扩展名为空的 `.env` 文件。
 
 启动前提供 JWT 签名密钥和模型配置加密主密钥。模型配置密钥必须是 32 个随机字节的 Base64 编码；生产环境必须使用安全随机值并妥善备份：
 
@@ -29,6 +30,16 @@ $keyBytes = New-Object byte[] 32
 $env:MODEL_CONFIG_ENCRYPTION_KEY = [Convert]::ToBase64String($keyBytes)
 mvn test
 mvn spring-boot:run
+```
+
+知识库文档默认写入 `./data/objects`。使用阿里云 OSS 时，在 `.env` 中配置以下项目；AccessKey 建议使用仅允许操作目标 Bucket 指定前缀的 RAM 用户凭据：
+
+```properties
+STORAGE_PROVIDER=aliyun-oss
+OSS_ENDPOINT=https://oss-cn-hangzhou.aliyuncs.com
+OSS_BUCKET=your-private-bucket
+OSS_ACCESS_KEY_ID=
+OSS_ACCESS_KEY_SECRET=
 ```
 
 应用启动时，Flyway 会自动执行 `src/main/resources/db/migration` 中尚未执行的数据库迁移。
@@ -59,7 +70,25 @@ $env:OPENAPI_ENABLED = "false"
 - `chat_messages`：对话消息表，保存客户消息、AI 回答、生成状态、模型快照和 Token 用量。
 - `agent_tool_calls`：工具调用记录表，保存工具参数、模型可见结果、状态和执行顺序。
 - `agent_pending_actions`：待确认操作表，保存 AI 生成的工单草稿及确认、取消、过期和执行状态。
+- `knowledge_bases`：知识库表，保存名称、说明和创建信息。
+- `knowledge_documents`：知识库文档元数据表，保存对象位置、文件摘要和处理状态；原始内容不进入 MySQL。
 - `flyway_schema_history`：Flyway 自动创建的迁移记录表，用于记录每个 SQL 迁移脚本是否执行成功，防止重复建表。请勿手动修改或删除其中的数据。
+
+## 知识库管理
+
+当前阶段提供管理员知识库和原始文档管理能力。上传支持 `txt`、`md`、`pdf`、`docx`，单文件最大 20 MB；成功上传后的状态为 `PENDING`，等待下一阶段的解析、分块和 Elasticsearch 索引任务。
+
+```http
+POST   /api/admin/knowledge-bases
+GET    /api/admin/knowledge-bases
+GET    /api/admin/knowledge-bases/{id}
+DELETE /api/admin/knowledge-bases/{id}
+POST   /api/admin/knowledge-bases/{id}/documents
+GET    /api/admin/knowledge-bases/{id}/documents?page=1&size=20
+DELETE /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}
+```
+
+文档上传接口使用 `multipart/form-data`，字段名为 `file`。知识库中存在文档时不能直接删除；应先逐个删除文档，确保对象存储内容同步清理。当前尚未实现文档解析、向量化和检索。
 
 ## 登录认证
 

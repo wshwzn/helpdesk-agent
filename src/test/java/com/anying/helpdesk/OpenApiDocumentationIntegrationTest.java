@@ -36,6 +36,11 @@ class OpenApiDocumentationIntegrationTest {
                         .value("发送消息并流式获取 AI 回答"))
                 .andExpect(jsonPath("$.paths['/api/admin/model-configs'].get.summary")
                         .value("查询全部模型配置"))
+                .andExpect(jsonPath("$.paths['/api/admin/knowledge-bases'].post.summary")
+                        .value("创建知识库"))
+                .andExpect(jsonPath("$.paths['/api/admin/knowledge-bases/{id}/documents'].post"
+                        + ".requestBody.content['multipart/form-data'].schema.properties.file.format")
+                        .value("binary"))
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.type").value("http"))
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
                 .andExpect(jsonPath("$.paths['/api/tickets'].post.security[0].bearerAuth").isArray())

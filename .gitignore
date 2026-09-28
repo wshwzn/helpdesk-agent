@@ -38,3 +38,7 @@ notes/*
 
 ### Local configuration ###
 src/main/resources/application-local.yml
+.env
+.env.*
+!.env.example
+data/
