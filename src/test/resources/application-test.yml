@@ -18,3 +18,8 @@ app:
   storage:
     provider: local
     local-root-directory: ./target/test-object-storage
+  knowledge:
+    processing:
+      max-extracted-characters: 2000000
+      chunk-size: 1000
+      chunk-overlap: 150

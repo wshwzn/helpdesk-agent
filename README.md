@@ -86,9 +86,20 @@ DELETE /api/admin/knowledge-bases/{id}
 POST   /api/admin/knowledge-bases/{id}/documents
 GET    /api/admin/knowledge-bases/{id}/documents?page=1&size=20
 DELETE /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}
+POST   /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/chunk-preview?page=1&size=20
 ```
 
-文档上传接口使用 `multipart/form-data`，字段名为 `file`。知识库中存在文档时不能直接删除；应先逐个删除文档，确保对象存储内容同步清理。当前尚未实现文档解析、向量化和检索。
+文档上传接口使用 `multipart/form-data`，字段名为 `file`。知识库中存在文档时不能直接删除；应先逐个删除文档，确保对象存储内容同步清理。
+
+分块预览接口会从本地目录或 OSS 下载原文，通过 Apache Tika 解析为纯文本，再分页返回实际分块。默认每块最多 1000 个字符，相邻块重叠 150 个字符，并优先在段落、换行和中英文句末处分割。可以通过 `.env` 调整：
+
+```properties
+KNOWLEDGE_MAX_EXTRACTED_CHARACTERS=2000000
+KNOWLEDGE_CHUNK_SIZE=1000
+KNOWLEDGE_CHUNK_OVERLAP=150
+```
+
+预览只用于检查解析和切块效果，会在每次请求时重新处理文档，不会修改文档的 `PENDING` 状态。当前尚未实现向量化、Elasticsearch 写入和检索。
 
 ## 登录认证
 

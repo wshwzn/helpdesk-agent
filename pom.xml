@@ -33,6 +33,7 @@
 		<springdoc.version>2.8.17</springdoc.version>
 		<swagger-core.version>2.2.47</swagger-core.version>
 		<aliyun-oss.version>3.18.5</aliyun-oss.version>
+		<apache-tika.version>3.3.2</apache-tika.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -108,6 +109,26 @@
 			<groupId>com.aliyun.oss</groupId>
 			<artifactId>aliyun-sdk-oss</artifactId>
 			<version>${aliyun-oss.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>${apache-tika.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parser-text-module</artifactId>
+			<version>${apache-tika.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parser-pdf-module</artifactId>
+			<version>${apache-tika.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parser-microsoft-module</artifactId>
+			<version>${apache-tika.version}</version>
 		</dependency>
 
 		<dependency>

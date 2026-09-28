@@ -25,3 +25,8 @@ app:
     bucket: ${OSS_BUCKET:}
     access-key-id: ${OSS_ACCESS_KEY_ID:}
     access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
+  knowledge:
+    processing:
+      max-extracted-characters: ${KNOWLEDGE_MAX_EXTRACTED_CHARACTERS:2000000}
+      chunk-size: ${KNOWLEDGE_CHUNK_SIZE:1000}
+      chunk-overlap: ${KNOWLEDGE_CHUNK_OVERLAP:150}

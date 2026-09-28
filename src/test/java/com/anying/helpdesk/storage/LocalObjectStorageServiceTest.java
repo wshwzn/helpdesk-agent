@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -31,6 +32,9 @@ class LocalObjectStorageServiceTest {
 
         Path storedFile = tempDirectory.resolve(objectKey);
         assertThat(storedFile).hasContent("knowledge");
+        try (InputStream inputStream = service.download("local", objectKey)) {
+            assertThat(inputStream.readAllBytes()).isEqualTo(content);
+        }
         service.delete("local", objectKey);
         service.delete("local", objectKey);
         assertThat(Files.exists(storedFile)).isFalse();

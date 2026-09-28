@@ -56,6 +56,21 @@ public class LocalObjectStorageService implements ObjectStorageService {
     }
 
     /**
+     * 打开本地对象读取流，并继续执行桶名和路径边界校验。
+     */
+    @Override
+    public InputStream download(String bucketName, String objectKey) {
+        if (!LOCAL_BUCKET.equals(bucketName)) {
+            throw new KnowledgeStorageException("stored document belongs to another bucket");
+        }
+        try {
+            return Files.newInputStream(resolveObjectPath(objectKey));
+        } catch (IOException exception) {
+            throw new KnowledgeStorageException("failed to download knowledge document", exception);
+        }
+    }
+
+    /**
      * 删除本地对象；不存在的对象无需报错。
      */
     @Override

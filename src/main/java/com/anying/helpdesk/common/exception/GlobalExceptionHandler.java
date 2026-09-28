@@ -17,6 +17,7 @@ import com.anying.helpdesk.knowledge.exception.InvalidKnowledgeDocumentException
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseConflictException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseNotFoundException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentNotFoundException;
+import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentParsingException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeStorageException;
 import com.anying.helpdesk.modelconfig.exception.InvalidModelConfigException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
@@ -84,6 +85,18 @@ public class GlobalExceptionHandler {
         log.error("Knowledge object storage operation failed: {}", exception.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(ApiResponse.error("KNOWLEDGE_STORAGE_FAILED", exception.getMessage(), null));
+    }
+
+    /**
+     * 将文档损坏、加密或无可提取文本等解析失败转换为明确响应。
+     */
+    @ExceptionHandler(KnowledgeDocumentParsingException.class)
+    public ResponseEntity<ApiResponse<Void>> handleKnowledgeDocumentParsing(
+            KnowledgeDocumentParsingException exception
+    ) {
+        log.warn("Knowledge document parsing failed: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ApiResponse.error("KNOWLEDGE_DOCUMENT_PARSE_FAILED", exception.getMessage(), null));
     }
 
     /**

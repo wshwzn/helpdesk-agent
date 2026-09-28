@@ -21,6 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 
@@ -111,6 +112,21 @@ class AdminKnowledgeBaseControllerIntegrationTest {
         assertThat(objectKeyCaptor.getValue())
                 .startsWith("knowledge-bases/" + knowledgeBaseId + "/documents/")
                 .endsWith(".md");
+
+        when(objectStorageService.download("local", objectKeyCaptor.getValue()))
+                .thenReturn(new ByteArrayInputStream(file.getBytes()));
+        mockMvc.perform(post(
+                                "/api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/chunk-preview",
+                                knowledgeBaseId,
+                                documentId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.documentId").value(documentId))
+                .andExpect(jsonPath("$.data.totalChunks").value(1))
+                .andExpect(jsonPath("$.data.chunks[0].content").value(
+                        org.hamcrest.Matchers.containsString("使用说明")
+                ));
 
         mockMvc.perform(get("/api/admin/knowledge-bases/{id}/documents", knowledgeBaseId)
                         .header(HttpHeaders.AUTHORIZATION, bearer(token)))

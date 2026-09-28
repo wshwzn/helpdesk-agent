@@ -66,6 +66,21 @@ public class AliyunOssObjectStorageService implements ObjectStorageService, Auto
     }
 
     /**
+     * 从当前 OSS Bucket 打开对象读取流，由调用方在解析结束后关闭。
+     */
+    @Override
+    public InputStream download(String bucketName, String objectKey) {
+        if (!this.bucketName.equals(bucketName)) {
+            throw new KnowledgeStorageException("stored document belongs to another bucket");
+        }
+        try {
+            return client.getObject(bucketName, objectKey).getObjectContent();
+        } catch (OSSException | ClientException exception) {
+            throw new KnowledgeStorageException("failed to download knowledge document", exception);
+        }
+    }
+
+    /**
      * 删除属于当前 Bucket 的对象。
      */
     @Override

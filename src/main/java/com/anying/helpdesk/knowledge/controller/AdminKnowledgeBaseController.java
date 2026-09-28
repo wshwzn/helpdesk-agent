@@ -4,10 +4,12 @@ import com.anying.helpdesk.common.response.ApiResponse;
 import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.config.OpenApiConfig;
 import com.anying.helpdesk.knowledge.dto.CreateKnowledgeBaseRequest;
+import com.anying.helpdesk.knowledge.dto.DocumentChunkPreviewResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeBaseResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
 import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentService;
+import com.anying.helpdesk.knowledge.service.KnowledgeDocumentPreviewService;
 import com.anying.helpdesk.security.CurrentUserProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -44,6 +46,7 @@ public class AdminKnowledgeBaseController {
 
     private final KnowledgeBaseService knowledgeBaseService;
     private final KnowledgeDocumentService knowledgeDocumentService;
+    private final KnowledgeDocumentPreviewService knowledgeDocumentPreviewService;
     private final CurrentUserProvider currentUserProvider;
 
     /**
@@ -125,6 +128,29 @@ public class AdminKnowledgeBaseController {
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) long size
     ) {
         return ApiResponse.ok(knowledgeDocumentService.page(id, page, size));
+    }
+
+    /**
+     * 下载并解析文档，分页预览实际生成的文本块。
+     */
+    @PostMapping("/{knowledgeBaseId}/documents/{documentId}/chunk-preview")
+    @Operation(summary = "预览文档分块", description = "仅执行下载、解析和分块，不修改文档状态")
+    public ApiResponse<DocumentChunkPreviewResponse> previewDocumentChunks(
+            @Parameter(description = "知识库主键", example = "1")
+            @PathVariable @Min(1) Long knowledgeBaseId,
+            @Parameter(description = "文档主键", example = "1")
+            @PathVariable @Min(1) Long documentId,
+            @Parameter(description = "分块页码，从 1 开始", example = "1")
+            @RequestParam(defaultValue = "1") @Min(1) long page,
+            @Parameter(description = "每页分块数，最大 100", example = "20")
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) long size
+    ) {
+        return ApiResponse.ok(knowledgeDocumentPreviewService.preview(
+                knowledgeBaseId,
+                documentId,
+                page,
+                size
+        ));
     }
 
     /**

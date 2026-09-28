@@ -20,6 +20,11 @@ public interface ObjectStorageService {
     void upload(String objectKey, InputStream inputStream, long contentLength, String contentType);
 
     /**
+     * 打开指定对象的读取流，调用方负责关闭该流。
+     */
+    InputStream download(String bucketName, String objectKey);
+
+    /**
      * 删除指定对象；对象不存在时按成功处理。
      */
     void delete(String bucketName, String objectKey);
