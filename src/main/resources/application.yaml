@@ -29,7 +29,7 @@ app:
   jwt:
     issuer: helpdesk-agent
     secret: ${JWT_SECRET}
-    access-token-ttl: 2h
+    access-token-ttl: 240h
   model-config:
     encryption-key: ${MODEL_CONFIG_ENCRYPTION_KEY}
   chat:
