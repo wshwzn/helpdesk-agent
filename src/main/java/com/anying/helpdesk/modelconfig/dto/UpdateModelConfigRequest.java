@@ -15,7 +15,7 @@ public record UpdateModelConfigRequest(
         @NotBlank @Size(max = 100) String name,
         @Schema(description = "模型用途；省略时保留当前类型", example = "CHAT")
         ModelType modelType,
-        @Schema(description = "模型厂商", example = "DEEPSEEK")
+        @Schema(description = "模型厂商；CHAT 可使用预设，EMBEDDING 必须为 CUSTOM", example = "DEEPSEEK")
         @NotNull ModelVendor vendor,
         @Schema(description = "仅 CUSTOM 厂商需要的 SDK 基础地址", example = "https://proxy.example.com/v1")
         @Size(max = 500) String baseUrl,

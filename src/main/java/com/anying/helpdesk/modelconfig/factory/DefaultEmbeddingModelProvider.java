@@ -2,6 +2,7 @@ package com.anying.helpdesk.modelconfig.factory;
 
 import com.anying.helpdesk.modelconfig.domain.AiModelConfig;
 import com.anying.helpdesk.modelconfig.domain.ModelType;
+import com.anying.helpdesk.modelconfig.domain.ModelVendor;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
 import com.anying.helpdesk.modelconfig.mapper.AiModelConfigMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -32,6 +33,9 @@ public class DefaultEmbeddingModelProvider {
             throw new ModelConfigConflictException("multiple default embedding model configurations are enabled");
         }
         AiModelConfig config = configs.getFirst();
+        if (config.getVendor() != ModelVendor.CUSTOM) {
+            throw new ModelConfigConflictException("default embedding model must use the CUSTOM vendor");
+        }
         if (config.getEmbeddingDimensions() == null) {
             throw new ModelConfigConflictException("default embedding model dimensions are missing");
         }

@@ -52,6 +52,7 @@ public class AiModelConfigService {
                 request.supportsTools(),
                 request.embeddingDimensions()
         );
+        validateVendor(modelType, request.vendor());
         AiModelConfig config = new AiModelConfig();
         config.setName(request.name().trim());
         config.setModelType(modelType);
@@ -110,6 +111,7 @@ public class AiModelConfigService {
                 request.supportsTools(),
                 embeddingDimensions
         );
+        validateVendor(modelType, request.vendor());
         if (config.getModelType() != modelType && Boolean.TRUE.equals(config.getIsDefault())) {
             config.setIsDefault(false);
         }
@@ -299,6 +301,15 @@ public class AiModelConfigService {
         }
         if (embeddingDimensions == null) {
             throw new InvalidModelConfigException("embeddingDimensions is required for EMBEDDING models");
+        }
+    }
+
+    /**
+     * 只允许聊天模型使用厂商地址预设，其他模型必须明确填写自定义基础地址。
+     */
+    private void validateVendor(ModelType modelType, ModelVendor vendor) {
+        if (modelType != ModelType.CHAT && vendor != ModelVendor.CUSTOM) {
+            throw new InvalidModelConfigException("EMBEDDING models must use the CUSTOM vendor");
         }
     }
 

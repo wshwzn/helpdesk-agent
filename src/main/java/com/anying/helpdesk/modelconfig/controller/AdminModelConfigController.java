@@ -8,6 +8,7 @@ import com.anying.helpdesk.modelconfig.dto.ModelConnectionTestResponse;
 import com.anying.helpdesk.modelconfig.dto.ModelVendorResponse;
 import com.anying.helpdesk.modelconfig.dto.UpdateModelConfigRequest;
 import com.anying.helpdesk.modelconfig.domain.ModelVendor;
+import com.anying.helpdesk.modelconfig.domain.ModelType;
 import com.anying.helpdesk.modelconfig.service.AiModelConfigService;
 import com.anying.helpdesk.security.CurrentUserProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
@@ -57,10 +59,17 @@ public class AdminModelConfigController {
         return ApiResponse.ok(modelConfigService.list());
     }
 
+    /**
+     * 按模型用途过滤管理端可选择的厂商，避免向量模型误用聊天地址预设。
+     */
     @GetMapping("/vendors")
-    @Operation(summary = "查询可选模型厂商", description = "返回内置地址预设以及自定义地址填写规则")
-    public ApiResponse<List<ModelVendorResponse>> listVendors() {
+    @Operation(summary = "按模型用途查询可选厂商", description = "CHAT 返回全部预设；EMBEDDING 只返回 CUSTOM")
+    public ApiResponse<List<ModelVendorResponse>> listVendors(
+            @Parameter(description = "模型用途；省略时为 CHAT", example = "CHAT")
+            @RequestParam(defaultValue = "CHAT") ModelType modelType
+    ) {
         return ApiResponse.ok(Arrays.stream(ModelVendor.values())
+                .filter(vendor -> modelType == ModelType.CHAT || vendor == ModelVendor.CUSTOM)
                 .map(ModelVendorResponse::from)
                 .toList());
     }

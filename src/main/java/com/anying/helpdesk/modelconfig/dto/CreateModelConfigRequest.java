@@ -15,9 +15,9 @@ public record CreateModelConfigRequest(
         @NotBlank @Size(max = 100) String name,
         @Schema(description = "模型用途；省略时兼容为 CHAT", example = "CHAT")
         ModelType modelType,
-        @Schema(description = "模型厂商；内置厂商使用后端预设地址", example = "DEEPSEEK")
+        @Schema(description = "模型厂商；CHAT 可使用预设，EMBEDDING 必须为 CUSTOM", example = "DEEPSEEK")
         @NotNull ModelVendor vendor,
-        @Schema(description = "CUSTOM 厂商必填的 SDK 基础地址，不能包含 /chat/completions", example = "https://proxy.example.com/v1")
+        @Schema(description = "CUSTOM 必填的 SDK 基础地址，不能包含具体模型接口路径", example = "https://proxy.example.com/v1")
         @Size(max = 500) String baseUrl,
         @Schema(description = "厂商侧模型名称", example = "deepseek-chat")
         @NotBlank @Size(max = 100) String modelName,

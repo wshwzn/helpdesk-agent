@@ -187,6 +187,7 @@ class AdminModelConfigControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("聊天模型返回厂商预设而向量模型只返回自定义厂商")
     void presetVendorUsesBackendUrlAndListsAvailableVendors() throws Exception {
         String token = createUserAndLogin("model_admin_five", UserRole.ADMIN);
 
@@ -197,6 +198,14 @@ class AdminModelConfigControllerIntegrationTest {
                 .andExpect(jsonPath("$.data[1].code").value("DEEPSEEK"))
                 .andExpect(jsonPath("$.data[1].baseUrl").value("https://api.deepseek.com"))
                 .andExpect(jsonPath("$.data[4].customBaseUrlRequired").value(true));
+
+        mockMvc.perform(get("/api/admin/model-configs/vendors")
+                        .queryParam("modelType", "EMBEDDING")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].code").value("CUSTOM"))
+                .andExpect(jsonPath("$.data[0].customBaseUrlRequired").value(true));
 
         mockMvc.perform(post("/api/admin/model-configs")
                         .header(HttpHeaders.AUTHORIZATION, bearer(token))
@@ -279,6 +288,7 @@ class AdminModelConfigControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("自定义厂商必须填写地址且向量模型拒绝厂商预设")
     void customVendorRequiresBaseUrlAndPresetRejectsManualUrl() throws Exception {
         String token = createUserAndLogin("model_admin_six", UserRole.ADMIN);
 
@@ -293,6 +303,25 @@ class AdminModelConfigControllerIntegrationTest {
                                   "apiKey": "sk-custom-test",
                                   "supportsStreaming": true,
                                   "supportsTools": true,
+                                  "enabled": true
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_MODEL_CONFIG"));
+
+        mockMvc.perform(post("/api/admin/model-configs")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Invalid Embedding Preset",
+                                  "modelType": "EMBEDDING",
+                                  "vendor": "QWEN",
+                                  "modelName": "text-embedding-v4",
+                                  "apiKey": "sk-embedding-test",
+                                  "supportsStreaming": false,
+                                  "supportsTools": false,
+                                  "embeddingDimensions": 1024,
                                   "enabled": true
                                 }
                                 """))

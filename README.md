@@ -153,10 +153,10 @@ Authorization: Bearer <accessToken>
 
 模型统一使用 OpenAI 兼容协议。管理员选择内置厂商时，后端自动使用预设地址；选择 `CUSTOM` 时才需要填写 SDK 基础地址。创建配置时的 API Key 会使用 AES-256-GCM 加密，后续接口只返回尾号掩码。
 
-查询可选厂商及其预设地址：
+按模型用途查询可选厂商及其预设地址；省略 `modelType` 时默认查询聊天模型厂商：
 
 ```http
-GET /api/admin/model-configs/vendors
+GET /api/admin/model-configs/vendors?modelType=CHAT
 Authorization: Bearer <管理员 accessToken>
 ```
 
@@ -179,7 +179,7 @@ Content-Type: application/json
 }
 ```
 
-创建 Embedding 配置时使用相同的 OpenAI 兼容基础地址，同时声明实际输出维度；流式和工具能力必须为 `false`：
+Embedding 模型不使用聊天厂商的地址预设，必须选择 `CUSTOM`、自行填写 OpenAI 兼容基础地址并声明实际输出维度；流式和工具能力必须为 `false`：
 
 ```json
 {
@@ -224,7 +224,7 @@ POST /api/admin/model-configs/{id}/enable
 POST /api/admin/model-configs/{id}/disable
 ```
 
-更新配置时省略 `apiKey` 会保留原密钥，更新 Embedding 配置时省略 `embeddingDimensions` 会保留原维度。创建请求省略 `modelType` 时按 `CHAT` 兼容，更新时省略则保留当前类型。接口响应中的 `protocol` 固定为 `OPENAI_COMPATIBLE`，`vendor` 用于区分地址预设；它们不是不同 SDK。`CHAT` 和 `EMBEDDING` 分别维护一个默认模型。默认模型必须处于启用状态，也不能直接禁用；应先切换默认模型。连接测试会按类型发送一个极短对话或向量请求，可能产生少量费用。
+更新配置时省略 `apiKey` 会保留原密钥，更新 Embedding 配置时省略 `embeddingDimensions` 会保留原维度。创建请求省略 `modelType` 时按 `CHAT` 兼容，更新时省略则保留当前类型。接口响应中的 `protocol` 固定为 `OPENAI_COMPATIBLE`；`vendor` 只为聊天模型提供地址预设，Embedding 固定使用 `CUSTOM`。`CHAT` 和 `EMBEDDING` 分别维护一个默认模型。默认模型必须处于启用状态，也不能直接禁用；应先切换默认模型。连接测试会按类型发送一个极短对话或向量请求，可能产生少量费用。
 
 ## 智能对话接口
 

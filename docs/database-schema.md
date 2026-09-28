@@ -263,6 +263,7 @@
 - 普通索引：`idx_ai_model_configs_type_enabled_default (model_type, enabled, is_default)`，用于分别解析默认聊天和向量模型。
 - 数据库暂未强制“每种用途只能有一个默认模型”，由 `AiModelConfigService` 在事务中按 `model_type` 清除旧默认项后设置新默认项。
 - 应用层要求 `CHAT` 的 `embedding_dimensions` 为空；`EMBEDDING` 的维度必须为 1～4096，且 `supports_streaming`、`supports_tools` 必须为 `FALSE`。
+- 厂商预设只适用于 `CHAT`；`EMBEDDING` 的 `vendor` 必须为 `CUSTOM`，并由管理员填写实际 `base_url`。
 
 ## 表关系
 
