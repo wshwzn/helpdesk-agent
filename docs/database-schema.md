@@ -98,7 +98,7 @@
 | `prompt_tokens` | `INT` | 是 | `NULL` | 厂商返回的输入 Token 数。 |
 | `completion_tokens` | `INT` | 是 | `NULL` | 厂商返回的输出 Token 数。 |
 | `total_tokens` | `INT` | 是 | `NULL` | 厂商返回的总 Token 数。 |
-| `error_code` | `VARCHAR(50)` | 是 | `NULL` | 生成失败时保存的内部脱敏错误码，例如 `MODEL_CALL_FAILED`。 |
+| `error_code` | `VARCHAR(50)` | 是 | `NULL` | 生成失败时保存的内部脱敏错误码，例如模型失败 `MODEL_CALL_FAILED`、进程中断超时恢复 `GENERATION_INTERRUPTED`。 |
 | `version` | `INT` | 否 | `0` | 乐观锁版本号，防止生成完成与失败状态互相覆盖。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息创建时间。 |
 | `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息状态或内容最后更新时间。 |
@@ -107,6 +107,8 @@
 
 - 主键：`PRIMARY KEY (id)`。
 - 普通索引：`idx_chat_messages_conversation_id (conversation_id, id)`，支持按对话顺序读取消息。
+- 普通索引：`idx_chat_messages_status_role_updated (status, role, updated_at)`，支持后台快速扫描超时的 `PENDING` 助手消息。
+- 超过配置阈值仍为 `PENDING` 的助手消息会被条件更新为 `FAILED` 并递增版本号，防止迟到的模型结果覆盖恢复状态。
 
 ## `agent_tool_calls` Agent 工具调用表
 
@@ -404,3 +406,4 @@ rag_evaluation_runs.id ──< rag_evaluation_run_results.run_id
 | V12 | `V12__require_vector_min_similarity.sql` | 将历史空阈值迁移为 0，并要求向量相似度下限始终存在。 |
 | V13 | `V13__add_default_knowledge_base.sql` | 为知识库增加客户对话使用的默认项标记和查询索引。 |
 | V14 | `V14__create_rag_evaluation_tables.sql` | 创建 RAG 评测用例、期望文档关系、运行汇总和逐题结果表。 |
+| V15 | `V15__add_chat_pending_recovery_index.sql` | 增加按状态、角色和更新时间扫描中断消息的索引。 |

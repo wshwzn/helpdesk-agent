@@ -34,3 +34,6 @@ app:
     encryption-key: ${MODEL_CONFIG_ENCRYPTION_KEY}
   chat:
     history-limit: ${CHAT_HISTORY_LIMIT:20}
+    stream-timeout: ${APP_CHAT_STREAM_TIMEOUT:5m}
+    pending-timeout: ${CHAT_PENDING_TIMEOUT:10m}
+    pending-recovery-interval: ${CHAT_PENDING_RECOVERY_INTERVAL:1m}

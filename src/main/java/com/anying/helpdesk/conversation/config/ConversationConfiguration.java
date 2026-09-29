@@ -3,10 +3,12 @@ package com.anying.helpdesk.conversation.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@EnableScheduling
 @EnableConfigurationProperties(ChatProperties.class)
 @RequiredArgsConstructor
 public class ConversationConfiguration implements WebMvcConfigurer {

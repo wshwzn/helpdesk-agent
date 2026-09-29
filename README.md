@@ -332,6 +332,13 @@ event: error   生成失败，携带脱敏错误码和说明
 
 流式请求默认允许持续 5 分钟，可通过环境变量 `APP_CHAT_STREAM_TIMEOUT` 调整，例如设置为 `10m`。
 
+如果应用被强制关闭，来不及完成正在生成的 AI 消息，系统会把超过 10 分钟仍为 `PENDING` 的回答恢复为 `FAILED`，错误码为 `GENERATION_INTERRUPTED`。恢复会在客户下一次发送前立即执行，后台任务也会每分钟扫描一次；关联的运行中工具记录会失败化，未确认工单草稿会作废。可以调整以下参数，但回收阈值必须大于流式请求超时：
+
+```properties
+CHAT_PENDING_TIMEOUT=10m
+CHAT_PENDING_RECOVERY_INTERVAL=1m
+```
+
 其他对话接口：
 
 ```http

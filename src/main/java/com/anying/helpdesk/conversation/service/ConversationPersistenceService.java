@@ -44,6 +44,7 @@ public class ConversationPersistenceService {
     private final ChatProperties chatProperties;
     private final AgentToolCallService toolCallService;
     private final KnowledgeCitationService knowledgeCitationService;
+    private final StaleChatGenerationRecoveryService staleGenerationRecoveryService;
 
     @Transactional
     public ConversationResponse create(CreateConversationRequest request, Long customerId) {
@@ -141,6 +142,7 @@ public class ConversationPersistenceService {
         if (conversation.getStatus() != ConversationStatus.ACTIVE) {
             throw new ConversationNotActiveException(conversationId);
         }
+        staleGenerationRecoveryService.recoverForConversation(conversationId);
         boolean generationInProgress = chatMessageMapper.selectCount(
                 new LambdaQueryWrapper<ChatMessage>()
                         .eq(ChatMessage::getConversationId, conversationId)

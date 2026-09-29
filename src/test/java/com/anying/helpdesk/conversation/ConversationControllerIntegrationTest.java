@@ -6,6 +6,7 @@ import com.anying.helpdesk.agent.action.domain.AgentPendingAction;
 import com.anying.helpdesk.agent.action.domain.PendingActionStatus;
 import com.anying.helpdesk.agent.action.service.PendingActionService;
 import com.anying.helpdesk.agent.domain.AgentToolCall;
+import com.anying.helpdesk.agent.domain.AgentToolCallStatus;
 import com.anying.helpdesk.agent.mapper.AgentToolCallMapper;
 import com.anying.helpdesk.agent.service.AgentToolCallService;
 import com.anying.helpdesk.auth.domain.User;
@@ -21,11 +22,14 @@ import com.anying.helpdesk.conversation.model.ChatStreamChunk;
 import com.anying.helpdesk.conversation.model.ConversationModelHistory;
 import com.anying.helpdesk.conversation.model.ConversationModelClient;
 import com.anying.helpdesk.conversation.service.ConversationPersistenceService;
+import com.anying.helpdesk.conversation.service.PreparedChatExchange;
+import com.anying.helpdesk.conversation.service.StaleChatGenerationRecoveryService;
 import com.anying.helpdesk.modelconfig.factory.DefaultChatModelProvider;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
 import com.anying.helpdesk.ticket.domain.TicketPriority;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -97,6 +101,9 @@ class ConversationControllerIntegrationTest {
 
     @Autowired
     private ConversationPersistenceService conversationPersistenceService;
+
+    @Autowired
+    private StaleChatGenerationRecoveryService staleGenerationRecoveryService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -460,6 +467,105 @@ class ConversationControllerIntegrationTest {
         assertThat(messages.get(0).getContent()).isEqualTo("第一条消息");
         assertThat(messages.get(1).getStatus()).isEqualTo(ChatMessageStatus.PENDING);
         verifyNoInteractions(modelClient);
+    }
+
+    /**
+     * 验证进程中断遗留的过期回答会在下一次发送前失败化，并同步清理半完成的关联状态。
+     */
+    @Test
+    @DisplayName("过期的生成任务应自动恢复并允许客户继续对话")
+    void recoversExpiredPendingMessageBeforeNextExchange() throws Exception {
+        String username = "conversation_interrupted";
+        String token = registerCustomer(username);
+        long conversationId = createConversation(token, "中断恢复测试");
+        User customer = userMapper.selectOne(
+                new LambdaQueryWrapper<User>().eq(User::getUsername, username)
+        );
+        ResolvedChatModel resolvedModel = new ResolvedChatModel(
+                105L,
+                "recovery-model",
+                true,
+                mock(ChatModel.class)
+        );
+        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
+        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
+                .thenReturn(new ChatCompletionResult("现在可以继续对话", 8, 5, 13));
+
+        PreparedChatExchange abandoned = conversationPersistenceService.prepareExchange(
+                conversationId,
+                customer.getId(),
+                "生成时服务被关闭",
+                resolvedModel
+        );
+        AgentExecutionContext abandonedContext = new AgentExecutionContext(
+                customer.getId(),
+                conversationId,
+                abandoned.assistantMessageId()
+        );
+        AgentToolCall runningToolCall = agentToolCallService.start(
+                abandonedContext,
+                "search_knowledge_base",
+                "{\"query\":\"测试\"}"
+        );
+        pendingActionService.prepareCreateTicket(
+                abandonedContext,
+                "未完成回答中的草稿",
+                "生成中断后不应继续确认该草稿",
+                TicketPriority.MEDIUM,
+                "测试中断恢复"
+        );
+        chatMessageMapper.update(null, new LambdaUpdateWrapper<ChatMessage>()
+                .eq(ChatMessage::getId, abandoned.assistantMessageId())
+                .set(ChatMessage::getUpdatedAt, LocalDateTime.now().minusMinutes(11)));
+
+        sendMessage(token, conversationId, "恢复后继续提问")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.assistantMessage.content").value("现在可以继续对话"));
+
+        ChatMessage recoveredMessage = chatMessageMapper.selectById(abandoned.assistantMessageId());
+        assertThat(recoveredMessage.getStatus()).isEqualTo(ChatMessageStatus.FAILED);
+        assertThat(recoveredMessage.getErrorCode())
+                .isEqualTo(StaleChatGenerationRecoveryService.GENERATION_INTERRUPTED);
+        AgentToolCall recoveredToolCall = agentToolCallMapper.selectById(runningToolCall.getId());
+        assertThat(recoveredToolCall.getStatus()).isEqualTo(AgentToolCallStatus.FAILED);
+        assertThat(recoveredToolCall.getCompletedAt()).isNotNull();
+        AgentPendingAction recoveredAction = pendingActionMapper.selectOne(
+                new LambdaQueryWrapper<AgentPendingAction>()
+                        .eq(AgentPendingAction::getAssistantMessageId, abandoned.assistantMessageId())
+        );
+        assertThat(recoveredAction.getStatus()).isEqualTo(PendingActionStatus.INVALIDATED);
+        assertThat(chatMessageMapper.selectCount(new LambdaQueryWrapper<ChatMessage>()
+                .eq(ChatMessage::getConversationId, conversationId)
+                .eq(ChatMessage::getStatus, ChatMessageStatus.PENDING))).isZero();
+    }
+
+    /**
+     * 验证后台扫描使用的全局入口也能回收过期消息，而不依赖客户再次发送。
+     */
+    @Test
+    @DisplayName("后台扫描应主动回收过期的生成任务")
+    void scheduledRecoveryEntryRecoversExpiredPendingMessage() throws Exception {
+        String username = "conversation_scheduled_recovery";
+        String token = registerCustomer(username);
+        long conversationId = createConversation(token, "后台恢复测试");
+        User customer = userMapper.selectOne(
+                new LambdaQueryWrapper<User>().eq(User::getUsername, username)
+        );
+        PreparedChatExchange abandoned = conversationPersistenceService.prepareExchange(
+                conversationId,
+                customer.getId(),
+                "等待后台恢复",
+                new ResolvedChatModel(106L, "recovery-model", true, mock(ChatModel.class))
+        );
+        chatMessageMapper.update(null, new LambdaUpdateWrapper<ChatMessage>()
+                .eq(ChatMessage::getId, abandoned.assistantMessageId())
+                .set(ChatMessage::getUpdatedAt, LocalDateTime.now().minusMinutes(11)));
+
+        assertThat(staleGenerationRecoveryService.recoverAll()).isEqualTo(1);
+        ChatMessage recoveredMessage = chatMessageMapper.selectById(abandoned.assistantMessageId());
+        assertThat(recoveredMessage.getStatus()).isEqualTo(ChatMessageStatus.FAILED);
+        assertThat(recoveredMessage.getErrorCode())
+                .isEqualTo(StaleChatGenerationRecoveryService.GENERATION_INTERRUPTED);
     }
 
     @Test
