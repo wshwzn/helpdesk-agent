@@ -44,6 +44,7 @@ public class ConversationServiceImpl implements ConversationService {
     private final DefaultChatModelProvider defaultChatModelProvider;
     private final ConversationModelClient modelClient;
     private final PendingActionService pendingActionService;
+    private final KnowledgeCitationService knowledgeCitationService;
 
     @Override
     public ConversationResponse create(CreateConversationRequest request, Long customerId) {
@@ -107,7 +108,7 @@ public class ConversationServiceImpl implements ConversationService {
         );
         return new ChatExchangeResponse(
                 ChatMessageResponse.from(prepared.userMessage()),
-                ChatMessageResponse.from(assistantMessage),
+                responseWithCitations(assistantMessage),
                 pendingActions
         );
     }
@@ -159,7 +160,7 @@ public class ConversationServiceImpl implements ConversationService {
                     pendingActions.stream()
                             .map(ChatStreamEvent::actionRequired)
                             .forEach(events::add);
-                    events.add(ChatStreamEvent.done(ChatMessageResponse.from(assistantMessage)));
+                    events.add(ChatStreamEvent.done(responseWithCitations(assistantMessage)));
                     finalized.set(true);
                     return events;
                 })
@@ -189,6 +190,16 @@ public class ConversationServiceImpl implements ConversationService {
                         })
                         .subscribeOn(Schedulers.boundedElastic()))
                 .doOnCancel(() -> markCancelledStream(prepared.assistantMessageId(), id, finalized));
+    }
+
+    /**
+     * 为已完成的 AI 消息附加本轮知识检索产生的引用片段。
+     */
+    private ChatMessageResponse responseWithCitations(ChatMessage assistantMessage) {
+        return ChatMessageResponse.from(
+                assistantMessage,
+                knowledgeCitationService.listByAssistantMessageId(assistantMessage.getId())
+        );
     }
 
     /**

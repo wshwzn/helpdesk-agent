@@ -218,6 +218,72 @@ class ConversationControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("知识检索结果应作为引用随本轮回答返回并保留在历史消息中")
+    void knowledgeCitationsAreReturnedWithCurrentAndHistoricalMessages() throws Exception {
+        String token = registerCustomer("conversation_knowledge_citations");
+        long conversationId = createConversation(token, "账号锁定规则");
+        ResolvedChatModel resolvedModel = new ResolvedChatModel(
+                105L,
+                "citation-model",
+                true,
+                mock(ChatModel.class)
+        );
+        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
+        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
+                .thenAnswer(invocation -> {
+                    AgentExecutionContext context = invocation.getArgument(2);
+                    AgentToolCall knowledgeCall = agentToolCallService.start(
+                            context,
+                            "search_knowledge_base",
+                            "{\"query\":\"账号锁定规则\"}"
+                    );
+                    agentToolCallService.completeSuccess(knowledgeCall.getId(), """
+                            {
+                              "status": "FOUND",
+                              "message": "请仅依据以下资料回答",
+                              "knowledgeBase": "产品帮助中心",
+                              "query": "账号锁定规则",
+                              "chunks": [
+                                {
+                                  "rank": 1,
+                                  "source": "账号安全说明.pdf",
+                                  "chunkSequence": 8,
+                                  "content": "连续五次输入错误密码后，账号将锁定三十分钟。"
+                                }
+                              ]
+                            }
+                            """);
+                    AgentToolCall ticketCall = agentToolCallService.start(
+                            context,
+                            "list_customer_tickets",
+                            "{}"
+                    );
+                    agentToolCallService.completeSuccess(ticketCall.getId(), "{\"tickets\":[]}");
+                    return new ChatCompletionResult("账号会锁定三十分钟。", 10, 6, 16);
+                });
+
+        sendMessage(token, conversationId, "密码输错后会锁定多久？")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.userMessage.citations").isEmpty())
+                .andExpect(jsonPath("$.data.assistantMessage.citations.length()").value(1))
+                .andExpect(jsonPath("$.data.assistantMessage.citations[0].knowledgeBaseName")
+                        .value("产品帮助中心"))
+                .andExpect(jsonPath("$.data.assistantMessage.citations[0].sourceName")
+                        .value("账号安全说明.pdf"))
+                .andExpect(jsonPath("$.data.assistantMessage.citations[0].chunkSequence").value(8))
+                .andExpect(jsonPath("$.data.assistantMessage.citations[0].content")
+                        .value("连续五次输入错误密码后，账号将锁定三十分钟。"));
+
+        mockMvc.perform(get("/api/conversations/{id}/messages", conversationId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].citations").isEmpty())
+                .andExpect(jsonPath("$.data.records[1].citations.length()").value(1))
+                .andExpect(jsonPath("$.data.records[1].citations[0].sourceName")
+                        .value("账号安全说明.pdf"));
+    }
+
+    @Test
     void customerCannotReadOrSendToAnotherCustomersConversation() throws Exception {
         String ownerToken = registerCustomer("conversation_owner");
         String otherToken = registerCustomer("conversation_other");
@@ -410,6 +476,27 @@ class ConversationControllerIntegrationTest {
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
         when(modelClient.stream(any(), any(ConversationModelHistory.class), any())).thenAnswer(invocation -> {
             AgentExecutionContext context = invocation.getArgument(2);
+            AgentToolCall knowledgeCall = agentToolCallService.start(
+                    context,
+                    "search_knowledge_base",
+                    "{\"query\":\"重置密码\"}"
+            );
+            agentToolCallService.completeSuccess(knowledgeCall.getId(), """
+                    {
+                      "status": "FOUND",
+                      "message": "请仅依据以下资料回答",
+                      "knowledgeBase": "产品帮助中心",
+                      "query": "重置密码",
+                      "chunks": [
+                        {
+                          "rank": 1,
+                          "source": "密码重置指南.md",
+                          "chunkSequence": 3,
+                          "content": "用户可以通过登录页的忘记密码入口重置密码。"
+                        }
+                      ]
+                    }
+                    """);
             pendingActionService.prepareCreateTicket(
                     context,
                     "重置密码后仍无法登录",
@@ -454,6 +541,7 @@ class ConversationControllerIntegrationTest {
                 )
                 .contains("\"content\":\"可以\"", "\"content\":\"重置密码\"")
                 .contains("\"title\":\"重置密码后仍无法登录\"", "\"priority\":\"HIGH\"")
+                .contains("\"sourceName\":\"密码重置指南.md\"", "\"chunkSequence\":3")
                 .doesNotContain("event:error");
 
         List<ChatMessage> messages = chatMessageMapper.selectList(

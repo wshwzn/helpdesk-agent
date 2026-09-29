@@ -12,6 +12,7 @@ import com.anying.helpdesk.conversation.domain.ConversationStatus;
 import com.anying.helpdesk.conversation.dto.ChatMessageResponse;
 import com.anying.helpdesk.conversation.dto.ConversationResponse;
 import com.anying.helpdesk.conversation.dto.CreateConversationRequest;
+import com.anying.helpdesk.conversation.dto.KnowledgeCitationResponse;
 import com.anying.helpdesk.conversation.exception.ConcurrentConversationUpdateException;
 import com.anying.helpdesk.conversation.exception.ConversationGenerationInProgressException;
 import com.anying.helpdesk.conversation.exception.ConversationNotActiveException;
@@ -32,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,7 @@ public class ConversationPersistenceService {
     private final ChatMessageMapper chatMessageMapper;
     private final ChatProperties chatProperties;
     private final AgentToolCallService toolCallService;
+    private final KnowledgeCitationService knowledgeCitationService;
 
     @Transactional
     public ConversationResponse create(CreateConversationRequest request, Long customerId) {
@@ -106,12 +109,24 @@ public class ConversationPersistenceService {
                         .eq(ChatMessage::getConversationId, conversationId)
                         .orderByAsc(ChatMessage::getId)
         );
+        Map<Long, List<KnowledgeCitationResponse>> citationsByMessage =
+                knowledgeCitationService.listByAssistantMessageIds(
+                        result.getRecords().stream()
+                                .filter(message -> message.getRole() == ChatMessageRole.ASSISTANT)
+                                .map(ChatMessage::getId)
+                                .toList()
+                );
         return new PageResponse<>(
                 result.getCurrent(),
                 result.getSize(),
                 result.getTotal(),
                 result.getPages(),
-                result.getRecords().stream().map(ChatMessageResponse::from).toList()
+                result.getRecords().stream()
+                        .map(message -> ChatMessageResponse.from(
+                                message,
+                                citationsByMessage.getOrDefault(message.getId(), List.of())
+                        ))
+                        .toList()
         );
     }
 

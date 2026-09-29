@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -82,6 +83,23 @@ public class AgentToolCallService {
         return toolCallMapper.selectList(new LambdaQueryWrapper<AgentToolCall>()
                 .eq(AgentToolCall::getAssistantMessageId, assistantMessageId)
                 .eq(AgentToolCall::getStatus, AgentToolCallStatus.SUCCESS)
+                .orderByAsc(AgentToolCall::getSequenceNo));
+    }
+
+    /**
+     * 批量读取多条 AI 消息关联的成功工具调用，供消息历史一次性组装附加信息。
+     */
+    @Transactional(readOnly = true)
+    public List<AgentToolCall> listSuccessfulByAssistantMessageIds(
+            Collection<Long> assistantMessageIds
+    ) {
+        if (assistantMessageIds == null || assistantMessageIds.isEmpty()) {
+            return List.of();
+        }
+        return toolCallMapper.selectList(new LambdaQueryWrapper<AgentToolCall>()
+                .in(AgentToolCall::getAssistantMessageId, assistantMessageIds)
+                .eq(AgentToolCall::getStatus, AgentToolCallStatus.SUCCESS)
+                .orderByAsc(AgentToolCall::getAssistantMessageId)
                 .orderByAsc(AgentToolCall::getSequenceNo));
     }
 

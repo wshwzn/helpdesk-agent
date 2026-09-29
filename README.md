@@ -147,6 +147,8 @@ Content-Type: application/json
 
 管理员可通过 `POST /api/admin/knowledge-bases/{id}/default` 设置唯一默认知识库。客户对话中的 `search_knowledge_base` 工具只接收模型生成的查询文本，知识库 ID 由后端读取默认配置，不向模型开放。工具调用及返回的 Chunk 会沿用 `agent_tool_calls` 完整落库，同步和流式对话共享同一套实现。
 
+知识检索成功时，AI 消息的 `citations` 字段会返回本轮命中的知识库名称、来源文件名、Chunk 序号和完整片段内容。同步对话、流式 `done` 事件和历史消息查询使用相同结构；未调用知识库或没有命中时返回空数组。该字段只包含知识检索工具结果，不会暴露工单等其他工具返回值。
+
 ## 登录认证
 
 公开注册只会创建 `CUSTOMER` 客户账号：
