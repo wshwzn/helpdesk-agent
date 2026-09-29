@@ -7,6 +7,7 @@ import com.anying.helpdesk.agent.domain.AgentToolCallStatus;
 import com.anying.helpdesk.agent.service.AgentToolCallService;
 import com.anying.helpdesk.agent.tool.CustomerTicketTools;
 import com.anying.helpdesk.agent.tool.CustomerTicketActionTools;
+import com.anying.helpdesk.agent.tool.KnowledgeSearchTools;
 import com.anying.helpdesk.agent.tool.RecordingToolCallbackFactory;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ChatMessageRole;
@@ -15,6 +16,8 @@ import com.anying.helpdesk.conversation.model.ChatStreamChunk;
 import com.anying.helpdesk.conversation.model.ConversationModelHistory;
 import com.anying.helpdesk.conversation.model.SpringAiConversationModelClient;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
+import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
+import com.anying.helpdesk.knowledge.service.KnowledgeRetrievalService;
 import com.anying.helpdesk.ticket.service.TicketService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,6 +52,10 @@ class SpringAiConversationModelClientTest {
     private final SpringAiConversationModelClient client = new SpringAiConversationModelClient(
             new CustomerTicketTools(mock(TicketService.class)),
             new CustomerTicketActionTools(mock(PendingActionService.class)),
+            new KnowledgeSearchTools(
+                    mock(KnowledgeBaseService.class),
+                    mock(KnowledgeRetrievalService.class)
+            ),
             new RecordingToolCallbackFactory(toolCallService)
     );
 
@@ -97,7 +104,8 @@ class SpringAiConversationModelClientTest {
                     ).containsExactlyInAnyOrder(
                             "list_my_tickets",
                             "get_my_ticket",
-                            "prepare_create_ticket"
+                            "prepare_create_ticket",
+                            "search_knowledge_base"
                     );
                     assertThat(options.getToolContext()).containsValue(EXECUTION_CONTEXT);
                 });
@@ -158,6 +166,12 @@ class SpringAiConversationModelClientTest {
         assertThat(promptCaptor.getValue().getInstructions())
                 .hasSize(2)
                 .element(0).isInstanceOf(SystemMessage.class);
+        assertThat(promptCaptor.getValue().getOptions())
+                .isInstanceOfSatisfying(ToolCallingChatOptions.class, options ->
+                        assertThat(options.getToolCallbacks()).extracting(callback ->
+                                callback.getToolDefinition().name()
+                        ).contains("search_knowledge_base")
+                );
     }
 
     /**

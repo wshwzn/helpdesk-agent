@@ -92,6 +92,18 @@ public class AdminKnowledgeBaseController {
     }
 
     /**
+     * 将一个知识库设为客户对话 RAG 使用的默认知识库。
+     */
+    @PostMapping("/{id}/default")
+    @Operation(summary = "设为默认知识库", description = "客户对话中的知识检索工具只查询当前默认知识库")
+    public ApiResponse<KnowledgeBaseResponse> setDefault(
+            @Parameter(description = "知识库主键", example = "1")
+            @PathVariable @Min(1) Long id
+    ) {
+        return ApiResponse.ok(knowledgeBaseService.setDefault(id));
+    }
+
+    /**
      * 更新一个知识库的候选窗口、向量阈值和最终结果上限。
      */
     @PutMapping("/{id}/retrieval-settings")

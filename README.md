@@ -93,6 +93,7 @@ $env:OPENAPI_ENABLED = "false"
 POST   /api/admin/knowledge-bases
 GET    /api/admin/knowledge-bases
 GET    /api/admin/knowledge-bases/{id}
+POST   /api/admin/knowledge-bases/{id}/default
 PUT    /api/admin/knowledge-bases/{id}/retrieval-settings
 DELETE /api/admin/knowledge-bases/{id}
 POST   /api/admin/knowledge-bases/{id}/documents
@@ -143,6 +144,8 @@ Content-Type: application/json
 ```
 
 响应会回显本次生效的三个参数，并给出融合名次、RRF 分数以及 Chunk 在 BM25、KNN 两路中的名次和原始分数，便于调试召回效果。向量检索只使用由当前默认 Embedding 配置生成的 Chunk；切换默认向量模型后，应重新索引文档并重新评估相似度阈值。
+
+管理员可通过 `POST /api/admin/knowledge-bases/{id}/default` 设置唯一默认知识库。客户对话中的 `search_knowledge_base` 工具只接收模型生成的查询文本，知识库 ID 由后端读取默认配置，不向模型开放。工具调用及返回的 Chunk 会沿用 `agent_tool_calls` 完整落库，同步和流式对话共享同一套实现。
 
 ## 登录认证
 

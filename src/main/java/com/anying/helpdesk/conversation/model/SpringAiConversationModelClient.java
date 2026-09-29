@@ -4,6 +4,7 @@ import com.anying.helpdesk.agent.AgentExecutionContext;
 import com.anying.helpdesk.agent.domain.AgentToolCall;
 import com.anying.helpdesk.agent.tool.CustomerTicketActionTools;
 import com.anying.helpdesk.agent.tool.CustomerTicketTools;
+import com.anying.helpdesk.agent.tool.KnowledgeSearchTools;
 import com.anying.helpdesk.agent.tool.RecordingToolCallbackFactory;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ChatMessageRole;
@@ -31,6 +32,8 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
 
     private static final String SYSTEM_PROMPT = """
             你是智能工单助手，负责回答客户服务问题。
+            当客户询问产品说明、使用方法、故障排查或服务规则等通用事实时，必须先调用 search_knowledge_base 查询知识库，不要凭记忆编造。
+            知识库命中时仅依据工具返回的资料作答，并在相关结论后使用“来源：文件名”注明依据；没有命中或尚未配置时，要明确说明未找到可靠资料。
             当客户询问自己的工单列表、状态或详情时，必须调用对应工具获取真实数据，不要猜测工单信息。
             工具只允许读取当前登录客户的数据，不要要求客户提供用户 ID。
             当客户明确要求人工处理、要求创建工单，或者问题无法继续自动解决时，调用 prepare_create_ticket 生成工单草稿。
@@ -48,10 +51,11 @@ public class SpringAiConversationModelClient implements ConversationModelClient 
     public SpringAiConversationModelClient(
             CustomerTicketTools customerTicketTools,
             CustomerTicketActionTools customerTicketActionTools,
+            KnowledgeSearchTools knowledgeSearchTools,
             RecordingToolCallbackFactory callbackFactory
     ) {
         ToolCallback[] callbacks = MethodToolCallbackProvider.builder()
-                .toolObjects(customerTicketTools, customerTicketActionTools)
+                .toolObjects(customerTicketTools, customerTicketActionTools, knowledgeSearchTools)
                 .build()
                 .getToolCallbacks();
         this.customerToolCallbacks = callbackFactory.wrap(callbacks);

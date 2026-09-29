@@ -48,6 +48,8 @@ class OpenApiDocumentationIntegrationTest {
                         .value("调试知识库混合检索"))
                 .andExpect(jsonPath("$.paths['/api/admin/knowledge-bases/{id}/retrieval-settings'].put.summary")
                         .value("更新知识库检索参数"))
+                .andExpect(jsonPath("$.paths['/api/admin/knowledge-bases/{id}/default'].post.summary")
+                        .value("设为默认知识库"))
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.type").value("http"))
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
                 .andExpect(jsonPath("$.paths['/api/tickets'].post.security[0].bearerAuth").isArray())

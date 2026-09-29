@@ -12,6 +12,7 @@ import com.anying.helpdesk.knowledge.exception.KnowledgeBaseNotFoundException;
 import com.anying.helpdesk.knowledge.mapper.KnowledgeBaseMapper;
 import com.anying.helpdesk.knowledge.mapper.KnowledgeDocumentMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +73,44 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
     @Transactional(readOnly = true)
     public KnowledgeBaseResponse getById(Long id) {
         KnowledgeBase knowledgeBase = requireKnowledgeBase(id);
+        return KnowledgeBaseResponse.from(knowledgeBase, countDocuments(id));
+    }
+
+    /**
+     * 查询唯一默认知识库，未配置时返回空结果。
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<KnowledgeBaseResponse> findDefault() {
+        return knowledgeBaseMapper.selectList(new LambdaQueryWrapper<KnowledgeBase>()
+                        .eq(KnowledgeBase::getIsDefault, true)
+                        .orderByDesc(KnowledgeBase::getUpdatedAt)
+                        .last("LIMIT 1"))
+                .stream()
+                .findFirst()
+                .map(knowledgeBase -> KnowledgeBaseResponse.from(
+                        knowledgeBase,
+                        countDocuments(knowledgeBase.getId())
+                ));
+    }
+
+    /**
+     * 清除旧默认项并通过乐观锁把目标知识库设为默认。
+     */
+    @Override
+    @Transactional
+    public KnowledgeBaseResponse setDefault(Long id) {
+        KnowledgeBase knowledgeBase = requireKnowledgeBase(id);
+        LocalDateTime now = LocalDateTime.now();
+        knowledgeBaseMapper.update(null, new LambdaUpdateWrapper<KnowledgeBase>()
+                .eq(KnowledgeBase::getIsDefault, true)
+                .set(KnowledgeBase::getIsDefault, false)
+                .set(KnowledgeBase::getUpdatedAt, now));
+        knowledgeBase.setIsDefault(true);
+        knowledgeBase.setUpdatedAt(now);
+        if (knowledgeBaseMapper.updateById(knowledgeBase) == 0) {
+            throw new KnowledgeBaseConflictException("knowledge base was updated concurrently");
+        }
         return KnowledgeBaseResponse.from(knowledgeBase, countDocuments(id));
     }
 

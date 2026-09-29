@@ -321,6 +321,38 @@ class AdminKnowledgeBaseControllerIntegrationTest {
     }
 
     /**
+     * 验证后设置的知识库会成为唯一默认项，供客户对话 RAG 工具选择。
+     */
+    @Test
+    @DisplayName("管理员可以切换唯一默认知识库")
+    void adminSetsDefaultKnowledgeBase() throws Exception {
+        String token = createUserAndLogin("knowledge_admin_default", UserRole.ADMIN);
+        long firstId = createKnowledgeBase(token, "默认知识库一");
+        long secondId = createKnowledgeBase(token, "默认知识库二");
+
+        mockMvc.perform(post("/api/admin/knowledge-bases/{id}/default", firstId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(firstId))
+                .andExpect(jsonPath("$.data.isDefault").value(true));
+
+        mockMvc.perform(post("/api/admin/knowledge-bases/{id}/default", secondId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(secondId))
+                .andExpect(jsonPath("$.data.isDefault").value(true));
+
+        mockMvc.perform(get("/api/admin/knowledge-bases/{id}", firstId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isDefault").value(false));
+        mockMvc.perform(get("/api/admin/knowledge-bases/{id}", secondId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isDefault").value(true));
+    }
+
+    /**
      * 验证管理员可以提交自然语言问题并查看双路召回的融合排名。
      */
     @Test
@@ -384,6 +416,7 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.retrievalCandidateLimit").value(50))
                 .andExpect(jsonPath("$.data.vectorMinSimilarity").value(0.000))
                 .andExpect(jsonPath("$.data.retrievalResultLimit").value(5))
+                .andExpect(jsonPath("$.data.isDefault").value(false))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();

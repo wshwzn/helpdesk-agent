@@ -187,6 +187,7 @@
 | `retrieval_candidate_limit` | `INT` | 否 | `50` | BM25 和 KNN 各自送入 RRF 的候选数量上限，应用限制为 1～200。 |
 | `vector_min_similarity` | `DECIMAL(4,3)` | 否 | `0.000` | 始终生效的 KNN 原始向量相似度下限，范围 0～1；0 会过滤负相关向量。 |
 | `retrieval_result_limit` | `INT` | 否 | `5` | RRF 融合后最终返回数量上限，应用限制为 1～50。 |
+| `is_default` | `BOOLEAN` | 否 | `FALSE` | 是否为客户对话 RAG 工具当前使用的默认知识库。 |
 | `created_by` | `BIGINT` | 否 | 无 | 创建管理员的 `users.id`，逻辑关联。 |
 | `version` | `INT` | 否 | `0` | 乐观锁版本号，为后续知识库编辑预留。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 创建时间。 |
@@ -196,8 +197,10 @@
 
 - 主键：`PRIMARY KEY (id)`。
 - 唯一约束：`uk_knowledge_bases_name (name)`。
+- 普通索引：`idx_knowledge_bases_default_updated (is_default, updated_at)`，用于读取默认知识库。
 - 只有不含文档记录的知识库可以删除，该规则由应用层强制。
 - `retrieval_result_limit` 不能超过 `retrieval_candidate_limit`；KNN 的 `num_candidates` 由应用按候选上限的 2 倍计算。
+- 应用层设置新默认项时会先清除旧默认项，客户对话只选择一个默认知识库。
 
 ## `knowledge_documents` 知识库文档表
 
@@ -313,3 +316,4 @@ users.id ──< knowledge_documents.created_by
 | V10 | `V10__add_model_type_and_embedding_dimensions.sql` | 为模型配置增加聊天/向量用途和 Embedding 维度。 |
 | V11 | `V11__add_knowledge_retrieval_settings.sql` | 为知识库增加候选窗口、向量阈值和最终结果上限。 |
 | V12 | `V12__require_vector_min_similarity.sql` | 将历史空阈值迁移为 0，并要求向量相似度下限始终存在。 |
+| V13 | `V13__add_default_knowledge_base.sql` | 为知识库增加客户对话使用的默认项标记和查询索引。 |

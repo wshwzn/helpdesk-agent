@@ -22,6 +22,7 @@ public class KnowledgeBase {
     private Integer retrievalCandidateLimit = 50;
     private BigDecimal vectorMinSimilarity = BigDecimal.ZERO;
     private Integer retrievalResultLimit = 5;
+    private Boolean isDefault = false;
     private Long createdBy;
     @Version
     private Integer version;
