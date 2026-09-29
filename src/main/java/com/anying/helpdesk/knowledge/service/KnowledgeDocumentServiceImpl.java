@@ -95,6 +95,29 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
     }
 
     /**
+     * 查询指定知识库中的单个文档，并隐藏底层对象存储位置。
+     */
+    @Override
+    public KnowledgeDocumentResponse get(Long knowledgeBaseId, Long documentId) {
+        return KnowledgeDocumentResponse.from(persistenceService.get(knowledgeBaseId, documentId));
+    }
+
+    /**
+     * 打开原始文档读取流，供受保护的管理接口在线预览或下载。
+     */
+    @Override
+    public KnowledgeDocumentContent openContent(Long knowledgeBaseId, Long documentId) {
+        KnowledgeDocument document = persistenceService.get(knowledgeBaseId, documentId);
+        requireCurrentStorageProvider(document);
+        return new KnowledgeDocumentContent(
+                document.getOriginalName(),
+                document.getContentType(),
+                document.getSizeBytes(),
+                objectStorageService.download(document.getBucketName(), document.getObjectKey())
+        );
+    }
+
+    /**
      * 先删除对象存储内容，再移除元数据，避免数据库指向不存在的对象。
      */
     @Override

@@ -17,6 +17,16 @@ public interface KnowledgeDocumentService {
     PageResponse<KnowledgeDocumentResponse> page(Long knowledgeBaseId, long page, long size);
 
     /**
+     * 查询指定知识库中的单个文档元数据。
+     */
+    KnowledgeDocumentResponse get(Long knowledgeBaseId, Long documentId);
+
+    /**
+     * 校验文档归属和存储提供方后打开原始文件读取流。
+     */
+    KnowledgeDocumentContent openContent(Long knowledgeBaseId, Long documentId);
+
+    /**
      * 删除文档对象及其元数据记录。
      */
     void delete(Long knowledgeBaseId, Long documentId);

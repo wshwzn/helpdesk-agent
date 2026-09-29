@@ -100,13 +100,15 @@ PUT    /api/admin/knowledge-bases/{id}/retrieval-settings
 DELETE /api/admin/knowledge-bases/{id}
 POST   /api/admin/knowledge-bases/{id}/documents
 GET    /api/admin/knowledge-bases/{id}/documents?page=1&size=20
+GET    /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}
+GET    /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/content
 DELETE /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}
 POST   /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/chunk-preview?page=1&size=20
 POST   /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/index
 POST   /api/admin/knowledge-bases/{id}/search
 ```
 
-文档上传接口使用 `multipart/form-data`，字段名为 `file`。知识库中存在文档时不能直接删除；应先逐个删除文档，确保对象存储内容同步清理。
+文档上传接口使用 `multipart/form-data`，字段名为 `file`。`content` 接口在 ADMIN 鉴权后以内联文件流返回原始文档，可用于管理端预览和下载，不会暴露对象存储地址。知识库中存在文档时不能直接删除；应先逐个删除文档，确保对象存储内容同步清理。
 
 分块预览接口会从本地目录或 OSS 下载原文，通过 Apache Tika 解析为纯文本，再分页返回实际分块。默认每块最多 1000 个字符，相邻块重叠 150 个字符，并优先在段落、换行和中英文句末处分割。可以通过 `.env` 调整：
 

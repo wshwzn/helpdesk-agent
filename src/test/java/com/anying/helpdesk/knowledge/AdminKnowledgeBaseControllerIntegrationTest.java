@@ -134,7 +134,31 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                 .endsWith(".md");
 
         when(objectStorageService.download("local", objectKeyCaptor.getValue()))
-                .thenReturn(new ByteArrayInputStream(file.getBytes()));
+                .thenAnswer(invocation -> new ByteArrayInputStream(file.getBytes()));
+
+        mockMvc.perform(get(
+                                "/api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}",
+                                knowledgeBaseId,
+                                documentId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(documentId))
+                .andExpect(jsonPath("$.data.originalName").value("guide.md"));
+
+        mockMvc.perform(get(
+                                "/api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/content",
+                                knowledgeBaseId,
+                                documentId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/markdown"))
+                .andExpect(content().bytes(file.getBytes()))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
+                        .string(HttpHeaders.CONTENT_DISPOSITION, org.hamcrest.Matchers.containsString("guide.md")))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
+                        .string("X-Content-Type-Options", "nosniff"));
         mockMvc.perform(post(
                                 "/api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/chunk-preview",
                                 knowledgeBaseId,

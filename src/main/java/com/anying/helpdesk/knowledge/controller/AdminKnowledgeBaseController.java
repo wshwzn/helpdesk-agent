@@ -12,9 +12,10 @@ import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeRetrievalSettingsResponse;
 import com.anying.helpdesk.knowledge.dto.UpdateKnowledgeRetrievalSettingsRequest;
 import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
-import com.anying.helpdesk.knowledge.service.KnowledgeDocumentService;
-import com.anying.helpdesk.knowledge.service.KnowledgeDocumentPreviewService;
+import com.anying.helpdesk.knowledge.service.KnowledgeDocumentContent;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentIndexingService;
+import com.anying.helpdesk.knowledge.service.KnowledgeDocumentPreviewService;
+import com.anying.helpdesk.knowledge.service.KnowledgeDocumentService;
 import com.anying.helpdesk.knowledge.service.KnowledgeRetrievalService;
 import com.anying.helpdesk.security.CurrentUserProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +44,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Validated
@@ -162,6 +166,44 @@ public class AdminKnowledgeBaseController {
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) long size
     ) {
         return ApiResponse.ok(knowledgeDocumentService.page(id, page, size));
+    }
+
+    /**
+     * 查询指定知识库中的单个文档元数据。
+     */
+    @GetMapping("/{knowledgeBaseId}/documents/{documentId}")
+    @Operation(summary = "查询知识库文档详情")
+    public ApiResponse<KnowledgeDocumentResponse> getDocument(
+            @Parameter(description = "知识库主键", example = "1")
+            @PathVariable @Min(1) Long knowledgeBaseId,
+            @Parameter(description = "文档主键", example = "1")
+            @PathVariable @Min(1) Long documentId
+    ) {
+        return ApiResponse.ok(knowledgeDocumentService.get(knowledgeBaseId, documentId));
+    }
+
+    /**
+     * 以内联响应方式输出原始文档，供管理端新标签页预览和下载。
+     */
+    @GetMapping("/{knowledgeBaseId}/documents/{documentId}/content")
+    @Operation(summary = "读取知识库原始文档", description = "返回受 ADMIN 鉴权保护的原始文件流，不暴露对象存储地址")
+    public ResponseEntity<InputStreamResource> readDocumentContent(
+            @Parameter(description = "知识库主键", example = "1")
+            @PathVariable @Min(1) Long knowledgeBaseId,
+            @Parameter(description = "文档主键", example = "1")
+            @PathVariable @Min(1) Long documentId
+    ) {
+        KnowledgeDocumentContent content = knowledgeDocumentService.openContent(knowledgeBaseId, documentId);
+        MediaType mediaType = MediaType.parseMediaType(content.contentType());
+        ContentDisposition disposition = ContentDisposition.inline()
+                .filename(content.originalName(), StandardCharsets.UTF_8)
+                .build();
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .contentLength(content.contentLength())
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .header("X-Content-Type-Options", "nosniff")
+                .body(new InputStreamResource(content.inputStream()));
     }
 
     /**
