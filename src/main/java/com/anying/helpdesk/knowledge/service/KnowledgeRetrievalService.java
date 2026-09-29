@@ -36,6 +36,17 @@ public class KnowledgeRetrievalService {
      */
     public KnowledgeSearchResponse search(Long knowledgeBaseId, KnowledgeSearchRequest request) {
         KnowledgeRetrievalSettingsResponse settings = knowledgeBaseService.getRetrievalSettings(knowledgeBaseId);
+        return search(knowledgeBaseId, request, settings);
+    }
+
+    /**
+     * 使用调用方提供的固定参数快照执行检索，保证批量评测期间口径一致。
+     */
+    public KnowledgeSearchResponse search(
+            Long knowledgeBaseId,
+            KnowledgeSearchRequest request,
+            KnowledgeRetrievalSettingsResponse settings
+    ) {
         String query = request.query().trim();
         ResolvedEmbeddingModel embeddingModel = embeddingModelProvider.get();
         chunkStore.ensureIndex(embeddingModel.dimensions());

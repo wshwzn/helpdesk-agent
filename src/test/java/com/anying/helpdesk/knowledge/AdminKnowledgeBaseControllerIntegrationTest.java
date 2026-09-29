@@ -4,11 +4,13 @@ import com.anying.helpdesk.auth.domain.User;
 import com.anying.helpdesk.auth.domain.UserRole;
 import com.anying.helpdesk.auth.mapper.UserMapper;
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocumentStatus;
+import com.anying.helpdesk.knowledge.domain.KnowledgeDocument;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResultResponse;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentIndexingService;
 import com.anying.helpdesk.knowledge.service.KnowledgeRetrievalService;
+import com.anying.helpdesk.knowledge.mapper.KnowledgeDocumentMapper;
 import com.anying.helpdesk.storage.ObjectStorageService;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -63,6 +66,9 @@ class AdminKnowledgeBaseControllerIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private KnowledgeDocumentMapper knowledgeDocumentMapper;
 
     @MockitoBean
     private ObjectStorageService objectStorageService;
@@ -396,6 +402,160 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.results[0].rank").value(1))
                 .andExpect(jsonPath("$.data.results[0].bm25Rank").value(2))
                 .andExpect(jsonPath("$.data.results[0].vectorRank").value(1));
+    }
+
+    /**
+     * 验证多期望文档评测用例可以运行、保存指标并保护被引用文档。
+     */
+    @Test
+    @DisplayName("管理员可以运行包含多个期望文档的 RAG 检索评测")
+    void adminRunsRagEvaluationWithMultipleExpectedDocuments() throws Exception {
+        String token = createUserAndLogin("knowledge_admin_evaluation", UserRole.ADMIN);
+        long knowledgeBaseId = createKnowledgeBase(token, "检索评测知识库");
+        long firstDocumentId = uploadReadyDocument(token, knowledgeBaseId, "account.md", "账号规则");
+        long secondDocumentId = uploadReadyDocument(token, knowledgeBaseId, "admin.md", "管理规则");
+
+        String caseResponse = mockMvc.perform(post(
+                                "/api/admin/knowledge-bases/{id}/evaluation/cases",
+                                knowledgeBaseId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "question": "连续输错密码会怎么样？",
+                                  "expectedDocumentIds": [%d, %d]
+                                }
+                                """.formatted(firstDocumentId, secondDocumentId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.expectedDocuments.length()").value(2))
+                .andExpect(jsonPath("$.data.expectedDocuments[0].id").value(firstDocumentId))
+                .andExpect(jsonPath("$.data.expectedDocuments[1].id").value(secondDocumentId))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long caseId = ((Number) JsonPath.read(caseResponse, "$.data.id")).longValue();
+
+        when(knowledgeRetrievalService.search(eq(knowledgeBaseId), any(), any()))
+                .thenReturn(new KnowledgeSearchResponse(
+                        knowledgeBaseId,
+                        "连续输错密码会怎么样？",
+                        50,
+                        new java.math.BigDecimal("0.000"),
+                        5,
+                        2,
+                        2,
+                        List.of(
+                                new KnowledgeSearchResultResponse(
+                                        1,
+                                        999L,
+                                        1,
+                                        "other.md",
+                                        "其他内容",
+                                        0.03D,
+                                        1,
+                                        3.0D,
+                                        1,
+                                        0.8D
+                                ),
+                                new KnowledgeSearchResultResponse(
+                                        2,
+                                        firstDocumentId,
+                                        3,
+                                        "account.md",
+                                        "连续输错密码后账号会被锁定。",
+                                        0.02D,
+                                        2,
+                                        2.0D,
+                                        2,
+                                        0.7D
+                                )
+                        )
+                ));
+
+        String runResponse = mockMvc.perform(post(
+                                "/api/admin/knowledge-bases/{id}/evaluation/runs",
+                                knowledgeBaseId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.summary.totalCases").value(1))
+                .andExpect(jsonPath("$.data.summary.hitCases").value(1))
+                .andExpect(jsonPath("$.data.summary.hitRate").value(1.0))
+                .andExpect(jsonPath("$.data.summary.recallAtK").value(0.5))
+                .andExpect(jsonPath("$.data.summary.meanReciprocalRank").value(0.5))
+                .andExpect(jsonPath("$.data.results[0].caseId").value(caseId))
+                .andExpect(jsonPath("$.data.results[0].matchedDocumentCount").value(1))
+                .andExpect(jsonPath("$.data.results[0].firstRelevantRank").value(2))
+                .andExpect(jsonPath("$.data.results[0].retrievedResults.length()").value(2))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long runId = ((Number) JsonPath.read(runResponse, "$.data.summary.id")).longValue();
+
+        mockMvc.perform(get("/api/admin/knowledge-bases/{id}/evaluation/runs", knowledgeBaseId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].id").value(runId));
+        mockMvc.perform(get(
+                                "/api/admin/knowledge-bases/{id}/evaluation/runs/{runId}",
+                                knowledgeBaseId,
+                                runId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.results[0].expectedDocuments.length()").value(2));
+
+        mockMvc.perform(delete(
+                                "/api/admin/knowledge-bases/{id}/documents/{documentId}",
+                                knowledgeBaseId,
+                                firstDocumentId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("RAG_EVALUATION_CONFLICT"));
+
+        mockMvc.perform(delete(
+                                "/api/admin/knowledge-bases/{id}/evaluation/cases/{caseId}",
+                                knowledgeBaseId,
+                                caseId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isNoContent());
+    }
+
+    /**
+     * 上传测试文档并直接推进到 READY，模拟已经完成 Elasticsearch 索引。
+     */
+    private long uploadReadyDocument(
+            String token,
+            long knowledgeBaseId,
+            String filename,
+            String content
+    ) throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                filename,
+                MediaType.TEXT_PLAIN_VALUE,
+                content.getBytes()
+        );
+        String response = mockMvc.perform(multipart(
+                                "/api/admin/knowledge-bases/{id}/documents",
+                                knowledgeBaseId
+                        )
+                        .file(file)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long documentId = ((Number) JsonPath.read(response, "$.data.id")).longValue();
+        KnowledgeDocument document = knowledgeDocumentMapper.selectById(documentId);
+        document.setStatus(KnowledgeDocumentStatus.READY);
+        document.setChunkCount(1);
+        document.setUpdatedAt(LocalDateTime.now());
+        knowledgeDocumentMapper.updateById(document);
+        return documentId;
     }
 
     /**

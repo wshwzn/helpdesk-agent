@@ -234,6 +234,87 @@
 - 普通索引：`idx_knowledge_documents_base_sha256 (knowledge_base_id, sha256)`，支持后续识别同一知识库中的重复内容；当前不禁止重复上传。
 - 上传时先写入 `UPLOADING`，对象保存成功后改为 `PENDING`；触发索引后进入 `PROCESSING`，后台成功写入 ES 后改为 `READY`，失败则改为 `FAILED` 并保存固定错误码。
 - `PROCESSING` 状态禁止重复触发和删除；状态推进及并发覆盖由应用层和 `version` 乐观锁共同限制。
+- 被当前 RAG 评测用例选为期望文档时禁止删除；应先修改或删除对应评测用例。
+
+## `rag_evaluation_cases` RAG 检索评测用例表
+
+保存知识库的固定测试问题，由 Flyway V14 创建。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 评测用例主键。 |
+| `knowledge_base_id` | `BIGINT` | 否 | 无 | 所属 `knowledge_bases.id`，逻辑关联。 |
+| `question` | `VARCHAR(2000)` | 否 | 无 | 模拟客户提问的检索问题。 |
+| `created_by` | `BIGINT` | 否 | 无 | 创建管理员的 `users.id`，逻辑关联。 |
+| `version` | `INT` | 否 | `0` | 编辑用例时使用的乐观锁版本号。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 创建时间。 |
+| `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 最后更新时间。 |
+
+- 主键：`PRIMARY KEY (id)`。
+- 普通索引：`idx_rag_evaluation_cases_base_id (knowledge_base_id, id)`。
+- 单个知识库每次最多运行 100 条用例，该限制由应用层强制。
+
+## `rag_evaluation_case_documents` 评测期望文档关系表
+
+保存每条问题的一个或多个相关文档，由 Flyway V14 创建。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `case_id` | `BIGINT` | 否 | 无 | `rag_evaluation_cases.id`，逻辑关联。 |
+| `document_id` | `BIGINT` | 否 | 无 | 期望命中的 `knowledge_documents.id`，逻辑关联。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 关系创建时间。 |
+
+- 复合主键：`PRIMARY KEY (case_id, document_id)`，同一用例不能重复选择同一文档。
+- 普通索引：`idx_rag_evaluation_case_documents_document (document_id, case_id)`，用于删除文档前检查引用。
+- 应用要求期望文档属于当前知识库且状态为 `READY`，每条用例允许 1～20 个期望文档。
+
+## `rag_evaluation_runs` RAG 评测运行表
+
+保存一次批量检索的参数快照和汇总指标，由 Flyway V14 创建。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 运行主键。 |
+| `knowledge_base_id` | `BIGINT` | 否 | 无 | 被评测的知识库主键。 |
+| `candidate_limit` | `INT` | 否 | 无 | 本次运行使用的单路候选数量。 |
+| `vector_min_similarity` | `DECIMAL(4,3)` | 否 | 无 | 本次运行使用的向量相似度下限。 |
+| `result_limit` | `INT` | 否 | 无 | 本次运行最终返回数量，也是 Hit@K、Recall@K 中的 K。 |
+| `total_cases` | `INT` | 否 | 无 | 运行的问题总数。 |
+| `hit_cases` | `INT` | 否 | 无 | 至少命中一个期望文档的问题数。 |
+| `hit_rate` | `DECIMAL(8,6)` | 否 | 无 | `hit_cases / total_cases`。 |
+| `recall_at_k` | `DECIMAL(8,6)` | 否 | 无 | 所有问题文档级 Recall@K 的平均值。 |
+| `mean_reciprocal_rank` | `DECIMAL(8,6)` | 否 | 无 | 所有问题首个相关 Chunk 倒数排名的平均值。 |
+| `average_latency_ms` | `BIGINT` | 否 | 无 | 每个问题完整检索耗时的平均值，单位毫秒。 |
+| `created_by` | `BIGINT` | 否 | 无 | 发起运行的管理员主键。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 运行完成并保存的时间。 |
+
+- 主键：`PRIMARY KEY (id)`。
+- 普通索引：`idx_rag_evaluation_runs_base_created (knowledge_base_id, created_at, id)`，用于读取最近运行。
+
+## `rag_evaluation_run_results` RAG 逐题评测结果表
+
+保存每道问题运行时的期望文档和实际 Chunk 快照，保证用例后续修改或删除不会改变历史结果。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 逐题结果主键。 |
+| `run_id` | `BIGINT` | 否 | 无 | 所属 `rag_evaluation_runs.id`。 |
+| `case_id` | `BIGINT` | 否 | 无 | 运行时的评测用例主键快照。 |
+| `question` | `VARCHAR(2000)` | 否 | 无 | 运行时的问题快照。 |
+| `expected_documents_json` | `LONGTEXT` | 否 | 无 | 期望文档主键和文件名 JSON 快照。 |
+| `retrieved_results_json` | `LONGTEXT` | 否 | 无 | 实际召回 Chunk 及其排名、分数的 JSON 快照。 |
+| `expected_document_count` | `INT` | 否 | 无 | 期望文档数量。 |
+| `matched_document_count` | `INT` | 否 | 无 | 被前 K 个 Chunk 覆盖的不同期望文档数量。 |
+| `first_relevant_rank` | `INT` | 是 | `NULL` | 第一个相关 Chunk 名次，未命中时为空。 |
+| `hit` | `BOOLEAN` | 否 | 无 | 是否至少命中一个期望文档。 |
+| `recall_at_k` | `DECIMAL(8,6)` | 否 | 无 | `matched_document_count / expected_document_count`。 |
+| `reciprocal_rank` | `DECIMAL(8,6)` | 否 | 无 | `1 / first_relevant_rank`，未命中为 0。 |
+| `latency_ms` | `BIGINT` | 否 | 无 | 本题完整检索耗时，单位毫秒。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 结果保存时间。 |
+
+- 主键：`PRIMARY KEY (id)`。
+- 普通索引：`idx_rag_evaluation_run_results_run_case (run_id, case_id)`。
+- 同一文档召回多个 Chunk 时，文档级 Recall@K 只计算一次；MRR 使用第一个相关 Chunk 的排名。
 
 ## `ai_model_configs` AI 模型配置表
 
@@ -292,6 +373,11 @@ agent_pending_actions.ticket_id >── tickets.id
 users.id ──< knowledge_bases.created_by
 knowledge_bases.id ──< knowledge_documents.knowledge_base_id
 users.id ──< knowledge_documents.created_by
+knowledge_bases.id ──< rag_evaluation_cases.knowledge_base_id
+rag_evaluation_cases.id ──< rag_evaluation_case_documents.case_id
+knowledge_documents.id ──< rag_evaluation_case_documents.document_id
+knowledge_bases.id ──< rag_evaluation_runs.knowledge_base_id
+rag_evaluation_runs.id ──< rag_evaluation_run_results.run_id
 ```
 
 这些关系目前均为逻辑关联，没有外键约束和级联删除行为。
@@ -317,3 +403,4 @@ users.id ──< knowledge_documents.created_by
 | V11 | `V11__add_knowledge_retrieval_settings.sql` | 为知识库增加候选窗口、向量阈值和最终结果上限。 |
 | V12 | `V12__require_vector_min_similarity.sql` | 将历史空阈值迁移为 0，并要求向量相似度下限始终存在。 |
 | V13 | `V13__add_default_knowledge_base.sql` | 为知识库增加客户对话使用的默认项标记和查询索引。 |
+| V14 | `V14__create_rag_evaluation_tables.sql` | 创建 RAG 评测用例、期望文档关系、运行汇总和逐题结果表。 |

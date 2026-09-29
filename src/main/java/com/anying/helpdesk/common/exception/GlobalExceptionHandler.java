@@ -23,6 +23,8 @@ import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentParsingException
 import com.anying.helpdesk.knowledge.exception.KnowledgeIndexException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeRetrievalException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeStorageException;
+import com.anying.helpdesk.knowledge.evaluation.exception.RagEvaluationConflictException;
+import com.anying.helpdesk.knowledge.evaluation.exception.RagEvaluationNotFoundException;
 import com.anying.helpdesk.modelconfig.exception.InvalidModelConfigException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigNotFoundException;
@@ -47,6 +49,28 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * 将评测用例或运行记录不存在转换为统一的未找到响应。
+     */
+    @ExceptionHandler(RagEvaluationNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRagEvaluationNotFound(
+            RagEvaluationNotFoundException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("RAG_EVALUATION_NOT_FOUND", exception.getMessage(), null));
+    }
+
+    /**
+     * 将空评测集、非法期望文档和并发编辑转换为冲突响应。
+     */
+    @ExceptionHandler(RagEvaluationConflictException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRagEvaluationConflict(
+            RagEvaluationConflictException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("RAG_EVALUATION_CONFLICT", exception.getMessage(), null));
+    }
 
     /**
      * 将知识库或知识文档不存在转换为统一的未找到响应。

@@ -7,6 +7,7 @@ import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
 import com.anying.helpdesk.knowledge.exception.InvalidKnowledgeDocumentException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentConflictException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeStorageException;
+import com.anying.helpdesk.knowledge.evaluation.service.RagEvaluationService;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkStore;
 import com.anying.helpdesk.storage.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
     private final KnowledgeDocumentPersistenceService persistenceService;
     private final ObjectStorageService objectStorageService;
     private final KnowledgeChunkStore chunkStore;
+    private final RagEvaluationService ragEvaluationService;
 
     /**
      * 完成文件校验、哈希计算、对象上传和文档元数据状态推进。
@@ -101,6 +103,7 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
         if (document.getStatus() == KnowledgeDocumentStatus.PROCESSING) {
             throw new KnowledgeDocumentConflictException("processing document cannot be deleted");
         }
+        ragEvaluationService.requireDocumentNotReferenced(documentId);
         requireCurrentStorageProvider(document);
         if (document.getStatus() == KnowledgeDocumentStatus.READY) {
             chunkStore.deleteDocument(documentId);

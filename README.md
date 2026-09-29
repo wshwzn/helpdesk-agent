@@ -83,6 +83,8 @@ $env:OPENAPI_ENABLED = "false"
 - `agent_pending_actions`：待确认操作表，保存 AI 生成的工单草稿及确认、取消、过期和执行状态。
 - `knowledge_bases`：知识库表，保存名称、说明和创建信息。
 - `knowledge_documents`：知识库文档元数据表，保存对象位置、文件摘要和处理状态；原始内容不进入 MySQL。
+- `rag_evaluation_cases`、`rag_evaluation_case_documents`：保存固定评测问题及其多个期望文档。
+- `rag_evaluation_runs`、`rag_evaluation_run_results`：保存每次检索评测的参数、汇总指标和逐题快照。
 - `flyway_schema_history`：Flyway 自动创建的迁移记录表，用于记录每个 SQL 迁移脚本是否执行成功，防止重复建表。请勿手动修改或删除其中的数据。
 
 ## 知识库管理
@@ -144,6 +146,20 @@ Content-Type: application/json
 ```
 
 响应会回显本次生效的三个参数，并给出融合名次、RRF 分数以及 Chunk 在 BM25、KNN 两路中的名次和原始分数，便于调试召回效果。向量检索只使用由当前默认 Embedding 配置生成的 Chunk；切换默认向量模型后，应重新索引文档并重新评估相似度阈值。
+
+管理员可以维护固定检索评测集。每道问题支持选择 1～20 个 `READY` 状态的期望文档，单次最多批量运行 100 道问题：
+
+```http
+POST   /api/admin/knowledge-bases/{id}/evaluation/cases
+GET    /api/admin/knowledge-bases/{id}/evaluation/cases
+PUT    /api/admin/knowledge-bases/{id}/evaluation/cases/{caseId}
+DELETE /api/admin/knowledge-bases/{id}/evaluation/cases/{caseId}
+POST   /api/admin/knowledge-bases/{id}/evaluation/runs
+GET    /api/admin/knowledge-bases/{id}/evaluation/runs?limit=10
+GET    /api/admin/knowledge-bases/{id}/evaluation/runs/{runId}
+```
+
+每次运行会固定使用开始时的候选数量、相似度下限和最终结果数量，保存文档级 `Hit@K`、平均 `Recall@K`、MRR、平均耗时及逐题实际召回 Chunk。相同文档出现多个 Chunk 时只计一次文档命中；历史运行保存问题、期望文档和召回结果快照，不受后续用例修改影响。被当前评测用例引用的文档不能删除，应先调整对应评测用例。
 
 管理员可通过 `POST /api/admin/knowledge-bases/{id}/default` 设置唯一默认知识库。客户对话中的 `search_knowledge_base` 工具只接收模型生成的查询文本，知识库 ID 由后端读取默认配置，不向模型开放。工具调用及返回的 Chunk 会沿用 `agent_tool_calls` 完整落库，同步和流式对话共享同一套实现。
 
