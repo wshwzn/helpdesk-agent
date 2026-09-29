@@ -71,7 +71,7 @@
 | `id` | `BIGINT` | 否 | 自增 | 对话主键。 |
 | `customer_id` | `BIGINT` | 否 | 无 | 对话所属客户的 `users.id`，逻辑关联。 |
 | `title` | `VARCHAR(100)` | 否 | 无 | 客户创建对话时填写的标题。 |
-| `status` | `VARCHAR(20)` | 否 | 无 | 对话状态：`ACTIVE`、`ARCHIVED`；当前只创建 `ACTIVE` 对话。 |
+| `status` | `VARCHAR(20)` | 否 | 无 | 对话状态：`ACTIVE`、`ARCHIVED`；客户删除对话时转为 `ARCHIVED` 并从活动列表隐藏。 |
 | `last_message_at` | `TIMESTAMP(6)` | 是 | `NULL` | 最近一次客户消息落库或 AI 生成结束的时间；新建空对话时为空。 |
 | `version` | `INT` | 否 | `0` | 乐观锁版本号，避免同一对话的并发发送互相覆盖。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 对话创建时间。 |
@@ -81,6 +81,7 @@
 
 - 主键：`PRIMARY KEY (id)`。
 - 普通索引：`idx_conversations_customer_status_updated (customer_id, status, updated_at)`，支持客户分页筛选自己的对话。
+- 删除对话采用应用层归档，不物理删除消息、工具调用和待确认操作；归档对话不能继续发送消息。
 
 ## `chat_messages` 对话消息表
 

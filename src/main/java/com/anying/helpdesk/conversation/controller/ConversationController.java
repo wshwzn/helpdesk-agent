@@ -25,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,8 +62,8 @@ public class ConversationController {
             @RequestParam(defaultValue = "1") @Min(1) long page,
             @Parameter(description = "每页数量，最大 100", example = "20")
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) long size,
-            @Parameter(description = "可选的对话状态筛选")
-            @RequestParam(required = false) ConversationStatus status
+            @Parameter(description = "对话状态筛选，默认只返回活动对话")
+            @RequestParam(defaultValue = "ACTIVE") ConversationStatus status
     ) {
         return ApiResponse.ok(conversationService.page(
                 page,
@@ -79,6 +80,19 @@ public class ConversationController {
             @PathVariable @Min(1) Long id
     ) {
         return ApiResponse.ok(conversationService.getById(id, currentUserProvider.userId()));
+    }
+
+    /**
+     * 删除客户自己的对话；后端使用归档状态保留消息与工具审计记录。
+     */
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除对话", description = "删除后不再出现在活动列表中，也不能继续发送消息")
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "对话主键", example = "1")
+            @PathVariable @Min(1) Long id
+    ) {
+        conversationService.delete(id, currentUserProvider.userId());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/messages")

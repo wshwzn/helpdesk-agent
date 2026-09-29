@@ -56,6 +56,14 @@ public class ConversationServiceImpl implements ConversationService {
         return persistenceService.getById(id, customerId);
     }
 
+    /**
+     * 删除客户自己的对话，归档后不再允许继续生成回答。
+     */
+    @Override
+    public void delete(Long id, Long customerId) {
+        persistenceService.archive(id, customerId);
+    }
+
     @Override
     public PageResponse<ConversationResponse> page(
             long page,

@@ -16,6 +16,11 @@ public interface ConversationService {
 
     ConversationResponse getById(Long id, Long customerId);
 
+    /**
+     * 删除客户自己的对话，业务实现保留历史数据并转为归档状态。
+     */
+    void delete(Long id, Long customerId);
+
     PageResponse<ConversationResponse> page(
             long page,
             long size,

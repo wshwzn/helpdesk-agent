@@ -345,9 +345,12 @@ CHAT_PENDING_RECOVERY_INTERVAL=1m
 GET /api/conversations?page=1&size=20&status=ACTIVE
 GET /api/conversations/{id}
 GET /api/conversations/{id}/messages?page=1&size=50
+DELETE /api/conversations/{id}
 ```
 
 客户只能访问自己的对话。系统默认携带最近 20 条已完成消息作为模型上下文，可通过 `CHAT_HISTORY_LIMIT` 调整为 1 至 100。同步接口调用失败时返回 `502 CHAT_GENERATION_FAILED`；流式接口开始传输后调用失败时返回 `error` 事件。两种方式都会保留客户消息和一条 `FAILED` AI 消息，且不会向客户端暴露厂商原始异常。
+
+删除对话采用归档方式：对话更新为 `ARCHIVED` 后不再出现在默认客户列表中，也不能继续发送消息，但消息、工具调用和工单草稿仍保留用于审计。列表接口默认查询 `ACTIVE`，需要审计归档记录时可显式传入 `status=ARCHIVED`。正在生成回答的对话不能删除；已经归档的对话重复删除保持幂等。
 
 ## 工单接口
 

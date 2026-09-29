@@ -61,6 +61,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -305,7 +306,54 @@ class ConversationControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("CONVERSATION_NOT_FOUND"));
 
+        mockMvc.perform(delete("/api/conversations/{id}", conversationId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(otherToken)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("CONVERSATION_NOT_FOUND"));
+
         verifyNoInteractions(defaultChatModelProvider, modelClient);
+    }
+
+    /**
+     * 验证删除对话采用归档语义，活动列表隐藏但历史消息继续保留且不能再次发送。
+     */
+    @Test
+    @DisplayName("客户删除自己的对话后应归档并保留历史")
+    void customerDeletesOwnConversationByArchivingIt() throws Exception {
+        String token = registerCustomer("conversation_delete");
+        long conversationId = createConversation(token, "准备删除的对话");
+        when(defaultChatModelProvider.get()).thenReturn(new ResolvedChatModel(
+                107L,
+                "delete-test-model",
+                true,
+                mock(ChatModel.class)
+        ));
+        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
+                .thenReturn(new ChatCompletionResult("这条历史应当保留", 6, 5, 11));
+        sendMessage(token, conversationId, "保存一轮历史").andExpect(status().isOk());
+
+        mockMvc.perform(delete("/api/conversations/{id}", conversationId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/conversations/{id}", conversationId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/conversations")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(0));
+        mockMvc.perform(get("/api/conversations/{id}", conversationId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("ARCHIVED"));
+        mockMvc.perform(get("/api/conversations/{id}/messages", conversationId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(2));
+        sendMessage(token, conversationId, "归档后不能继续发送")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("CONVERSATION_NOT_ACTIVE"));
     }
 
     /**
@@ -455,6 +503,10 @@ class ConversationControllerIntegrationTest {
                         .content("""
                                 {"content": "第三条消息"}
                                 """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("CONVERSATION_GENERATION_IN_PROGRESS"));
+        mockMvc.perform(delete("/api/conversations/{id}", conversationId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("CONVERSATION_GENERATION_IN_PROGRESS"));
 

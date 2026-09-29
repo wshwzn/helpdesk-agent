@@ -64,6 +64,32 @@ public class ConversationPersistenceService {
         return ConversationResponse.from(requireOwnedConversation(id, customerId));
     }
 
+    /**
+     * 将客户自己的活动对话归档；存在未超时生成任务时拒绝删除，避免后台继续写入。
+     */
+    @Transactional
+    public void archive(Long id, Long customerId) {
+        Conversation conversation = requireOwnedConversation(id, customerId);
+        if (conversation.getStatus() == ConversationStatus.ARCHIVED) {
+            return;
+        }
+        staleGenerationRecoveryService.recoverForConversation(id);
+        boolean generationInProgress = chatMessageMapper.selectCount(
+                new LambdaQueryWrapper<ChatMessage>()
+                        .eq(ChatMessage::getConversationId, id)
+                        .eq(ChatMessage::getRole, ChatMessageRole.ASSISTANT)
+                        .eq(ChatMessage::getStatus, ChatMessageStatus.PENDING)
+        ) > 0;
+        if (generationInProgress) {
+            throw new ConversationGenerationInProgressException(id);
+        }
+        conversation.setStatus(ConversationStatus.ARCHIVED);
+        conversation.setUpdatedAt(LocalDateTime.now());
+        if (conversationMapper.updateById(conversation) == 0) {
+            throw new ConcurrentConversationUpdateException(id);
+        }
+    }
+
     @Transactional(readOnly = true)
     public void validateCanSend(Long id, Long customerId) {
         Conversation conversation = requireOwnedConversation(id, customerId);
