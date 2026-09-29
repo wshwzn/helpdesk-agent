@@ -539,6 +539,36 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("RAG_EVALUATION_CONFLICT"));
 
+        long anotherKnowledgeBaseId = createKnowledgeBase(token, "其他知识库");
+        mockMvc.perform(delete(
+                                "/api/admin/knowledge-bases/{id}/evaluation/runs/{runId}",
+                                anotherKnowledgeBaseId,
+                                runId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("RAG_EVALUATION_NOT_FOUND"));
+
+        mockMvc.perform(delete(
+                                "/api/admin/knowledge-bases/{id}/evaluation/runs/{runId}",
+                                knowledgeBaseId,
+                                runId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(get(
+                                "/api/admin/knowledge-bases/{id}/evaluation/runs/{runId}",
+                                knowledgeBaseId,
+                                runId
+                        )
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("RAG_EVALUATION_NOT_FOUND"));
+        mockMvc.perform(get("/api/admin/knowledge-bases/{id}/evaluation/runs", knowledgeBaseId)
+                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(0));
+
         mockMvc.perform(delete(
                                 "/api/admin/knowledge-bases/{id}/evaluation/cases/{caseId}",
                                 knowledgeBaseId,

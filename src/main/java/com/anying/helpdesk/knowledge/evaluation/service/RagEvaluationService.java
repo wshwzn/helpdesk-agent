@@ -151,6 +151,13 @@ public class RagEvaluationService {
     }
 
     /**
+     * 删除指定知识库中的一次评测运行及其逐题快照。
+     */
+    public void deleteRun(Long knowledgeBaseId, Long runId) {
+        persistenceService.deleteRun(knowledgeBaseId, runId);
+    }
+
+    /**
      * 阻止删除仍被评测用例引用的文档，避免期望集合静默失效。
      */
     public void requireDocumentNotReferenced(Long documentId) {

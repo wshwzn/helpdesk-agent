@@ -137,4 +137,17 @@ public class AdminRagEvaluationController {
     ) {
         return ApiResponse.ok(evaluationService.getRun(knowledgeBaseId, runId));
     }
+
+    /**
+     * 删除一次运行汇总及其逐题快照，不影响评测用例。
+     */
+    @DeleteMapping("/runs/{runId}")
+    @Operation(summary = "删除 RAG 评测运行结果")
+    public ResponseEntity<Void> deleteRun(
+            @PathVariable @Min(1) Long knowledgeBaseId,
+            @PathVariable @Min(1) Long runId
+    ) {
+        evaluationService.deleteRun(knowledgeBaseId, runId);
+        return ResponseEntity.noContent().build();
+    }
 }

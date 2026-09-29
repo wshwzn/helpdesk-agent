@@ -159,9 +159,10 @@ DELETE /api/admin/knowledge-bases/{id}/evaluation/cases/{caseId}
 POST   /api/admin/knowledge-bases/{id}/evaluation/runs
 GET    /api/admin/knowledge-bases/{id}/evaluation/runs?limit=10
 GET    /api/admin/knowledge-bases/{id}/evaluation/runs/{runId}
+DELETE /api/admin/knowledge-bases/{id}/evaluation/runs/{runId}
 ```
 
-每次运行会固定使用开始时的候选数量、相似度下限和最终结果数量，保存文档级 `Hit@K`、平均 `Recall@K`、MRR、平均耗时及逐题实际召回 Chunk。相同文档出现多个 Chunk 时只计一次文档命中；历史运行保存问题、期望文档和召回结果快照，不受后续用例修改影响。被当前评测用例引用的文档不能删除，应先调整对应评测用例。
+每次运行会固定使用开始时的候选数量、相似度下限和最终结果数量，保存文档级 `Hit@K`、平均 `Recall@K`、MRR、平均耗时及逐题实际召回 Chunk。相同文档出现多个 Chunk 时只计一次文档命中；历史运行保存问题、期望文档和召回结果快照，不受后续用例修改影响。删除某次运行会同时删除汇总和逐题快照，但不会影响评测用例。被当前评测用例引用的文档不能删除，应先调整对应评测用例。
 
 管理员可通过 `POST /api/admin/knowledge-bases/{id}/default` 设置唯一默认知识库。客户对话中的 `search_knowledge_base` 工具只接收模型生成的查询文本，知识库 ID 由后端读取默认配置，不向模型开放。工具调用及返回的 Chunk 会沿用 `agent_tool_calls` 完整落库，同步和流式对话共享同一套实现。
 

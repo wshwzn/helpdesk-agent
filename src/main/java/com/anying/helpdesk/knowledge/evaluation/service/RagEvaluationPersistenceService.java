@@ -186,6 +186,17 @@ public class RagEvaluationPersistenceService {
     }
 
     /**
+     * 在同一事务内先删除逐题快照，再删除所属知识库的运行汇总。
+     */
+    @Transactional
+    public void deleteRun(Long knowledgeBaseId, Long runId) {
+        getRun(knowledgeBaseId, runId);
+        runResultMapper.delete(new LambdaQueryWrapper<RagEvaluationRunResult>()
+                .eq(RagEvaluationRunResult::getRunId, runId));
+        runMapper.deleteById(runId);
+    }
+
+    /**
      * 按原始用例顺序读取一次运行的逐题结果。
      */
     @Transactional(readOnly = true)
