@@ -1,0 +1,117 @@
+name: helpdesk-agent
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: '3'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: helpdesk-mysql
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 1.0
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_DATABASE: helpdesk_agent
+      MYSQL_USER: helpdesk
+      MYSQL_PASSWORD: ${DB_PASSWORD:?required}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?required}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --innodb-buffer-pool-size=128M
+      - --max-connections=50
+      - --performance-schema=OFF
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$${MYSQL_PASSWORD}" mysql -h 127.0.0.1 -u helpdesk -D helpdesk_agent -e "SELECT 1" >/dev/null 2>&1']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+    networks: [database]
+    logging: *logging
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
+    container_name: helpdesk-elasticsearch
+    restart: unless-stopped
+    mem_limit: 1280m
+    cpus: 1.5
+    environment:
+      TZ: Asia/Shanghai
+      discovery.type: single-node
+      cluster.name: helpdesk-agent
+      xpack.security.enabled: 'true'
+      xpack.security.http.ssl.enabled: 'false'
+      xpack.security.transport.ssl.enabled: 'false'
+      xpack.security.enrollment.enabled: 'false'
+      xpack.ml.enabled: 'false'
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?required}
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          curl -fsS -u "elastic:$${ELASTIC_PASSWORD}" "http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s" |
+          grep -Eq '"status"[[:space:]]*:[[:space:]]*"(green|yellow)"'
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 60s
+    networks: [database]
+    logging: *logging
+
+  backend:
+    image: eclipse-temurin:21-jre
+    container_name: helpdesk-backend
+    restart: unless-stopped
+    user: '10001:10001'
+    working_dir: /app
+    mem_limit: 768m
+    cpus: 1.0
+    environment:
+      TZ: Asia/Shanghai
+      SPRING_PROFILES_ACTIVE: prod
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx384m -XX:MaxMetaspaceSize=192m -XX:ReservedCodeCacheSize=64m -XX:+ExitOnOutOfMemoryError
+      DB_USERNAME: helpdesk
+      DB_PASSWORD: ${DB_PASSWORD:?required}
+      JWT_SECRET: ${JWT_SECRET:?required}
+      MODEL_CONFIG_ENCRYPTION_KEY: ${MODEL_CONFIG_ENCRYPTION_KEY:?required}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?required}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+      OSS_ENDPOINT: ${OSS_ENDPOINT:-}
+      OSS_BUCKET: ${OSS_BUCKET:-}
+      OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID:-}
+      OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET:-}
+      OPENAPI_ENABLED: ${OPENAPI_ENABLED:-false}
+    command: [java, -jar, /app/app.jar]
+    ports:
+      - '127.0.0.1:8080:8080'
+    volumes:
+      - ./app.jar:/app/app.jar:ro
+      - ./data/objects:/app/data/objects
+    depends_on:
+      mysql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, 'curl -fsS http://127.0.0.1:8080/actuator/health >/dev/null']
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    networks: [database, outbound]
+    logging: *logging
+
+networks:
+  database:
+    internal: true
+  outbound: {}

@@ -1,0 +1,50 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://mysql:3306/helpdesk_agent?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${DB_USERNAME:helpdesk}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 8
+      minimum-idle: 2
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+server:
+  port: 8080
+  shutdown: graceful
+
+springdoc:
+  api-docs:
+    enabled: ${OPENAPI_ENABLED:false}
+  swagger-ui:
+    enabled: ${OPENAPI_ENABLED:false}
+
+app:
+  chat:
+    log-model-protocol: false
+  storage:
+    provider: ${STORAGE_PROVIDER:local}
+    local-root-directory: ${STORAGE_LOCAL_ROOT_DIRECTORY:/app/data/objects}
+    endpoint: ${OSS_ENDPOINT:}
+    bucket: ${OSS_BUCKET:}
+    access-key-id: ${OSS_ACCESS_KEY_ID:}
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
+  elasticsearch:
+    uri: ${ELASTIC_URI:http://elasticsearch:9200}
+    username: ${ELASTIC_USERNAME:elastic}
+    password: ${ELASTIC_PASSWORD}
+    ca-cert-path: ${ELASTIC_CA_CERT_PATH:}
+    index-name: ${ELASTIC_INDEX_NAME:helpdesk_knowledge_chunks_v1}
+    request-timeout: ${ELASTIC_REQUEST_TIMEOUT:30s}
+  knowledge:
+    processing:
+      max-extracted-characters: ${KNOWLEDGE_MAX_EXTRACTED_CHARACTERS:2000000}
+      chunk-size: ${KNOWLEDGE_CHUNK_SIZE:1000}
+      chunk-overlap: ${KNOWLEDGE_CHUNK_OVERLAP:150}
+      embedding-batch-size: ${KNOWLEDGE_EMBEDDING_BATCH_SIZE:16}

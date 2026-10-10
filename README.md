@@ -12,6 +12,8 @@
 
 ## 本地启动
 
+服务器 Docker 部署及 OpenResty 接入说明见 [`deploy/README.md`](deploy/README.md)。
+
 创建本地数据库：
 
 ```sql
