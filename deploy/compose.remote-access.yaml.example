@@ -1,0 +1,15 @@
+# 在服务器复制为 compose.override.yaml 后，Compose 会自动启用远程数据库端口。
+services:
+  mysql:
+    ports:
+      - '0.0.0.0:3306:3306'
+    networks:
+      database: {}
+      outbound: {}
+
+  elasticsearch:
+    ports:
+      - '0.0.0.0:9200:9200'
+    networks:
+      database: {}
+      outbound: {}

@@ -10,6 +10,18 @@
 - 内部网络的 ES HTTP 不启用 TLS；后端另接外连网络访问模型 API 和 OSS。
 - `data/mysql`、`data/elasticsearch`、`data/objects` 保存持久化数据。
 
+## 从本机查看数据库
+
+当前服务器额外启用了 `compose.override.yaml`，由 `compose.remote-access.yaml.example` 提供模板。它自动合并到默认 Compose 配置，映射 MySQL `3306` 和 ES `9200`，并为两个容器增加外连网络，以支持远程连接返回流量。原有内部网络、数据目录和密码继续保留。
+
+在云服务器安全组放行 TCP `3306`、`9200`，来源可设为本机公网 IP `/32`。服务器本机防火墙未运行，无需额外放行。
+
+- MySQL：主机 `115.190.123.216`，端口 `3306`，数据库 `helpdesk_agent`，账号 `helpdesk`；密码对应服务器 `.env` 的 `DB_PASSWORD`。
+- ES：地址 `http://115.190.123.216:9200`，Basic Auth 账号 `elastic`；密码对应服务器 `.env` 的 `ELASTIC_PASSWORD`。
+- 不映射 MySQL X Protocol `33060` 或 ES 节点间通信端口 `9300`。
+
+启用模板后需要重新创建两个数据库容器，后端会暂时断开连接，随后连接池自动恢复。安全组未放行时，本机的公网访问仍会被拦截。
+
 ## 配置与启动
 
 1. 本地运行 `mvn clean verify`，上传 `target/helpdesk-agent-0.0.1-SNAPSHOT.jar` 为服务器 `app.jar`。
