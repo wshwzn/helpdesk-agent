@@ -116,7 +116,7 @@ public class ConversationController {
     @PostMapping("/{id}/messages")
     @Operation(
             summary = "发送消息并获取 AI 回答",
-            description = "当前为非流式响应；模型失败时客户消息和失败的 AI 消息仍会保留"
+            description = "mode 默认 AGENT；KNOWLEDGE 强制本轮检索、引用校验和语义复核。失败消息仍会保留"
     )
     public ApiResponse<ChatExchangeResponse> sendMessage(
             @Parameter(description = "对话主键", example = "1")
@@ -136,7 +136,7 @@ public class ConversationController {
     @PostMapping(value = "/{id}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(
             summary = "发送消息并流式获取 AI 回答",
-            description = "依次返回 start、delta、done 事件；模型失败时返回脱敏的 error 事件"
+            description = "依次返回 start、delta、done；KNOWLEDGE 核验并保存后一次性发送 delta，无未审核正文。失败时返回 error"
     )
     public Flux<ServerSentEvent<ChatStreamEvent>> streamMessage(
             @Parameter(description = "对话主键", example = "1")

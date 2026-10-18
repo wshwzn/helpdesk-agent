@@ -85,7 +85,7 @@
 
 ## `chat_messages` 对话消息表
 
-保存客户消息、AI 回答及生成状态，由 Flyway V6 创建。
+保存客户消息、AI 回答及生成状态，由 Flyway V6 创建，V17 增加知识问答模式与证据报告。
 
 | 字段 | 类型 | 可空 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -100,6 +100,9 @@
 | `completion_tokens` | `INT` | 是 | `NULL` | 厂商返回的输出 Token 数。 |
 | `total_tokens` | `INT` | 是 | `NULL` | 厂商返回的总 Token 数。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 生成失败时保存的内部脱敏错误码，例如模型失败 `MODEL_CALL_FAILED`、进程中断超时恢复 `GENERATION_INTERRUPTED`。 |
+| `mode` | `VARCHAR(20)` | 否 | `AGENT` | 本条消息的模式：`AGENT` 自动工具对话、`KNOWLEDGE` 强制证据核验；历史记录默认为 AGENT。 |
+| `applicability_scope` | `VARCHAR(40)` | 是 | `NULL` | 本轮请求显式选择的业务范围快照。KNOWLEDGE 未指定时为 `ALL`，AGENT 为空；非权限字段。 |
+| `knowledge_answer` | `MEDIUMTEXT` | 是 | `NULL` | 核验报告 JSON；仅成功完成的 KNOWLEDGE 助手消息写入。包含 `schemaVersion=1`、原因、知识库身份快照、范围、核验时间、结构化回答及本轮证据快照。 |
 | `version` | `INT` | 否 | `0` | 乐观锁版本号，防止生成完成与失败状态互相覆盖。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息创建时间。 |
 | `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息状态或内容最后更新时间。 |
@@ -110,6 +113,12 @@
 - 普通索引：`idx_chat_messages_conversation_id (conversation_id, id)`，支持按对话顺序读取消息。
 - 普通索引：`idx_chat_messages_status_role_updated (status, role, updated_at)`，支持后台快速扫描超时的 `PENDING` 助手消息。
 - 超过配置阈值仍为 `PENDING` 的助手消息会被条件更新为 `FAILED` 并递增版本号，防止迟到的模型结果覆盖恢复状态。
+- V17 检查约束：`ck_chat_message_mode` 限定 `AGENT`、`KNOWLEDGE`。本次未新增索引。
+- `knowledge_answer` 中 `reason` 为 `REVIEWED`、`NO_MATCH`、`NOT_CONFIGURED`；`answer.status` 为 `ANSWERABLE`、`NEEDS_CLARIFICATION`、`INSUFFICIENT_EVIDENCE`、`CONFLICT`。无命中/未配置时状态为证据不足，但不调用回答模型。
+- 报告的 `evidence[].id` 为本轮临时编号 E1/E2；`documentId`、`chunkSequence` 逻辑关联知识文档及 ES Chunk。`sourceName`、正文与业务元数据是历史快照，文档撤回或删除后仍保留，不用外键级联删除。
+- 应用保证每项事实结论有本轮证据引用，`quote` 是连续原文；冲突双方至少涉及两份文档。正文与报告在同一个带乐观锁的完成事务写入。JSON 结构和模式/范围关系由应用约束，数据库不校验 JSON 内部结构。
+- 知识链路技术失败使用 `KNOWLEDGE_ANSWER_FAILED`，取消使用 `STREAM_CANCELLED`；失败消息不保存草案或成功报告。核验时间采用 Asia/Shanghai；历史报告表示当时的结果，不保证资料现在仍有效。
+- KNOWLEDGE 的 Token 用量合计草案与复核两次回答模型调用，任一调用未返回某项用量时该项为 NULL；无回答模型调用时为 0，不含检索 Embedding 用量。
 
 ## `agent_tool_calls` Agent 工具调用表
 

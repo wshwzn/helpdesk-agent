@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.anying.helpdesk.conversation.mapper.KnowledgeAnswerReportTypeHandler;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerReport;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@TableName("chat_messages")
+@TableName(value = "chat_messages", autoResultMap = true)
 public class ChatMessage {
 
     @TableId(type = IdType.AUTO)
@@ -26,6 +29,10 @@ public class ChatMessage {
     private Integer completionTokens;
     private Integer totalTokens;
     private String errorCode;
+    private ChatMode mode;
+    private String applicabilityScope;
+    @TableField(typeHandler = KnowledgeAnswerReportTypeHandler.class)
+    private KnowledgeAnswerReport knowledgeAnswer;
     @Version
     private Integer version;
     private LocalDateTime createdAt;

@@ -20,6 +20,8 @@ import com.anying.helpdesk.conversation.exception.ConversationNotFoundException;
 import com.anying.helpdesk.conversation.mapper.ChatMessageMapper;
 import com.anying.helpdesk.conversation.mapper.ConversationMapper;
 import com.anying.helpdesk.conversation.model.ChatCompletionResult;
+import com.anying.helpdesk.conversation.dto.SendMessageRequest;
+import com.anying.helpdesk.conversation.domain.ChatMode;
 import com.anying.helpdesk.conversation.model.ConversationModelHistory;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -157,11 +159,19 @@ public class ConversationPersistenceService {
         );
     }
 
+    /** 兼容普通 Agent 调用，使用默认消息模式创建本轮记录。 */
+    @Transactional
+    public PreparedChatExchange prepareExchange(Long conversationId, Long customerId, String content,
+                                                 ResolvedChatModel model) {
+        return prepareExchange(conversationId, customerId, new SendMessageRequest(content), model);
+    }
+
+    /** 在短事务内保存问题和待生成消息，同时快照本轮模式及适用范围。 */
     @Transactional
     public PreparedChatExchange prepareExchange(
             Long conversationId,
             Long customerId,
-            String content,
+            SendMessageRequest request,
             ResolvedChatModel model
     ) {
         Conversation conversation = requireOwnedConversation(conversationId, customerId);
@@ -183,7 +193,9 @@ public class ConversationPersistenceService {
         ChatMessage userMessage = new ChatMessage();
         userMessage.setConversationId(conversationId);
         userMessage.setRole(ChatMessageRole.USER);
-        userMessage.setContent(content.trim());
+        userMessage.setContent(request.content().trim());
+        userMessage.setMode(request.mode());
+        userMessage.setApplicabilityScope(request.applicabilityScope());
         userMessage.setStatus(ChatMessageStatus.COMPLETED);
         userMessage.setCreatedAt(now);
         userMessage.setUpdatedAt(now);
@@ -192,6 +204,8 @@ public class ConversationPersistenceService {
         ChatMessage assistantMessage = new ChatMessage();
         assistantMessage.setConversationId(conversationId);
         assistantMessage.setRole(ChatMessageRole.ASSISTANT);
+        assistantMessage.setMode(request.mode());
+        assistantMessage.setApplicabilityScope(request.applicabilityScope());
         assistantMessage.setStatus(ChatMessageStatus.PENDING);
         assistantMessage.setModelConfigId(model.configId());
         assistantMessage.setModelName(model.modelName());
@@ -213,15 +227,22 @@ public class ConversationPersistenceService {
         );
     }
 
+    /** 原子保存最终正文、Token 用量和核验报告，拒绝覆盖已结束的生成任务。 */
     @Transactional
     public ChatMessage completeAssistant(Long assistantMessageId, ChatCompletionResult result) {
         ChatMessage message = requirePendingAssistant(assistantMessageId);
+        if ((message.getMode() == ChatMode.KNOWLEDGE) != (result.knowledgeAnswer() != null)
+                || (result.knowledgeAnswer() != null && !java.util.Objects.equals(
+                message.getApplicabilityScope(), result.knowledgeAnswer().applicabilityScope()))) {
+            throw new IllegalStateException("knowledge answer does not match message mode or scope");
+        }
         LocalDateTime now = LocalDateTime.now();
         message.setContent(result.content());
         message.setStatus(ChatMessageStatus.COMPLETED);
         message.setPromptTokens(result.promptTokens());
         message.setCompletionTokens(result.completionTokens());
         message.setTotalTokens(result.totalTokens());
+        message.setKnowledgeAnswer(result.knowledgeAnswer());
         message.setUpdatedAt(now);
         if (chatMessageMapper.updateById(message) == 0) {
             throw new ConcurrentConversationUpdateException(message.getConversationId());

@@ -3,6 +3,8 @@ package com.anying.helpdesk.conversation.dto;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ChatMessageRole;
 import com.anying.helpdesk.conversation.domain.ChatMessageStatus;
+import com.anying.helpdesk.conversation.domain.ChatMode;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerReport;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -23,6 +25,9 @@ public record ChatMessageResponse(
         @Schema(description = "失败错误码；成功时为空") String errorCode,
         @Schema(description = "AI 回答引用的知识库片段；未检索知识库时为空数组")
         List<KnowledgeCitationResponse> citations,
+        @Schema(description = "本条消息的对话模式") ChatMode mode,
+        @Schema(description = "知识问答显式选择的适用范围") String applicabilityScope,
+        @Schema(description = "知识问答核验报告；普通对话、生成中或失败时为空") KnowledgeAnswerReport knowledgeAnswer,
         @Schema(description = "创建时间") LocalDateTime createdAt,
         @Schema(description = "最后更新时间") LocalDateTime updatedAt
 ) {
@@ -57,7 +62,10 @@ public record ChatMessageResponse(
                 message.getCompletionTokens(),
                 message.getTotalTokens(),
                 message.getErrorCode(),
-                citations,
+                message.getKnowledgeAnswer() == null ? citations : message.getKnowledgeAnswer().citations(),
+                message.getMode(),
+                message.getApplicabilityScope(),
+                message.getKnowledgeAnswer(),
                 message.getCreatedAt(),
                 message.getUpdatedAt()
         );

@@ -344,7 +344,7 @@ Content-Type: application/json
 }
 ```
 
-默认模型配置的 `supportsStreaming` 为 `true` 时，可以通过 SSE 流式获取回答。调用方应同时声明接受 SSE 和 JSON：正常生成时返回事件流，权限、参数或模型能力预检失败时仍可接收标准 JSON 错误响应。
+普通 `AGENT` 模式下，默认模型配置的 `supportsStreaming` 为 `true` 时，可以通过 SSE 流式获取回答。调用方应同时声明接受 SSE 和 JSON：正常生成时返回事件流，权限、参数或模型能力预检失败时仍可接收标准 JSON 错误响应。
 
 ```http
 POST /api/conversations/{id}/messages/stream
@@ -387,7 +387,32 @@ GET /api/conversations/{id}/messages?page=1&size=50
 DELETE /api/conversations/{id}
 ```
 
-客户只能访问自己的对话。系统默认携带最近 20 条已完成消息作为模型上下文，可通过 `CHAT_HISTORY_LIMIT` 调整为 1 至 100。同步接口调用失败时返回 `502 CHAT_GENERATION_FAILED`；流式接口开始传输后调用失败时返回 `error` 事件。两种方式都会保留客户消息和一条 `FAILED` AI 消息，且不会向客户端暴露厂商原始异常。
+客户只能访问自己的对话。普通 AGENT 模式默认携带最近 20 条已完成消息作为模型上下文，可通过 `CHAT_HISTORY_LIMIT` 调整为 1 至 100。同步接口调用失败时返回 `502 CHAT_GENERATION_FAILED`；流式接口开始传输后调用失败时返回 `error` 事件。两种方式都会保留客户消息和一条 `FAILED` AI 消息，且不会向客户端暴露厂商原始异常。
+
+### 证据约束知识问答
+
+同一消息接口增加可选 `mode`，省略仍为 `AGENT`。显式传 `KNOWLEDGE` 才进入服务端强制的“本轮检索 → 结构化草案 → 引用校验 → 独立语义复核 → 准入复查 → 保存并返回”链路：
+
+```http
+POST /api/conversations/{id}/messages
+Authorization: Bearer <客户 accessToken>
+Content-Type: application/json
+
+{
+  "content": "上海员工当前出差住宿每晚报销上限是多少？",
+  "mode": "KNOWLEDGE",
+  "applicabilityScope": "CN_SH"
+}
+```
+
+- 知识问题最多 2000 字，每次提交完整问题；此模式不带历史事实、不执行工单工具。使用默认知识库，范围只能由调用方指定；省略时只查 `ALL`，不自动把“上海”映射成 `CN_SH`。AGENT 请求携带范围会返回 400，防止调用方误以为范围已应用。
+- `assistantMessage.knowledgeAnswer.answer.status` 返回 `ANSWERABLE`（充分依据）、`NEEDS_CLARIFICATION`（需补条件）、`INSUFFICIENT_EVIDENCE`（依据不足）或 `CONFLICT`（疑似冲突）。不足时允许保留有依据部分；冲突时展示双方，不按版本号或上传时间选边。
+- 报告含 `claims[].references[]` 的 `evidenceId` 和逐字 `quote`，通过 `evidence[]` 对应真实 `documentId`、`chunkSequence`、原文与业务版本。正文中的 `[E1]` 由服务端生成。兼容字段 `citations` 只包含实际使用的证据；报告还保留未被引用的本轮候选，便于审计遗漏。
+- `reason=NO_MATCH/NOT_CONFIGURED` 区分无命中与未配置；`REVIEWED` 表示有证据且通过复核。检索异常、协议错误、引用伪造、复核否决、生成期间证据失效均是技术失败，不能当作正确拒答统计；错误码 `KNOWLEDGE_ANSWER_FAILED`，无草案正文。
+- `/messages/stream` 同样接受这三个参数：先 `start`，核验和保存完成后一次性 `delta`，最后 `done`。因此知识模式无需厂商流式能力，但首段正文会等待两次模型调用；失败只有 `start/error`。普通 AGENT 流程不变。
+- 历史消息保存 `mode`、范围和完整核验报告；历史证据不会随知识库撤回而消失，不能据此推断今天的规则。V17 会自动迁移旧消息为 AGENT。
+
+程序严格检查引用身份和逐字出处；语义复核使用同一个配置模型的独立调用，仍可能误判，不构成事实正确性的数学保证。候选超过 50 个 Chunk、正文合计超过 50000 字时明确失败，不静默丢弃可能含冲突的资料。当前冲突识别仅覆盖本次检索命中的资料，还没有全库冲突扫描、真实模型专项得分或前端模式选择器。实现与测试细节见 `notes/25-证据约束回答与核验.md`。
 
 删除对话采用归档方式：对话更新为 `ARCHIVED` 后不再出现在默认客户列表中，也不能继续发送消息，但消息、工具调用和工单草稿仍保留用于审计。列表接口默认查询 `ACTIVE`，需要审计归档记录时可显式传入 `status=ARCHIVED`。正在生成回答的对话不能删除；已经归档的对话重复删除保持幂等。
 
