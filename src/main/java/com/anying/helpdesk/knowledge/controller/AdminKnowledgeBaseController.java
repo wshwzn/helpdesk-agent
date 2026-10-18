@@ -11,6 +11,9 @@ import com.anying.helpdesk.knowledge.dto.KnowledgeSearchRequest;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeRetrievalSettingsResponse;
 import com.anying.helpdesk.knowledge.dto.UpdateKnowledgeRetrievalSettingsRequest;
+import com.anying.helpdesk.knowledge.dto.UpdateKnowledgeDocumentMetadataRequest;
+import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentVersionRequest;
+import com.anying.helpdesk.knowledge.service.KnowledgeDocumentPublicationService;
 import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentContent;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentIndexingService;
@@ -60,6 +63,7 @@ public class AdminKnowledgeBaseController {
     private final KnowledgeDocumentPreviewService knowledgeDocumentPreviewService;
     private final KnowledgeDocumentIndexingService knowledgeDocumentIndexingService;
     private final KnowledgeRetrievalService knowledgeRetrievalService;
+    private final KnowledgeDocumentPublicationService publicationService;
     private final CurrentUserProvider currentUserProvider;
 
     /**
@@ -180,6 +184,45 @@ public class AdminKnowledgeBaseController {
             @PathVariable @Min(1) Long documentId
     ) {
         return ApiResponse.ok(knowledgeDocumentService.get(knowledgeBaseId, documentId));
+    }
+
+    /**
+     * 配置草稿的业务版本、生效时间和适用范围，保存后重新建立索引。
+     */
+    @PutMapping("/{knowledgeBaseId}/documents/{documentId}/metadata")
+    @Operation(summary = "配置文档业务元数据")
+    public ApiResponse<KnowledgeDocumentResponse> updateDocumentMetadata(
+            @PathVariable @Min(1) Long knowledgeBaseId,
+            @PathVariable @Min(1) Long documentId,
+            @Valid @RequestBody UpdateKnowledgeDocumentMetadataRequest request
+    ) {
+        return ApiResponse.ok(publicationService.updateMetadata(knowledgeBaseId, documentId, request));
+    }
+
+    /**
+     * 发布已索引的草稿，未来生效的文档会等到生效时间再参与检索。
+     */
+    @PostMapping("/{knowledgeBaseId}/documents/{documentId}/publish")
+    @Operation(summary = "发布知识文档")
+    public ApiResponse<KnowledgeDocumentResponse> publishDocument(
+            @PathVariable @Min(1) Long knowledgeBaseId,
+            @PathVariable @Min(1) Long documentId,
+            @Valid @RequestBody KnowledgeDocumentVersionRequest request
+    ) {
+        return ApiResponse.ok(publicationService.publish(knowledgeBaseId, documentId, request.version()));
+    }
+
+    /**
+     * 撤回已发布文档，让后续知识检索排除该版本。
+     */
+    @PostMapping("/{knowledgeBaseId}/documents/{documentId}/withdraw")
+    @Operation(summary = "撤回知识文档")
+    public ApiResponse<KnowledgeDocumentResponse> withdrawDocument(
+            @PathVariable @Min(1) Long knowledgeBaseId,
+            @PathVariable @Min(1) Long documentId,
+            @Valid @RequestBody KnowledgeDocumentVersionRequest request
+    ) {
+        return ApiResponse.ok(publicationService.withdraw(knowledgeBaseId, documentId, request.version()));
     }
 
     /**

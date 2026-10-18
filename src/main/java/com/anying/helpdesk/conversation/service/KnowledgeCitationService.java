@@ -66,7 +66,7 @@ public class KnowledgeCitationService {
     }
 
     /**
-     * 将一条知识检索结果追加到对应消息，并按知识库、文件和 Chunk 序号去重。
+     * 按文档主键和 Chunk 序号区分不同版本，旧记录回退到名称去重。
      */
     private void appendToolResult(
             AgentToolCall toolCall,
@@ -92,7 +92,8 @@ public class KnowledgeCitationService {
             result.chunks().forEach(chunk -> {
                 CitationKey key = new CitationKey(
                         result.knowledgeBase(),
-                        chunk.source(),
+                        chunk.documentId() == null ? chunk.source() : null,
+                        chunk.documentId(),
                         chunk.chunkSequence()
                 );
                 if (seen.add(key)) {
@@ -100,7 +101,9 @@ public class KnowledgeCitationService {
                             result.knowledgeBase(),
                             chunk.source(),
                             chunk.chunkSequence(),
-                            chunk.content()
+                            chunk.content(),
+                            chunk.documentId(),
+                            chunk.metadata()
                     ));
                 }
             });
@@ -113,6 +116,6 @@ public class KnowledgeCitationService {
         }
     }
 
-    private record CitationKey(String knowledgeBaseName, String sourceName, int chunkSequence) {
+    private record CitationKey(String knowledgeBaseName, String sourceName, Long documentId, int chunkSequence) {
     }
 }

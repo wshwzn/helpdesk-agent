@@ -1,6 +1,7 @@
 package com.anying.helpdesk.agent.tool;
 
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResultResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentMetadata;
 
 /**
  * 提供给模型的精简知识片段，保留回答引用所需的来源信息。
@@ -9,7 +10,9 @@ public record KnowledgeSearchToolChunk(
         int rank,
         String source,
         int chunkSequence,
-        String content
+        String content,
+        Long documentId,
+        KnowledgeDocumentMetadata metadata
 ) {
 
     /**
@@ -20,7 +23,9 @@ public record KnowledgeSearchToolChunk(
                 result.rank(),
                 result.originalName(),
                 result.chunkSequence(),
-                result.content()
+                result.content(),
+                result.documentId(),
+                result.metadata()
         );
     }
 }

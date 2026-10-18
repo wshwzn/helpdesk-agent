@@ -1,6 +1,7 @@
 package com.anying.helpdesk.knowledge.service;
 
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocument;
+import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentMetadata;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentParsingException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeIndexException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeStorageException;
@@ -138,7 +139,8 @@ public class KnowledgeDocumentIndexWorker {
                     document.getOriginalName(),
                     embeddingModel.configId(),
                     embeddingModel.modelName(),
-                    indexedAt
+                    indexedAt,
+                    KnowledgeDocumentMetadata.from(document)
             ));
         }
         return List.copyOf(indexedChunks);

@@ -4,6 +4,7 @@ import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.knowledge.domain.KnowledgeBase;
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocument;
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocumentStatus;
+import com.anying.helpdesk.knowledge.domain.KnowledgePublicationStatus;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
 import com.anying.helpdesk.knowledge.exception.KnowledgeBaseNotFoundException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentNotFoundException;
@@ -55,6 +56,8 @@ public class KnowledgeDocumentPersistenceService {
         document.setSizeBytes(sizeBytes);
         document.setSha256(sha256);
         document.setStatus(KnowledgeDocumentStatus.UPLOADING);
+        document.setPublicationStatus(KnowledgePublicationStatus.DRAFT);
+        document.setApplicabilityScope("ALL");
         document.setChunkCount(0);
         document.setCreatedBy(adminId);
         document.setCreatedAt(now);
@@ -94,6 +97,9 @@ public class KnowledgeDocumentPersistenceService {
     @Transactional
     public KnowledgeDocument markProcessing(Long knowledgeBaseId, Long documentId) {
         KnowledgeDocument document = get(knowledgeBaseId, documentId);
+        if (document.getPublicationStatus() != KnowledgePublicationStatus.DRAFT) {
+            throw new KnowledgeDocumentConflictException("only draft documents can be indexed; upload a new version to update published knowledge");
+        }
         if (document.getStatus() == KnowledgeDocumentStatus.UPLOADING) {
             throw new KnowledgeDocumentConflictException("uploading document cannot be indexed");
         }

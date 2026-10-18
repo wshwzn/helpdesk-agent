@@ -207,7 +207,7 @@
 
 ## `knowledge_documents` 知识库文档表
 
-保存原始文档的对象存储位置、完整性信息和处理状态，由 Flyway V9 创建。文件正文存放在本地开发目录或阿里云 OSS；后续生成的检索分块和向量存放在 Elasticsearch，不在 MySQL 重复保存。
+保存原始文档的对象存储位置、完整性信息和处理状态，由 Flyway V9 创建，V16 增加业务版本、适用范围和发布元数据。文件正文存放在本地开发目录或阿里云 OSS；检索分块和向量存放在 Elasticsearch，不在 MySQL 重复保存。
 
 | 字段 | 类型 | 可空 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -221,6 +221,12 @@
 | `file_extension` | `VARCHAR(20)` | 否 | 无 | 小写扩展名，当前允许 `txt`、`md`、`pdf`、`docx`。 |
 | `size_bytes` | `BIGINT` | 否 | 无 | 原始文件大小，单位字节；当前最大 20 MB。 |
 | `sha256` | `CHAR(64)` | 否 | 无 | 原始文件内容的 SHA-256 十六进制摘要。 |
+| `source_key` | `VARCHAR(120)` | 是 | `NULL` | 稳定来源标识，同一来源的各业务版本共用；草稿可暂未配置，发布前必须有值。小写 ASCII 字母、数字及 `._:/-`，首位为字母或数字。 |
+| `business_version` | `VARCHAR(40)` | 是 | `NULL` | 人工指定的业务版本标签；小写 ASCII 字母、数字及 `._-`，首位为字母或数字。不用于自动选最新版，与 `version` 乐观锁无关。 |
+| `applicability_scope` | `VARCHAR(40)` | 否 | `ALL` | 单一适用范围代码，`ALL` 代表通用资料；大写字母开头，仅大写字母、数字、下划线和连字符。这是业务条件，不是权限。 |
+| `valid_from` | `DATETIME(6)` | 是 | `NULL` | 生效时间（含边界），统一解释为 Asia/Shanghai 本地时间；发布前必填。 |
+| `valid_until` | `DATETIME(6)` | 是 | `NULL` | 失效时间（不含边界）；空表示不设截止，非空时必须晚于生效时间。 |
+| `publication_status` | `VARCHAR(20)` | 否 | `DRAFT` | 发布状态：`DRAFT` 草稿、`PUBLISHED` 已发布、`WITHDRAWN` 已撤回，与索引状态独立。 |
 | `status` | `VARCHAR(20)` | 否 | 无 | 状态：`UPLOADING`、`PENDING`、`PROCESSING`、`READY`、`FAILED`。 |
 | `chunk_count` | `INT` | 否 | `0` | Elasticsearch 中当前有效分块数量。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 失败时的脱敏错误码，例如 `STORAGE_UPLOAD_FAILED`。 |
@@ -233,11 +239,21 @@
 
 - 主键：`PRIMARY KEY (id)`。
 - 唯一约束：`uk_knowledge_documents_object_key (object_key)`。
+- V16 唯一约束：`uk_knowledge_document_business_version (knowledge_base_id, source_key, business_version, applicability_scope)`；同库、同来源、同业务版本、同范围不可重复，未配置的空值草稿可以共存。
+- V16 检查约束：`ck_knowledge_document_validity` 保证截止时间为空，或开始时间非空且截止晚于开始；`ck_knowledge_document_publication` 限定三个发布状态。
+- V16 普通索引：`idx_knowledge_document_eligibility (knowledge_base_id, publication_status, status, applicability_scope, valid_from)`，支持检索准入查询；截止时间作为剩余条件校验。
 - 普通索引：`idx_knowledge_documents_base_status_id (knowledge_base_id, status, id)`，支持按知识库和处理状态读取文档。
 - 普通索引：`idx_knowledge_documents_base_sha256 (knowledge_base_id, sha256)`，支持后续识别同一知识库中的重复内容；当前不禁止重复上传。
 - 上传时先写入 `UPLOADING`，对象保存成功后改为 `PENDING`；触发索引后进入 `PROCESSING`，后台成功写入 ES 后改为 `READY`，失败则改为 `FAILED` 并保存固定错误码。
 - `PROCESSING` 状态禁止重复触发和删除；状态推进及并发覆盖由应用层和 `version` 乐观锁共同限制。
 - 被当前 RAG 评测用例选为期望文档时禁止删除；应先修改或删除对应评测用例。
+- 新文档和 V16 迁移后的历史文档均为草稿。历史 `READY` 不自动等于已审核；必须配置业务元数据、重新索引并发布后才能参与检索。
+- 元数据仅允许在非上传中、非索引中的草稿上编辑。保存元数据后处理状态回到 `PENDING`，清空错误与分块统计；业务截止时间可以显式清空。
+- 发布要求 `DRAFT + READY` 且来源、业务版本、生效时间已配置；未来生效的资料可以先发布，但不会提前召回。只有已发布资料可以撤回，撤回为终态；修订时上传新版本。
+- 发布、撤回和元数据编辑要求提交当前乐观锁 `version`，过期或并发更新返回 409。唯一性冲突同样返回 409。
+- 已发布及撤回文档不允许重新索引或修改业务元数据；已发布文档必须先撤回才能删除。当前索引替换仍非原子，限制在草稿上执行。
+- 检索准入同时要求 `PUBLISHED + READY`、`valid_from <= 当前时间 < valid_until`（空截止除外），以及范围为 `ALL` 或请求明确给出的范围。省略范围只允许 `ALL`。不同业务版本同时有效时全部保留，不按标签排序裁决。
+- MySQL 为准入权威；ES Chunk 中保存业务元数据快照，不复制可变发布状态。两路召回前均传入文档 ID 白名单，返回后再次查询 MySQL 复核。单次准入文档超过 10000 时明确失败，不截断或退化为无过滤检索。
 
 ## `rag_evaluation_cases` RAG 检索评测用例表
 

@@ -4,6 +4,8 @@ import com.anying.helpdesk.knowledge.dto.KnowledgeSearchRequest;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResultResponse;
 import com.anying.helpdesk.knowledge.dto.KnowledgeRetrievalSettingsResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentMetadata;
+import com.anying.helpdesk.knowledge.domain.KnowledgeDocument;
 import com.anying.helpdesk.knowledge.exception.KnowledgeRetrievalException;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkSearchHit;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkSearchResults;
@@ -19,6 +21,8 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.Clock;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +34,8 @@ public class KnowledgeRetrievalService {
     private final KnowledgeBaseService knowledgeBaseService;
     private final DefaultEmbeddingModelProvider embeddingModelProvider;
     private final KnowledgeChunkStore chunkStore;
+    private final KnowledgeDocumentEligibilityService eligibilityService;
+    private final Clock knowledgeClock;
 
     /**
      * 为查询生成向量，执行 BM25 与 KNN 双路召回，并使用标准 RRF 融合结果。
@@ -48,6 +54,12 @@ public class KnowledgeRetrievalService {
             KnowledgeRetrievalSettingsResponse settings
     ) {
         String query = request.query().trim();
+        Map<Long, KnowledgeDocument> eligible = new LinkedHashMap<>(eligibilityService.findEligible(
+                knowledgeBaseId, request.applicabilityScope(), LocalDateTime.now(knowledgeClock)));
+        if (eligible.isEmpty()) {
+            return new KnowledgeSearchResponse(knowledgeBaseId, query, settings.candidateLimit(),
+                    settings.vectorMinSimilarity(), settings.resultLimit(), 0, 0, List.of());
+        }
         ResolvedEmbeddingModel embeddingModel = embeddingModelProvider.get();
         chunkStore.ensureIndex(embeddingModel.dimensions());
         float[] queryVector = embedQuery(query, embeddingModel);
@@ -59,17 +71,25 @@ public class KnowledgeRetrievalService {
                 queryVector,
                 settings.candidateLimit(),
                 settings.candidateLimit() * VECTOR_CANDIDATE_MULTIPLIER,
-                settings.vectorMinSimilarity().doubleValue()
+                settings.vectorMinSimilarity().doubleValue(),
+                List.copyOf(eligible.keySet())
         );
-        List<KnowledgeSearchResultResponse> results = fuse(candidates, settings.resultLimit());
+        // 网络调用期间可能发生撤回或到期；只允许初次准入且复核仍有效的文档进入最终证据。
+        Map<Long, KnowledgeDocument> current = eligibilityService.findEligible(
+                knowledgeBaseId, request.applicabilityScope(), LocalDateTime.now(knowledgeClock));
+        eligible.keySet().retainAll(current.keySet());
+        KnowledgeChunkSearchResults verified = new KnowledgeChunkSearchResults(
+                candidates.bm25Hits().stream().filter(hit -> eligible.containsKey(hit.documentId())).toList(),
+                candidates.vectorHits().stream().filter(hit -> eligible.containsKey(hit.documentId())).toList());
+        List<KnowledgeSearchResultResponse> results = fuse(verified, settings.resultLimit(), eligible);
         return new KnowledgeSearchResponse(
                 knowledgeBaseId,
                 query,
                 settings.candidateLimit(),
                 settings.vectorMinSimilarity(),
                 settings.resultLimit(),
-                candidates.bm25Hits().size(),
-                candidates.vectorHits().size(),
+                verified.bm25Hits().size(),
+                verified.vectorHits().size(),
                 results
         );
     }
@@ -94,7 +114,8 @@ public class KnowledgeRetrievalService {
     /**
      * 按各路名次累加倒数排名分数，对相同 Chunk 去重后返回配置数量。
      */
-    private List<KnowledgeSearchResultResponse> fuse(KnowledgeChunkSearchResults candidates, int resultLimit) {
+    private List<KnowledgeSearchResultResponse> fuse(KnowledgeChunkSearchResults candidates, int resultLimit,
+                                                   Map<Long, KnowledgeDocument> documents) {
         Map<String, SearchAccumulator> accumulators = new LinkedHashMap<>();
         addBm25Ranks(accumulators, candidates.bm25Hits());
         addVectorRanks(accumulators, candidates.vectorHits());
@@ -117,7 +138,8 @@ public class KnowledgeRetrievalService {
                     value.bm25Rank,
                     value.bm25Score,
                     value.vectorRank,
-                    value.vectorScore
+                    value.vectorScore,
+                    KnowledgeDocumentMetadata.from(documents.get(value.hit.documentId()))
             ));
         }
         return List.copyOf(results);

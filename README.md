@@ -121,7 +121,41 @@ KNOWLEDGE_CHUNK_OVERLAP=150
 KNOWLEDGE_EMBEDDING_BATCH_SIZE=16
 ```
 
-预览只用于检查解析和切块效果，会在每次请求时重新处理文档，不修改处理状态。索引接口会预检默认 Embedding 模型和 ES 映射，然后返回 `202 Accepted`；后台完成下载、解析、分块、批量向量化和写入。重复触发 `READY` 或 `FAILED` 文档会覆盖该文档原有 Chunk；`PROCESSING` 文档拒绝重复触发和删除。
+预览只用于检查解析和切块效果，会在每次请求时重新处理文档，不修改处理状态。索引接口会预检默认 Embedding 模型和 ES 映射，然后返回 `202 Accepted`；后台完成下载、解析、分块、批量向量化和写入。仅草稿允许建立或重新建立索引；草稿的 `READY` 或 `FAILED` 文档可以重试，`PROCESSING` 文档拒绝重复触发和删除。
+
+### 文档业务版本与发布
+
+`status=READY` 仅表示索引完成。正式检索还要求 `publicationStatus=PUBLISHED`、处于生效区间且适用范围匹配。**V16 将历史文档保留为草稿，不自动发布；升级后需补齐业务元数据、重新索引、发布，才能恢复正式召回。**
+
+上传后按以下顺序操作，每次从文档详情读取最新的乐观锁 `version`：
+
+```http
+PUT  /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/metadata
+POST /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/index
+POST /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/publish
+POST /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/withdraw
+```
+
+元数据 PUT 请求示例（时间统一使用 Asia/Shanghai，不带时区偏移；有效期为左闭右开）：
+
+```json
+{
+  "version": 1,
+  "sourceKey": "travel-policy",
+  "businessVersion": "2026.2",
+  "applicabilityScope": "CN_SH",
+  "validFrom": "2026-10-01T00:00:00",
+  "validUntil": null
+}
+```
+
+`sourceKey` 是跨业务版本保持稳定的来源标识；同库的来源、业务版本、范围组合唯一。范围使用大写代码，`ALL` 表示通用，**不表示员工访问权限**。`businessVersion` 只是标签，不用它自动选最新版。元数据只可修改草稿，保存后需要重新索引；清空 `validUntil` 会移除原截止时间。
+
+索引异步完成至 `READY` 后，发布和撤回均提交 `{"version": 当前乐观锁版本}`。缺少元数据、处理未完成、错误状态或旧版本请求返回 409；非法日期区间返回 400。已发布记录不可直接修改或重建索引，修订须上传新业务版本。撤回后不再参与新的检索，也不能重新发布。
+
+检索请求可以增加 `"applicabilityScope": "CN_SH"`，同时查询该范围与 `ALL`；省略范围只查通用资料。MySQL 先产生可用文档 ID，BM25 和 KNN 都在召回前过滤；返回后再复核撤回和到期情况。单次准入超过 10000 份文档会明确失败，需要拆分知识库。新旧有效期重叠时保留双方，正文冲突检测尚待后续实现。
+
+公开虚构演示资料及固定问题见 [`docs/demo/trusted-knowledge/README.md`](docs/demo/trusted-knowledge/README.md)。
 
 混合检索接口会为问题生成查询向量，通过一次 Elasticsearch `_msearch` 分别执行 BM25 全文检索和 KNN 向量检索，再在应用层使用 RRF 去重融合。当前本地 ES 的 Basic 许可证不包含原生 RRF，因此应用层融合可避免商业许可证依赖。每个知识库独立维护检索参数，默认单路候选上限为 50、向量相似度下限为 0、最终结果上限为 5：
 
@@ -166,9 +200,9 @@ DELETE /api/admin/knowledge-bases/{id}/evaluation/runs/{runId}
 
 每次运行会固定使用开始时的候选数量、相似度下限和最终结果数量，保存文档级 `Hit@K`、平均 `Recall@K`、MRR、平均耗时及逐题实际召回 Chunk。相同文档出现多个 Chunk 时只计一次文档命中；历史运行保存问题、期望文档和召回结果快照，不受后续用例修改影响。删除某次运行会同时删除汇总和逐题快照，但不会影响评测用例。被当前评测用例引用的文档不能删除，应先调整对应评测用例。
 
-管理员可通过 `POST /api/admin/knowledge-bases/{id}/default` 设置唯一默认知识库。客户对话中的 `search_knowledge_base` 工具只接收模型生成的查询文本，知识库 ID 由后端读取默认配置，不向模型开放。工具调用及返回的 Chunk 会沿用 `agent_tool_calls` 完整落库，同步和流式对话共享同一套实现。
+管理员可通过 `POST /api/admin/knowledge-bases/{id}/default` 设置唯一默认知识库。客户对话中的 `search_knowledge_base` 工具接收查询文本及可选适用范围代码，范围必须来自用户明确提供的条件；知识库 ID 由后端读取默认配置，不向模型开放。工具调用及返回的 Chunk 会沿用 `agent_tool_calls` 完整落库，同步和流式对话共享同一套实现。现有检索评测尚无范围字段，默认只评测 `ALL` 通用资料。
 
-知识检索成功时，AI 消息的 `citations` 字段会返回本轮命中的知识库名称、来源文件名、Chunk 序号和完整片段内容。同步对话、流式 `done` 事件和历史消息查询使用相同结构；未调用知识库或没有命中时返回空数组。该字段只包含知识检索工具结果，不会暴露工单等其他工具返回值。
+知识检索成功时，AI 消息的 `citations` 字段会返回本轮命中的知识库名称、来源文件名、Chunk 序号、完整片段内容、`documentId` 和 `metadata` 业务版本快照。同名不同文档按主键区分，旧工具记录缺少新字段时仍能显示。同步对话、流式 `done` 事件和历史消息查询使用相同结构；未调用知识库或没有命中时返回空数组。引用代表检索来源，尚不代表已验证其支持回答中的每项结论。历史引用保留当时快照，新问答必须重新检索。
 
 ## 登录认证
 

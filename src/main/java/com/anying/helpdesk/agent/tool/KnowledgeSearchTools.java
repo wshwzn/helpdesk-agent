@@ -24,7 +24,7 @@ public class KnowledgeSearchTools {
     private final KnowledgeRetrievalService knowledgeRetrievalService;
 
     /**
-     * 使用后端配置的默认知识库检索客户问题，模型只能提供查询文本。
+     * 使用后端默认知识库检索问题，模型只提供查询文本和用户明确说明的适用范围。
      */
     @Tool(
             name = "search_knowledge_base",
@@ -32,10 +32,14 @@ public class KnowledgeSearchTools {
     )
     public KnowledgeSearchToolResult searchKnowledgeBase(
             @ToolParam(description = "根据客户问题整理出的完整、独立的自然语言检索句") String query,
+            @ToolParam(required = false, description = "用户明确说明的适用范围代码，如 CN_SH；未知时省略，仅检索 ALL 通用资料，不能猜测范围。范围不是访问权限。") String applicabilityScope,
             ToolContext toolContext
     ) {
         AgentExecutionContext.require(toolContext);
         if (query == null || query.isBlank() || query.length() > MAX_QUERY_LENGTH) {
+            return KnowledgeSearchToolResult.invalidQuery();
+        }
+        if (applicabilityScope != null && !applicabilityScope.matches("[A-Z][A-Z0-9_-]{0,39}")) {
             return KnowledgeSearchToolResult.invalidQuery();
         }
         String normalizedQuery = query.trim();
@@ -46,7 +50,7 @@ public class KnowledgeSearchTools {
         KnowledgeBaseResponse selected = knowledgeBase.get();
         KnowledgeSearchResponse response = knowledgeRetrievalService.search(
                 selected.id(),
-                new KnowledgeSearchRequest(normalizedQuery)
+                new KnowledgeSearchRequest(normalizedQuery, applicabilityScope)
         );
         return KnowledgeSearchToolResult.from(selected.name(), response);
     }

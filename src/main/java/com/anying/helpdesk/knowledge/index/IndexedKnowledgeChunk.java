@@ -1,5 +1,6 @@
 package com.anying.helpdesk.knowledge.index;
 
+import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentMetadata;
 import java.time.Instant;
 
 public record IndexedKnowledgeChunk(
@@ -13,6 +14,7 @@ public record IndexedKnowledgeChunk(
         String originalName,
         Long embeddingModelConfigId,
         String embeddingModelName,
-        Instant indexedAt
+        Instant indexedAt,
+        KnowledgeDocumentMetadata metadata
 ) {
 }

@@ -3,6 +3,7 @@ package com.anying.helpdesk.knowledge.service;
 import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocument;
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocumentStatus;
+import com.anying.helpdesk.knowledge.domain.KnowledgePublicationStatus;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentResponse;
 import com.anying.helpdesk.knowledge.exception.InvalidKnowledgeDocumentException;
 import com.anying.helpdesk.knowledge.exception.KnowledgeDocumentConflictException;
@@ -125,6 +126,9 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
         KnowledgeDocument document = persistenceService.get(knowledgeBaseId, documentId);
         if (document.getStatus() == KnowledgeDocumentStatus.PROCESSING) {
             throw new KnowledgeDocumentConflictException("processing document cannot be deleted");
+        }
+        if (document.getPublicationStatus() == KnowledgePublicationStatus.PUBLISHED) {
+            throw new KnowledgeDocumentConflictException("withdraw published documents before deleting");
         }
         ragEvaluationService.requireDocumentNotReferenced(documentId);
         requireCurrentStorageProvider(document);

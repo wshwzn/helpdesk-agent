@@ -2,6 +2,7 @@ package com.anying.helpdesk.knowledge.dto;
 
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocument;
 import com.anying.helpdesk.knowledge.domain.KnowledgeDocumentStatus;
+import com.anying.helpdesk.knowledge.domain.KnowledgePublicationStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,12 @@ public record KnowledgeDocumentResponse(
         @Schema(description = "已生成的分块数量") Integer chunkCount,
         @Schema(description = "失败时的脱敏错误码") String errorCode,
         @Schema(description = "乐观锁版本") Integer version,
+        @Schema(description = "稳定来源标识；未配置时为空") String sourceKey,
+        @Schema(description = "业务版本，与乐观锁版本无关") String businessVersion,
+        @Schema(description = "适用范围代码，ALL 表示通用") String applicabilityScope,
+        @Schema(description = "生效时间，Asia/Shanghai，含边界") LocalDateTime validFrom,
+        @Schema(description = "失效时间，Asia/Shanghai，不含边界") LocalDateTime validUntil,
+        @Schema(description = "业务发布状态") KnowledgePublicationStatus publicationStatus,
         @Schema(description = "创建时间") LocalDateTime createdAt,
         @Schema(description = "更新时间") LocalDateTime updatedAt
 ) {
@@ -39,6 +46,12 @@ public record KnowledgeDocumentResponse(
                 document.getChunkCount(),
                 document.getErrorCode(),
                 document.getVersion(),
+                document.getSourceKey(),
+                document.getBusinessVersion(),
+                document.getApplicabilityScope(),
+                document.getValidFrom(),
+                document.getValidUntil(),
+                document.getPublicationStatus(),
                 document.getCreatedAt(),
                 document.getUpdatedAt()
         );

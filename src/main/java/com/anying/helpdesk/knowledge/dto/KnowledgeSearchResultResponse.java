@@ -13,6 +13,16 @@ public record KnowledgeSearchResultResponse(
         @Schema(description = "BM25 名次；未被该路召回时为空", example = "2") Integer bm25Rank,
         @Schema(description = "BM25 原始分数；未被该路召回时为空", example = "4.21") Double bm25Score,
         @Schema(description = "向量检索名次；未被该路召回时为空", example = "1") Integer vectorRank,
-        @Schema(description = "向量检索原始分数；未被该路召回时为空", example = "0.87") Double vectorScore
+        @Schema(description = "向量检索原始分数；未被该路召回时为空", example = "0.87") Double vectorScore,
+        @Schema(description = "本次检索时核对的业务元数据；旧快照可能为空") KnowledgeDocumentMetadata metadata
 ) {
+    /**
+     * 兼容不含业务元数据的历史检索快照构造。
+     */
+    public KnowledgeSearchResultResponse(int rank, Long documentId, int chunkSequence, String originalName,
+                                         String content, double rrfScore, Integer bm25Rank, Double bm25Score,
+                                         Integer vectorRank, Double vectorScore) {
+        this(rank, documentId, chunkSequence, originalName, content, rrfScore,
+                bm25Rank, bm25Score, vectorRank, vectorScore, null);
+    }
 }

@@ -35,16 +35,16 @@ class KnowledgeSearchToolsTest {
     );
 
     /**
-     * 验证模型只能填写查询文本，知识库选择和客户身份均由服务端控制。
+     * 验证模型只能填写查询文本和业务范围，知识库选择和客户身份由服务端控制。
      */
     @Test
-    @DisplayName("知识检索工具只向模型暴露查询文本")
+    @DisplayName("知识检索工具只向模型暴露查询文本和业务范围")
     void toolSchemaOnlyExposesQuery() {
         ToolCallback callback = toolCallback();
 
         assertThat(callback.getToolDefinition().name()).isEqualTo("search_knowledge_base");
         assertThat(callback.getToolDefinition().inputSchema())
-                .contains("query")
+                .contains("query", "applicabilityScope")
                 .doesNotContain("knowledgeBaseId", "customerId", "toolContext");
     }
 
@@ -61,6 +61,7 @@ class KnowledgeSearchToolsTest {
 
         KnowledgeSearchToolResult result = tools.searchKnowledgeBase(
                 "  如何重置密码？  ",
+                "CN_SH",
                 toolContext()
         );
 
@@ -75,6 +76,8 @@ class KnowledgeSearchToolsTest {
         );
         verify(retrievalService).search(org.mockito.ArgumentMatchers.eq(3L), requestCaptor.capture());
         assertThat(requestCaptor.getValue().query()).isEqualTo("如何重置密码？");
+        assertThat(requestCaptor.getValue().applicabilityScope()).isEqualTo("CN_SH");
+        assertThat(result.chunks().getFirst().documentId()).isEqualTo(8L);
     }
 
     /**
@@ -85,7 +88,7 @@ class KnowledgeSearchToolsTest {
     void reportsMissingDefaultKnowledgeBase() {
         when(knowledgeBaseService.findDefault()).thenReturn(Optional.empty());
 
-        KnowledgeSearchToolResult result = tools.searchKnowledgeBase("如何登录？", toolContext());
+        KnowledgeSearchToolResult result = tools.searchKnowledgeBase("如何登录？", null, toolContext());
 
         assertThat(result.status()).isEqualTo("NOT_CONFIGURED");
         assertThat(result.chunks()).isEmpty();

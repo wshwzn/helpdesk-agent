@@ -25,6 +25,12 @@ public class KnowledgeDocument {
     private String fileExtension;
     private Long sizeBytes;
     private String sha256;
+    private String sourceKey;
+    private String businessVersion;
+    private String applicabilityScope;
+    private LocalDateTime validFrom;
+    private LocalDateTime validUntil;
+    private KnowledgePublicationStatus publicationStatus;
     private KnowledgeDocumentStatus status;
     private Integer chunkCount;
     private String errorCode;

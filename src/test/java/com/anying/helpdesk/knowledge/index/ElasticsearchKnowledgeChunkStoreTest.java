@@ -1,6 +1,7 @@
 package com.anying.helpdesk.knowledge.index;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentMetadata;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,6 +33,9 @@ class ElasticsearchKnowledgeChunkStoreTest {
         }
     }
 
+    /**
+     * 验证新旧映射均可写入业务版本快照，并保留现有分块替换协议。
+     */
     @Test
     @DisplayName("创建映射后可以删除旧 Chunk 并发送 NDJSON 批量请求")
     void createsMappingAndReplacesDocumentChunks() throws IOException {
@@ -61,7 +66,9 @@ class ElasticsearchKnowledgeChunkStoreTest {
                 "guide.md",
                 9L,
                 "embedding-model",
-                Instant.parse("2026-09-28T12:00:00Z")
+                Instant.parse("2026-09-28T12:00:00Z"),
+                new KnowledgeDocumentMetadata("travel-policy", "v2", "CN_SH",
+                        LocalDateTime.of(2026, 10, 1, 0, 0), null)
         );
 
         store.replaceDocumentChunks(5L, 3, List.of(chunk));
@@ -71,6 +78,8 @@ class ElasticsearchKnowledgeChunkStoreTest {
         assertThat(bulkBody.get())
                 .contains("\"_id\":\"5-1\"")
                 .contains("\"content\":\"测试内容\"")
+                .contains("\"businessVersion\":\"v2\"")
+                .contains("\"validFrom\":\"2026-10-01T00:00:00\"")
                 .contains("\"contentVector\":[1.0,0.0,0.0]");
     }
 
@@ -109,7 +118,8 @@ class ElasticsearchKnowledgeChunkStoreTest {
                 new float[]{0.1F, 0.2F, 0.3F},
                 20,
                 40,
-                0.65D
+                0.65D,
+                List.of(5L, 7L)
         );
 
         assertThat(results.bm25Hits()).singleElement()
@@ -123,6 +133,12 @@ class ElasticsearchKnowledgeChunkStoreTest {
                 .contains("\"embeddingModelName\":\"embedding-model\"")
                 .contains("\"similarity\":0.65")
                 .endsWith("\n");
+        String[] lines = searchBody.get().split("\n");
+        ObjectMapper mapper = new ObjectMapper();
+        assertThat(mapper.readTree(lines[1]).at("/query/bool/filter/1/terms/documentId").toString())
+                .isEqualTo("[5,7]");
+        assertThat(mapper.readTree(lines[3]).at("/knn/filter/bool/filter/1/terms/documentId").toString())
+                .isEqualTo("[5,7]");
     }
 
     /**
@@ -165,6 +181,11 @@ class ElasticsearchKnowledgeChunkStoreTest {
             send(exchange, 200, """
                     {"test_knowledge_chunks":{"mappings":{"properties":{"contentVector":{"type":"dense_vector","dims":%d}}}}}
                     """.formatted(dimensions));
+            return;
+        }
+        if ("PUT".equals(method) && "/test_knowledge_chunks/_mapping".equals(path)) {
+            assertThat(readBody(exchange)).contains("\"metadata\"", "\"businessVersion\"");
+            send(exchange, 200, "{\"acknowledged\":true}");
             return;
         }
         if ("POST".equals(method) && "/test_knowledge_chunks/_delete_by_query".equals(path)) {

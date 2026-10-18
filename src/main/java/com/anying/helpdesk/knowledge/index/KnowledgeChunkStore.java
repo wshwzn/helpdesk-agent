@@ -10,7 +10,7 @@ public interface KnowledgeChunkStore {
     void ensureIndex(int dimensions);
 
     /**
-     * 原子业务语义上替换一份文档的全部 Chunk；失败时调用方负责状态补偿。
+     * 替换草稿文档的全部 Chunk；不是原子切换，失败时调用方负责状态补偿。
      */
     void replaceDocumentChunks(Long documentId, int dimensions, List<IndexedKnowledgeChunk> chunks);
 
@@ -25,7 +25,8 @@ public interface KnowledgeChunkStore {
             float[] queryVector,
             int rankWindowSize,
             int vectorNumCandidates,
-            double vectorMinSimilarity
+            double vectorMinSimilarity,
+            List<Long> eligibleDocumentIds
     );
 
     /**

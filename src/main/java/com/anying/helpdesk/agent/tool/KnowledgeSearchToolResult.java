@@ -54,8 +54,8 @@ public record KnowledgeSearchToolResult(
         return new KnowledgeSearchToolResult(
                 chunks.isEmpty() ? "NO_MATCH" : "FOUND",
                 chunks.isEmpty()
-                        ? "知识库中没有达到相似度下限的资料，不要编造答案。"
-                        : "请仅依据以下资料回答，并注明来源文件。",
+                        ? "没有找到当前已发布、生效且适用的可靠资料；缺少适用条件时请询问用户，不要编造答案。"
+                        : "请仅依据以下资料回答，注明文件与业务版本。多个有效来源不等于结论一致，不能按版本标签或上传时间擅自裁决。",
                 knowledgeBase,
                 response.query(),
                 chunks

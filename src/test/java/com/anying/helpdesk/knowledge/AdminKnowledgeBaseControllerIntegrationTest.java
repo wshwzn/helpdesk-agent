@@ -263,6 +263,12 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                 0,
                 null,
                 2,
+                null,
+                null,
+                "ALL",
+                null,
+                null,
+                com.anying.helpdesk.knowledge.domain.KnowledgePublicationStatus.DRAFT,
                 now,
                 now
         ));
