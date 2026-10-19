@@ -85,7 +85,18 @@ public class KnowledgeAnswerModelClient {
             没有任何结论时 claims 必须是 []，四个全局判断仍须全部提供。
             """;
 
-    public enum ReviewStrategy { BASELINE, CHECKLIST }
+    private static final String CONTEXTUAL_REVIEW_PROMPT = REVIEW_PROMPT + """
+            补充判定口径：将 question、applicabilityScope 和整份 draft 合起来理解，逐条检查引文与完整 evidence。
+            问题或显式范围已经明确的条件可以限定本轮结论，不要求每条结论机械重复同一条件；
+            但若结论明确扩大范围、抹去例外、改变否定或数字，仍必须否决。
+            没有重复与问题无关的背景信息不是遗漏；问题明确询问的要点及影响答案的重要条件必须保留。
+            INSUFFICIENT_EVIDENCE 明确表示不能完整回答；只回答有依据部分、没有编造未知部分时可以通过，
+            不要求把“缺少依据”伪装成有引用的事实结论。若证据其实足够却拒答，仍必须否决。
+            ANSWERABLE 必须覆盖全部实质问题，不能因其中一部分有依据就通过。
+            使用这些口径理解原规则，仍仅返回 approved 布尔值，不因回答自称可靠而批准。
+            """;
+
+    public enum ReviewStrategy { BASELINE, CHECKLIST, CONTEXTUAL }
 
     @Value("${app.knowledge.review-strategy:BASELINE}")
     private ReviewStrategy reviewStrategy = ReviewStrategy.BASELINE;
@@ -140,8 +151,8 @@ public class KnowledgeAnswerModelClient {
     public ModelResult<Review> review(ResolvedChatModel model, String question, String scope,
                                      List<KnowledgeAnswerReport.Evidence> evidence, KnowledgeAnswerDraft draft,
                                      ReviewStrategy strategy) {
-        if (strategy == ReviewStrategy.BASELINE) {
-            var result = call(model, REVIEW_PROMPT, Map.of("question", question, "applicabilityScope", scope,
+        if (strategy == ReviewStrategy.BASELINE || strategy == ReviewStrategy.CONTEXTUAL) {
+            var result = call(model, reviewPrompt(strategy), Map.of("question", question, "applicabilityScope", scope,
                     "evidence", evidence, "draft", draft), Review.class);
             var review = result.value();
             if (review == null || review.approved() == null || review.checklist() != null
@@ -166,7 +177,11 @@ public class KnowledgeAnswerModelClient {
 
     /** 为评测记录提示摘要，避免只凭策略名称认定两次运行使用相同规则。 */
     public String reviewPrompt(ReviewStrategy strategy) {
-        return strategy == ReviewStrategy.BASELINE ? REVIEW_PROMPT : CHECKLIST_PROMPT;
+        return switch (strategy) {
+            case BASELINE -> REVIEW_PROMPT;
+            case CHECKLIST -> CHECKLIST_PROMPT;
+            case CONTEXTUAL -> CONTEXTUAL_REVIEW_PROMPT;
+        };
     }
 
     /** 严格解析模型协议；畸形、超长、未知字段或多段 JSON 均视为生成失败。 */

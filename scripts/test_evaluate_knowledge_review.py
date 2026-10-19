@@ -51,6 +51,20 @@ class ReviewEvaluationTest(unittest.TestCase):
         next(r for r in self.rows if r["strategy"] == "CHECKLIST" and r["id"] == "R12N")["review"]["approved"] = True
         self.assertFalse(evaluation.summarize(self.dataset, self.rows, 2)["candidateEligibleForEndToEnd"])
 
+    def test_contextual_candidate_is_compared_without_mixing_checklist(self):
+        """候选切换后仍只比较两种策略，旧 CHECKLIST 结果不能混入新门槛。"""
+        rows = copy.deepcopy(self.rows)
+        for row in rows:
+            if row["strategy"] == "CHECKLIST":
+                row["strategy"] = "CONTEXTUAL"
+            if row["strategy"] == "BASELINE" and row["id"] == "R01P":
+                row["review"]["approved"] = False
+        summary = evaluation.summarize(self.dataset, rows, 2, "CONTEXTUAL")
+        self.assertEqual({"BASELINE", "CONTEXTUAL"}, set(summary["strategies"]))
+        self.assertTrue(summary["candidateEligibleForEndToEnd"])
+        with self.assertRaises(ValueError):
+            evaluation.summarize(self.dataset, self.rows, 2, "CONTEXTUAL")
+
     def test_flips_require_two_valid_decisions(self):
         """重复样本判断翻转单列，协议失败不当作布尔否决。"""
         first = copy.deepcopy(self.rows[0])

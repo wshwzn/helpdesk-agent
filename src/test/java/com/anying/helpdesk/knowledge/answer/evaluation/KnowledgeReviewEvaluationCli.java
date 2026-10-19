@@ -46,7 +46,12 @@ public class KnowledgeReviewEvaluationCli {
 
     /** 只启动模型配置读取所需组件，禁用 Web、迁移及 SQL 初始化，避免评测改动业务数据。 */
     public static void main(String[] args) throws Exception {
-        if (args.length != 3) throw new IllegalArgumentException("expected dataset, output, repeats");
+        if (args.length < 3 || args.length > 4) throw new IllegalArgumentException("expected dataset, output, repeats, optional candidate");
+        var candidate = args.length == 4 ? KnowledgeAnswerModelClient.ReviewStrategy.valueOf(args[3])
+                : KnowledgeAnswerModelClient.ReviewStrategy.CHECKLIST;
+        if (candidate == KnowledgeAnswerModelClient.ReviewStrategy.BASELINE)
+            throw new IllegalArgumentException("candidate must differ from baseline");
+        var selectedStrategies = List.of(KnowledgeAnswerModelClient.ReviewStrategy.BASELINE, candidate);
         Path datasetPath = Path.of(args[0]);
         Path output = Path.of(args[1]);
         int repeats = Integer.parseInt(args[2]);
@@ -69,8 +74,9 @@ public class KnowledgeReviewEvaluationCli {
             metadata.put("modelName", model.modelName());
             metadata.put("datasetSha256", sha256(Files.readAllBytes(datasetPath)));
             metadata.put("repeats", repeats);
+            metadata.put("candidate", candidate.name());
             metadata.put("planned", dataset.cases().size() * repeats * 2);
-            for (var strategy : KnowledgeAnswerModelClient.ReviewStrategy.values()) {
+            for (var strategy : selectedStrategies) {
                 metadata.put(strategy.name() + "PromptSha256", sha256(client.reviewPrompt(strategy).getBytes(StandardCharsets.UTF_8)));
             }
             Files.writeString(output.resolve("metadata.json"), json.writerWithDefaultPrettyPrinter().writeValueAsString(metadata),
@@ -80,7 +86,7 @@ public class KnowledgeReviewEvaluationCli {
                 Collections.shuffle(cases, new Random(20261019L + repeat));
                 int index = 0;
                 for (var item : cases) {
-                    var strategies = new ArrayList<>(List.of(KnowledgeAnswerModelClient.ReviewStrategy.values()));
+                    var strategies = new ArrayList<>(selectedStrategies);
                     if ((index++ + repeat) % 2 == 0) Collections.reverse(strategies);
                     for (var strategy : strategies) {
                         if (!provider.get().equals(model)) throw new IllegalStateException("default model changed during evaluation");

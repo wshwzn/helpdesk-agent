@@ -1,0 +1,2000 @@
+{
+  "startedAt": "2026-10-19T19:57:14.233283+08:00",
+  "planned": 5,
+  "results": [
+    {
+      "id": "B01",
+      "scenario": "baseline",
+      "question": "差旅结束后多少个自然日内需要提交报销申请？",
+      "expectedStatus": "ANSWERABLE",
+      "scope": "ALL",
+      "semanticReview": "PENDING",
+      "conversationId": 187,
+      "problems": [],
+      "actualStatus": "ANSWERABLE",
+      "reason": "REVIEWED",
+      "referencedSources": [
+        "expense-process:v1:ALL"
+      ],
+      "claimCount": 1,
+      "statusMatched": true,
+      "referenceCount": 1,
+      "invalidReferenceCount": 0,
+      "candidateSources": [
+        "expense-process:v1:ALL"
+      ],
+      "outcome": "CHECK_PASSED",
+      "message": {
+        "id": 684,
+        "conversationId": 187,
+        "role": "ASSISTANT",
+        "content": "根据本轮检索资料：\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。 [E1]",
+        "status": "COMPLETED",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "promptTokens": 1714,
+        "completionTokens": 118,
+        "totalTokens": 1832,
+        "errorCode": null,
+        "citations": [
+          {
+            "knowledgeBaseName": "口述练习资料库-d23135b3ae",
+            "sourceName": "01-通用报销流程.md",
+            "chunkSequence": 1,
+            "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+            "documentId": 223,
+            "metadata": {
+              "sourceKey": "expense-process",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": "ALL",
+        "knowledgeAnswer": {
+          "schemaVersion": 1,
+          "reason": "REVIEWED",
+          "knowledgeBaseId": 18,
+          "knowledgeBaseName": "口述练习资料库-d23135b3ae",
+          "applicabilityScope": "ALL",
+          "checkedAt": "2026-10-19T19:57:19.3474669",
+          "answer": {
+            "status": "ANSWERABLE",
+            "claims": [
+              {
+                "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 223,
+              "chunkSequence": 1,
+              "sourceName": "01-通用报销流程.md",
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "clarification": null,
+          "continuationOfMessageId": null
+        },
+        "knowledgeRunId": "8edc26ff-f40b-4e57-bf82-163eec58aad2",
+        "createdAt": "2026-10-19T19:57:14.38941",
+        "updatedAt": "2026-10-19T19:57:19.363501"
+      },
+      "elapsedSeconds": 5.036,
+      "knowledgeRunId": "8edc26ff-f40b-4e57-bf82-163eec58aad2",
+      "diagnosticState": "CAPTURED",
+      "diagnostic": {
+        "schemaVersion": 2,
+        "runId": "8edc26ff-f40b-4e57-bf82-163eec58aad2",
+        "assistantMessageId": 684,
+        "conversationId": 187,
+        "question": "差旅结束后多少个自然日内需要提交报销申请？",
+        "applicabilityScope": "ALL",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 16,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-19T19:57:14.3970008",
+        "updatedAt": "2026-10-19T19:57:19.372011",
+        "finishedAt": "2026-10-19T19:57:19.372011",
+        "retrieval": {
+          "knowledgeBaseId": 18,
+          "query": "差旅结束后多少个自然日内需要提交报销申请？",
+          "candidateLimit": 50,
+          "vectorMinSimilarity": 0.0,
+          "resultLimit": 5,
+          "bm25CandidateCount": 1,
+          "vectorCandidateCount": 1,
+          "results": [
+            {
+              "rank": 1,
+              "documentId": 223,
+              "chunkSequence": 1,
+              "originalName": "01-通用报销流程.md",
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "rrfScore": 0.03278688524590164,
+              "bm25Rank": 1,
+              "bm25Score": 40.12076,
+              "vectorRank": 1,
+              "vectorScore": 0.8931128,
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ]
+        },
+        "retrievalTruncated": false,
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 223,
+            "chunkSequence": 1,
+            "sourceName": "01-通用报销流程.md",
+            "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+            "metadata": {
+              "sourceKey": "expense-process",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "draft": {
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "review": {
+          "approved": true,
+          "reason": null,
+          "checklist": null
+        },
+        "answerReason": "REVIEWED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:14.4020008",
+            "durationMs": 1520,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 184,
+              "completionTokens": 15,
+              "totalTokens": 199
+            }
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:15.9279261",
+            "durationMs": 336,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "DRAFT",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:16.2747008",
+            "durationMs": 1674,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 898,
+              "completionTokens": 98,
+              "totalTokens": 996
+            }
+          },
+          {
+            "stage": "VALIDATION",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:17.9567287",
+            "durationMs": 3,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "REVIEW",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:17.9647093",
+            "durationMs": 1374,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 632,
+              "completionTokens": 5,
+              "totalTokens": 637
+            }
+          },
+          {
+            "stage": "EVIDENCE_RECHECK",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:19.3442944",
+            "durationMs": 7,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:19.356473",
+            "durationMs": 11,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": {
+          "citationSetId": "35c8f14a-3f30-4d09-8cb2-7543f08f83b3",
+          "sources": [
+            {
+              "id": "E1",
+              "documentId": 223,
+              "chunkSequence": 1,
+              "sourceName": "01-通用报销流程.md",
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E1-P1",
+                  "startOffset": 0,
+                  "endOffset": 14,
+                  "text": "# 星河示例公司通用报销流程",
+                  "selectable": true
+                },
+                {
+                  "id": "E1-P2",
+                  "startOffset": 16,
+                  "endOffset": 44,
+                  "text": "本文件为公开演示编写的虚构资料，不代表任何真实企业制度。",
+                  "selectable": true
+                },
+                {
+                  "id": "E1-P3",
+                  "startOffset": 46,
+                  "endOffset": 116,
+                  "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                  "selectable": true
+                }
+              ]
+            }
+          ]
+        },
+        "selection": {
+          "citationSetId": "35c8f14a-3f30-4d09-8cb2-7543f08f83b3",
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P3"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "travel-lodging",
+                "description": "因公出差的住宿报销标准、金额上限及超额费用如何处理。不包括通用报销提交期限和所需材料。",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  }
+                ]
+              },
+              {
+                "id": "expense-process",
+                "description": "通用差旅报销提交期限、流程和申请所需材料，不涉及具体地区的住宿金额标准。",
+                "scopeOptions": []
+              }
+            ]
+          },
+          "route": {
+            "topicIds": [
+              "expense-process"
+            ],
+            "uncertain": false
+          },
+          "continuationOfMessageId": null,
+          "routingAttempted": true
+        }
+      }
+    },
+    {
+      "id": "PRACTICE_CN_SH",
+      "scenario": "baseline",
+      "question": "普通员工因公出差，住宿报销上限是多少？",
+      "expectedStatus": "NEEDS_CLARIFICATION",
+      "scope": "ALL",
+      "semanticReview": "PENDING",
+      "conversationId": 188,
+      "problems": [],
+      "actualStatus": "NEEDS_CLARIFICATION",
+      "reason": "APPLICABILITY_REQUIRED",
+      "referencedSources": [],
+      "claimCount": 0,
+      "statusMatched": true,
+      "referenceCount": 0,
+      "invalidReferenceCount": 0,
+      "candidateSources": [],
+      "outcome": "CHECK_PASSED",
+      "message": {
+        "id": 686,
+        "conversationId": 188,
+        "role": "ASSISTANT",
+        "content": "请补充本次问题适用的地区或范围：上海、北京。",
+        "status": "COMPLETED",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "promptTokens": 184,
+        "completionTokens": 16,
+        "totalTokens": 200,
+        "errorCode": null,
+        "citations": [],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": "ALL",
+        "knowledgeAnswer": {
+          "schemaVersion": 2,
+          "reason": "APPLICABILITY_REQUIRED",
+          "knowledgeBaseId": 18,
+          "knowledgeBaseName": "口述练习资料库-d23135b3ae",
+          "applicabilityScope": "ALL",
+          "checkedAt": "2026-10-19T19:57:20.8105728",
+          "answer": {
+            "status": "NEEDS_CLARIFICATION",
+            "claims": [],
+            "missingConditions": [
+              "请明确本次问题适用的地区或范围？"
+            ],
+            "conflicts": []
+          },
+          "evidence": [],
+          "clarification": {
+            "originalQuestion": "普通员工因公出差，住宿报销上限是多少？",
+            "policyRevision": 1,
+            "topicIds": [
+              "travel-lodging"
+            ],
+            "scopeOptions": [
+              {
+                "value": "CN_SH",
+                "label": "上海"
+              },
+              {
+                "value": "CN_BJ",
+                "label": "北京"
+              }
+            ]
+          },
+          "continuationOfMessageId": null
+        },
+        "knowledgeRunId": "faf8741a-d312-47a5-b32b-ee07e5280e80",
+        "createdAt": "2026-10-19T19:57:19.428577",
+        "updatedAt": "2026-10-19T19:57:20.8145726"
+      },
+      "elapsedSeconds": 1.436,
+      "knowledgeRunId": "faf8741a-d312-47a5-b32b-ee07e5280e80",
+      "diagnosticState": "CAPTURED",
+      "diagnostic": {
+        "schemaVersion": 2,
+        "runId": "faf8741a-d312-47a5-b32b-ee07e5280e80",
+        "assistantMessageId": 686,
+        "conversationId": 188,
+        "question": "普通员工因公出差，住宿报销上限是多少？",
+        "applicabilityScope": "ALL",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 6,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-19T19:57:19.4357428",
+        "updatedAt": "2026-10-19T19:57:20.8222502",
+        "finishedAt": "2026-10-19T19:57:20.8222502",
+        "retrieval": null,
+        "retrievalTruncated": false,
+        "evidence": [],
+        "draft": {
+          "status": "NEEDS_CLARIFICATION",
+          "claims": [],
+          "missingConditions": [
+            "请明确本次问题适用的地区或范围？"
+          ],
+          "conflicts": []
+        },
+        "review": null,
+        "answerReason": "APPLICABILITY_REQUIRED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:19.4399641",
+            "durationMs": 1362,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 184,
+              "completionTokens": 16,
+              "totalTokens": 200
+            }
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:20.8105728",
+            "durationMs": 8,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": null,
+        "selection": null,
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "travel-lodging",
+                "description": "因公出差的住宿报销标准、金额上限及超额费用如何处理。不包括通用报销提交期限和所需材料。",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  }
+                ]
+              },
+              {
+                "id": "expense-process",
+                "description": "通用差旅报销提交期限、流程和申请所需材料，不涉及具体地区的住宿金额标准。",
+                "scopeOptions": []
+              }
+            ]
+          },
+          "route": {
+            "topicIds": [
+              "travel-lodging"
+            ],
+            "uncertain": false
+          },
+          "continuationOfMessageId": null,
+          "routingAttempted": true
+        }
+      }
+    },
+    {
+      "id": "CONTINUE_CN_SH",
+      "scenario": "baseline",
+      "question": "普通员工因公出差，住宿报销上限是多少？",
+      "scope": "CN_SH",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "travel-policy:v2:CN_SH"
+      ],
+      "requiredPatterns": [
+        "600|六百"
+      ],
+      "conversationId": 188,
+      "semanticReview": "PENDING",
+      "message": {
+        "id": 688,
+        "conversationId": 188,
+        "role": "ASSISTANT",
+        "content": "根据本轮检索资料：\n\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元；超出上限的部分不予报销。该标准适用于 CN_SH，有效期为 2026 年 10 月 1 日起至 2027 年 1 月 1 日前，不适用于其他地区。 [E1]\n\n通用报销流程只说明提交流程，不规定住宿金额上限。 [E2]",
+        "status": "COMPLETED",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "promptTokens": 2113,
+        "completionTokens": 179,
+        "totalTokens": 2292,
+        "errorCode": null,
+        "citations": [
+          {
+            "knowledgeBaseName": "口述练习资料库-d23135b3ae",
+            "sourceName": "03-上海住宿新版.md",
+            "chunkSequence": 1,
+            "content": "# 星河示例公司上海住宿标准 v2\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。",
+            "documentId": 225,
+            "metadata": {
+              "sourceKey": "travel-policy",
+              "businessVersion": "v2",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-10-01T00:00:00",
+              "validUntil": "2027-01-01T00:00:00"
+            }
+          },
+          {
+            "knowledgeBaseName": "口述练习资料库-d23135b3ae",
+            "sourceName": "01-通用报销流程.md",
+            "chunkSequence": 1,
+            "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+            "documentId": 223,
+            "metadata": {
+              "sourceKey": "expense-process",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": "CN_SH",
+        "knowledgeAnswer": {
+          "schemaVersion": 2,
+          "reason": "REVIEWED",
+          "knowledgeBaseId": 18,
+          "knowledgeBaseName": "口述练习资料库-d23135b3ae",
+          "applicabilityScope": "CN_SH",
+          "checkedAt": "2026-10-19T19:57:24.6353571",
+          "answer": {
+            "status": "ANSWERABLE",
+            "claims": [
+              {
+                "text": "上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元；超出上限的部分不予报销。该标准适用于 CN_SH，有效期为 2026 年 10 月 1 日起至 2027 年 1 月 1 日前，不适用于其他地区。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。"
+                  }
+                ]
+              },
+              {
+                "text": "通用报销流程只说明提交流程，不规定住宿金额上限。",
+                "references": [
+                  {
+                    "evidenceId": "E2",
+                    "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 225,
+              "chunkSequence": 1,
+              "sourceName": "03-上海住宿新版.md",
+              "content": "# 星河示例公司上海住宿标准 v2\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。",
+              "metadata": {
+                "sourceKey": "travel-policy",
+                "businessVersion": "v2",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-10-01T00:00:00",
+                "validUntil": "2027-01-01T00:00:00"
+              }
+            },
+            {
+              "id": "E2",
+              "documentId": 223,
+              "chunkSequence": 1,
+              "sourceName": "01-通用报销流程.md",
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "clarification": null,
+          "continuationOfMessageId": 686
+        },
+        "knowledgeRunId": "db67a91b-ef67-4b97-b70b-38dba44aed9b",
+        "createdAt": "2026-10-19T19:57:20.853392",
+        "updatedAt": "2026-10-19T19:57:24.6789562"
+      },
+      "problems": [],
+      "actualStatus": "ANSWERABLE",
+      "reason": "REVIEWED",
+      "referencedSources": [
+        "expense-process:v1:ALL",
+        "travel-policy:v2:CN_SH"
+      ],
+      "claimCount": 2,
+      "statusMatched": true,
+      "referenceCount": 2,
+      "invalidReferenceCount": 0,
+      "candidateSources": [
+        "expense-process:v1:ALL",
+        "travel-policy:v2:CN_SH"
+      ],
+      "outcome": "CHECK_PASSED",
+      "elapsedSeconds": 3.885,
+      "knowledgeRunId": "db67a91b-ef67-4b97-b70b-38dba44aed9b",
+      "diagnosticState": "CAPTURED",
+      "diagnostic": {
+        "schemaVersion": 2,
+        "runId": "db67a91b-ef67-4b97-b70b-38dba44aed9b",
+        "assistantMessageId": 688,
+        "conversationId": 188,
+        "question": "普通员工因公出差，住宿报销上限是多少？",
+        "applicabilityScope": "CN_SH",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 16,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-19T19:57:20.8604045",
+        "updatedAt": "2026-10-19T19:57:24.6980957",
+        "finishedAt": "2026-10-19T19:57:24.6980957",
+        "retrieval": {
+          "knowledgeBaseId": 18,
+          "query": "普通员工因公出差，住宿报销上限是多少？",
+          "candidateLimit": 50,
+          "vectorMinSimilarity": 0.0,
+          "resultLimit": 5,
+          "bm25CandidateCount": 2,
+          "vectorCandidateCount": 2,
+          "results": [
+            {
+              "rank": 1,
+              "documentId": 225,
+              "chunkSequence": 1,
+              "originalName": "03-上海住宿新版.md",
+              "content": "# 星河示例公司上海住宿标准 v2\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。",
+              "rrfScore": 0.03278688524590164,
+              "bm25Rank": 1,
+              "bm25Score": 32.420376,
+              "vectorRank": 1,
+              "vectorScore": 0.8737806,
+              "metadata": {
+                "sourceKey": "travel-policy",
+                "businessVersion": "v2",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-10-01T00:00:00",
+                "validUntil": "2027-01-01T00:00:00"
+              }
+            },
+            {
+              "rank": 2,
+              "documentId": 223,
+              "chunkSequence": 1,
+              "originalName": "01-通用报销流程.md",
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "rrfScore": 0.03225806451612903,
+              "bm25Rank": 2,
+              "bm25Score": 24.30452,
+              "vectorRank": 2,
+              "vectorScore": 0.8111042,
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ]
+        },
+        "retrievalTruncated": false,
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 225,
+            "chunkSequence": 1,
+            "sourceName": "03-上海住宿新版.md",
+            "content": "# 星河示例公司上海住宿标准 v2\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。",
+            "metadata": {
+              "sourceKey": "travel-policy",
+              "businessVersion": "v2",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-10-01T00:00:00",
+              "validUntil": "2027-01-01T00:00:00"
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 223,
+            "chunkSequence": 1,
+            "sourceName": "01-通用报销流程.md",
+            "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+            "metadata": {
+              "sourceKey": "expense-process",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "draft": {
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元；超出上限的部分不予报销。该标准适用于 CN_SH，有效期为 2026 年 10 月 1 日起至 2027 年 1 月 1 日前，不适用于其他地区。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。"
+                }
+              ]
+            },
+            {
+              "text": "通用报销流程只说明提交流程，不规定住宿金额上限。",
+              "references": [
+                {
+                  "evidenceId": "E2",
+                  "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "review": {
+          "approved": true,
+          "reason": null,
+          "checklist": null
+        },
+        "answerReason": "REVIEWED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:20.8687618",
+            "durationMs": 7,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:20.8792393",
+            "durationMs": 138,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "DRAFT",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:21.023239",
+            "durationMs": 1763,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 1152,
+              "completionTokens": 174,
+              "totalTokens": 1326
+            }
+          },
+          {
+            "stage": "VALIDATION",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:22.791272",
+            "durationMs": 3,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "REVIEW",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:22.8260518",
+            "durationMs": 1777,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 961,
+              "completionTokens": 5,
+              "totalTokens": 966
+            }
+          },
+          {
+            "stage": "EVIDENCE_RECHECK",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:24.6202809",
+            "durationMs": 27,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:24.663725",
+            "durationMs": 26,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": {
+          "citationSetId": "7e2fd194-7335-452e-ac78-3ae7d4d13a8e",
+          "sources": [
+            {
+              "id": "E1",
+              "documentId": 225,
+              "chunkSequence": 1,
+              "sourceName": "03-上海住宿新版.md",
+              "metadata": {
+                "sourceKey": "travel-policy",
+                "businessVersion": "v2",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-10-01T00:00:00",
+                "validUntil": "2027-01-01T00:00:00"
+              },
+              "paragraphs": [
+                {
+                  "id": "E1-P1",
+                  "startOffset": 0,
+                  "endOffset": 17,
+                  "text": "# 星河示例公司上海住宿标准 v2",
+                  "selectable": true
+                },
+                {
+                  "id": "E1-P2",
+                  "startOffset": 19,
+                  "endOffset": 47,
+                  "text": "本文件为公开演示编写的虚构资料，不代表任何真实企业制度。",
+                  "selectable": true
+                },
+                {
+                  "id": "E1-P3",
+                  "startOffset": 49,
+                  "endOffset": 155,
+                  "text": "适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E2",
+              "documentId": 223,
+              "chunkSequence": 1,
+              "sourceName": "01-通用报销流程.md",
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E2-P1",
+                  "startOffset": 0,
+                  "endOffset": 14,
+                  "text": "# 星河示例公司通用报销流程",
+                  "selectable": true
+                },
+                {
+                  "id": "E2-P2",
+                  "startOffset": 16,
+                  "endOffset": 44,
+                  "text": "本文件为公开演示编写的虚构资料，不代表任何真实企业制度。",
+                  "selectable": true
+                },
+                {
+                  "id": "E2-P3",
+                  "startOffset": 46,
+                  "endOffset": 116,
+                  "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                  "selectable": true
+                }
+              ]
+            }
+          ]
+        },
+        "selection": {
+          "citationSetId": "7e2fd194-7335-452e-ac78-3ae7d4d13a8e",
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元；超出上限的部分不予报销。该标准适用于 CN_SH，有效期为 2026 年 10 月 1 日起至 2027 年 1 月 1 日前，不适用于其他地区。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P3"
+                }
+              ]
+            },
+            {
+              "text": "通用报销流程只说明提交流程，不规定住宿金额上限。",
+              "references": [
+                {
+                  "evidenceId": "E2",
+                  "paragraphId": "E2-P3"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "travel-lodging",
+                "description": "因公出差的住宿报销标准、金额上限及超额费用如何处理。不包括通用报销提交期限和所需材料。",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  }
+                ]
+              },
+              {
+                "id": "expense-process",
+                "description": "通用差旅报销提交期限、流程和申请所需材料，不涉及具体地区的住宿金额标准。",
+                "scopeOptions": []
+              }
+            ]
+          },
+          "route": null,
+          "continuationOfMessageId": 686,
+          "routingAttempted": false
+        }
+      }
+    },
+    {
+      "id": "PRACTICE_CN_BJ",
+      "scenario": "baseline",
+      "question": "普通员工因公出差，住宿报销上限是多少？",
+      "expectedStatus": "NEEDS_CLARIFICATION",
+      "scope": "ALL",
+      "semanticReview": "PENDING",
+      "conversationId": 189,
+      "problems": [],
+      "actualStatus": "NEEDS_CLARIFICATION",
+      "reason": "APPLICABILITY_REQUIRED",
+      "referencedSources": [],
+      "claimCount": 0,
+      "statusMatched": true,
+      "referenceCount": 0,
+      "invalidReferenceCount": 0,
+      "candidateSources": [],
+      "outcome": "CHECK_PASSED",
+      "message": {
+        "id": 690,
+        "conversationId": 189,
+        "role": "ASSISTANT",
+        "content": "请补充本次问题适用的地区或范围：上海、北京。",
+        "status": "COMPLETED",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "promptTokens": 184,
+        "completionTokens": 16,
+        "totalTokens": 200,
+        "errorCode": null,
+        "citations": [],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": "ALL",
+        "knowledgeAnswer": {
+          "schemaVersion": 2,
+          "reason": "APPLICABILITY_REQUIRED",
+          "knowledgeBaseId": 18,
+          "knowledgeBaseName": "口述练习资料库-d23135b3ae",
+          "applicabilityScope": "ALL",
+          "checkedAt": "2026-10-19T19:57:26.1488429",
+          "answer": {
+            "status": "NEEDS_CLARIFICATION",
+            "claims": [],
+            "missingConditions": [
+              "请明确本次问题适用的地区或范围？"
+            ],
+            "conflicts": []
+          },
+          "evidence": [],
+          "clarification": {
+            "originalQuestion": "普通员工因公出差，住宿报销上限是多少？",
+            "policyRevision": 1,
+            "topicIds": [
+              "travel-lodging"
+            ],
+            "scopeOptions": [
+              {
+                "value": "CN_SH",
+                "label": "上海"
+              },
+              {
+                "value": "CN_BJ",
+                "label": "北京"
+              }
+            ]
+          },
+          "continuationOfMessageId": null
+        },
+        "knowledgeRunId": "a0319bd0-250c-4a93-b101-bd25b66a8d94",
+        "createdAt": "2026-10-19T19:57:24.807945",
+        "updatedAt": "2026-10-19T19:57:26.1529359"
+      },
+      "elapsedSeconds": 1.427,
+      "knowledgeRunId": "a0319bd0-250c-4a93-b101-bd25b66a8d94",
+      "diagnosticState": "CAPTURED",
+      "diagnostic": {
+        "schemaVersion": 2,
+        "runId": "a0319bd0-250c-4a93-b101-bd25b66a8d94",
+        "assistantMessageId": 690,
+        "conversationId": 189,
+        "question": "普通员工因公出差，住宿报销上限是多少？",
+        "applicabilityScope": "ALL",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 6,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-19T19:57:24.8172534",
+        "updatedAt": "2026-10-19T19:57:26.1617999",
+        "finishedAt": "2026-10-19T19:57:26.1617999",
+        "retrieval": null,
+        "retrievalTruncated": false,
+        "evidence": [],
+        "draft": {
+          "status": "NEEDS_CLARIFICATION",
+          "claims": [],
+          "missingConditions": [
+            "请明确本次问题适用的地区或范围？"
+          ],
+          "conflicts": []
+        },
+        "review": null,
+        "answerReason": "APPLICABILITY_REQUIRED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:24.823156",
+            "durationMs": 1321,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 184,
+              "completionTokens": 16,
+              "totalTokens": 200
+            }
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:26.1488429",
+            "durationMs": 9,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": null,
+        "selection": null,
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "travel-lodging",
+                "description": "因公出差的住宿报销标准、金额上限及超额费用如何处理。不包括通用报销提交期限和所需材料。",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  }
+                ]
+              },
+              {
+                "id": "expense-process",
+                "description": "通用差旅报销提交期限、流程和申请所需材料，不涉及具体地区的住宿金额标准。",
+                "scopeOptions": []
+              }
+            ]
+          },
+          "route": {
+            "topicIds": [
+              "travel-lodging"
+            ],
+            "uncertain": false
+          },
+          "continuationOfMessageId": null,
+          "routingAttempted": true
+        }
+      }
+    },
+    {
+      "id": "CONTINUE_CN_BJ",
+      "scenario": "baseline",
+      "question": "普通员工因公出差，住宿报销上限是多少？",
+      "scope": "CN_BJ",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "travel-policy:v1:CN_BJ"
+      ],
+      "requiredPatterns": [
+        "450|四百五十"
+      ],
+      "conversationId": 189,
+      "semanticReview": "PENDING",
+      "message": {
+        "id": 692,
+        "conversationId": 189,
+        "role": "ASSISTANT",
+        "content": "根据本轮检索资料：\n\n北京地区普通员工因公出差，住宿报销上限为每人每晚450元；该标准自2026年1月1日起生效。 [E1]",
+        "status": "COMPLETED",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "promptTokens": 1924,
+        "completionTokens": 104,
+        "totalTokens": 2028,
+        "errorCode": null,
+        "citations": [
+          {
+            "knowledgeBaseName": "口述练习资料库-d23135b3ae",
+            "sourceName": "05-北京住宿标准.md",
+            "chunkSequence": 1,
+            "content": "# 星河示例公司北京住宿标准 v1\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_BJ。自 2026 年 1 月 1 日起生效。\n北京地区普通员工因公出差，住宿报销上限为每人每晚 450 元。\n本标准不适用于上海地区。",
+            "documentId": 227,
+            "metadata": {
+              "sourceKey": "travel-policy",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_BJ",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": "CN_BJ",
+        "knowledgeAnswer": {
+          "schemaVersion": 2,
+          "reason": "REVIEWED",
+          "knowledgeBaseId": 18,
+          "knowledgeBaseName": "口述练习资料库-d23135b3ae",
+          "applicabilityScope": "CN_BJ",
+          "checkedAt": "2026-10-19T19:57:29.7595301",
+          "answer": {
+            "status": "ANSWERABLE",
+            "claims": [
+              {
+                "text": "北京地区普通员工因公出差，住宿报销上限为每人每晚450元；该标准自2026年1月1日起生效。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "适用范围：CN_BJ。自 2026 年 1 月 1 日起生效。\n北京地区普通员工因公出差，住宿报销上限为每人每晚 450 元。\n本标准不适用于上海地区。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 227,
+              "chunkSequence": 1,
+              "sourceName": "05-北京住宿标准.md",
+              "content": "# 星河示例公司北京住宿标准 v1\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_BJ。自 2026 年 1 月 1 日起生效。\n北京地区普通员工因公出差，住宿报销上限为每人每晚 450 元。\n本标准不适用于上海地区。",
+              "metadata": {
+                "sourceKey": "travel-policy",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "id": "E2",
+              "documentId": 223,
+              "chunkSequence": 1,
+              "sourceName": "01-通用报销流程.md",
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "clarification": null,
+          "continuationOfMessageId": 690
+        },
+        "knowledgeRunId": "8f8fa710-83ec-45ba-9948-d07f6f0a3123",
+        "createdAt": "2026-10-19T19:57:26.195374",
+        "updatedAt": "2026-10-19T19:57:29.7758604"
+      },
+      "problems": [],
+      "actualStatus": "ANSWERABLE",
+      "reason": "REVIEWED",
+      "referencedSources": [
+        "travel-policy:v1:CN_BJ"
+      ],
+      "claimCount": 1,
+      "statusMatched": true,
+      "referenceCount": 1,
+      "invalidReferenceCount": 0,
+      "candidateSources": [
+        "expense-process:v1:ALL",
+        "travel-policy:v1:CN_BJ"
+      ],
+      "outcome": "CHECK_PASSED",
+      "elapsedSeconds": 3.614,
+      "knowledgeRunId": "8f8fa710-83ec-45ba-9948-d07f6f0a3123",
+      "diagnosticState": "CAPTURED",
+      "diagnostic": {
+        "schemaVersion": 2,
+        "runId": "8f8fa710-83ec-45ba-9948-d07f6f0a3123",
+        "assistantMessageId": 692,
+        "conversationId": 189,
+        "question": "普通员工因公出差，住宿报销上限是多少？",
+        "applicabilityScope": "CN_BJ",
+        "modelConfigId": 3,
+        "modelName": "deepseek-v4.1-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 16,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-19T19:57:26.2039064",
+        "updatedAt": "2026-10-19T19:57:29.7853794",
+        "finishedAt": "2026-10-19T19:57:29.7853794",
+        "retrieval": {
+          "knowledgeBaseId": 18,
+          "query": "普通员工因公出差，住宿报销上限是多少？",
+          "candidateLimit": 50,
+          "vectorMinSimilarity": 0.0,
+          "resultLimit": 5,
+          "bm25CandidateCount": 2,
+          "vectorCandidateCount": 2,
+          "results": [
+            {
+              "rank": 1,
+              "documentId": 227,
+              "chunkSequence": 1,
+              "originalName": "05-北京住宿标准.md",
+              "content": "# 星河示例公司北京住宿标准 v1\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_BJ。自 2026 年 1 月 1 日起生效。\n北京地区普通员工因公出差，住宿报销上限为每人每晚 450 元。\n本标准不适用于上海地区。",
+              "rrfScore": 0.03278688524590164,
+              "bm25Rank": 1,
+              "bm25Score": 31.345188,
+              "vectorRank": 1,
+              "vectorScore": 0.88063514,
+              "metadata": {
+                "sourceKey": "travel-policy",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "rank": 2,
+              "documentId": 223,
+              "chunkSequence": 1,
+              "originalName": "01-通用报销流程.md",
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "rrfScore": 0.03225806451612903,
+              "bm25Rank": 2,
+              "bm25Score": 24.30452,
+              "vectorRank": 2,
+              "vectorScore": 0.81109256,
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ]
+        },
+        "retrievalTruncated": false,
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 227,
+            "chunkSequence": 1,
+            "sourceName": "05-北京住宿标准.md",
+            "content": "# 星河示例公司北京住宿标准 v1\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_BJ。自 2026 年 1 月 1 日起生效。\n北京地区普通员工因公出差，住宿报销上限为每人每晚 450 元。\n本标准不适用于上海地区。",
+            "metadata": {
+              "sourceKey": "travel-policy",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_BJ",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 223,
+            "chunkSequence": 1,
+            "sourceName": "01-通用报销流程.md",
+            "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+            "metadata": {
+              "sourceKey": "expense-process",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "draft": {
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "北京地区普通员工因公出差，住宿报销上限为每人每晚450元；该标准自2026年1月1日起生效。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "适用范围：CN_BJ。自 2026 年 1 月 1 日起生效。\n北京地区普通员工因公出差，住宿报销上限为每人每晚 450 元。\n本标准不适用于上海地区。"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "review": {
+          "approved": true,
+          "reason": null,
+          "checklist": null
+        },
+        "answerReason": "REVIEWED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:26.20938",
+            "durationMs": 7,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:26.2198341",
+            "durationMs": 212,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "DRAFT",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:26.4433735",
+            "durationMs": 1758,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 1123,
+              "completionTokens": 99,
+              "totalTokens": 1222
+            }
+          },
+          {
+            "stage": "VALIDATION",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:28.2066075",
+            "durationMs": 4,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "REVIEW",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:28.2155103",
+            "durationMs": 1530,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 801,
+              "completionTokens": 5,
+              "totalTokens": 806
+            }
+          },
+          {
+            "stage": "EVIDENCE_RECHECK",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:29.7555316",
+            "durationMs": 8,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-19T19:57:29.7686372",
+            "durationMs": 12,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": {
+          "citationSetId": "0e2d91a7-9240-4230-994c-072ce8efba68",
+          "sources": [
+            {
+              "id": "E1",
+              "documentId": 227,
+              "chunkSequence": 1,
+              "sourceName": "05-北京住宿标准.md",
+              "metadata": {
+                "sourceKey": "travel-policy",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E1-P1",
+                  "startOffset": 0,
+                  "endOffset": 17,
+                  "text": "# 星河示例公司北京住宿标准 v1",
+                  "selectable": true
+                },
+                {
+                  "id": "E1-P2",
+                  "startOffset": 19,
+                  "endOffset": 47,
+                  "text": "本文件为公开演示编写的虚构资料，不代表任何真实企业制度。",
+                  "selectable": true
+                },
+                {
+                  "id": "E1-P3",
+                  "startOffset": 49,
+                  "endOffset": 125,
+                  "text": "适用范围：CN_BJ。自 2026 年 1 月 1 日起生效。\n北京地区普通员工因公出差，住宿报销上限为每人每晚 450 元。\n本标准不适用于上海地区。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E2",
+              "documentId": 223,
+              "chunkSequence": 1,
+              "sourceName": "01-通用报销流程.md",
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E2-P1",
+                  "startOffset": 0,
+                  "endOffset": 14,
+                  "text": "# 星河示例公司通用报销流程",
+                  "selectable": true
+                },
+                {
+                  "id": "E2-P2",
+                  "startOffset": 16,
+                  "endOffset": 44,
+                  "text": "本文件为公开演示编写的虚构资料，不代表任何真实企业制度。",
+                  "selectable": true
+                },
+                {
+                  "id": "E2-P3",
+                  "startOffset": 46,
+                  "endOffset": 116,
+                  "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                  "selectable": true
+                }
+              ]
+            }
+          ]
+        },
+        "selection": {
+          "citationSetId": "0e2d91a7-9240-4230-994c-072ce8efba68",
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "北京地区普通员工因公出差，住宿报销上限为每人每晚450元；该标准自2026年1月1日起生效。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P3"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "travel-lodging",
+                "description": "因公出差的住宿报销标准、金额上限及超额费用如何处理。不包括通用报销提交期限和所需材料。",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  }
+                ]
+              },
+              {
+                "id": "expense-process",
+                "description": "通用差旅报销提交期限、流程和申请所需材料，不涉及具体地区的住宿金额标准。",
+                "scopeOptions": []
+              }
+            ]
+          },
+          "route": null,
+          "continuationOfMessageId": 690,
+          "routingAttempted": false
+        }
+      }
+    }
+  ],
+  "original": {
+    "knowledgeBase": {
+      "id": 18,
+      "name": "口述练习资料库-d23135b3ae",
+      "description": "prepare_knowledge_practice.py owner=d23135b3ae8144f1a2a4e075f4baa569",
+      "retrievalCandidateLimit": 50,
+      "vectorMinSimilarity": 0.0,
+      "retrievalResultLimit": 5,
+      "isDefault": true,
+      "documentCount": 7,
+      "version": 2,
+      "createdAt": "2026-10-19T19:54:35.540956",
+      "updatedAt": "2026-10-19T19:54:50.796069"
+    },
+    "documents": [
+      {
+        "id": 229,
+        "knowledgeBaseId": 18,
+        "originalName": "07-上海住宿冲突通知.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 579,
+        "sha256": "accb0c307cbf2aa359f8c5843c0d99fd43f2d3537c56a79be266ddd60500ffa6",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 4,
+        "sourceKey": "travel-notice",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2026-10-01T00:00:00",
+        "validUntil": "2027-01-01T00:00:00",
+        "publicationStatus": "DRAFT",
+        "createdAt": "2026-10-19T19:54:48.519393",
+        "updatedAt": "2026-10-19T19:54:49.914584"
+      },
+      {
+        "id": 228,
+        "knowledgeBaseId": 18,
+        "originalName": "06-上海住宿未审核草稿.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 300,
+        "sha256": "3fe06c4a8b38a08be75dfb3c10ade7f01eb9c10773f7c132cab175b07007ceaa",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 4,
+        "sourceKey": "travel-draft",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "DRAFT",
+        "createdAt": "2026-10-19T19:54:47.315467",
+        "updatedAt": "2026-10-19T19:54:48.374173"
+      },
+      {
+        "id": 227,
+        "knowledgeBaseId": 18,
+        "originalName": "05-北京住宿标准.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 310,
+        "sha256": "0bbddc8de22bb0b95b804855ebc9ec8f794e7b0b254f4af87a832ce8f0463a8d",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "travel-policy",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_BJ",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:45.060532",
+        "updatedAt": "2026-10-19T19:54:47.267956"
+      },
+      {
+        "id": 226,
+        "knowledgeBaseId": 18,
+        "originalName": "04-上海住宿未来版.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 370,
+        "sha256": "d5ba33d9315835b9f152ae0bfbe33c873614f7c56be73577fa6661f3ab661af2",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "travel-policy",
+        "businessVersion": "v3",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2027-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:42.807172",
+        "updatedAt": "2026-10-19T19:54:45.02105"
+      },
+      {
+        "id": 225,
+        "knowledgeBaseId": 18,
+        "originalName": "03-上海住宿新版.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 376,
+        "sha256": "c6454153a3c5c17cc4656a5effe46b868bd3c748f423bc3b396de09cf6eb52d9",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "travel-policy",
+        "businessVersion": "v2",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2026-10-01T00:00:00",
+        "validUntil": "2027-01-01T00:00:00",
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:41.58951",
+        "updatedAt": "2026-10-19T19:54:42.774221"
+      },
+      {
+        "id": 224,
+        "knowledgeBaseId": 18,
+        "originalName": "02-上海住宿旧版.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 376,
+        "sha256": "e420b56242a705147d1dc43cf58f28758e406005d193c1ec8e605e0ced522f76",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "travel-policy",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": "2026-10-01T00:00:00",
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:39.390762",
+        "updatedAt": "2026-10-19T19:54:41.549163"
+      },
+      {
+        "id": 223,
+        "knowledgeBaseId": 18,
+        "originalName": "01-通用报销流程.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 335,
+        "sha256": "565158e7678c56180f5b236b01fb28be5f0973388bbdce0cc8668973dd94cc6f",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "expense-process",
+        "businessVersion": "v1",
+        "applicabilityScope": "ALL",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:35.675336",
+        "updatedAt": "2026-10-19T19:54:39.340202"
+      }
+    ],
+    "models": [
+      {
+        "id": 3,
+        "modelType": "CHAT",
+        "modelName": "deepseek-v4.1-flash",
+        "enabled": true,
+        "embeddingDimensions": null,
+        "updatedAt": "2026-09-29T18:55:43.578997"
+      },
+      {
+        "id": 8,
+        "modelType": "EMBEDDING",
+        "modelName": "qwen3.7-text-embedding",
+        "enabled": true,
+        "embeddingDimensions": 1024,
+        "updatedAt": "2026-09-29T02:39:29.153776"
+      }
+    ]
+  },
+  "runtimeLabel": "用户现有8080服务；运行构建摘要未核验，验证稳定资料和正常BASELINE行为",
+  "gitCommit": "f7f470d9edcc1d002448f3c349c2ef4f4ba21502",
+  "dirty": true,
+  "datasetSha256": "subset-of-fixed-cases-B01-B08-plus-two-continuations",
+  "practiceAccountRole": "CUSTOMER",
+  "policy": {
+    "revision": 1,
+    "topics": [
+      {
+        "id": "travel-lodging",
+        "description": "因公出差的住宿报销标准、金额上限及超额费用如何处理。不包括通用报销提交期限和所需材料。",
+        "scopeOptions": [
+          {
+            "value": "CN_SH",
+            "label": "上海"
+          },
+          {
+            "value": "CN_BJ",
+            "label": "北京"
+          }
+        ]
+      },
+      {
+        "id": "expense-process",
+        "description": "通用差旅报销提交期限、流程和申请所需材料，不涉及具体地区的住宿金额标准。",
+        "scopeOptions": []
+      }
+    ]
+  },
+  "metrics": {
+    "planned": 5,
+    "executed": 5,
+    "automaticPassed": 5,
+    "technicalFailures": 0,
+    "checkFailures": 0,
+    "completedWithReport": 5,
+    "statusMatchesIncludingTechnicalFailures": 5,
+    "knownAnswerTokens": 6552,
+    "completedAnswersMissingUsage": 0,
+    "failedCallUsageUnavailable": 0,
+    "referenceCount": 4,
+    "invalidReferenceCount": 0,
+    "diagnosticCaptured": 5,
+    "diagnosticMissing": 0,
+    "diagnosticKnownAnswerTokens": 6552,
+    "diagnosticModelStagesMissingUsage": 0
+  },
+  "finalState": {
+    "knowledgeBase": {
+      "id": 18,
+      "name": "口述练习资料库-d23135b3ae",
+      "description": "prepare_knowledge_practice.py owner=d23135b3ae8144f1a2a4e075f4baa569",
+      "retrievalCandidateLimit": 50,
+      "vectorMinSimilarity": 0.0,
+      "retrievalResultLimit": 5,
+      "isDefault": true,
+      "documentCount": 7,
+      "version": 2,
+      "createdAt": "2026-10-19T19:54:35.540956",
+      "updatedAt": "2026-10-19T19:54:50.796069"
+    },
+    "documents": [
+      {
+        "id": 229,
+        "knowledgeBaseId": 18,
+        "originalName": "07-上海住宿冲突通知.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 579,
+        "sha256": "accb0c307cbf2aa359f8c5843c0d99fd43f2d3537c56a79be266ddd60500ffa6",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 4,
+        "sourceKey": "travel-notice",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2026-10-01T00:00:00",
+        "validUntil": "2027-01-01T00:00:00",
+        "publicationStatus": "DRAFT",
+        "createdAt": "2026-10-19T19:54:48.519393",
+        "updatedAt": "2026-10-19T19:54:49.914584"
+      },
+      {
+        "id": 228,
+        "knowledgeBaseId": 18,
+        "originalName": "06-上海住宿未审核草稿.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 300,
+        "sha256": "3fe06c4a8b38a08be75dfb3c10ade7f01eb9c10773f7c132cab175b07007ceaa",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 4,
+        "sourceKey": "travel-draft",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "DRAFT",
+        "createdAt": "2026-10-19T19:54:47.315467",
+        "updatedAt": "2026-10-19T19:54:48.374173"
+      },
+      {
+        "id": 227,
+        "knowledgeBaseId": 18,
+        "originalName": "05-北京住宿标准.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 310,
+        "sha256": "0bbddc8de22bb0b95b804855ebc9ec8f794e7b0b254f4af87a832ce8f0463a8d",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "travel-policy",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_BJ",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:45.060532",
+        "updatedAt": "2026-10-19T19:54:47.267956"
+      },
+      {
+        "id": 226,
+        "knowledgeBaseId": 18,
+        "originalName": "04-上海住宿未来版.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 370,
+        "sha256": "d5ba33d9315835b9f152ae0bfbe33c873614f7c56be73577fa6661f3ab661af2",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "travel-policy",
+        "businessVersion": "v3",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2027-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:42.807172",
+        "updatedAt": "2026-10-19T19:54:45.02105"
+      },
+      {
+        "id": 225,
+        "knowledgeBaseId": 18,
+        "originalName": "03-上海住宿新版.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 376,
+        "sha256": "c6454153a3c5c17cc4656a5effe46b868bd3c748f423bc3b396de09cf6eb52d9",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "travel-policy",
+        "businessVersion": "v2",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2026-10-01T00:00:00",
+        "validUntil": "2027-01-01T00:00:00",
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:41.58951",
+        "updatedAt": "2026-10-19T19:54:42.774221"
+      },
+      {
+        "id": 224,
+        "knowledgeBaseId": 18,
+        "originalName": "02-上海住宿旧版.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 376,
+        "sha256": "e420b56242a705147d1dc43cf58f28758e406005d193c1ec8e605e0ced522f76",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "travel-policy",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": "2026-10-01T00:00:00",
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:39.390762",
+        "updatedAt": "2026-10-19T19:54:41.549163"
+      },
+      {
+        "id": 223,
+        "knowledgeBaseId": 18,
+        "originalName": "01-通用报销流程.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 335,
+        "sha256": "565158e7678c56180f5b236b01fb28be5f0973388bbdce0cc8668973dd94cc6f",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "expense-process",
+        "businessVersion": "v1",
+        "applicabilityScope": "ALL",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-19T19:54:35.675336",
+        "updatedAt": "2026-10-19T19:54:39.340202"
+      }
+    ],
+    "models": [
+      {
+        "id": 3,
+        "modelType": "CHAT",
+        "modelName": "deepseek-v4.1-flash",
+        "enabled": true,
+        "embeddingDimensions": null,
+        "updatedAt": "2026-09-29T18:55:43.578997"
+      },
+      {
+        "id": 8,
+        "modelType": "EMBEDDING",
+        "modelName": "qwen3.7-text-embedding",
+        "enabled": true,
+        "embeddingDimensions": 1024,
+        "updatedAt": "2026-09-29T02:39:29.153776"
+      }
+    ]
+  },
+  "finishedAt": "2026-10-19T19:57:29.882359+08:00"
+}

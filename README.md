@@ -533,5 +533,13 @@ Spring Security 根据 JWT 中的角色限制访问：`CUSTOMER` 可以操作自
 
 提供固定问题、证据与草案的 12 组正反例，可单独比较复核误杀、漏检、技术失败和成本。运行说明见 [复核专项评测](docs/evaluation/knowledge-review.md)。默认策略仍为 `BASELINE`，`app.knowledge.review-strategy=CHECKLIST` 仅用于显式实验；本轮候选退化且更耗 Token，未被采用，完整数据见 [专项对比报告](docs/evaluation/runs/2026-10-19-复核专项对比.md)。普通单元测试不会调用真实模型。
 
+随后将真实 B03/B09 失败输入及反例追加为 28 题，对 `CONTEXTUAL` 候选完成 112 次固定输入复核。虽然总体误杀减少，但逐轮错误放行和挑战样本未达到预设门槛，因此默认仍为 `BASELINE`，详见 [真实失败回放报告](docs/evaluation/runs/2026-10-19-真实失败复核与练习环境.md)。
+
+### 自用练习与口头面试
+
+[稳定练习环境](docs/demo/trusted-knowledge/练习环境.md)使用独立练习账号和资料库，初始化后保留正常发布状态，避免直接使用批量评测结束后已撤回资料的库。默认知识库仍是全局配置，账号并不隔离知识库。
+
+[口头面试准备](docs/interview/可信知识问答口述准备.md)按一分钟介绍、请求流程、设计取舍、常见追问和真实失败案例组织，不依赖现场展示源码或成品。
+
 
 V19 增加可配置的适用条件澄清：管理员通过 `/api/admin/knowledge-bases/{id}/clarification-policy` 配置业务主题及范围选项。缺范围时先识别主题，再由服务端返回结构化澄清；客户传 `clarificationMessageId` 和显式范围后，服务端从原消息恢复问题、绑定原知识库并重新检索及核验。通用流程无需一律问地区，旧知识库默认关闭此功能。规则、接口和限制见 `notes/30-适用条件澄清与续答.md`；演示见 `docs/demo/trusted-knowledge/README.md`，实测见 `docs/evaluation/runs/2026-10-19-澄清续答验证.md`。本轮接口/脚本交付，尚未增加前端选择卡片。

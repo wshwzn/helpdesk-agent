@@ -37,14 +37,16 @@ def metrics(rows, planned):
             "casesWithRepeatedValidDecisions": len(repeated), "casesWithDecisionFlip": sum(len(set(v)) > 1 for v in repeated)}
 
 
-def summarize(dataset, rows, repeats):
+def summarize(dataset, rows, repeats, candidate_strategy="CHECKLIST"):
     """核对结果身份、去重并分层计算；两轮都满足事先冻结的条件才进入端到端候选验证。"""
+    if candidate_strategy not in ("CHECKLIST", "CONTEXTUAL"):
+        raise ValueError("invalid candidate strategy")
     cases = {case["id"]: case for case in dataset["cases"]}
     seen = set()
     for row in rows:
         case = cases.get(row["id"])
         identity = (row["id"], row["strategy"], row["repeat"])
-        if (not case or identity in seen or row["strategy"] not in ("BASELINE", "CHECKLIST")
+        if (not case or identity in seen or row["strategy"] not in ("BASELINE", candidate_strategy)
                 or not 1 <= row["repeat"] <= repeats or row["expectedApproved"] != case["expectedApproved"]
                 or row["split"] != case["split"] or row["pairId"] != case["pairId"]):
             raise ValueError("invalid or duplicate evaluation identity")
@@ -52,8 +54,8 @@ def summarize(dataset, rows, repeats):
         if row.get("errorCode") is None and (not isinstance(row.get("review"), dict)
                                             or type(row["review"].get("approved")) is not bool):
             raise ValueError("missing valid decision without technical error")
-    summary = {"strategies": {}, "byRepeat": {}, "bySplit": {}, "complete": len(rows) == len(cases) * repeats * 2}
-    for strategy in ("BASELINE", "CHECKLIST"):
+    summary = {"candidate": candidate_strategy, "strategies": {}, "byRepeat": {}, "bySplit": {}, "complete": len(rows) == len(cases) * repeats * 2}
+    for strategy in ("BASELINE", candidate_strategy):
         selected = [r for r in rows if r["strategy"] == strategy]
         summary["strategies"][strategy] = metrics(selected, len(cases) * repeats)
         summary["byRepeat"][strategy] = {str(i): metrics([r for r in selected if r["repeat"] == i], len(cases))
@@ -63,13 +65,13 @@ def summarize(dataset, rows, repeats):
     eligible = summary["complete"] and repeats >= 2
     for i in range(1, repeats + 1):
         baseline = summary["byRepeat"]["BASELINE"][str(i)]
-        candidate = summary["byRepeat"]["CHECKLIST"][str(i)]
+        candidate = summary["byRepeat"][candidate_strategy][str(i)]
         eligible &= (candidate["falseRejects"] < baseline["falseRejects"]
                      and candidate["falseAccepts"] <= baseline["falseAccepts"]
                      and candidate["technicalFailures"] <= baseline["technicalFailures"])
         challenge = {strategy: metrics([r for r in rows if r["strategy"] == strategy
-                    and r["repeat"] == i and r["split"] == "CHALLENGE"], sum(c["split"] == "CHALLENGE" for c in cases.values())) for strategy in ("BASELINE", "CHECKLIST")}
-        eligible &= all(challenge["CHECKLIST"][key] <= challenge["BASELINE"][key]
+                    and r["repeat"] == i and r["split"] == "CHALLENGE"], sum(c["split"] == "CHALLENGE" for c in cases.values())) for strategy in ("BASELINE", candidate_strategy)}
+        eligible &= all(challenge[candidate_strategy][key] <= challenge["BASELINE"][key]
                         for key in ("falseRejects", "falseAccepts", "technicalFailures"))
     summary["candidateEligibleForEndToEnd"] = bool(eligible)
     return summary
@@ -81,6 +83,7 @@ def main():
     parser.add_argument("--dataset", type=Path, default=ROOT / "docs/evaluation/knowledge-review-cases.json")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repeats", type=int, default=2, choices=range(1, 6))
+    parser.add_argument("--candidate", choices=("CHECKLIST", "CONTEXTUAL"), default="CHECKLIST")
     args = parser.parse_args()
     output = args.output.resolve()
     if not output.is_relative_to(ROOT / "target"):
@@ -101,7 +104,7 @@ def main():
     classpath = os.pathsep.join([str(ROOT / "target/test-classes"), str(ROOT / "target/classes"),
                                 classpath_file.read_text(encoding="utf-8").strip()])
     java_args = ["-cp", classpath, "com.anying.helpdesk.knowledge.answer.evaluation.KnowledgeReviewEvaluationCli",
-                 str((output / "dataset.json").resolve()), str(output), str(args.repeats)]
+                 str((output / "dataset.json").resolve()), str(output), str(args.repeats), args.candidate]
     argument_file = output / "java-arguments.txt"
     argument_file.write_text("\n".join('"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"' for value in java_args), encoding="utf-8")
     command = [shutil.which("java"), "@" + str(argument_file)]
@@ -128,7 +131,7 @@ def main():
     finally:
         path = output / "calls.jsonl"
         rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()] if path.exists() else []
-        summary = summarize(dataset, rows, args.repeats)
+        summary = summarize(dataset, rows, args.repeats, args.candidate)
         summary["runnerExitCode"] = exit_code
         summary["finished"] = (output / "finished.json").exists()
         if exit_code != 0 or not summary["finished"]:

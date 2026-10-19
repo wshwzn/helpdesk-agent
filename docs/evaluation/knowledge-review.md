@@ -65,3 +65,17 @@ python -X utf8 scripts/evaluate_knowledge_review.py --repeats 2 --output target/
 知识回答仍经历原检索、草案、引用校验、复核、准入复查和保存流程。新增 `review.checklist` 仅出现在管理员诊断中；旧诊断缺此字段时为空，客户 API 不增加实验字段。结构合法的否决映射已有原因枚举；协议失败保留已知用量，语义判断不能冒充人工结论。
 
 两轮小样本仅作开发决策依据，不能推出泛化准确率或统计显著性。冻结题集后若修正标签，必须说明依据、生成新题集版本并保留原实验，不追溯改写已公布成绩。
+
+## 真实失败回放与 CONTEXTUAL 候选
+
+`knowledge-review-replay-cases.json` 保留原 24 题，增加历史 B03/B09 的原样问题、范围、证据与草案，以及各一个错误金额/错误状态反例，共 28 题。新增题均为 DEVELOPMENT；原 8 题 CHALLENGE 已用于先前实验，不能称为新盲测。标签仍为助手暂定标签，来源摘要与反例改动见 `knowledge-review-replay-provenance.json`。
+
+`CONTEXTUAL` 在原布尔复核提示后补充上下文理解：判断结论时结合问题、显式范围及完整草案，不要求每条结论机械重复条件；证据不足时允许只回答有据部分。扩大条件、无依据事实，以及声称 ANSWERABLE 却遗漏实质问题仍须拒绝。原共享规则、BASELINE、CHECKLIST 和草案生成提示保持不变。
+
+```powershell
+python -X utf8 scripts/evaluate_knowledge_review.py --dataset docs/evaluation/knowledge-review-replay-cases.json --candidate CONTEXTUAL --repeats 2 --output target/knowledge-review/contextual-replay-02
+```
+
+`--candidate` 可选 CHECKLIST 或 CONTEXTUAL，默认 CHECKLIST；每次仅比较 BASELINE 与所选候选。上述 28 题两轮共 112 次调用，沿用相同采用门槛，不因新增候选而放宽条件。输出目录必须是新的目录，示例 `-02` 不是自动重试指令。
+
+实际首轮实验已完成：BASELINE 误杀 6/28、错误放行 3/28；CONTEXTUAL 误杀 4/28、错误放行 3/28，双方技术失败均为 0。但候选第一轮错误放行增加、CHALLENGE 退化，已知 Token 增加约 28.8%，故未进入候选端到端验证，默认保留 BASELINE。B03 历史误杀未复现，B09 两种策略两轮都否决。详见 [完整报告](runs/2026-10-19-真实失败复核与练习环境.md)。

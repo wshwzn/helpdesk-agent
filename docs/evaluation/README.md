@@ -139,3 +139,11 @@ python -X utf8 scripts/evaluate_knowledge_clarification.py --base-url http://loc
 新增阶段 `APPLICABILITY` 保存配置、主题识别和续答来源；只在 routingAttempted=true 时统计该阶段的模型用量，技术失败缺用量必须保留为未知。新增错误码：KNOWLEDGE_APPLICABILITY_CALL_FAILED（依赖调用故障）、KNOWLEDGE_APPLICABILITY_UNCERTAIN（主题不确定或范围无交集）、KNOWLEDGE_APPLICABILITY_CHANGED（生成期间配置变更）。前置非法参数返回 400，过期卡片/配置修订冲突返回 409，不进入模型运行分母。
 
 [2026-10-19 澄清续答验证](runs/2026-10-19-澄清续答验证.md)：18 次中 16 自动通过，2 次原有复核否决，两个地区闭环通过；完整[原始数据](runs/2026-10-19-澄清续答数据.json)保留全部失败。自动通过不等同于语义金标准。
+
+## 真实失败回放与稳定练习
+
+`knowledge-review-replay-cases.json` 在原 24 题上追加 B03/B09 的真实输入及两个反例，共 28 题；`knowledge-review-replay-provenance.json` 保存来源与摘要。运行命令及候选解释见 [复核专项说明](knowledge-review.md)。原 24 题的默认 CHECKLIST 比较方式保留。
+
+[真实失败复核与练习环境报告](runs/2026-10-19-真实失败复核与练习环境.md)记录 BASELINE/CONTEXTUAL 两轮共 112 次调用。候选总体误杀减少，但第一轮错误放行增加且 CHALLENGE 退化，未采用；[全量复核数据](runs/2026-10-19-真实失败复核数据.json)保留完整输入及全部判断。原 B03 误杀未复现，B09 仍被两种策略否决，不能描述为两条问题都已修复。
+
+[练习环境说明](../demo/trusted-knowledge/练习环境.md)提供可重复使用的资料库初始化脚本。它不执行撤回场景，也不是模型质量评测。[五次练习验证数据](runs/2026-10-19-练习环境验证数据.json)记录通用期限及两个地区的澄清续答，五次均自动通过；运行中的 8080 服务构建未核实，不把这组结果称为候选策略端到端验证。
