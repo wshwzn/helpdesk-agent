@@ -34,6 +34,7 @@ public class KnowledgeDocument {
     private KnowledgeDocumentStatus status;
     private Integer chunkCount;
     private String errorCode;
+    private String activeIndexBuildId;
     private Long createdBy;
     @Version
     private Integer version;

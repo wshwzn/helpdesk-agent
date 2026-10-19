@@ -294,10 +294,10 @@ public class AdminKnowledgeBaseController {
     }
 
     /**
-     * 预检默认 Embedding 模型和 ES 索引后，异步处理或重新索引文档。
+     * 持久化索引任务，默认 Embedding 模型和 ES 的检查由后台执行。
      */
     @PostMapping("/{knowledgeBaseId}/documents/{documentId}/index")
-    @Operation(summary = "开始或重新索引文档", description = "请求成功后文档进入 PROCESSING，后台完成向量化和 ES 写入")
+    @Operation(summary = "开始或重新索引文档", description = "202 表示任务已入库；活动任务重复提交不重复入队，外部依赖故障在任务状态中体现")
     public ResponseEntity<ApiResponse<KnowledgeDocumentResponse>> indexDocument(
             @Parameter(description = "知识库主键", example = "1")
             @PathVariable @Min(1) Long knowledgeBaseId,
@@ -309,6 +309,25 @@ public class AdminKnowledgeBaseController {
                 documentId
         );
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ApiResponse.ok(response));
+    }
+
+    /** 保存完整业务元数据并提交索引，等待完成后仍需管理员发布。 */
+    @PostMapping("/{knowledgeBaseId}/documents/{documentId}/submit")
+    @Operation(summary = "保存元数据并提交索引")
+    public ResponseEntity<ApiResponse<KnowledgeDocumentResponse>> submitDocument(
+            @PathVariable @Min(1) Long knowledgeBaseId,
+            @PathVariable @Min(1) Long documentId,
+            @Valid @RequestBody UpdateKnowledgeDocumentMetadataRequest request) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ApiResponse.ok(
+                knowledgeDocumentIndexingService.submit(knowledgeBaseId, documentId, request)));
+    }
+
+    /** 查询最近一次任务的重试次数及失败原因，尚未提交返回 data 为 null。 */
+    @GetMapping("/{knowledgeBaseId}/documents/{documentId}/index-task")
+    @Operation(summary = "查询文档索引任务")
+    public ApiResponse<com.anying.helpdesk.knowledge.dto.KnowledgeIndexTaskResponse> indexTask(
+            @PathVariable @Min(1) Long knowledgeBaseId, @PathVariable @Min(1) Long documentId) {
+        return ApiResponse.ok(knowledgeDocumentIndexingService.task(knowledgeBaseId, documentId));
     }
 
     /**

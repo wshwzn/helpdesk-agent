@@ -45,6 +45,7 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
     private final ObjectStorageService objectStorageService;
     private final KnowledgeChunkStore chunkStore;
     private final RagEvaluationService ragEvaluationService;
+    private final KnowledgeIndexTaskStore taskStore;
 
     /**
      * 完成文件校验、哈希计算、对象上传和文档元数据状态推进。
@@ -122,8 +123,9 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
      * 先删除对象存储内容，再移除元数据，避免数据库指向不存在的对象。
      */
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public void delete(Long knowledgeBaseId, Long documentId) {
-        KnowledgeDocument document = persistenceService.get(knowledgeBaseId, documentId);
+        KnowledgeDocument document = persistenceService.lock(knowledgeBaseId, documentId);
         if (document.getStatus() == KnowledgeDocumentStatus.PROCESSING) {
             throw new KnowledgeDocumentConflictException("processing document cannot be deleted");
         }
@@ -132,7 +134,8 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
         }
         ragEvaluationService.requireDocumentNotReferenced(documentId);
         requireCurrentStorageProvider(document);
-        if (document.getStatus() == KnowledgeDocumentStatus.READY) {
+        if (document.getStatus() == KnowledgeDocumentStatus.READY || document.getActiveIndexBuildId() != null
+                || taskStore.find(documentId) != null) {
             chunkStore.deleteDocument(documentId);
         }
         objectStorageService.delete(document.getBucketName(), document.getObjectKey());

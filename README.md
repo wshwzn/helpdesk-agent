@@ -89,6 +89,7 @@ $env:OPENAPI_ENABLED = "false"
 - `agent_pending_actions`：待确认操作表，保存 AI 生成的工单草稿及确认、取消、过期和执行状态。
 - `knowledge_bases`：知识库表，保存名称、说明和创建信息。
 - `knowledge_documents`：知识库文档元数据表，保存对象位置、文件摘要和处理状态；原始内容不进入 MySQL。
+- `knowledge_index_tasks`：每份文档最近一次索引任务，保存排队、重试次数和执行租约。
 - `rag_evaluation_cases`、`rag_evaluation_case_documents`：保存固定评测问题及其多个期望文档。
 - `rag_evaluation_runs`、`rag_evaluation_run_results`：保存每次检索评测的参数、汇总指标和逐题快照。
 - `flyway_schema_history`：Flyway 自动创建的迁移记录表，用于记录每个 SQL 迁移脚本是否执行成功，防止重复建表。请勿手动修改或删除其中的数据。
@@ -111,6 +112,8 @@ GET    /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/conte
 DELETE /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}
 POST   /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/chunk-preview?page=1&size=20
 POST   /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/index
+POST   /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/submit
+GET    /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/index-task
 POST   /api/admin/knowledge-bases/{id}/search
 ```
 
@@ -125,7 +128,20 @@ KNOWLEDGE_CHUNK_OVERLAP=150
 KNOWLEDGE_EMBEDDING_BATCH_SIZE=16
 ```
 
-预览只用于检查解析和切块效果，会在每次请求时重新处理文档，不修改处理状态。索引接口会预检默认 Embedding 模型和 ES 映射，然后返回 `202 Accepted`；后台完成下载、解析、分块、批量向量化和写入。仅草稿允许建立或重新建立索引；草稿的 `READY` 或 `FAILED` 文档可以重试，`PROCESSING` 文档拒绝重复触发和删除。
+预览只用于检查解析和切块效果，会在每次请求时重新处理文档，不修改处理状态。索引接口返回 `202 Accepted` 表示任务已持久化；默认 Embedding 模型和 ES 检查改由后台执行，外部依赖不可用时通过任务状态报告。仅草稿允许建立或重新建立索引；草稿的 `READY` 或 `FAILED` 文档可以重新提交，`PROCESSING` 文档重复调用索引接口返回现有状态，不重复入队，期间禁止修改元数据或删除。
+
+推荐使用 `POST .../documents/{documentId}/submit`，请求体与下方元数据 PUT 相同，原子完成“保存完整元数据 + 提交索引”，不用再单独调用 index。原 PUT 仍仅保存元数据；单纯上传或仅保存留下的 PENDING 文档不会被定时任务擅自处理。后台索引完成后仍需管理员发布。
+
+`GET .../documents/{documentId}/index-task` 返回最近一次任务状态（QUEUED / RUNNING / SUCCEEDED / FAILED）、执行次数、预算、下次可执行时间、租约时间和固定错误码；尚未提交返回 `data: null`。文档 PROCESSING 包含排队、执行及自动重试等待。默认失败退避 30 秒、最多执行 3 次，解析错误直接失败；超时租约可恢复，旧执行者不能激活或覆盖新批次。配置如下：
+
+```properties
+KNOWLEDGE_INDEX_TASKS_ENABLED=true
+KNOWLEDGE_INDEX_MAX_ATTEMPTS=3
+KNOWLEDGE_INDEX_LEASE_SECONDS=120
+KNOWLEDGE_INDEX_RETRY_DELAY_SECONDS=30
+```
+
+**V20 升级前先停止旧版实例，不与旧工作者混跑。** 历史 PROCESSING 标为 FAILED / INDEX_TASK_MISSING，管理员检查后重试；历史有效索引继续兼容。索引批次隔离与任务设计、测试边界见 [`notes/33-文档提交与可靠索引.md`](notes/33-文档提交与可靠索引.md)。
 
 ### 文档业务版本与发布
 

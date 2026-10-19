@@ -84,7 +84,8 @@ class KnowledgeRetrievalServiceTest {
         KnowledgeChunkSearchHit chunkA = hit("3-1", 1, "登录说明", 8.8D);
         KnowledgeChunkSearchHit chunkB = hit("3-2", 2, "密码帮助", 7.7D);
         KnowledgeChunkSearchHit chunkC = hit("3-3", 3, "账号帮助", 0.7D);
-        when(chunkStore.search(3L, 8L, "embedding-model", "如何登录", queryVector, 40, 80, 0.65D, List.of(3L)))
+        when(chunkStore.search(3L, 8L, "embedding-model", "如何登录", queryVector, 40, 80, 0.65D,
+                List.of(new com.anying.helpdesk.knowledge.index.KnowledgeIndexSelection(3L, null))))
                 .thenReturn(new KnowledgeChunkSearchResults(
                         List.of(chunkA, chunkB),
                         List.of(
@@ -141,7 +142,8 @@ class KnowledgeRetrievalServiceTest {
         when(embeddingModel.embed("差旅标准")).thenReturn(vector);
         KnowledgeChunkSearchHit withdrawn = hit("3-1", 1, "旧标准", 10);
         KnowledgeChunkSearchHit unexpected = new KnowledgeChunkSearchHit("9-1", 9L, 1, "new.md", "新标准", 9);
-        when(chunkStore.search(3L, 8L, "embedding-model", "差旅标准", vector, 50, 100, 0, List.of(3L)))
+        when(chunkStore.search(3L, 8L, "embedding-model", "差旅标准", vector, 50, 100, 0,
+                List.of(new com.anying.helpdesk.knowledge.index.KnowledgeIndexSelection(3L, null))))
                 .thenReturn(new KnowledgeChunkSearchResults(List.of(withdrawn, unexpected), List.of(withdrawn)));
         KnowledgeSearchResponse response = service.search(3L, new KnowledgeSearchRequest("差旅标准", "CN_SH"),
                 new KnowledgeRetrievalSettingsResponse(3L, 50, BigDecimal.ZERO, 5, 0));

@@ -19,7 +19,6 @@ import com.anying.helpdesk.storage.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -41,30 +40,35 @@ public class KnowledgeDocumentIndexWorker {
     private final KnowledgeProcessingProperties processingProperties;
     private final DefaultEmbeddingModelProvider embeddingModelProvider;
     private final KnowledgeChunkStore chunkStore;
+    private final KnowledgeIndexTaskStore taskStore;
 
     /**
-     * 在后台完成下载、解析、分块、向量化和 ES 写入，并最终推进文档状态。
+     * 在独立批次中完成索引，仅持有有效租约的执行者可以激活结果。
      */
-    @Async("knowledgeIndexExecutor")
-    public void index(Long knowledgeBaseId, Long documentId) {
+    public void index(KnowledgeIndexClaim claim) {
         try {
-            KnowledgeDocument document = persistenceService.get(knowledgeBaseId, documentId);
+            requireOwnership(claim);
+            KnowledgeDocument document = persistenceService.get(claim.knowledgeBaseId(), claim.documentId());
             requireCurrentStorageProvider(document);
+            ResolvedEmbeddingModel embeddingModel = embeddingModelProvider.get();
+            chunkStore.ensureIndex(embeddingModel.dimensions());
             List<DocumentChunk> chunks = parseChunks(document);
             if (chunks.isEmpty()) {
                 throw new KnowledgeDocumentParsingException("document contains no indexable text");
             }
-            ResolvedEmbeddingModel embeddingModel = embeddingModelProvider.get();
-            List<float[]> vectors = embed(chunks, embeddingModel);
+            List<float[]> vectors = embed(chunks, embeddingModel, claim);
             List<IndexedKnowledgeChunk> indexedChunks = toIndexedChunks(document, chunks, vectors, embeddingModel);
-            chunkStore.replaceDocumentChunks(documentId, embeddingModel.dimensions(), indexedChunks);
-            persistenceService.markReady(documentId, indexedChunks.size());
+            requireOwnership(claim);
+            chunkStore.writeBuildChunks(claim.documentId(), claim.token(), embeddingModel.dimensions(), indexedChunks);
+            taskStore.complete(claim, indexedChunks.size());
+        } catch (IndexOwnershipLostException ignored) {
+            log.info("Knowledge index ownership expired for document {}", claim.documentId());
         } catch (RuntimeException exception) {
-            compensateFailedIndex(documentId);
-            markFailed(documentId, failureCode(exception));
+            // 不按 documentId 删除：过期执行者的补偿可能破坏新批次，提交结果不确定时也保留数据。
+            taskStore.fail(claim, failureCode(exception), !(exception instanceof KnowledgeDocumentParsingException));
             log.warn(
                     "Knowledge document indexing failed for document {} ({})",
-                    documentId,
+                    claim.documentId(),
                     exception.getClass().getSimpleName()
             );
         }
@@ -92,10 +96,11 @@ public class KnowledgeDocumentIndexWorker {
     /**
      * 分批调用 Embedding 模型，并校验数量和每条向量维度。
      */
-    private List<float[]> embed(List<DocumentChunk> chunks, ResolvedEmbeddingModel embeddingModel) {
+    private List<float[]> embed(List<DocumentChunk> chunks, ResolvedEmbeddingModel embeddingModel, KnowledgeIndexClaim claim) {
         List<float[]> vectors = new ArrayList<>(chunks.size());
         int batchSize = processingProperties.getEmbeddingBatchSize();
         for (int start = 0; start < chunks.size(); start += batchSize) {
+            requireOwnership(claim);
             int end = Math.min(start + batchSize, chunks.size());
             List<String> contents = chunks.subList(start, end)
                     .stream()
@@ -155,34 +160,14 @@ public class KnowledgeDocumentIndexWorker {
         }
     }
 
-    /**
-     * 后台任务失败时尽力移除可能已部分写入的 Chunk。
-     */
-    private void compensateFailedIndex(Long documentId) {
-        try {
-            chunkStore.deleteDocument(documentId);
-        } catch (RuntimeException cleanupException) {
-            log.error(
-                    "Failed to clean Elasticsearch chunks for document {} ({})",
-                    documentId,
-                    cleanupException.getClass().getSimpleName()
-            );
+    /** 在外部调用前主动停止失去租约的执行者。 */
+    private void requireOwnership(KnowledgeIndexClaim claim) {
+        if (!taskStore.owns(claim)) {
+            throw new IndexOwnershipLostException();
         }
     }
 
-    /**
-     * 后台任务失败时尽力将文档状态推进为 FAILED。
-     */
-    private void markFailed(Long documentId, String errorCode) {
-        try {
-            persistenceService.markIndexingFailed(documentId, errorCode);
-        } catch (RuntimeException stateException) {
-            log.error(
-                    "Failed to mark knowledge document {} as failed ({})",
-                    documentId,
-                    stateException.getClass().getSimpleName()
-            );
-        }
+    private static class IndexOwnershipLostException extends RuntimeException {
     }
 
     /**

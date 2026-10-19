@@ -4,11 +4,11 @@
 
 ## 通用约定
 
-- 主键统一使用 `BIGINT AUTO_INCREMENT`。
+- 业务实体主键通常使用 `BIGINT AUTO_INCREMENT`；一对一任务表使用所属文档 ID 作为主键。
 - 时间字段使用 `TIMESTAMP(6)`，保留微秒精度。
 - Java 枚举以字符串名称入库，禁止直接修改已使用的枚举名称。
 - `updated_at` 由应用服务在更新数据时写入，没有配置数据库 `ON UPDATE`。
-- 当前业务表之间使用逻辑关联，尚未建立数据库外键；应用层必须校验数据归属与引用对象。
+- 业务表主要使用逻辑关联；V20 的索引任务对所属文档建立级联删除外键。应用层仍必须校验数据归属与引用对象。
 - `version` 是 MyBatis-Plus 乐观锁版本号，每次成功更新后递增。
 
 ## `users` 用户表
@@ -262,7 +262,7 @@ V19 增加适用条件配置，更新不需要重建 ES 索引：
 
 ## `knowledge_documents` 知识库文档表
 
-保存原始文档的对象存储位置、完整性信息和处理状态，由 Flyway V9 创建，V16 增加业务版本、适用范围和发布元数据。文件正文存放在本地开发目录或阿里云 OSS；检索分块和向量存放在 Elasticsearch，不在 MySQL 重复保存。
+保存原始文档的对象存储位置、完整性信息和处理状态，由 Flyway V9 创建，V16 增加业务版本、适用范围和发布元数据，V20 增加有效索引批次。文件正文存放在本地开发目录或阿里云 OSS；检索分块和向量存放在 Elasticsearch，不在 MySQL 重复保存。
 
 | 字段 | 类型 | 可空 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -285,6 +285,7 @@ V19 增加适用条件配置，更新不需要重建 ES 索引：
 | `status` | `VARCHAR(20)` | 否 | 无 | 状态：`UPLOADING`、`PENDING`、`PROCESSING`、`READY`、`FAILED`。 |
 | `chunk_count` | `INT` | 否 | `0` | Elasticsearch 中当前有效分块数量。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 失败时的脱敏错误码，例如 `STORAGE_UPLOAD_FAILED`。 |
+| `active_index_build_id` | `VARCHAR(36)` | 是 | `NULL` | V20：最近成功提交的 ES 执行批次 UUID。空表示升级前无批次字段的历史片段；与业务版本及乐观锁版本不同，无新增索引或唯一约束。 |
 | `created_by` | `BIGINT` | 否 | 无 | 上传管理员的 `users.id`，逻辑关联。 |
 | `version` | `INT` | 否 | `0` | 文档状态推进使用的乐观锁版本号。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 元数据创建时间。 |
@@ -299,16 +300,45 @@ V19 增加适用条件配置，更新不需要重建 ES 索引：
 - V16 普通索引：`idx_knowledge_document_eligibility (knowledge_base_id, publication_status, status, applicability_scope, valid_from)`，支持检索准入查询；截止时间作为剩余条件校验。
 - 普通索引：`idx_knowledge_documents_base_status_id (knowledge_base_id, status, id)`，支持按知识库和处理状态读取文档。
 - 普通索引：`idx_knowledge_documents_base_sha256 (knowledge_base_id, sha256)`，支持后续识别同一知识库中的重复内容；当前不禁止重复上传。
-- 上传时先写入 `UPLOADING`，对象保存成功后改为 `PENDING`；触发索引后进入 `PROCESSING`，后台成功写入 ES 后改为 `READY`，失败则改为 `FAILED` 并保存固定错误码。
-- `PROCESSING` 状态禁止重复触发和删除；状态推进及并发覆盖由应用层和 `version` 乐观锁共同限制。
+- 上传时先写入 `UPLOADING`，对象保存成功后改为 `PENDING`；提交索引后文档状态与任务同事务写入，`PROCESSING` 包括排队、执行和退避重试。成功写入 ES 并激活批次后改为 `READY`；确定性解析错误或重试耗尽改为 `FAILED`。
+- `PROCESSING` 状态禁止修改元数据和删除；重复调用原索引接口返回活动任务对应的文档，不重复入队。文档行锁、乐观锁及执行令牌分别保护提交、编辑及后台完成。
 - 被当前 RAG 评测用例选为期望文档时禁止删除；应先修改或删除对应评测用例。
 - 新文档和 V16 迁移后的历史文档均为草稿。历史 `READY` 不自动等于已审核；必须配置业务元数据、重新索引并发布后才能参与检索。
 - 元数据仅允许在非上传中、非索引中的草稿上编辑。保存元数据后处理状态回到 `PENDING`，清空错误与分块统计；业务截止时间可以显式清空。
 - 发布要求 `DRAFT + READY` 且来源、业务版本、生效时间已配置；未来生效的资料可以先发布，但不会提前召回。只有已发布资料可以撤回，撤回为终态；修订时上传新版本。
 - 发布、撤回和元数据编辑要求提交当前乐观锁 `version`，过期或并发更新返回 409。唯一性冲突同样返回 409。
-- 已发布及撤回文档不允许重新索引或修改业务元数据；已发布文档必须先撤回才能删除。当前索引替换仍非原子，限制在草稿上执行。
+- 已发布及撤回文档不允许重新索引或修改业务元数据；已发布文档必须先撤回才能删除。草稿索引使用独立执行批次，只有成功提交的批次指针可进入检索，不覆盖已有批次。
 - 检索准入同时要求 `PUBLISHED + READY`、`valid_from <= 当前时间 < valid_until`（空截止除外），以及范围为 `ALL` 或请求明确给出的范围。省略范围只允许 `ALL`。不同业务版本同时有效时全部保留，不按标签排序裁决。
-- MySQL 为准入权威；ES Chunk 中保存业务元数据快照，不复制可变发布状态。两路召回前均传入文档 ID 白名单，返回后再次查询 MySQL 复核。单次准入文档超过 10000 时明确失败，不截断或退化为无过滤检索。
+- MySQL 为准入权威；ES Chunk 中保存业务元数据快照和 `indexBuildId`，不复制可变发布状态。两路召回前均传入文档及有效批次白名单；历史空批次仅匹配无 `indexBuildId` 的片段。返回后再次查询 MySQL 复核。单次准入文档超过 10000 时明确失败，不截断或退化为无过滤检索。
+- V20 升级将原 `PROCESSING` 状态设为 `FAILED`，错误码 `INDEX_TASK_MISSING`，分块数清零且乐观锁递增，供管理员重新提交。上线前须停止旧版实例，不能与旧版无批次隔离的工作者混跑。
+
+## `knowledge_index_tasks` 文档索引任务表
+
+V20 创建，一份文档保存最近一次索引提交。没有任务的 PENDING 文档不会被自动处理；重新提交终止任务会重置本轮记录，不保留完整执行历史。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `document_id` | `BIGINT` | 否 | 无 | 主键，关联 `knowledge_documents.id`，一文档一任务。 |
+| `status` | `VARCHAR(20)` | 否 | 无 | `QUEUED` 等待或退避，`RUNNING` 已领取，`SUCCEEDED` 完成，`FAILED` 终止。 |
+| `attempt_count` | `INT` | 否 | `0` | 本次提交已领取次数，租约恢复也计数。 |
+| `max_attempts` | `INT` | 否 | 无 | 提交时保存重试预算，应用默认 3，配置必须大于零。 |
+| `run_token` | `VARCHAR(36)` | 是 | `NULL` | 每次领取生成新 UUID，兼作 ES 批次标识；终止后可保留最近令牌，无独立唯一索引。 |
+| `available_at` | `TIMESTAMP(6)` | 否 | 无 | 最早可领取时间；提交时为数据库当前时间，失败重试默认延后 30 秒。 |
+| `lease_until` | `TIMESTAMP(6)` | 是 | `NULL` | RUNNING 的租约截止时间，默认 120 秒，心跳延长，结束或退避时清空。 |
+| `error_code` | `VARCHAR(50)` | 是 | `NULL` | 固定脱敏错误码，保存最近失败原因；成功清空。 |
+| `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 最近一次显式提交时间，自动重试不重置。 |
+| `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 状态变更或心跳时间，由应用更新。 |
+
+索引、约束与应用规则：
+
+- 主键 `PRIMARY KEY (document_id)`，保证每份文档至多一个任务记录。
+- 外键 `fk_knowledge_index_task_document` 引用 `knowledge_documents(id) ON DELETE CASCADE`；删除文档自动移除任务。
+- 检查约束 `ck_knowledge_index_task_status` 限定四个状态；`ck_knowledge_index_task_attempts` 要求次数非负、预算为正。应用条件更新保证次数不超过预算。
+- `idx_knowledge_index_task_available (status, available_at)` 用于发现到期排队任务；`idx_knowledge_index_task_lease (status, lease_until)` 用于发现超时执行任务。
+- 提交先锁文档，元数据、PROCESSING 及 QUEUED 在一个事务中写入。领取、成功及失败统一先锁文档再更新任务；心跳只更新任务。数据库时钟用于租约比较。
+- 领取使用状态和时间条件更新，并更换令牌；续租与完成要求 RUNNING、令牌匹配且租约未过期。成功时任务 SUCCEEDED 与文档 READY、有效批次指针同事务提交。ES 外部写入不处于数据库事务内。
+- 暂时性故障在预算内回到 QUEUED；解析失败立即 FAILED；预算耗尽（包括反复租约过期）同步标记文档 FAILED。任务码包括 `DOCUMENT_PARSE_FAILED`、`ELASTICSEARCH_INDEX_FAILED`、`STORAGE_DOWNLOAD_FAILED`、`EMBEDDING_MODEL_UNAVAILABLE`、`EMBEDDING_FAILED`、`INDEX_LEASE_EXPIRED`。
+- 原索引接口允许活动任务幂等查询；保存并提交接口仍检查元数据乐观锁。任务不是业务发布记录，不会自动发布或撤回资料。
 
 ## `rag_evaluation_cases` RAG 检索评测用例表
 
@@ -446,6 +476,7 @@ chat_messages.id ──< agent_pending_actions.assistant_message_id
 agent_pending_actions.ticket_id >── tickets.id
 users.id ──< knowledge_bases.created_by
 knowledge_bases.id ──< knowledge_documents.knowledge_base_id
+knowledge_documents.id ── knowledge_index_tasks.document_id（级联删除外键）
 users.id ──< knowledge_documents.created_by
 knowledge_bases.id ──< rag_evaluation_cases.knowledge_base_id
 rag_evaluation_cases.id ──< rag_evaluation_case_documents.case_id
@@ -483,5 +514,6 @@ rag_evaluation_runs.id ──< rag_evaluation_run_results.run_id
 | V17 | `V17__add_knowledge_answer_report.sql` | 消息模式、范围与知识核验报告。 |
 | V18 | `V18__add_knowledge_answer_runs.sql` | 运行 UUID 关联及管理员诊断表。 |
 | V19 | `V19__add_knowledge_clarification_policy.sql` | 在 knowledge_bases 增加适用条件 JSON 与独立修订号；旧库默认关闭。 |
+| V20 | `V20__create_knowledge_index_tasks.sql` | 增加文档有效索引批次与持久任务表、调度索引、检查约束及级联外键；显式标记旧内存任务失败。 |
 
 诊断阶段补充：需要判断适用条件时先执行 `APPLICABILITY`；只有 `applicability.routingAttempted=true` 才实际调用路由模型并计入模型用量。配置未启用/续答不调用路由；DRAFT、REVIEW 仍分别记账，Embedding 用量不在此统计内。

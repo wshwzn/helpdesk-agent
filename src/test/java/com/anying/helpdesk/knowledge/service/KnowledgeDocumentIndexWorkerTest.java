@@ -47,6 +47,10 @@ class KnowledgeDocumentIndexWorkerTest {
     private KnowledgeChunkStore chunkStore;
     @Mock
     private EmbeddingModel embeddingModel;
+    @Mock
+    private KnowledgeIndexTaskStore taskStore;
+
+    private final KnowledgeIndexClaim claim = new KnowledgeIndexClaim(3L, 7L, "build-one");
 
     private KnowledgeDocumentIndexWorker worker;
     private KnowledgeDocument document;
@@ -65,7 +69,8 @@ class KnowledgeDocumentIndexWorkerTest {
                 textChunker,
                 properties,
                 embeddingModelProvider,
-                chunkStore
+                chunkStore,
+                taskStore
         );
         document = new KnowledgeDocument();
         document.setId(7L);
@@ -80,6 +85,7 @@ class KnowledgeDocumentIndexWorkerTest {
     @Test
     @DisplayName("索引成功后批量写入 Chunk 并标记文档就绪")
     void indexesChunksAndMarksDocumentReady() {
+        when(taskStore.owns(claim)).thenReturn(true);
         List<DocumentChunk> chunks = List.of(
                 new DocumentChunk(1, 0, 5, "第一段"),
                 new DocumentChunk(2, 4, 9, "第二段")
@@ -99,19 +105,21 @@ class KnowledgeDocumentIndexWorkerTest {
                 new float[]{0F, 1F, 0F}
         ));
 
-        worker.index(3L, 7L);
+        worker.index(claim);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<IndexedKnowledgeChunk>> chunksCaptor = ArgumentCaptor.forClass(List.class);
-        verify(chunkStore).replaceDocumentChunks(org.mockito.ArgumentMatchers.eq(7L), org.mockito.ArgumentMatchers.eq(3), chunksCaptor.capture());
+        verify(chunkStore).writeBuildChunks(org.mockito.ArgumentMatchers.eq(7L), org.mockito.ArgumentMatchers.eq("build-one"),
+                org.mockito.ArgumentMatchers.eq(3), chunksCaptor.capture());
         assertThat(chunksCaptor.getValue()).hasSize(2);
         assertThat(chunksCaptor.getValue().getFirst().content()).isEqualTo("第一段");
-        verify(persistenceService).markReady(7L, 2);
+        verify(taskStore).complete(claim, 2);
     }
 
     @Test
-    @DisplayName("向量维度不匹配时清理索引并标记失败")
+    @DisplayName("向量维度不匹配时记录任务失败且不删除其他批次")
     void rejectsUnexpectedEmbeddingDimensions() {
+        when(taskStore.owns(claim)).thenReturn(true);
         when(persistenceService.get(3L, 7L)).thenReturn(document);
         when(objectStorageService.provider()).thenReturn("local");
         when(objectStorageService.download("local", "knowledge/guide.md"))
@@ -124,15 +132,26 @@ class KnowledgeDocumentIndexWorkerTest {
         );
         when(embeddingModel.embed(anyList())).thenReturn(List.of(new float[]{1F, 0F}));
 
-        worker.index(3L, 7L);
+        worker.index(claim);
 
-        verify(chunkStore).deleteDocument(7L);
-        verify(chunkStore, never()).replaceDocumentChunks(
+        verify(chunkStore, never()).deleteDocument(7L);
+        verify(chunkStore, never()).writeBuildChunks(
                 org.mockito.ArgumentMatchers.anyLong(),
+                org.mockito.ArgumentMatchers.anyString(),
                 org.mockito.ArgumentMatchers.anyInt(),
                 anyList()
         );
-        verify(persistenceService).markIndexingFailed(7L, "EMBEDDING_FAILED");
+        verify(taskStore).fail(claim, "EMBEDDING_FAILED", true);
+    }
+
+    /** 失去租约后不再下载文件或继续外部模型调用。 */
+    @Test
+    @DisplayName("过期工作者在执行前停止且不覆盖任务状态")
+    void stopsWithoutOwnership() {
+        worker.index(claim);
+        org.mockito.Mockito.verifyNoInteractions(objectStorageService, embeddingModelProvider, chunkStore);
+        verify(taskStore, never()).fail(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyBoolean());
     }
 
     /**

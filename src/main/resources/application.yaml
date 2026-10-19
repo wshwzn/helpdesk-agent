@@ -32,6 +32,12 @@ app:
     access-token-ttl: 240h
   model-config:
     encryption-key: ${MODEL_CONFIG_ENCRYPTION_KEY}
+  knowledge:
+    index-tasks:
+      enabled: ${KNOWLEDGE_INDEX_TASKS_ENABLED:true}
+      max-attempts: ${KNOWLEDGE_INDEX_MAX_ATTEMPTS:3}
+      lease-seconds: ${KNOWLEDGE_INDEX_LEASE_SECONDS:120}
+      retry-delay-seconds: ${KNOWLEDGE_INDEX_RETRY_DELAY_SECONDS:30}
   chat:
     history-limit: ${CHAT_HISTORY_LIMIT:20}
     stream-timeout: ${APP_CHAT_STREAM_TIMEOUT:5m}

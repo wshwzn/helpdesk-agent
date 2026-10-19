@@ -175,6 +175,18 @@ public class KnowledgeDocumentPersistenceService {
         return document;
     }
 
+    /** 在调用方事务中锁定文档，串行化任务提交与文件删除。 */
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.MANDATORY)
+    public KnowledgeDocument lock(Long knowledgeBaseId, Long documentId) {
+        KnowledgeDocument document = knowledgeDocumentMapper.selectOne(new LambdaQueryWrapper<KnowledgeDocument>()
+                .eq(KnowledgeDocument::getId, documentId)
+                .eq(KnowledgeDocument::getKnowledgeBaseId, knowledgeBaseId).last("FOR UPDATE"));
+        if (document == null) {
+            throw new KnowledgeDocumentNotFoundException(knowledgeBaseId, documentId);
+        }
+        return document;
+    }
+
     /**
      * 在对象删除成功后移除对应文档元数据。
      */

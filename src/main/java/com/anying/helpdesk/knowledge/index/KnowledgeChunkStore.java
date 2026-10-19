@@ -10,9 +10,9 @@ public interface KnowledgeChunkStore {
     void ensureIndex(int dimensions);
 
     /**
-     * 替换草稿文档的全部 Chunk；不是原子切换，失败时调用方负责状态补偿。
+     * 写入指定执行批次，禁止删除其他批次；有效批次由数据库决定。
      */
-    void replaceDocumentChunks(Long documentId, int dimensions, List<IndexedKnowledgeChunk> chunks);
+    void writeBuildChunks(Long documentId, String buildId, int dimensions, List<IndexedKnowledgeChunk> chunks);
 
     /**
      * 在指定知识库中同时执行 BM25 与 KNN 检索，返回两路独立排序的候选。
@@ -26,7 +26,7 @@ public interface KnowledgeChunkStore {
             int rankWindowSize,
             int vectorNumCandidates,
             double vectorMinSimilarity,
-            List<Long> eligibleDocumentIds
+            List<KnowledgeIndexSelection> eligibleIndexes
     );
 
     /**

@@ -10,6 +10,7 @@ import com.anying.helpdesk.knowledge.exception.KnowledgeRetrievalException;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkSearchHit;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkSearchResults;
 import com.anying.helpdesk.knowledge.index.KnowledgeChunkStore;
+import com.anying.helpdesk.knowledge.index.KnowledgeIndexSelection;
 import com.anying.helpdesk.modelconfig.exception.ModelConfigConflictException;
 import com.anying.helpdesk.modelconfig.factory.DefaultEmbeddingModelProvider;
 import com.anying.helpdesk.modelconfig.factory.ResolvedEmbeddingModel;
@@ -72,7 +73,8 @@ public class KnowledgeRetrievalService {
                 settings.candidateLimit(),
                 settings.candidateLimit() * VECTOR_CANDIDATE_MULTIPLIER,
                 settings.vectorMinSimilarity().doubleValue(),
-                List.copyOf(eligible.keySet())
+                eligible.values().stream().map(document -> new KnowledgeIndexSelection(
+                        document.getId(), document.getActiveIndexBuildId())).toList()
         );
         // 网络调用期间可能发生撤回或到期；只允许初次准入且复核仍有效的文档进入最终证据。
         Map<Long, KnowledgeDocument> current = eligibilityService.findEligible(

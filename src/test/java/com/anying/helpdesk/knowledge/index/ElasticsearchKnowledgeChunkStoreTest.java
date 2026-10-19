@@ -34,10 +34,10 @@ class ElasticsearchKnowledgeChunkStoreTest {
     }
 
     /**
-     * 验证新旧映射均可写入业务版本快照，并保留现有分块替换协议。
+     * 验证批次写入保留业务快照且不删除旧工作者或当前有效批次。
      */
     @Test
-    @DisplayName("创建映射后可以删除旧 Chunk 并发送 NDJSON 批量请求")
+    @DisplayName("按批次写入 Chunk 且不删除其他批次")
     void createsMappingAndReplacesDocumentChunks() throws IOException {
         AtomicBoolean indexExists = new AtomicBoolean(false);
         AtomicReference<String> createBody = new AtomicReference<>();
@@ -71,16 +71,20 @@ class ElasticsearchKnowledgeChunkStoreTest {
                         LocalDateTime.of(2026, 10, 1, 0, 0), null)
         );
 
-        store.replaceDocumentChunks(5L, 3, List.of(chunk));
+        store.writeBuildChunks(5L, "attempt-a", 3, List.of(chunk));
 
         assertThat(createBody.get()).contains("\"dense_vector\"").contains("\"dims\":3");
-        assertThat(deleteBody.get()).contains("\"documentId\":5");
+        assertThat(deleteBody.get()).isNull();
         assertThat(bulkBody.get())
-                .contains("\"_id\":\"5-1\"")
+                .contains("\"_id\":\"5-attempt-a-1\"")
+                .contains("\"indexBuildId\":\"attempt-a\"")
                 .contains("\"content\":\"测试内容\"")
                 .contains("\"businessVersion\":\"v2\"")
                 .contains("\"validFrom\":\"2026-10-01T00:00:00\"")
                 .contains("\"contentVector\":[1.0,0.0,0.0]");
+        store.writeBuildChunks(5L, "attempt-b", 3, List.of(chunk));
+        assertThat(bulkBody.get()).contains("\"_id\":\"5-attempt-b-1\"");
+        assertThat(deleteBody.get()).isNull();
     }
 
     /**
@@ -119,7 +123,7 @@ class ElasticsearchKnowledgeChunkStoreTest {
                 20,
                 40,
                 0.65D,
-                List.of(5L, 7L)
+                List.of(new KnowledgeIndexSelection(5L, null), new KnowledgeIndexSelection(7L, "active-build"))
         );
 
         assertThat(results.bm25Hits()).singleElement()
@@ -135,10 +139,13 @@ class ElasticsearchKnowledgeChunkStoreTest {
                 .endsWith("\n");
         String[] lines = searchBody.get().split("\n");
         ObjectMapper mapper = new ObjectMapper();
-        assertThat(mapper.readTree(lines[1]).at("/query/bool/filter/1/terms/documentId").toString())
-                .isEqualTo("[5,7]");
-        assertThat(mapper.readTree(lines[3]).at("/knn/filter/bool/filter/1/terms/documentId").toString())
-                .isEqualTo("[5,7]");
+        var bm25 = mapper.readTree(lines[1]).at("/query/bool/filter/1");
+        var knn = mapper.readTree(lines[3]).at("/knn/filter/bool/filter/1");
+        assertThat(bm25).isEqualTo(knn);
+        assertThat(bm25.at("/bool/minimum_should_match").asInt()).isEqualTo(1);
+        assertThat(bm25.at("/bool/should/0/bool/filter/0/terms/documentId").toString()).isEqualTo("[5]");
+        assertThat(bm25.at("/bool/should/0/bool/must_not/0/exists/field").asText()).isEqualTo("indexBuildId");
+        assertThat(bm25.at("/bool/should/1/bool/filter/1/terms/indexBuildId").toString()).isEqualTo("[\"active-build\"]");
     }
 
     /**

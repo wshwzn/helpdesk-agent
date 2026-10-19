@@ -73,22 +73,29 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
     }
 
     /**
-     * 先清理旧 Chunk，再使用确定性文档 ID 批量写入新 Chunk。
+     * 按执行批次隔离写入，即使旧执行者恢复也不会覆盖新批次的片段。
      */
     @Override
-    public void replaceDocumentChunks(Long documentId, int dimensions, List<IndexedKnowledgeChunk> chunks) {
+    public void writeBuildChunks(Long documentId, String buildId, int dimensions, List<IndexedKnowledgeChunk> chunks) {
+        if (buildId == null || buildId.isBlank()) {
+            throw new IllegalArgumentException("index build ID is required");
+        }
         ensureIndex(dimensions);
         ensureMetadataMapping();
-        deleteDocument(documentId);
         if (chunks.isEmpty()) {
             return;
         }
         StringBuilder body = new StringBuilder();
         for (IndexedKnowledgeChunk chunk : chunks) {
+            if (!documentId.equals(chunk.documentId())) {
+                throw new IllegalArgumentException("chunk belongs to another document");
+            }
             body.append(toJson(Map.of(
-                    "index", Map.of("_id", chunk.documentId() + "-" + chunk.chunkSequence())
+                    "index", Map.of("_id", chunk.documentId() + "-" + buildId + "-" + chunk.chunkSequence())
             ))).append('\n');
-            body.append(toJson(chunk)).append('\n');
+            com.fasterxml.jackson.databind.node.ObjectNode source = objectMapper.valueToTree(chunk);
+            source.put("indexBuildId", buildId);
+            body.append(toJson(source)).append('\n');
         }
         HttpResponse<String> response = send(
                 "POST",
@@ -118,14 +125,14 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
             int rankWindowSize,
             int vectorNumCandidates,
             double vectorMinSimilarity,
-            List<Long> eligibleDocumentIds
+            List<KnowledgeIndexSelection> eligibleIndexes
     ) {
-        if (eligibleDocumentIds == null || eligibleDocumentIds.isEmpty()) {
+        if (eligibleIndexes == null || eligibleIndexes.isEmpty()) {
             return new KnowledgeChunkSearchResults(List.of(), List.of());
         }
         StringBuilder body = new StringBuilder();
         body.append("{}\n");
-        body.append(toJson(buildBm25SearchBody(knowledgeBaseId, query, rankWindowSize, eligibleDocumentIds))).append('\n');
+        body.append(toJson(buildBm25SearchBody(knowledgeBaseId, query, rankWindowSize, eligibleIndexes))).append('\n');
         body.append("{}\n");
         body.append(toJson(buildVectorSearchBody(
                 knowledgeBaseId,
@@ -135,7 +142,7 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
                 rankWindowSize,
                 vectorNumCandidates,
                 vectorMinSimilarity,
-                eligibleDocumentIds
+                eligibleIndexes
         ))).append('\n');
         HttpResponse<String> response = send(
                 "POST",
@@ -184,14 +191,14 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
      * 构造限定知识库范围的 BM25 全文检索请求。
      */
     private Map<String, Object> buildBm25SearchBody(Long knowledgeBaseId, String query, int rankWindowSize,
-                                                   List<Long> eligibleDocumentIds) {
+                                                   List<KnowledgeIndexSelection> eligibleIndexes) {
         return Map.of(
                 "size", rankWindowSize,
                 "_source", SEARCH_SOURCE_FIELDS,
                 "query", Map.of("bool", Map.of(
                         "must", List.of(Map.of("match", Map.of("content", query))),
                         "filter", List.of(Map.of("term", Map.of("knowledgeBaseId", knowledgeBaseId)),
-                                Map.of("terms", Map.of("documentId", eligibleDocumentIds)))
+                                indexSelectionFilter(eligibleIndexes))
                 ))
         );
     }
@@ -207,7 +214,7 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
             int rankWindowSize,
             int vectorNumCandidates,
             double vectorMinSimilarity,
-            List<Long> eligibleDocumentIds
+            List<KnowledgeIndexSelection> eligibleIndexes
     ) {
         Map<String, Object> knn = new LinkedHashMap<>();
         knn.put("field", "contentVector");
@@ -217,7 +224,7 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
         knn.put("similarity", vectorMinSimilarity);
         knn.put("filter", Map.of("bool", Map.of("filter", List.of(
                 Map.of("term", Map.of("knowledgeBaseId", knowledgeBaseId)),
-                Map.of("terms", Map.of("documentId", eligibleDocumentIds)),
+                indexSelectionFilter(eligibleIndexes),
                 Map.of("term", Map.of("embeddingModelConfigId", embeddingModelConfigId)),
                 Map.of("term", Map.of("embeddingModelName", embeddingModelName))
         ))));
@@ -226,6 +233,21 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
                 "_source", SEARCH_SOURCE_FIELDS,
                 "knn", knn
         );
+    }
+
+    /** 精确匹配已激活批次；历史文档仅匹配无批次字段的片段，失败残留不能进入召回。 */
+    private Map<String, Object> indexSelectionFilter(List<KnowledgeIndexSelection> selections) {
+        List<Long> legacy = selections.stream().filter(value -> value.buildId() == null)
+                .map(KnowledgeIndexSelection::documentId).toList();
+        List<String> builds = selections.stream().filter(value -> value.buildId() != null)
+                .map(KnowledgeIndexSelection::buildId).toList();
+        return Map.of("bool", Map.of("minimum_should_match", 1, "should", List.of(
+                Map.of("bool", Map.of("filter", List.of(
+                        Map.of("terms", Map.of("documentId", legacy))),
+                        "must_not", List.of(Map.of("exists", Map.of("field", "indexBuildId"))))),
+                Map.of("bool", Map.of("filter", List.of(
+                        Map.of("terms", Map.of("documentId", selections.stream().map(KnowledgeIndexSelection::documentId).toList())),
+                        Map.of("terms", Map.of("indexBuildId", builds))))))));
     }
 
     /**
@@ -275,6 +297,7 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
         Map<String, Object> propertiesMapping = new LinkedHashMap<>();
         propertiesMapping.put("knowledgeBaseId", Map.of("type", "long"));
         propertiesMapping.put("documentId", Map.of("type", "long"));
+        propertiesMapping.put("indexBuildId", Map.of("type", "keyword"));
         propertiesMapping.put("chunkSequence", Map.of("type", "integer"));
         propertiesMapping.put("startOffset", Map.of("type", "integer"));
         propertiesMapping.put("endOffset", Map.of("type", "integer"));
@@ -309,7 +332,7 @@ public class ElasticsearchKnowledgeChunkStore implements KnowledgeChunkStore {
      */
     private void ensureMetadataMapping() {
         HttpResponse<String> response = send("PUT", indexPath() + "/_mapping",
-                toJson(Map.of("properties", Map.of("metadata", metadataMapping()))),
+                toJson(Map.of("properties", Map.of("metadata", metadataMapping(), "indexBuildId", Map.of("type", "keyword")))),
                 MediaType.APPLICATION_JSON_VALUE);
         if (!isSuccess(response.statusCode())) {
             throw statusException("failed to update knowledge metadata mapping", response.statusCode());
