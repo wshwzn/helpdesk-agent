@@ -124,3 +124,18 @@ Python 测试检查评测判分的边界；Java 测试检查服务端约束。�
 [专项评测说明](knowledge-review.md)提供 12 组固定正反草案、BASELINE/CHECKLIST 两轮配对比较，以及误杀、漏检和技术失败的独立统计。专项脚本不会重新检索或生成草案；普通单元测试不调用真实模型。采用新策略前需达到预先冻结的门槛并继续端到端验证。
 
 [2026-10-19 复核专项对比](runs/2026-10-19-复核专项对比.md)记录 96 次固定草案复核、未采用 CHECKLIST 的依据及保留基线后的 15 题回归；全部失败和技术错误均归档，没有只保留最好的一轮。
+
+
+## 适用条件澄清闭环评测
+
+`scripts/evaluate_knowledge_clarification.py` 在隔离库启用 `docs/demo/trusted-knowledge/clarification-policy.json`，保留原 15 题，增加两次地区续答与一次独立澄清，合计 18 次问答；另外校验非法范围、ALL 和重复续答不新增消息。原始历史失败输入冻结在 `clarification-historical-failures.json`，未把人工重写样本冒充历史重放。
+
+```powershell
+python -X utf8 scripts/evaluate_knowledge_clarification.py --base-url http://localhost:8080 --output target/knowledge-clarification/run-01 --runtime-label <实际构建标识>
+```
+
+鉴权沿用前述四个环境变量或忽略的本地 auth-file。始终新建资料库，最终恢复原默认库，原库条件配置不修改；脚本不会自动重试失败生成。需要 V19 及当前后端代码；资料有效期仍为 2026-10-01 至 2027-01-01 之前。
+
+新增阶段 `APPLICABILITY` 保存配置、主题识别和续答来源；只在 routingAttempted=true 时统计该阶段的模型用量，技术失败缺用量必须保留为未知。新增错误码：KNOWLEDGE_APPLICABILITY_CALL_FAILED（依赖调用故障）、KNOWLEDGE_APPLICABILITY_UNCERTAIN（主题不确定或范围无交集）、KNOWLEDGE_APPLICABILITY_CHANGED（生成期间配置变更）。前置非法参数返回 400，过期卡片/配置修订冲突返回 409，不进入模型运行分母。
+
+[2026-10-19 澄清续答验证](runs/2026-10-19-澄清续答验证.md)：18 次中 16 自动通过，2 次原有复核否决，两个地区闭环通过；完整[原始数据](runs/2026-10-19-澄清续答数据.json)保留全部失败。自动通过不等同于语义金标准。

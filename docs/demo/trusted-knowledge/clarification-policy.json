@@ -1,0 +1,24 @@
+{
+  "revision": 0,
+  "topics": [
+    {
+      "id": "travel-lodging",
+      "description": "因公出差的住宿报销标准、金额上限及超额费用如何处理。不包括通用报销提交期限和所需材料。",
+      "scopeOptions": [
+        {
+          "value": "CN_SH",
+          "label": "上海"
+        },
+        {
+          "value": "CN_BJ",
+          "label": "北京"
+        }
+      ]
+    },
+    {
+      "id": "expense-process",
+      "description": "通用差旅报销提交期限、流程和申请所需材料，不涉及具体地区的住宿金额标准。",
+      "scopeOptions": []
+    }
+  ]
+}

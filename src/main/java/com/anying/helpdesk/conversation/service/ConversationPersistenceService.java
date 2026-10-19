@@ -1,5 +1,13 @@
 package com.anying.helpdesk.conversation.service;
 
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerReport;
+
+import com.anying.helpdesk.knowledge.answer.KnowledgeClarificationException;
+
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerInput;
+
+import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityService;
+
 import com.anying.helpdesk.agent.domain.AgentToolCall;
 import com.anying.helpdesk.agent.service.AgentToolCallService;
 import com.anying.helpdesk.common.response.PageResponse;
@@ -47,6 +55,7 @@ public class ConversationPersistenceService {
     private final AgentToolCallService toolCallService;
     private final KnowledgeCitationService knowledgeCitationService;
     private final StaleChatGenerationRecoveryService staleGenerationRecoveryService;
+    private final KnowledgeApplicabilityService applicabilityService;
 
     @Transactional
     public ConversationResponse create(CreateConversationRequest request, Long customerId) {
@@ -189,6 +198,7 @@ public class ConversationPersistenceService {
             throw new ConversationGenerationInProgressException(conversationId);
         }
 
+        var knowledgeInput = resolveKnowledgeInput(conversationId, request);
         LocalDateTime now = LocalDateTime.now();
         ChatMessage userMessage = new ChatMessage();
         userMessage.setConversationId(conversationId);
@@ -227,8 +237,34 @@ public class ConversationPersistenceService {
                 userMessage,
                 assistantMessage.getId(),
                 new ConversationModelHistory(history, loadRecentToolCalls(history)),
-                assistantMessage.getKnowledgeRunId()
+                assistantMessage.getKnowledgeRunId(), knowledgeInput
         );
+    }
+
+    /** 只允许续答当前对话最后一条结构化澄清，原问题和知识库均由服务端恢复。 */
+    private KnowledgeAnswerInput resolveKnowledgeInput(
+            Long conversationId, SendMessageRequest request) {
+        if (request.clarificationMessageId() == null)
+            return new KnowledgeAnswerInput(
+                    request.content().trim(), request.applicabilityScope(), null, null, null);
+        var latest = chatMessageMapper.selectList(new LambdaQueryWrapper<ChatMessage>()
+                .eq(ChatMessage::getConversationId, conversationId).orderByDesc(ChatMessage::getId).last("LIMIT 1"));
+        var source = latest.isEmpty() ? null : latest.getFirst();
+        if (source == null || !source.getId().equals(request.clarificationMessageId())
+                || source.getRole() != ChatMessageRole.ASSISTANT || source.getStatus() != ChatMessageStatus.COMPLETED
+                || source.getMode() != ChatMode.KNOWLEDGE || source.getKnowledgeAnswer() == null
+                || source.getKnowledgeAnswer().reason() != KnowledgeAnswerReport.Reason.APPLICABILITY_REQUIRED
+                || source.getKnowledgeAnswer().clarification() == null)
+            throw new KnowledgeClarificationException(true, "clarification is no longer available; ask the original question again");
+        var report = source.getKnowledgeAnswer();
+        var clarification = report.clarification();
+        if (request.mode() != ChatMode.KNOWLEDGE || clarification.scopeOptions().stream()
+                .noneMatch(option -> option.value().equals(request.applicabilityScope())))
+            throw new KnowledgeClarificationException(false, "select a scope offered by the clarification");
+        if (applicabilityService.get(report.knowledgeBaseId()).revision() != clarification.policyRevision())
+            throw new KnowledgeClarificationException(true, "applicability policy has changed; ask the original question again");
+        return new KnowledgeAnswerInput(clarification.originalQuestion(),
+                request.applicabilityScope(), report.knowledgeBaseId(), source.getId(), clarification.policyRevision());
     }
 
     /** 原子保存最终正文、Token 用量和核验报告，拒绝覆盖已结束的生成任务。 */

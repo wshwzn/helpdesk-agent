@@ -23,6 +23,8 @@ public class KnowledgeBase {
     private BigDecimal vectorMinSimilarity = BigDecimal.ZERO;
     private Integer retrievalResultLimit = 5;
     private Boolean isDefault = false;
+    private String clarificationPolicy;
+    private Long clarificationRevision = 0L;
     private Long createdBy;
     @Version
     private Integer version;

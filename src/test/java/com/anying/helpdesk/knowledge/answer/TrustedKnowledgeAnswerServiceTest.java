@@ -50,7 +50,7 @@ class TrustedKnowledgeAnswerServiceTest {
     private final Clock clock = Clock.fixed(Instant.parse("2026-10-18T00:00:00Z"), ZoneId.of("Asia/Shanghai"));
     private final ResolvedChatModel model = new ResolvedChatModel(1L, "test", true, mock(ChatModel.class));
     private final TrustedKnowledgeAnswerService service = new TrustedKnowledgeAnswerService(
-            bases, retrieval, eligibility, client, new KnowledgeAnswerGuard(), clock);
+            bases, retrieval, eligibility, client, new KnowledgeAnswerGuard(), clock, mock(KnowledgeApplicabilityService.class));
 
     /** 默认提供两份当前有效资料，以检查复核是否覆盖未被草案选中的候选。 */
     @BeforeEach
@@ -110,7 +110,7 @@ class TrustedKnowledgeAnswerServiceTest {
             return new ChatResponse(List.of(new Generation(new AssistantMessage(output))));
         });
         var realAdapterService = new TrustedKnowledgeAnswerService(bases, retrieval, eligibility,
-                new KnowledgeAnswerModelClient(json), new KnowledgeAnswerGuard(), clock);
+                new KnowledgeAnswerModelClient(json), new KnowledgeAnswerGuard(), clock, mock(KnowledgeApplicabilityService.class));
         var result = realAdapterService.answer(model, QUESTION, "SH");
         assertThat(result.knowledgeAnswer().answer().status()).isEqualTo(KnowledgeAnswerDraft.Status.CONFLICT);
         assertThat(result.content()).contains("600", "650", "[E1]", "[E2]");

@@ -158,7 +158,7 @@ def measures(report):
     available = [item for item in results if item.get("message")]
     known_usage = [item["message"]["totalTokens"] for item in available if item["message"].get("totalTokens") is not None]
     diagnostics = [item["diagnostic"] for item in results if item.get("diagnosticState") == "CAPTURED"]
-    model_stages = [stage for item in diagnostics for stage in item["stages"] if stage["stage"] in ("DRAFT", "REVIEW")]
+    model_stages = [stage for item in diagnostics for stage in item["stages"] if (stage["stage"] in ("DRAFT", "REVIEW") or (stage["stage"] == "APPLICABILITY" and (item.get("applicability") or {}).get("routingAttempted")))]
     diagnostic_usage = [(stage.get("usage") or {}).get("totalTokens") for stage in model_stages]
     return {"planned": report["planned"], "executed": len(results),
             "automaticPassed": outcomes["CHECK_PASSED"], "technicalFailures": outcomes["TECHNICAL_ERROR"],

@@ -1,5 +1,9 @@
 package com.anying.helpdesk.knowledge.controller;
 
+import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityPolicy;
+
+import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityService;
+
 import com.anying.helpdesk.common.response.ApiResponse;
 import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.config.OpenApiConfig;
@@ -65,6 +69,23 @@ public class AdminKnowledgeBaseController {
     private final KnowledgeRetrievalService knowledgeRetrievalService;
     private final KnowledgeDocumentPublicationService publicationService;
     private final CurrentUserProvider currentUserProvider;
+    private final KnowledgeApplicabilityService applicabilityService;
+
+    /** 查询知识库的主题和适用条件配置，空主题列表表示未启用。 */
+    @GetMapping("/{id}/clarification-policy")
+    public ApiResponse<KnowledgeApplicabilityPolicy> clarificationPolicy(
+            @PathVariable @Min(1) Long id) {
+        return ApiResponse.ok(applicabilityService.get(id));
+    }
+
+    /** 按修订号替换适用条件配置，空主题列表可关闭此功能。 */
+    @PutMapping("/{id}/clarification-policy")
+    public ApiResponse<KnowledgeApplicabilityPolicy> updateClarificationPolicy(
+            @PathVariable @Min(1) Long id,
+            @Valid @RequestBody KnowledgeApplicabilityPolicy policy) {
+        return ApiResponse.ok(applicabilityService.update(id, policy));
+    }
+
 
     /**
      * 创建一个新的知识库。

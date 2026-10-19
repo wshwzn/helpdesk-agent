@@ -1,5 +1,7 @@
 package com.anying.helpdesk.knowledge.answer;
 
+import com.anying.helpdesk.knowledge.dto.KnowledgeBaseResponse;
+
 import com.anying.helpdesk.conversation.model.ChatCompletionResult;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentMetadata;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchRequest;
@@ -31,6 +33,7 @@ public class TrustedKnowledgeAnswerService {
     private final KnowledgeAnswerModelClient modelClient;
     private final KnowledgeAnswerGuard guard;
     private final Clock knowledgeClock;
+    private final KnowledgeApplicabilityService applicabilityService;
 
     /** 兼容直接业务调用；正式会话入口使用显式关联助手消息的诊断上下文。 */
     public ChatCompletionResult answer(ResolvedChatModel model, String question, String scope) {
@@ -40,14 +43,37 @@ public class TrustedKnowledgeAnswerService {
 
     /** 执行原有核验链路并记录阶段快照，诊断信息不进入客户可见回答。 */
     public ChatCompletionResult answer(ResolvedChatModel model, String question, String scope, KnowledgeAnswerTrace trace) {
+        return answer(model, new KnowledgeAnswerInput(question, scope, null, null, null), trace);
+    }
+
+    /** 用恢复的原问题和用户明确选择的范围重新执行完整检索及核验。 */
+    public ChatCompletionResult answer(ResolvedChatModel model, KnowledgeAnswerInput input, KnowledgeAnswerTrace trace) {
+        String question = input.question();
+        String scope = input.scope();
         if (question == null || question.isBlank() || question.length() > 2000
                 || scope == null || !scope.matches("[A-Z][A-Z0-9_-]{0,39}")) {
             throw new IllegalArgumentException("invalid knowledge question");
         }
-        var retrieved = trace.stage(RETRIEVAL, () -> retrieve(question, scope, trace));
+        var preparation = "ALL".equals(scope) || input.continuationOfMessageId() != null
+                ? trace.stage(APPLICABILITY, () -> prepareApplicability(model, input, trace)) : null;
+        if (preparation != null && !preparation.options().isEmpty()) {
+            applicabilityService.requireRevision(preparation.base().id(), preparation.policy().revision());
+            var clarification = new KnowledgeAnswerReport.Clarification(question, preparation.policy().revision(),
+                    preparation.route().value().topicIds(), preparation.options());
+            var draft = new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.NEEDS_CLARIFICATION, List.of(),
+                    List.of("请明确本次问题适用的地区或范围？"), List.of());
+            var report = new KnowledgeAnswerReport(2, KnowledgeAnswerReport.Reason.APPLICABILITY_REQUIRED,
+                    preparation.base().id(), preparation.base().name(), scope, LocalDateTime.now(knowledgeClock),
+                    draft, List.of(), clarification, null);
+            trace.answerReason(report.reason());
+            trace.resolved(draft);
+            return withRoutingUsage(new ChatCompletionResult(render(report), 0, 0, 0, report), preparation);
+        }
+        var retrieved = trace.stage(RETRIEVAL, () -> retrieve(question, scope, trace, preparation));
         if (retrieved.reason() != KnowledgeAnswerReport.Reason.REVIEWED) {
             trace.answerReason(retrieved.reason());
-            return empty(retrieved.reason(), retrieved.baseId(), retrieved.baseName(), scope);
+            checkPolicy(preparation);
+            return withRoutingUsage(withContinuation(empty(retrieved.reason(), retrieved.baseId(), retrieved.baseName(), scope), input), preparation);
         }
         var evidence = retrieved.evidence();
         var catalog = retrieved.catalog();
@@ -80,19 +106,69 @@ public class TrustedKnowledgeAnswerService {
             }
             return now;
         });
+        checkPolicy(preparation);
         var report = new KnowledgeAnswerReport(1, KnowledgeAnswerReport.Reason.REVIEWED,
                 retrieved.baseId(), retrieved.baseName(), scope, checkedAt, draft, evidence);
         trace.answerReason(report.reason());
-        return new ChatCompletionResult(render(report), sum(selection.promptTokens(), review.promptTokens()),
-                sum(selection.completionTokens(), review.completionTokens()), sum(selection.totalTokens(), review.totalTokens()), report);
+        return withRoutingUsage(withContinuation(new ChatCompletionResult(render(report),
+                sum(selection.promptTokens(), review.promptTokens()), sum(selection.completionTokens(), review.completionTokens()),
+                sum(selection.totalTokens(), review.totalTokens()), report), input), preparation);
+    }
+
+    private record ApplicabilityPreparation(KnowledgeBaseResponse base,
+            KnowledgeApplicabilityPolicy policy, KnowledgeAnswerModelClient.ModelResult<KnowledgeApplicabilityPolicy.Route> route,
+            List<KnowledgeApplicabilityPolicy.ScopeOption> options) { }
+
+    /** 只在缺少范围时进行主题路由；续答绑定原知识库并复核配置，不再次猜测主题。 */
+    private ApplicabilityPreparation prepareApplicability(ResolvedChatModel model, KnowledgeAnswerInput input,
+                                                         KnowledgeAnswerTrace trace) {
+        var base = atStage(KNOWLEDGE_RETRIEVAL_FAILED, () -> input.knowledgeBaseId() == null
+                ? knowledgeBaseService.findDefault().orElse(null) : knowledgeBaseService.getById(input.knowledgeBaseId()));
+        if (base == null) return new ApplicabilityPreparation(null, null, null, List.of());
+        var policy = applicabilityService.get(base.id());
+        trace.applicability(policy, null, input.continuationOfMessageId(), false);
+        if (input.continuationOfMessageId() != null) {
+            applicabilityService.requireRevision(base.id(), input.policyRevision());
+            return new ApplicabilityPreparation(base, policy, null, List.of());
+        }
+        if (policy.topics().isEmpty()) return new ApplicabilityPreparation(base, policy, null, List.of());
+        trace.applicability(policy, null, null, true);
+        var route = atStage(KNOWLEDGE_APPLICABILITY_CALL_FAILED, () -> modelClient.route(model, input.question(), policy));
+        trace.applicability(policy, route, null, true);
+        var options = applicabilityService.requiredOptions(policy, route.value());
+        return new ApplicabilityPreparation(base, policy, route, options);
+    }
+
+    /** 在交付前确认配置没有变化，不能把过期条件判断作为当前澄清依据。 */
+    private void checkPolicy(ApplicabilityPreparation preparation) {
+        if (preparation != null && preparation.policy() != null)
+            applicabilityService.requireRevision(preparation.base().id(), preparation.policy().revision());
+    }
+
+    /** 追加路由调用的已知用量；任何模型调用用量未知时保持未知。 */
+    private ChatCompletionResult withRoutingUsage(ChatCompletionResult result, ApplicabilityPreparation preparation) {
+        if (preparation == null || preparation.route() == null) return result;
+        var route = preparation.route();
+        return new ChatCompletionResult(result.content(), sum(result.promptTokens(), route.promptTokens()),
+                sum(result.completionTokens(), route.completionTokens()), sum(result.totalTokens(), route.totalTokens()), result.knowledgeAnswer());
+    }
+
+    /** 最终报告关联澄清来源，历史卡片保持原样，不向客户暴露内部诊断。 */
+    private ChatCompletionResult withContinuation(ChatCompletionResult result, KnowledgeAnswerInput input) {
+        if (input.continuationOfMessageId() == null) return result;
+        var old = result.knowledgeAnswer();
+        var report = new KnowledgeAnswerReport(2, old.reason(), old.knowledgeBaseId(), old.knowledgeBaseName(),
+                old.applicabilityScope(), old.checkedAt(), old.answer(), old.evidence(), null, input.continuationOfMessageId());
+        return new ChatCompletionResult(result.content(), result.promptTokens(), result.completionTokens(), result.totalTokens(), report);
     }
 
     private record Retrieved(Long baseId, String baseName, KnowledgeAnswerReport.Reason reason,
                              List<KnowledgeAnswerReport.Evidence> evidence, KnowledgeCitationCatalog catalog) { }
 
     /** 保存实际召回再按原有预算建立证据编号，诊断截断不会改变送入模型的证据。 */
-    private Retrieved retrieve(String question, String scope, KnowledgeAnswerTrace trace) {
-        var base = atStage(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault);
+    private Retrieved retrieve(String question, String scope, KnowledgeAnswerTrace trace, ApplicabilityPreparation preparation) {
+        var base = preparation == null ? atStage(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault)
+                : java.util.Optional.ofNullable(preparation.base());
         if (base.isEmpty()) return new Retrieved(null, null, KnowledgeAnswerReport.Reason.NOT_CONFIGURED, List.of(), null);
         var knowledgeBase = base.get();
         var search = atStage(KNOWLEDGE_RETRIEVAL_FAILED,
@@ -168,6 +244,10 @@ public class TrustedKnowledgeAnswerService {
         }
         if (report.reason() == KnowledgeAnswerReport.Reason.NO_MATCH) {
             return "在当前适用范围和生效时间内未检索到可用依据。请补充适用范围或联系知识维护者。";
+        }
+        if (report.reason() == KnowledgeAnswerReport.Reason.APPLICABILITY_REQUIRED) {
+            return "请补充本次问题适用的地区或范围：" + report.clarification().scopeOptions().stream()
+                    .map(KnowledgeApplicabilityPolicy.ScopeOption::label).collect(Collectors.joining("、")) + "。";
         }
         var answer = report.answer();
         StringBuilder content = new StringBuilder(switch (answer.status()) {

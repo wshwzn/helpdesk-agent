@@ -102,7 +102,7 @@
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 生成失败时保存的内部脱敏错误码，例如模型失败 `MODEL_CALL_FAILED`、进程中断超时恢复 `GENERATION_INTERRUPTED`。 |
 | `mode` | `VARCHAR(20)` | 否 | `AGENT` | 本条消息的模式：`AGENT` 自动工具对话、`KNOWLEDGE` 强制证据核验；历史记录默认为 AGENT。 |
 | `applicability_scope` | `VARCHAR(40)` | 是 | `NULL` | 本轮请求显式选择的业务范围快照。KNOWLEDGE 未指定时为 `ALL`，AGENT 为空；非权限字段。 |
-| `knowledge_answer` | `MEDIUMTEXT` | 是 | `NULL` | 核验报告 JSON；仅成功完成的 KNOWLEDGE 助手消息写入。包含 `schemaVersion=1`、原因、知识库身份快照、范围、核验时间、结构化回答及本轮证据快照。 |
+| `knowledge_answer` | `MEDIUMTEXT` | 是 | `NULL` | 核验报告 JSON；仅成功完成的 KNOWLEDGE 助手消息写入。包含 `schemaVersion=1`（普通结果）或 `2`（结构化澄清/续答）、原因、知识库身份快照、范围、核验时间、结构化回答及本轮证据快照。 |
 | `knowledge_run_id` | `VARCHAR(36)` | 是 | `NULL` | V18 新增，服务端为新 KNOWLEDGE 助手消息分配的 UUID，逻辑关联 `knowledge_answer_runs.run_id`。客户消息、AGENT 消息及升级前历史消息为空；成功或失败后均保留。 |
 | `version` | `INT` | 否 | `0` | 乐观锁版本号，防止生成完成与失败状态互相覆盖。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息创建时间。 |
@@ -116,11 +116,14 @@
 - 普通索引：`idx_chat_messages_status_role_updated (status, role, updated_at)`，支持后台快速扫描超时的 `PENDING` 助手消息。
 - 超过配置阈值仍为 `PENDING` 的助手消息会被条件更新为 `FAILED` 并递增版本号，防止迟到的模型结果覆盖恢复状态。
 - V17 检查约束：`ck_chat_message_mode` 限定 `AGENT`、`KNOWLEDGE`。本次未新增索引。
-- `knowledge_answer` 中 `reason` 为 `REVIEWED`、`NO_MATCH`、`NOT_CONFIGURED`；`answer.status` 为 `ANSWERABLE`、`NEEDS_CLARIFICATION`、`INSUFFICIENT_EVIDENCE`、`CONFLICT`。无命中/未配置时状态为证据不足，但不调用回答模型。
+- `knowledge_answer` 中 `reason` 为 `REVIEWED`、`NO_MATCH`、`NOT_CONFIGURED`、`APPLICABILITY_REQUIRED`；`answer.status` 为 `ANSWERABLE`、`NEEDS_CLARIFICATION`、`INSUFFICIENT_EVIDENCE`、`CONFLICT`。无命中/未配置时状态为证据不足，但不调用回答模型。
 - 报告的 `evidence[].id` 为本轮临时编号 E1/E2；`documentId`、`chunkSequence` 逻辑关联知识文档及 ES Chunk。`sourceName`、正文与业务元数据是历史快照，文档撤回或删除后仍保留，不用外键级联删除。
 - 应用保证每项事实结论有本轮证据引用，`quote` 是连续原文；冲突双方至少涉及两份文档。正文与报告在同一个带乐观锁的完成事务写入。JSON 结构和模式/范围关系由应用约束，数据库不校验 JSON 内部结构。
 - 知识链路技术失败保存固定阶段码，如 `KNOWLEDGE_RETRIEVAL_FAILED`、`KNOWLEDGE_DRAFT_CALL_FAILED`、`KNOWLEDGE_PROTOCOL_INVALID`、`KNOWLEDGE_CITATION_INVALID`、`KNOWLEDGE_REVIEW_REJECTED`、`KNOWLEDGE_REVIEW_WRONG_STATUS`、`KNOWLEDGE_EVIDENCE_CHANGED`；未知或历史旧版本失败保留 `KNOWLEDGE_ANSWER_FAILED`。取消使用 `STREAM_CANCELLED`。全部码不超过 50 字符，完整分类见 `docs/evaluation/README.md`；无新增列或约束。失败消息不保存草案或成功报告。核验时间采用 Asia/Shanghai；历史报告表示当时的结果，不保证资料现在仍有效。
 - KNOWLEDGE 的 Token 用量合计草案与复核两次回答模型调用，任一调用未返回某项用量时该项为 NULL；无回答模型调用时为 0，不含检索 Embedding 用量。
+
+- V19 起，`knowledge_answer.clarification` 可保存 `originalQuestion`（最多 2000 字）、`policyRevision`、`topicIds`、`scopeOptions[{value,label}]`；仅 `APPLICABILITY_REQUIRED / NEEDS_CLARIFICATION` 使用，没有事实结论或证据。旧 JSON 新字段为空。
+- `knowledge_answer.continuationOfMessageId` 逻辑关联同会话的澄清助手消息，无数据库外键或新增索引。续答前校验该消息是会话最新消息、已完成、属于 KNOWLEDGE 且包含结构化澄清；用户仍须通过会话归属检查。原问题及知识库由此恢复，用户选择范围必须在快照选项内、配置修订仍相同。消息并发沿用会话乐观锁；失败后重新发送原问题，不能重复消费旧卡片。
 
 ## `knowledge_answer_runs` 知识问答诊断表
 
@@ -135,7 +138,7 @@
 | `status` | `VARCHAR(20)` | 否 | 无 | `RUNNING`、`SUCCEEDED`、`FAILED`、`CANCELLED`。成功指最终消息已落库；未结束快照不能视为模型还在运行的实时证明。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 固定失败码，无自由文本。除知识阶段码外可为 `STREAM_CANCELLED`、诊断专用的 `KNOWLEDGE_MESSAGE_SAVE_FAILED`；客户消息仍按原协议记录错误。 |
 | `revision` | `BIGINT` | 否 | 无 | 本次运行内递增的快照修订号，从 1 开始；不是 MyBatis 实体乐观锁。写入失败后下次修订可跳号。 |
-| `snapshot` | `MEDIUMTEXT` | 否 | 无 | `schemaVersion=2` JSON（兼容读取版本 1）：身份、问题、范围、回答模型配置 ID/名称、运行状态、阶段耗时、召回参数与结果、证据编号、引用目录 `citationCatalog`、模型选择 `selection`、解析后草案 `draft`、复核结果、回答原因、逐模型阶段用量、诊断写入失败次数。不得加入凭据、模型客户端对象或厂商原始异常。 |
+| `snapshot` | `MEDIUMTEXT` | 否 | 无 | `schemaVersion=2` JSON（兼容读取版本 1）：身份、问题、范围、回答模型配置 ID/名称、运行状态、阶段耗时、召回参数与结果、证据编号、引用目录 `citationCatalog`、模型选择 `selection`、解析后草案 `draft`、复核结果、回答原因、逐模型阶段用量、诊断写入失败次数。另有可空 `applicability`：配置快照、路由结果、续答消息 ID 和 `routingAttempted`。不得加入凭据、模型客户端对象或厂商原始异常。 |
 | `started_at` | `TIMESTAMP(6)` | 否 | 无 | 在已接受消息上开始诊断的时间，应用按 Asia/Shanghai 写入。 |
 | `updated_at` | `TIMESTAMP(6)` | 否 | 无 | 此快照生成时间。 |
 | `finished_at` | `TIMESTAMP(6)` | 是 | `NULL` | 终态时间；运行中为空。 |
@@ -224,6 +227,15 @@
 ## `knowledge_bases` 知识库表
 
 保存管理员创建的知识库容器，由 Flyway V9 创建。原始文件和检索分块不存入该表。
+
+V19 增加适用条件配置，更新不需要重建 ES 索引：
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `clarification_policy` | `MEDIUMTEXT` | 是 | `NULL` | 配置 JSON：`revision` 与下面字段一致，`topics` 最多 20 个；每个主题含唯一 `id`、业务 `description`（最多 500 字）、`scopeOptions`（最多 20 个）。选项为 `value` 范围码和 `label`（最多 80 字）。空选项表示此主题无需地区；空主题列表关闭路由。NULL 为升级前未配置。 |
+| `clarification_revision` | `BIGINT` | 否 | `0` | 独立配置修订号，更新配置加一。客户端提供当前修订号；应用同时使用既有 `version` 乐观锁防止覆盖其他管理修改。不得回退、复用旧修订号。 |
+
+应用约束：主题 ID 为 `[a-z][a-z0-9_-]{0,39}`，选项码为 `[A-Z][A-Z0-9_-]{0,39}` 且不允许 `ALL`，主题内范围不重复，同码标签必须一致；修订号非负。无新增索引、外键或数据库枚举。配置只决定必要条件，不是制度事实，也不承诺某地区有有效证据；续答重新执行 MySQL 准入及 ES 检索。多个需范围主题取选项交集，交集为空或模型分类不确定时作为技术失败。
 
 | 字段 | 类型 | 可空 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -467,3 +479,9 @@ rag_evaluation_runs.id ──< rag_evaluation_run_results.run_id
 | V13 | `V13__add_default_knowledge_base.sql` | 为知识库增加客户对话使用的默认项标记和查询索引。 |
 | V14 | `V14__create_rag_evaluation_tables.sql` | 创建 RAG 评测用例、期望文档关系、运行汇总和逐题结果表。 |
 | V15 | `V15__add_chat_pending_recovery_index.sql` | 增加按状态、角色和更新时间扫描中断消息的索引。 |
+| V16 | `V16__add_knowledge_document_publication.sql` | 文档业务版本、发布状态、适用范围和有效期。 |
+| V17 | `V17__add_knowledge_answer_report.sql` | 消息模式、范围与知识核验报告。 |
+| V18 | `V18__add_knowledge_answer_runs.sql` | 运行 UUID 关联及管理员诊断表。 |
+| V19 | `V19__add_knowledge_clarification_policy.sql` | 在 knowledge_bases 增加适用条件 JSON 与独立修订号；旧库默认关闭。 |
+
+诊断阶段补充：需要判断适用条件时先执行 `APPLICABILITY`；只有 `applicability.routingAttempted=true` 才实际调用路由模型并计入模型用量。配置未启用/续答不调用路由；DRAFT、REVIEW 仍分别记账，Embedding 用量不在此统计内。

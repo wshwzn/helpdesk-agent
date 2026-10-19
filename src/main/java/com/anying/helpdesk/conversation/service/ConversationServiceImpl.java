@@ -109,7 +109,7 @@ public class ConversationServiceImpl implements ConversationService {
         ChatMessage assistantMessage;
         try {
             ChatCompletionResult completion = request.mode() == ChatMode.KNOWLEDGE
-                    ? trustedKnowledgeAnswerService.answer(model, request.content().trim(), request.applicabilityScope(), trace)
+                    ? answerKnowledge(model, prepared, trace)
                     : modelClient.complete(
                     model,
                     prepared.history(),
@@ -225,8 +225,7 @@ public class ConversationServiceImpl implements ConversationService {
         AtomicBoolean finalized = new AtomicBoolean(false);
         KnowledgeAnswerTrace trace = knowledgeAnswerRunService.start(prepared, model);
         Flux<ChatStreamEvent> completed = Mono.fromCallable(() -> {
-                    var completion = trustedKnowledgeAnswerService.answer(
-                            model, request.content().trim(), request.applicabilityScope(), trace);
+                    var completion = answerKnowledge(model, prepared, trace);
                     ChatMessage assistant;
                     // 取消与落库共用临界区，已取消的生成即使迟到也不能写入完成状态。
                     synchronized (finalized) {
@@ -257,6 +256,15 @@ public class ConversationServiceImpl implements ConversationService {
                         markCancelledStream(prepared.assistantMessageId(), id, finalized);
                     }
                 });
+    }
+
+    /** 同步与流式共用已校验的问题上下文，续答不把“上海”等短回复当作新问题检索。 */
+    private ChatCompletionResult answerKnowledge(ResolvedChatModel model, PreparedChatExchange prepared,
+                                                KnowledgeAnswerTrace trace) {
+        var input = prepared.knowledgeInput();
+        return input.continuationOfMessageId() == null
+                ? trustedKnowledgeAnswerService.answer(model, input.question(), input.scope(), trace)
+                : trustedKnowledgeAnswerService.answer(model, input, trace);
     }
 
     /** 将知识异常映射为安全的阶段码，未分类错误仍使用兼容的通用码。 */

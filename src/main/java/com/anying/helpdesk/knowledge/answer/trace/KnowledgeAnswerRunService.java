@@ -17,7 +17,7 @@ public class KnowledgeAnswerRunService {
     public KnowledgeAnswerTrace start(PreparedChatExchange exchange, ResolvedChatModel model) {
         var message = exchange.userMessage();
         var trace = new KnowledgeAnswerTrace(exchange.knowledgeRunId(), exchange.assistantMessageId(),
-                message.getConversationId(), message.getContent(), message.getApplicabilityScope(), model,
+                message.getConversationId(), exchange.knowledgeInput().question(), message.getApplicabilityScope(), model,
                 knowledgeClock, store::save);
         trace.start();
         return trace;

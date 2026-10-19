@@ -3,6 +3,9 @@ package com.anying.helpdesk.knowledge.answer;
 /** 以固定枚举标识知识回答失败阶段，禁止把厂商正文或草案写入消息错误码。 */
 public class KnowledgeAnswerFailure extends IllegalStateException {
     public enum Code {
+        KNOWLEDGE_APPLICABILITY_CALL_FAILED,
+        KNOWLEDGE_APPLICABILITY_UNCERTAIN,
+        KNOWLEDGE_APPLICABILITY_CHANGED,
         KNOWLEDGE_RETRIEVAL_FAILED,
         KNOWLEDGE_DRAFT_CALL_FAILED,
         KNOWLEDGE_REVIEW_CALL_FAILED,

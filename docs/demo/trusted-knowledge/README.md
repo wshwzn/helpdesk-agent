@@ -74,3 +74,29 @@
 - 已发布元数据不可修改；旧版未预设截止时间时，需要管理员在切换时明确撤回，当前没有自动替代关系。
 - 有效版本存在重叠时保留双方；知识模式对本轮召回资料做冲突复核，但未实现全库冲突扫描，也没有真实模型准确率结论。
 - 尚未实现增量扫描、索引批次原子切换、失败保留上一批次及更新任务持久化。
+
+
+## 适用范围澄清与续答
+
+服务升级到 V19 后，先用 ADMIN 查询 `GET /api/admin/knowledge-bases/{id}/clarification-policy`，以返回的 revision 为准，PUT 同一路径。示例配置见本目录 `clarification-policy.json`：住宿标准需要地区，通用流程不需要。初次配置 revision=0；再次修改必须用当前修订号。
+
+1. 客户发 `POST /api/conversations/{id}/messages`：
+
+```json
+{"content":"普通员工因公出差，住宿报销上限是多少？","mode":"KNOWLEDGE","applicabilityScope":"ALL"}
+```
+
+2. 服务返回 `assistantMessage.knowledgeAnswer.reason=APPLICABILITY_REQUIRED`、`answer.status=NEEDS_CLARIFICATION` 和 `clarification.scopeOptions`。保存该助手消息 ID。此时没有引用或制度答案。
+3. 在同一会话选择上海（将 123 替换为刚返回的助手消息 ID）：
+
+```json
+{"content":"我选择上海","mode":"KNOWLEDGE","applicabilityScope":"CN_SH","clarificationMessageId":123}
+```
+
+后端恢复原问题与原知识库，重新检索当前有效资料；通过引用校验和复核后，报告的 `continuationOfMessageId` 关联原澄清消息。历史澄清保持不变。SSE 接口接受相同参数。
+
+通用“差旅结束多久内提交报销”不应追问地区。配置只定义条件，不承诺所选地区存在资料；缺资料、冲突及技术失败仍分别处理。新问题不自动继承地区；续答正文只作为用户选择的说明，变更问题请另发不带 clarificationMessageId 的请求。
+
+非法范围/ALL 返回 400；跨会话、已使用或过期卡片返回 409；配置修改后需重新提问。续答失败也需重新发送原问题，不能复用已经不是最新消息的澄清。
+
+自动验证：`python -X utf8 scripts/evaluate_knowledge_clarification.py --base-url http://localhost:8080 --output target/knowledge-clarification/run-01 --runtime-label <实际构建标识>`。使用与原评测相同的四个 HELPDESK_* 环境变量或忽略的本地 auth-file，不能把凭据写入版本库。脚本新建资料库、启用示例配置，跑固定回归及两个地区续答，最后恢复原默认库；失败不自动重跑。

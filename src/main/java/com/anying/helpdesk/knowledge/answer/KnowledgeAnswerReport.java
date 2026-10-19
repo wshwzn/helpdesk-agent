@@ -17,9 +17,22 @@ public record KnowledgeAnswerReport(
         String applicabilityScope,
         @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDateTime checkedAt,
         KnowledgeAnswerDraft answer,
-        List<Evidence> evidence
+        List<Evidence> evidence,
+        Clarification clarification,
+        Long continuationOfMessageId
 ) {
-    public enum Reason { REVIEWED, NO_MATCH, NOT_CONFIGURED }
+    public enum Reason { REVIEWED, NO_MATCH, NOT_CONFIGURED, APPLICABILITY_REQUIRED }
+
+    public record Clarification(String originalQuestion, long policyRevision, List<String> topicIds,
+                                List<KnowledgeApplicabilityPolicy.ScopeOption> scopeOptions) { }
+
+    /** 兼容旧报告和没有可续答澄清的调用方。 */
+    public KnowledgeAnswerReport(int schemaVersion, Reason reason, Long knowledgeBaseId, String knowledgeBaseName,
+                                 String applicabilityScope, LocalDateTime checkedAt, KnowledgeAnswerDraft answer,
+                                 List<Evidence> evidence) {
+        this(schemaVersion, reason, knowledgeBaseId, knowledgeBaseName, applicabilityScope, checkedAt, answer,
+                evidence, null, null);
+    }
 
     public record Evidence(String id, Long documentId, int chunkSequence, String sourceName,
                            String content, KnowledgeDocumentMetadata metadata) { }

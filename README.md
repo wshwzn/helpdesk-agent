@@ -532,3 +532,6 @@ Spring Security 根据 JWT 中的角色限制访问：`CUSTOMER` 可以操作自
 ### 复核专项评测
 
 提供固定问题、证据与草案的 12 组正反例，可单独比较复核误杀、漏检、技术失败和成本。运行说明见 [复核专项评测](docs/evaluation/knowledge-review.md)。默认策略仍为 `BASELINE`，`app.knowledge.review-strategy=CHECKLIST` 仅用于显式实验；本轮候选退化且更耗 Token，未被采用，完整数据见 [专项对比报告](docs/evaluation/runs/2026-10-19-复核专项对比.md)。普通单元测试不会调用真实模型。
+
+
+V19 增加可配置的适用条件澄清：管理员通过 `/api/admin/knowledge-bases/{id}/clarification-policy` 配置业务主题及范围选项。缺范围时先识别主题，再由服务端返回结构化澄清；客户传 `clarificationMessageId` 和显式范围后，服务端从原消息恢复问题、绑定原知识库并重新检索及核验。通用流程无需一律问地区，旧知识库默认关闭此功能。规则、接口和限制见 `notes/30-适用条件澄清与续答.md`；演示见 `docs/demo/trusted-knowledge/README.md`，实测见 `docs/evaluation/runs/2026-10-19-澄清续答验证.md`。本轮接口/脚本交付，尚未增加前端选择卡片。

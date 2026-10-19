@@ -128,7 +128,9 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(runId).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.SUCCEEDED);
         assertThat(snapshot.stages()).extracting(KnowledgeAnswerRunSnapshot.StageResult::stage)
-                .containsExactly(KnowledgeAnswerRunSnapshot.Stage.values());
+                .containsExactly(KnowledgeAnswerRunSnapshot.Stage.RETRIEVAL, KnowledgeAnswerRunSnapshot.Stage.DRAFT,
+                        KnowledgeAnswerRunSnapshot.Stage.VALIDATION, KnowledgeAnswerRunSnapshot.Stage.REVIEW,
+                        KnowledgeAnswerRunSnapshot.Stage.EVIDENCE_RECHECK, KnowledgeAnswerRunSnapshot.Stage.MESSAGE_PERSISTENCE);
         assertThat(snapshot.stages()).allSatisfy(stage -> {
             assertThat(stage.status()).isEqualTo(KnowledgeAnswerRunSnapshot.StageStatus.SUCCEEDED);
             assertThat(stage.durationMs()).isGreaterThanOrEqualTo(0);

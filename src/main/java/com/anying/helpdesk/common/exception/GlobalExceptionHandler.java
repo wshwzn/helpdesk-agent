@@ -1,5 +1,7 @@
 package com.anying.helpdesk.common.exception;
 
+import com.anying.helpdesk.knowledge.answer.KnowledgeClarificationException;
+
 import com.anying.helpdesk.agent.action.exception.ConcurrentPendingActionUpdateException;
 import com.anying.helpdesk.agent.action.exception.InvalidPendingActionStatusException;
 import com.anying.helpdesk.agent.action.exception.PendingActionExpiredException;
@@ -47,6 +49,15 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /** 参数错误返回 400，旧澄清消息或并发配置变化返回 409。 */
+    @ExceptionHandler(KnowledgeClarificationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleClarification(
+            KnowledgeClarificationException exception) {
+        return ResponseEntity.status(exception.conflict() ? HttpStatus.CONFLICT : HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(exception.conflict() ? "KNOWLEDGE_CLARIFICATION_STALE"
+                        : "INVALID_KNOWLEDGE_CLARIFICATION", exception.getMessage(), null));
+    }
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 

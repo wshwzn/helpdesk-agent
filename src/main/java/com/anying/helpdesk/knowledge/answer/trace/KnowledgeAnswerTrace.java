@@ -1,5 +1,7 @@
 package com.anying.helpdesk.knowledge.answer.trace;
 
+import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityPolicy;
+
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerDraft;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerSelection;
 import com.anying.helpdesk.knowledge.answer.KnowledgeCitationCatalog;
@@ -50,6 +52,19 @@ public final class KnowledgeAnswerTrace {
     private KnowledgeAnswerModelClient.Review review;
     private KnowledgeAnswerReport.Reason answerReason;
     private long stageStartedNanos;
+    private KnowledgeApplicabilityPolicy.Assessment applicability;
+
+    /** 保存条件配置、主题路由和续答来源，并将已发生的路由用量计入独立阶段。 */
+    public synchronized void applicability(KnowledgeApplicabilityPolicy policy,
+            KnowledgeAnswerModelClient.ModelResult<KnowledgeApplicabilityPolicy.Route> result,
+            Long continuationId, boolean routingAttempted) {
+        if (status != Status.RUNNING) return;
+        applicability = new KnowledgeApplicabilityPolicy.Assessment(
+                policy, result == null ? null : result.value(), continuationId, routingAttempted);
+        if (result != null) usage(new KnowledgeAnswerModelClient.TokenUsage(
+                result.promptTokens(), result.completionTokens(), result.totalTokens()));
+    }
+
 
     /** 为已经接受的助手消息建立独立诊断上下文，身份字段均来自服务端。 */
     public KnowledgeAnswerTrace(String runId, Long messageId, Long conversationId, String question, String scope,
@@ -162,7 +177,7 @@ public final class KnowledgeAnswerTrace {
         return new KnowledgeAnswerRunSnapshot(2, runId, messageId, conversationId, question, scope,
                 modelConfigId, modelName, status, errorCode, revision, writeFailures,
                 startedAt, LocalDateTime.now(clock), finishedAt, retrieval, retrievalTruncated,
-                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection);
+                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability);
     }
 
     /** 在调用前持久化运行中阶段，进程中断时仍可定位最后进入的位置。 */
@@ -214,6 +229,7 @@ public final class KnowledgeAnswerTrace {
     private String fallbackCode() {
         if (stages.isEmpty()) return "KNOWLEDGE_ANSWER_FAILED";
         return switch (stages.getLast().stage()) {
+            case APPLICABILITY -> "KNOWLEDGE_APPLICABILITY_CALL_FAILED";
             case RETRIEVAL -> "KNOWLEDGE_RETRIEVAL_FAILED";
             case DRAFT -> "KNOWLEDGE_DRAFT_CALL_FAILED";
             case VALIDATION -> "KNOWLEDGE_STRUCTURE_INVALID";

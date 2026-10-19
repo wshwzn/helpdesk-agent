@@ -1,0 +1,916 @@
+{
+  "schemaVersion": 1,
+  "purpose": "原样冻结历史输入、输出和诊断；不改写问题、证据、草案，也不作为独立人工金标准。",
+  "cases": [
+    {
+      "sourceFile": "docs/evaluation/runs/2026-10-19-片段引用数据.json",
+      "sourceSha256": "7c5e9056c67d66f20c7afb0abdd5079826ebc83e47e8d738d16b83d8bcc01ab4",
+      "caseId": "B08",
+      "originalResult": {
+        "id": "B08",
+        "scenario": "baseline",
+        "question": "普通员工因公出差，住宿报销上限是多少？",
+        "expectedStatus": "NEEDS_CLARIFICATION",
+        "scope": "ALL",
+        "semanticReview": "PENDING",
+        "conversationId": 146,
+        "problems": [
+          "status_mismatch"
+        ],
+        "actualStatus": "INSUFFICIENT_EVIDENCE",
+        "reason": "REVIEWED",
+        "referencedSources": [
+          "expense-process:v1:ALL"
+        ],
+        "claimCount": 2,
+        "statusMatched": false,
+        "referenceCount": 2,
+        "invalidReferenceCount": 0,
+        "candidateSources": [
+          "expense-process:v1:ALL"
+        ],
+        "outcome": "CHECK_FAILED",
+        "message": {
+          "id": 584,
+          "conversationId": 146,
+          "role": "ASSISTANT",
+          "content": "现有证据不足以完整回答问题。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。 [E1]\n\n该通用报销流程文件适用于所有地区，但只说明提交流程，不规定住宿金额上限。 [E1]",
+          "status": "COMPLETED",
+          "modelConfigId": 3,
+          "modelName": "deepseek-v4.1-flash",
+          "promptTokens": 1610,
+          "completionTokens": 145,
+          "totalTokens": 1755,
+          "errorCode": null,
+          "citations": [
+            {
+              "knowledgeBaseName": "可信评测-b52788a6bd",
+              "sourceName": "01-通用报销流程.md",
+              "chunkSequence": 1,
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "documentId": 202,
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "mode": "KNOWLEDGE",
+          "applicabilityScope": "ALL",
+          "knowledgeAnswer": {
+            "schemaVersion": 1,
+            "reason": "REVIEWED",
+            "knowledgeBaseId": 15,
+            "knowledgeBaseName": "可信评测-b52788a6bd",
+            "applicabilityScope": "ALL",
+            "checkedAt": "2026-10-19T17:22:21.2921107",
+            "answer": {
+              "status": "INSUFFICIENT_EVIDENCE",
+              "claims": [
+                {
+                  "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。",
+                  "references": [
+                    {
+                      "evidenceId": "E1",
+                      "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                    }
+                  ]
+                },
+                {
+                  "text": "该通用报销流程文件适用于所有地区，但只说明提交流程，不规定住宿金额上限。",
+                  "references": [
+                    {
+                      "evidenceId": "E1",
+                      "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                    }
+                  ]
+                }
+              ],
+              "missingConditions": [],
+              "conflicts": []
+            },
+            "evidence": [
+              {
+                "id": "E1",
+                "documentId": 202,
+                "chunkSequence": 1,
+                "sourceName": "01-通用报销流程.md",
+                "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                "metadata": {
+                  "sourceKey": "expense-process",
+                  "businessVersion": "v1",
+                  "applicabilityScope": "ALL",
+                  "validFrom": "2026-01-01T00:00:00",
+                  "validUntil": null
+                }
+              }
+            ]
+          },
+          "knowledgeRunId": "86d3671a-7b6b-41da-9ca1-d24a5fe00033",
+          "createdAt": "2026-10-19T17:22:17.697689",
+          "updatedAt": "2026-10-19T17:22:21.3010702"
+        },
+        "elapsedSeconds": 3.663,
+        "knowledgeRunId": "86d3671a-7b6b-41da-9ca1-d24a5fe00033",
+        "diagnosticState": "CAPTURED",
+        "diagnostic": {
+          "schemaVersion": 2,
+          "runId": "86d3671a-7b6b-41da-9ca1-d24a5fe00033",
+          "assistantMessageId": 584,
+          "conversationId": 146,
+          "question": "普通员工因公出差，住宿报销上限是多少？",
+          "applicabilityScope": "ALL",
+          "modelConfigId": 3,
+          "modelName": "deepseek-v4.1-flash",
+          "status": "SUCCEEDED",
+          "errorCode": null,
+          "revision": 14,
+          "diagnosticWriteFailures": 0,
+          "startedAt": "2026-10-19T17:22:17.7018096",
+          "updatedAt": "2026-10-19T17:22:21.3080683",
+          "finishedAt": "2026-10-19T17:22:21.3080683",
+          "retrieval": {
+            "knowledgeBaseId": 15,
+            "query": "普通员工因公出差，住宿报销上限是多少？",
+            "candidateLimit": 50,
+            "vectorMinSimilarity": 0.0,
+            "resultLimit": 5,
+            "bm25CandidateCount": 1,
+            "vectorCandidateCount": 1,
+            "results": [
+              {
+                "rank": 1,
+                "documentId": 202,
+                "chunkSequence": 1,
+                "originalName": "01-通用报销流程.md",
+                "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                "rrfScore": 0.03278688524590164,
+                "bm25Rank": 1,
+                "bm25Score": 26.541561,
+                "vectorRank": 1,
+                "vectorScore": 0.8111135,
+                "metadata": {
+                  "sourceKey": "expense-process",
+                  "businessVersion": "v1",
+                  "applicabilityScope": "ALL",
+                  "validFrom": "2026-01-01T00:00:00",
+                  "validUntil": null
+                }
+              }
+            ]
+          },
+          "retrievalTruncated": false,
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 202,
+              "chunkSequence": 1,
+              "sourceName": "01-通用报销流程.md",
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "draft": {
+            "status": "INSUFFICIENT_EVIDENCE",
+            "claims": [
+              {
+                "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                  }
+                ]
+              },
+              {
+                "text": "该通用报销流程文件适用于所有地区，但只说明提交流程，不规定住宿金额上限。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "review": {
+            "approved": true,
+            "reason": null
+          },
+          "answerReason": "REVIEWED",
+          "stages": [
+            {
+              "stage": "RETRIEVAL",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T17:22:17.7048311",
+              "durationMs": 132,
+              "errorCode": null,
+              "usage": null
+            },
+            {
+              "stage": "DRAFT",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T17:22:17.8402567",
+              "durationMs": 1916,
+              "errorCode": null,
+              "usage": {
+                "promptTokens": 890,
+                "completionTokens": 140,
+                "totalTokens": 1030
+              }
+            },
+            {
+              "stage": "VALIDATION",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T17:22:19.7601693",
+              "durationMs": 2,
+              "errorCode": null,
+              "usage": null
+            },
+            {
+              "stage": "REVIEW",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T17:22:19.76707",
+              "durationMs": 1513,
+              "errorCode": null,
+              "usage": {
+                "promptTokens": 720,
+                "completionTokens": 5,
+                "totalTokens": 725
+              }
+            },
+            {
+              "stage": "EVIDENCE_RECHECK",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T17:22:21.289213",
+              "durationMs": 4,
+              "errorCode": null,
+              "usage": null
+            },
+            {
+              "stage": "MESSAGE_PERSISTENCE",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T17:22:21.2965407",
+              "durationMs": 8,
+              "errorCode": null,
+              "usage": null
+            }
+          ],
+          "citationCatalog": {
+            "citationSetId": "48158a33-b875-4ef0-bbbf-bbe521593fb9",
+            "sources": [
+              {
+                "id": "E1",
+                "documentId": 202,
+                "chunkSequence": 1,
+                "sourceName": "01-通用报销流程.md",
+                "metadata": {
+                  "sourceKey": "expense-process",
+                  "businessVersion": "v1",
+                  "applicabilityScope": "ALL",
+                  "validFrom": "2026-01-01T00:00:00",
+                  "validUntil": null
+                },
+                "paragraphs": [
+                  {
+                    "id": "E1-P1",
+                    "startOffset": 0,
+                    "endOffset": 14,
+                    "text": "# 星河示例公司通用报销流程",
+                    "selectable": true
+                  },
+                  {
+                    "id": "E1-P2",
+                    "startOffset": 16,
+                    "endOffset": 44,
+                    "text": "本文件为公开演示编写的虚构资料，不代表任何真实企业制度。",
+                    "selectable": true
+                  },
+                  {
+                    "id": "E1-P3",
+                    "startOffset": 46,
+                    "endOffset": 116,
+                    "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                    "selectable": true
+                  }
+                ]
+              }
+            ]
+          },
+          "selection": {
+            "citationSetId": "48158a33-b875-4ef0-bbbf-bbe521593fb9",
+            "status": "INSUFFICIENT_EVIDENCE",
+            "claims": [
+              {
+                "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "paragraphId": "E1-P3"
+                  }
+                ]
+              },
+              {
+                "text": "该通用报销流程文件适用于所有地区，但只说明提交流程，不规定住宿金额上限。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "paragraphId": "E1-P3"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          }
+        }
+      }
+    },
+    {
+      "sourceFile": "docs/evaluation/runs/2026-10-19-复核基线回归数据.json",
+      "sourceSha256": "8a649ea6fadc7947318f067646b1c08b6850b212615de4574f557dffd1602379",
+      "caseId": "B06",
+      "originalResult": {
+        "id": "B06",
+        "scenario": "baseline",
+        "question": "上海普通员工现在国内出差，可以直接按未来标准每人每晚700元报销住宿吗？",
+        "expectedStatus": "ANSWERABLE",
+        "scope": "CN_SH",
+        "semanticReview": "PENDING",
+        "conversationId": 159,
+        "outcome": "TECHNICAL_ERROR",
+        "httpStatus": 502,
+        "errorCode": "CHAT_GENERATION_FAILED",
+        "failedMessage": {
+          "id": 610,
+          "conversationId": 159,
+          "role": "ASSISTANT",
+          "content": null,
+          "status": "FAILED",
+          "modelConfigId": 3,
+          "modelName": "deepseek-v4.1-flash",
+          "promptTokens": null,
+          "completionTokens": null,
+          "totalTokens": null,
+          "errorCode": "KNOWLEDGE_REVIEW_REJECTED",
+          "citations": [],
+          "mode": "KNOWLEDGE",
+          "applicabilityScope": "CN_SH",
+          "knowledgeAnswer": null,
+          "knowledgeRunId": "f1708731-919b-46a9-a4f1-db6115588bf1",
+          "createdAt": "2026-10-19T18:03:01.741743",
+          "updatedAt": "2026-10-19T18:03:04.953347"
+        },
+        "elapsedSeconds": 3.291,
+        "knowledgeRunId": "f1708731-919b-46a9-a4f1-db6115588bf1",
+        "diagnosticState": "CAPTURED",
+        "diagnostic": {
+          "schemaVersion": 2,
+          "runId": "f1708731-919b-46a9-a4f1-db6115588bf1",
+          "assistantMessageId": 610,
+          "conversationId": 159,
+          "question": "上海普通员工现在国内出差，可以直接按未来标准每人每晚700元报销住宿吗？",
+          "applicabilityScope": "CN_SH",
+          "modelConfigId": 3,
+          "modelName": "deepseek-v4.1-flash",
+          "status": "FAILED",
+          "errorCode": "KNOWLEDGE_REVIEW_REJECTED",
+          "revision": 9,
+          "diagnosticWriteFailures": 0,
+          "startedAt": "2026-10-19T18:03:01.752827",
+          "updatedAt": "2026-10-19T18:03:04.9483278",
+          "finishedAt": "2026-10-19T18:03:04.9483278",
+          "retrieval": {
+            "knowledgeBaseId": 16,
+            "query": "上海普通员工现在国内出差，可以直接按未来标准每人每晚700元报销住宿吗？",
+            "candidateLimit": 50,
+            "vectorMinSimilarity": 0.0,
+            "resultLimit": 5,
+            "bm25CandidateCount": 2,
+            "vectorCandidateCount": 2,
+            "results": [
+              {
+                "rank": 1,
+                "documentId": 211,
+                "chunkSequence": 1,
+                "originalName": "03-上海住宿新版.md",
+                "content": "# 星河示例公司上海住宿标准 v2\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。",
+                "rrfScore": 0.03278688524590164,
+                "bm25Rank": 1,
+                "bm25Score": 44.785576,
+                "vectorRank": 1,
+                "vectorScore": 0.9041449,
+                "metadata": {
+                  "sourceKey": "travel-policy",
+                  "businessVersion": "v2",
+                  "applicabilityScope": "CN_SH",
+                  "validFrom": "2026-10-01T00:00:00",
+                  "validUntil": "2027-01-01T00:00:00"
+                }
+              },
+              {
+                "rank": 2,
+                "documentId": 209,
+                "chunkSequence": 1,
+                "originalName": "01-通用报销流程.md",
+                "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                "rrfScore": 0.03225806451612903,
+                "bm25Rank": 2,
+                "bm25Score": 22.885387,
+                "vectorRank": 2,
+                "vectorScore": 0.79933083,
+                "metadata": {
+                  "sourceKey": "expense-process",
+                  "businessVersion": "v1",
+                  "applicabilityScope": "ALL",
+                  "validFrom": "2026-01-01T00:00:00",
+                  "validUntil": null
+                }
+              }
+            ]
+          },
+          "retrievalTruncated": false,
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 211,
+              "chunkSequence": 1,
+              "sourceName": "03-上海住宿新版.md",
+              "content": "# 星河示例公司上海住宿标准 v2\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。",
+              "metadata": {
+                "sourceKey": "travel-policy",
+                "businessVersion": "v2",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-10-01T00:00:00",
+                "validUntil": "2027-01-01T00:00:00"
+              }
+            },
+            {
+              "id": "E2",
+              "documentId": 209,
+              "chunkSequence": 1,
+              "sourceName": "01-通用报销流程.md",
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "draft": {
+            "status": "ANSWERABLE",
+            "claims": [
+              {
+                "text": "在上海地区，普通员工因公出差时的住宿报销上限为每人每晚 600 元，超出上限的部分不予报销。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。"
+                  }
+                ]
+              },
+              {
+                "text": "该标准只适用于 CN_SH，不适用于其他地区。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。"
+                  }
+                ]
+              },
+              {
+                "text": "该标准的有效期为 2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。"
+                  }
+                ]
+              },
+              {
+                "text": "通用报销流程只说明提交流程，不规定住宿金额上限。",
+                "references": [
+                  {
+                    "evidenceId": "E2",
+                    "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "review": {
+            "approved": false,
+            "reason": null,
+            "checklist": null
+          },
+          "answerReason": null,
+          "stages": [
+            {
+              "stage": "RETRIEVAL",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T18:03:01.7608104",
+              "durationMs": 170,
+              "errorCode": null,
+              "usage": null
+            },
+            {
+              "stage": "DRAFT",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T18:03:01.935422",
+              "durationMs": 1841,
+              "errorCode": null,
+              "usage": {
+                "promptTokens": 1158,
+                "completionTokens": 222,
+                "totalTokens": 1380
+              }
+            },
+            {
+              "stage": "VALIDATION",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T18:03:03.7809214",
+              "durationMs": 3,
+              "errorCode": null,
+              "usage": null
+            },
+            {
+              "stage": "REVIEW",
+              "status": "FAILED",
+              "startedAt": "2026-10-19T18:03:03.7869399",
+              "durationMs": 1161,
+              "errorCode": "KNOWLEDGE_REVIEW_REJECTED",
+              "usage": {
+                "promptTokens": 1145,
+                "completionTokens": 5,
+                "totalTokens": 1150
+              }
+            }
+          ],
+          "citationCatalog": {
+            "citationSetId": "7654794e-8920-4437-9ad5-40b3ab7f759f",
+            "sources": [
+              {
+                "id": "E1",
+                "documentId": 211,
+                "chunkSequence": 1,
+                "sourceName": "03-上海住宿新版.md",
+                "metadata": {
+                  "sourceKey": "travel-policy",
+                  "businessVersion": "v2",
+                  "applicabilityScope": "CN_SH",
+                  "validFrom": "2026-10-01T00:00:00",
+                  "validUntil": "2027-01-01T00:00:00"
+                },
+                "paragraphs": [
+                  {
+                    "id": "E1-P1",
+                    "startOffset": 0,
+                    "endOffset": 17,
+                    "text": "# 星河示例公司上海住宿标准 v2",
+                    "selectable": true
+                  },
+                  {
+                    "id": "E1-P2",
+                    "startOffset": 19,
+                    "endOffset": 47,
+                    "text": "本文件为公开演示编写的虚构资料，不代表任何真实企业制度。",
+                    "selectable": true
+                  },
+                  {
+                    "id": "E1-P3",
+                    "startOffset": 49,
+                    "endOffset": 155,
+                    "text": "适用范围：CN_SH。有效期：2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。\n上海地区普通员工因公出差，住宿报销上限为每人每晚 600 元。\n超出上限部分不予报销。本标准不适用于其他地区。",
+                    "selectable": true
+                  }
+                ]
+              },
+              {
+                "id": "E2",
+                "documentId": 209,
+                "chunkSequence": 1,
+                "sourceName": "01-通用报销流程.md",
+                "metadata": {
+                  "sourceKey": "expense-process",
+                  "businessVersion": "v1",
+                  "applicabilityScope": "ALL",
+                  "validFrom": "2026-01-01T00:00:00",
+                  "validUntil": null
+                },
+                "paragraphs": [
+                  {
+                    "id": "E2-P1",
+                    "startOffset": 0,
+                    "endOffset": 14,
+                    "text": "# 星河示例公司通用报销流程",
+                    "selectable": true
+                  },
+                  {
+                    "id": "E2-P2",
+                    "startOffset": 16,
+                    "endOffset": 44,
+                    "text": "本文件为公开演示编写的虚构资料，不代表任何真实企业制度。",
+                    "selectable": true
+                  },
+                  {
+                    "id": "E2-P3",
+                    "startOffset": 46,
+                    "endOffset": 116,
+                    "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                    "selectable": true
+                  }
+                ]
+              }
+            ]
+          },
+          "selection": {
+            "citationSetId": "7654794e-8920-4437-9ad5-40b3ab7f759f",
+            "status": "ANSWERABLE",
+            "claims": [
+              {
+                "text": "在上海地区，普通员工因公出差时的住宿报销上限为每人每晚 600 元，超出上限的部分不予报销。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "paragraphId": "E1-P3"
+                  }
+                ]
+              },
+              {
+                "text": "该标准只适用于 CN_SH，不适用于其他地区。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "paragraphId": "E1-P3"
+                  }
+                ]
+              },
+              {
+                "text": "该标准的有效期为 2026 年 10 月 1 日起，至 2027 年 1 月 1 日前。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "paragraphId": "E1-P3"
+                  }
+                ]
+              },
+              {
+                "text": "通用报销流程只说明提交流程，不规定住宿金额上限。",
+                "references": [
+                  {
+                    "evidenceId": "E2",
+                    "paragraphId": "E2-P3"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          }
+        }
+      }
+    },
+    {
+      "sourceFile": "docs/evaluation/runs/2026-10-19-复核基线回归数据.json",
+      "sourceSha256": "8a649ea6fadc7947318f067646b1c08b6850b212615de4574f557dffd1602379",
+      "caseId": "B08",
+      "originalResult": {
+        "id": "B08",
+        "scenario": "baseline",
+        "question": "普通员工因公出差，住宿报销上限是多少？",
+        "expectedStatus": "NEEDS_CLARIFICATION",
+        "scope": "ALL",
+        "semanticReview": "PENDING",
+        "conversationId": 161,
+        "outcome": "TECHNICAL_ERROR",
+        "httpStatus": 502,
+        "errorCode": "CHAT_GENERATION_FAILED",
+        "failedMessage": {
+          "id": 614,
+          "conversationId": 161,
+          "role": "ASSISTANT",
+          "content": null,
+          "status": "FAILED",
+          "modelConfigId": 3,
+          "modelName": "deepseek-v4.1-flash",
+          "promptTokens": null,
+          "completionTokens": null,
+          "totalTokens": null,
+          "errorCode": "KNOWLEDGE_REVIEW_REJECTED",
+          "citations": [],
+          "mode": "KNOWLEDGE",
+          "applicabilityScope": "ALL",
+          "knowledgeAnswer": null,
+          "knowledgeRunId": "bef69e42-4353-44e6-8ce1-ac21d605652d",
+          "createdAt": "2026-10-19T18:03:08.951441",
+          "updatedAt": "2026-10-19T18:03:12.434841"
+        },
+        "elapsedSeconds": 3.566,
+        "knowledgeRunId": "bef69e42-4353-44e6-8ce1-ac21d605652d",
+        "diagnosticState": "CAPTURED",
+        "diagnostic": {
+          "schemaVersion": 2,
+          "runId": "bef69e42-4353-44e6-8ce1-ac21d605652d",
+          "assistantMessageId": 614,
+          "conversationId": 161,
+          "question": "普通员工因公出差，住宿报销上限是多少？",
+          "applicabilityScope": "ALL",
+          "modelConfigId": 3,
+          "modelName": "deepseek-v4.1-flash",
+          "status": "FAILED",
+          "errorCode": "KNOWLEDGE_REVIEW_REJECTED",
+          "revision": 9,
+          "diagnosticWriteFailures": 0,
+          "startedAt": "2026-10-19T18:03:08.9603189",
+          "updatedAt": "2026-10-19T18:03:12.4278118",
+          "finishedAt": "2026-10-19T18:03:12.4278118",
+          "retrieval": {
+            "knowledgeBaseId": 16,
+            "query": "普通员工因公出差，住宿报销上限是多少？",
+            "candidateLimit": 50,
+            "vectorMinSimilarity": 0.0,
+            "resultLimit": 5,
+            "bm25CandidateCount": 1,
+            "vectorCandidateCount": 1,
+            "results": [
+              {
+                "rank": 1,
+                "documentId": 209,
+                "chunkSequence": 1,
+                "originalName": "01-通用报销流程.md",
+                "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                "rrfScore": 0.03278688524590164,
+                "bm25Rank": 1,
+                "bm25Score": 25.733452,
+                "vectorRank": 1,
+                "vectorScore": 0.81114614,
+                "metadata": {
+                  "sourceKey": "expense-process",
+                  "businessVersion": "v1",
+                  "applicabilityScope": "ALL",
+                  "validFrom": "2026-01-01T00:00:00",
+                  "validUntil": null
+                }
+              }
+            ]
+          },
+          "retrievalTruncated": false,
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 209,
+              "chunkSequence": 1,
+              "sourceName": "01-通用报销流程.md",
+              "content": "# 星河示例公司通用报销流程\n\n本文件为公开演示编写的虚构资料，不代表任何真实企业制度。\n\n员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+              "metadata": {
+                "sourceKey": "expense-process",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "draft": {
+            "status": "INSUFFICIENT_EVIDENCE",
+            "claims": [
+              {
+                "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "review": {
+            "approved": false,
+            "reason": null,
+            "checklist": null
+          },
+          "answerReason": null,
+          "stages": [
+            {
+              "stage": "RETRIEVAL",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T18:03:08.9652538",
+              "durationMs": 136,
+              "errorCode": null,
+              "usage": null
+            },
+            {
+              "stage": "DRAFT",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T18:03:09.103289",
+              "durationMs": 1787,
+              "errorCode": null,
+              "usage": {
+                "promptTokens": 894,
+                "completionTokens": 101,
+                "totalTokens": 995
+              }
+            },
+            {
+              "stage": "VALIDATION",
+              "status": "SUCCEEDED",
+              "startedAt": "2026-10-19T18:03:10.8957711",
+              "durationMs": 4,
+              "errorCode": null,
+              "usage": null
+            },
+            {
+              "stage": "REVIEW",
+              "status": "FAILED",
+              "startedAt": "2026-10-19T18:03:10.9036678",
+              "durationMs": 1524,
+              "errorCode": "KNOWLEDGE_REVIEW_REJECTED",
+              "usage": {
+                "promptTokens": 637,
+                "completionTokens": 5,
+                "totalTokens": 642
+              }
+            }
+          ],
+          "citationCatalog": {
+            "citationSetId": "65786565-7a1d-4c47-b2f8-8461c88951b3",
+            "sources": [
+              {
+                "id": "E1",
+                "documentId": 209,
+                "chunkSequence": 1,
+                "sourceName": "01-通用报销流程.md",
+                "metadata": {
+                  "sourceKey": "expense-process",
+                  "businessVersion": "v1",
+                  "applicabilityScope": "ALL",
+                  "validFrom": "2026-01-01T00:00:00",
+                  "validUntil": null
+                },
+                "paragraphs": [
+                  {
+                    "id": "E1-P1",
+                    "startOffset": 0,
+                    "endOffset": 14,
+                    "text": "# 星河示例公司通用报销流程",
+                    "selectable": true
+                  },
+                  {
+                    "id": "E1-P2",
+                    "startOffset": 16,
+                    "endOffset": 44,
+                    "text": "本文件为公开演示编写的虚构资料，不代表任何真实企业制度。",
+                    "selectable": true
+                  },
+                  {
+                    "id": "E1-P3",
+                    "startOffset": 46,
+                    "endOffset": 116,
+                    "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。\n本文件适用于所有地区，只说明提交流程，不规定住宿金额上限。",
+                    "selectable": true
+                  }
+                ]
+              }
+            ]
+          },
+          "selection": {
+            "citationSetId": "65786565-7a1d-4c47-b2f8-8461c88951b3",
+            "status": "INSUFFICIENT_EVIDENCE",
+            "claims": [
+              {
+                "text": "员工应在差旅结束后十五个自然日内提交报销申请，并附行程说明、审批记录和有效票据。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "paragraphId": "E1-P3"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          }
+        }
+      }
+    }
+  ]
+}
