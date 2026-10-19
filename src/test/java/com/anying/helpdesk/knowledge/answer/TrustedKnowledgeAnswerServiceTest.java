@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
@@ -98,10 +99,16 @@ class TrustedKnowledgeAnswerServiceTest {
     @DisplayName("检索到两份相反资料时完整协议链路保留冲突双方")
     void completesConflictThroughRealProtocolAdapter() throws Exception {
         var json = JsonMapper.builder().addModule(new JavaTimeModule()).build();
-        when(model.chatModel().call(any(Prompt.class))).thenReturn(
-                new ChatResponse(List.of(new Generation(new AssistantMessage(
-                        json.writeValueAsString(draft(KnowledgeAnswerDraft.Status.CONFLICT)))))),
-                new ChatResponse(List.of(new Generation(new AssistantMessage("{\"approved\":true}")))));
+        when(model.chatModel().call(any(Prompt.class))).thenAnswer(invocation -> {
+            Prompt prompt = invocation.getArgument(0);
+            var input = json.readTree(prompt.getInstructions().getLast().getText());
+            String output = "{\"approved\":true}";
+            if (!input.has("draft")) {
+                var catalog = json.treeToValue(input.get("evidence"), KnowledgeCitationCatalog.class);
+                output = json.writeValueAsString(selection(draft(KnowledgeAnswerDraft.Status.CONFLICT), catalog));
+            }
+            return new ChatResponse(List.of(new Generation(new AssistantMessage(output))));
+        });
         var realAdapterService = new TrustedKnowledgeAnswerService(bases, retrieval, eligibility,
                 new KnowledgeAnswerModelClient(json), new KnowledgeAnswerGuard(), clock);
         var result = realAdapterService.answer(model, QUESTION, "SH");
@@ -120,13 +127,13 @@ class TrustedKnowledgeAnswerServiceTest {
         verify(client, never()).review(any(), any(), any(), any(), any());
     }
 
-    /** 真编号不能为篡改金额的假引文提供合法性。 */
+    /** 真证据编号也不能引用目录中不存在的片段。 */
     @Test
-    @DisplayName("真实证据编号搭配伪造引文也不能通过")
-    void rejectsAlteredQuote() {
+    @DisplayName("真实证据编号搭配伪造片段也不能通过")
+    void rejectsUnknownParagraph() {
         propose(new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.ANSWERABLE,
                 List.of(claim("E1", "上海员工住宿上限为每晚900元。")), List.of(), List.of()));
-        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH")).hasMessage("quote is absent from evidence");
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH")).hasMessage("unknown paragraph id");
     }
 
     /** 同一文档的引用不能伪装成两个来源冲突。 */
@@ -197,8 +204,8 @@ class TrustedKnowledgeAnswerServiceTest {
     @Test
     @DisplayName("缺失模型用量时汇总仍为未知")
     void unknownUsageStaysUnknown() {
-        when(client.draft(any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
-                draft(KnowledgeAnswerDraft.Status.ANSWERABLE), null, null, null));
+        when(client.draft(any(), any(), any(), any())).thenAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(
+                selection(draft(KnowledgeAnswerDraft.Status.ANSWERABLE), invocation.getArgument(3)), null, null, null));
         assertThat(service.answer(model, QUESTION, "SH").totalTokens()).isNull();
     }
 
@@ -213,7 +220,8 @@ class TrustedKnowledgeAnswerServiceTest {
                     assertThat(failure.getMessage()).doesNotContain("private provider secret");
                     assertThat(failure.getCause()).isNull();
                 });
-        doReturn(new KnowledgeAnswerModelClient.ModelResult<>(draft(KnowledgeAnswerDraft.Status.ANSWERABLE), 1, 1, 2))
+        doAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(
+                selection(draft(KnowledgeAnswerDraft.Status.ANSWERABLE), invocation.getArgument(3)), 1, 1, 2))
                 .when(client).draft(any(), any(), any(), any());
         when(client.review(any(), any(), any(), any(), any())).thenThrow(new IllegalStateException("private review secret"));
         assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
@@ -259,10 +267,53 @@ class TrustedKnowledgeAnswerServiceTest {
                         : List.of());
     }
 
+    /** 真实引文只证明出处；错误数字、否定与适用范围仍必须进入语义复核并接受否决。 */
+    @ParameterizedTest
+    @ValueSource(strings = {"上海普通员工每晚可报销900元。", "超出600元的部分也可报销。", "所有地区员工均可报销600元。"})
+    @DisplayName("合法片段配错误结论仍由复核拦截且不得交付")
+    void validParagraphDoesNotBypassSemanticReview(String wrongClaim) {
+        String original = "仅适用上海普通员工。\n每晚 600 元，超出部分不予报销。";
+        when(retrieval.search(any(), any())).thenReturn(search(List.of(hit(10L, original))));
+        when(client.draft(any(), any(), any(), any())).thenAnswer(invocation -> {
+            KnowledgeCitationCatalog catalog = invocation.getArgument(3);
+            return new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerSelection(catalog.citationSetId(),
+                    KnowledgeAnswerDraft.Status.ANSWERABLE, List.of(new KnowledgeAnswerSelection.Claim(wrongClaim,
+                    List.of(new KnowledgeAnswerSelection.Reference("E1", "E1-P1")))), List.of(), List.of()), 10, 5, 15);
+        });
+        when(client.review(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
+            KnowledgeAnswerDraft resolved = invocation.getArgument(4);
+            assertThat(resolved.claims().getFirst().text()).isEqualTo(wrongClaim);
+            assertThat(resolved.claims().getFirst().references().getFirst().quote()).isEqualTo(original);
+            return new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerModelClient.Review(false), 20, 5, 25);
+        });
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
+                .hasMessage("knowledge answer review rejected");
+        verify(client).review(any(), any(), any(), any(), any());
+        verifyNoInteractions(eligibility);
+    }
+
     /** 配置草案调用的确定性响应。 */
     private void propose(KnowledgeAnswerDraft draft) {
         when(client.draft(any(), any(), any(), any()))
-                .thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(draft, 10, 5, 15));
+                .thenAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(selection(draft, invocation.getArgument(3)), 10, 5, 15));
+    }
+
+    /** 把既有业务状态样本转换为本轮片段选择，以继续覆盖原编排边界。 */
+    private KnowledgeAnswerSelection selection(KnowledgeAnswerDraft draft, KnowledgeCitationCatalog catalog) {
+        return new KnowledgeAnswerSelection(catalog.citationSetId(), draft.status(),
+                draft.claims().stream().map(claim -> selectionClaim(claim, catalog)).toList(), draft.missingConditions(),
+                draft.conflicts().stream().map(conflict -> new KnowledgeAnswerSelection.Conflict(conflict.issue(),
+                        selectionClaim(conflict.first(), catalog), selectionClaim(conflict.second(), catalog))).toList());
+    }
+
+    /** 在固定目录中选择对应原句，找不到的引文转换为故意伪造的片段编号。 */
+    private KnowledgeAnswerSelection.Claim selectionClaim(KnowledgeAnswerDraft.Claim claim, KnowledgeCitationCatalog catalog) {
+        return new KnowledgeAnswerSelection.Claim(claim.text(), claim.references().stream().map(reference -> {
+            String id = catalog.sources().stream().filter(source -> source.id().equals(reference.evidenceId()))
+                    .flatMap(source -> source.paragraphs().stream()).filter(paragraph -> paragraph.text().equals(reference.quote()))
+                    .map(KnowledgeCitationCatalog.Paragraph::id).findFirst().orElse(reference.evidenceId() + "-P999");
+            return new KnowledgeAnswerSelection.Reference(reference.evidenceId(), id);
+        }).toList());
     }
 
     /** 构造包含逐字引文的结论。 */

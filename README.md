@@ -407,11 +407,12 @@ Content-Type: application/json
 
 - 知识问题最多 2000 字，每次提交完整问题；此模式不带历史事实、不执行工单工具。使用默认知识库，范围只能由调用方指定；省略时只查 `ALL`，不自动把“上海”映射成 `CN_SH`。AGENT 请求携带范围会返回 400，防止调用方误以为范围已应用。
 - `assistantMessage.knowledgeAnswer.answer.status` 返回 `ANSWERABLE`（充分依据）、`NEEDS_CLARIFICATION`（需补条件）、`INSUFFICIENT_EVIDENCE`（依据不足）或 `CONFLICT`（疑似冲突）。不足时允许保留有依据部分；冲突时展示双方，不按版本号或上传时间选边。
+- 草案模型只返回本轮 `citationSetId` 与 `evidenceId + paragraphId`。后端按空行建立片段目录、验证所属证据并逐字提取完整原文；跨轮目录、未知片段、跨证据片段均拒绝，不放宽引用校验。过长段落保留上下文但不可引用。
 - 报告含 `claims[].references[]` 的 `evidenceId` 和逐字 `quote`，通过 `evidence[]` 对应真实 `documentId`、`chunkSequence`、原文与业务版本。正文中的 `[E1]` 由服务端生成。兼容字段 `citations` 只包含实际使用的证据；报告还保留未被引用的本轮候选，便于审计遗漏。
 - `reason=NO_MATCH/NOT_CONFIGURED` 区分无命中与未配置；`REVIEWED` 表示有证据且通过复核。检索异常、协议错误、引用伪造、复核否决、生成期间证据失效均是技术失败，不能当作正确拒答统计；消息历史保存安全的知识阶段错误码（如 `KNOWLEDGE_CITATION_INVALID`），未知或旧版本错误仍为 `KNOWLEDGE_ANSWER_FAILED`，无草案正文。
 - `/messages/stream` 同样接受这三个参数：先 `start`，核验和保存完成后一次性 `delta`，最后 `done`。因此知识模式无需厂商流式能力，但首段正文会等待两次模型调用；失败只有 `start/error`。普通 AGENT 流程不变。
 - 历史消息保存 `mode`、范围和完整核验报告；历史证据不会随知识库撤回而消失，不能据此推断今天的规则。V17 会自动迁移旧消息为 AGENT。
-- V18 为新知识助手消息增加 `knowledgeRunId`，成功或失败均保留。管理员可通过 `GET /api/admin/knowledge-answer-runs/{runId}` 查询候选、草案、核验结果、分阶段耗时及已知用量；列表接口只返回摘要。客户消息不会返回未核验草案。诊断存储故障与业务结果隔离，可能留下缺失或未结束快照，不能把运行 ID 当作诊断完整性的保证。设计见 `notes/27-问答运行记录与失败诊断.md`。
+- V18 为新知识助手消息增加 `knowledgeRunId`，成功或失败均保留。管理员可通过 `GET /api/admin/knowledge-answer-runs/{runId}` 查询候选、草案、核验结果、分阶段耗时及已知用量；列表接口只返回摘要。客户消息不会返回未核验草案。诊断存储故障与业务结果隔离，可能留下缺失或未结束快照，不能把运行 ID 当作诊断完整性的保证。新诊断版本 2 额外保留 `citationCatalog` 和模型原始 `selection`；`draft` 是引用解析后的草案。旧诊断仍可读取。设计见 `notes/27-问答运行记录与失败诊断.md` 和 `notes/28-片段选择与原文引用.md`。
 
 程序严格检查引用身份和逐字出处；语义复核使用同一个配置模型的独立调用，仍可能误判，不构成事实正确性的数学保证。候选超过 50 个 Chunk、正文合计超过 50000 字时明确失败，不静默丢弃可能含冲突的资料。当前冲突识别仅覆盖本次检索命中的资料，还没有全库冲突扫描或前端模式选择器。基础实现与测试细节见 `notes/25-证据约束回答与核验.md`，真实模型运行结果见下述专项评测。
 

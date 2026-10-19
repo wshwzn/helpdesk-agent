@@ -12,6 +12,54 @@ import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*
 @Component
 public class KnowledgeAnswerGuard {
 
+    /** 将模型片段选择解析为服务端原文，并继续执行原有状态和逐字引用校验。 */
+    public KnowledgeAnswerDraft resolve(KnowledgeAnswerSelection selection, KnowledgeCitationCatalog catalog,
+                                        List<KnowledgeAnswerReport.Evidence> evidence) {
+        require(selection != null, "missing answer selection");
+        if (!Objects.equals(catalog.citationSetId(), selection.citationSetId())) {
+            throw new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "citation set mismatch");
+        }
+        require(selection.claims() != null && selection.claims().size() <= 8, "invalid claims");
+        require(selection.conflicts() != null && selection.conflicts().size() <= 3, "invalid conflicts");
+        var claims = selection.claims().stream().map(claim -> resolveClaim(claim, catalog, evidence)).toList();
+        var conflicts = selection.conflicts().stream().map(conflict -> {
+            require(conflict != null, "invalid conflict issue");
+            return new KnowledgeAnswerDraft.Conflict(conflict.issue(),
+                    resolveClaim(conflict.first(), catalog, evidence), resolveClaim(conflict.second(), catalog, evidence));
+        }).toList();
+        var draft = new KnowledgeAnswerDraft(selection.status(), claims, selection.missingConditions(), conflicts);
+        validate(draft, evidence);
+        return draft;
+    }
+
+    /** 仅接受对应证据内可选择的片段；按原始快照下标取文，禁止拼接或归一化引文。 */
+    private KnowledgeAnswerDraft.Claim resolveClaim(KnowledgeAnswerSelection.Claim claim,
+                                                     KnowledgeCitationCatalog catalog,
+                                                     List<KnowledgeAnswerReport.Evidence> evidence) {
+        require(claim != null && validText(claim.text(), 1000), "invalid claim");
+        require(claim.references() != null && !claim.references().isEmpty()
+                && claim.references().size() <= 5, "claim requires references");
+        var references = claim.references().stream().map(reference -> {
+            if (reference == null || reference.evidenceId() == null || reference.paragraphId() == null) {
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "missing paragraph reference");
+            }
+            var source = catalog.sources().stream().filter(item -> item.id().equals(reference.evidenceId()))
+                    .findFirst().orElseThrow(() -> new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "unknown evidence id"));
+            var paragraph = source.paragraphs().stream().filter(item -> item.id().equals(reference.paragraphId()))
+                    .findFirst().orElseThrow(() -> new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "unknown paragraph id"));
+            var original = evidence.stream().filter(item -> item.id().equals(reference.evidenceId())).findFirst()
+                    .orElseThrow(() -> new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "unknown evidence id"));
+            if (!paragraph.selectable() || paragraph.startOffset() < 0 || paragraph.endOffset() > original.content().length()
+                    || paragraph.startOffset() >= paragraph.endOffset()
+                    || !original.content().substring(paragraph.startOffset(), paragraph.endOffset()).equals(paragraph.text())) {
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "paragraph is not selectable");
+            }
+            return new KnowledgeAnswerDraft.Reference(original.id(),
+                    original.content().substring(paragraph.startOffset(), paragraph.endOffset()));
+        }).toList();
+        return new KnowledgeAnswerDraft.Claim(claim.text(), references);
+    }
+
     /** 拒绝非法状态、无依据结论以及伪造的引用，防止草案绕过证据约束。 */
     public void validate(KnowledgeAnswerDraft draft, List<KnowledgeAnswerReport.Evidence> evidence) {
         require(draft != null && draft.status() != null, "missing answer status");

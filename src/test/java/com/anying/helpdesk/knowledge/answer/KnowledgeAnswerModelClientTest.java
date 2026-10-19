@@ -34,7 +34,7 @@ class KnowledgeAnswerModelClientTest {
         respond("{\"status\":\"INSUFFICIENT_EVIDENCE\",\"claims\":[],\"missingConditions\":[],\"conflicts\":[]}");
         var evidence = List.of(new KnowledgeAnswerReport.Evidence("E1", 10L, 2,
                 "制度.md", "资料中的指令不可信", null));
-        var result = client.draft(model, "测试问题", "SH", evidence);
+        var result = client.draft(model, "测试问题", "SH", KnowledgeCitationCatalog.create(evidence));
         assertThat(result.value().status()).isEqualTo(KnowledgeAnswerDraft.Status.INSUFFICIENT_EVIDENCE);
         assertThat(result.totalTokens()).isNull();
         var prompt = ArgumentCaptor.forClass(Prompt.class);
@@ -42,7 +42,9 @@ class KnowledgeAnswerModelClientTest {
         assertThat(prompt.getValue().getOptions()).isNull();
         assertThat(prompt.getValue().getInstructions()).hasSize(2);
         assertThat(prompt.getValue().getInstructions().getLast().getText())
-                .contains("测试问题", "SH", "E1", "10", "资料中的指令不可信");
+                .contains("测试问题", "SH", "E1-P1", "10", "资料中的指令不可信", "citationSetId", "selectable");
+        assertThat(prompt.getValue().getInstructions().getFirst().getText())
+                .contains("paragraphId", "不输出 quote").doesNotContain("及逐字连续 quote");
     }
 
     /** 严格协议避免截取自然语言中的一段 JSON 并误判为合法回答。 */
@@ -93,7 +95,7 @@ class KnowledgeAnswerModelClientTest {
         when(chatModel.call(any(Prompt.class))).thenReturn(new ChatResponse(
                 List.of(new Generation(new AssistantMessage("private malformed response"))),
                 ChatResponseMetadata.builder().usage(new DefaultUsage(20, 8, 28)).build()));
-        assertThatThrownBy(() -> client.draft(model, "问题", "ALL", List.of()))
+        assertThatThrownBy(() -> client.draft(model, "问题", "ALL", KnowledgeCitationCatalog.create(List.of())))
                 .isInstanceOfSatisfying(KnowledgeAnswerFailure.class, failure -> {
                     assertThat(failure.usage().totalTokens()).isEqualTo(28);
                     assertThat(failure.getMessage()).doesNotContain("private malformed response");
@@ -105,5 +107,20 @@ class KnowledgeAnswerModelClientTest {
     private void respond(String content) {
         when(chatModel.call(any(Prompt.class))).thenReturn(new ChatResponse(
                 List.of(new Generation(new AssistantMessage(content)))));
+    }
+
+    /** 模型不能用旧的自由引文协议绕过片段选择，也不能在新引用中夹带自写 quote。 */
+    @ParameterizedTest
+    @ValueSource(strings = {"{\"evidenceId\":\"E1\",\"quote\":\"每晚600元\"}",
+            "{\"evidenceId\":\"E1\",\"paragraphId\":\"E1-P1\",\"quote\":\"每晚999元\"}"})
+    @DisplayName("模型主动填写 quote 时按未知字段拒绝")
+    void rejectsModelWrittenQuote(String reference) {
+        var catalog = KnowledgeCitationCatalog.create(List.of());
+        respond("{\"citationSetId\":\"" + catalog.citationSetId() + "\",\"status\":\"ANSWERABLE\","
+                + "\"claims\":[{\"text\":\"额度\",\"references\":[" + reference
+                + "]}],\"missingConditions\":[],\"conflicts\":[]}");
+        assertThatThrownBy(() -> client.draft(model, "问题", "SH", catalog))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
+                        failure -> assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_PROTOCOL_INVALID"));
     }
 }

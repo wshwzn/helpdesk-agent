@@ -1,6 +1,8 @@
 package com.anying.helpdesk.knowledge.answer.trace;
 
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerDraft;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerSelection;
+import com.anying.helpdesk.knowledge.answer.KnowledgeCitationCatalog;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerModelClient;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerReport;
 import com.anying.helpdesk.knowledge.dto.KnowledgeSearchResponse;
@@ -17,7 +19,7 @@ public record KnowledgeAnswerRunSnapshot(
         KnowledgeSearchResponse retrieval, boolean retrievalTruncated,
         List<KnowledgeAnswerReport.Evidence> evidence, KnowledgeAnswerDraft draft,
         KnowledgeAnswerModelClient.Review review, KnowledgeAnswerReport.Reason answerReason,
-        List<StageResult> stages
+        List<StageResult> stages, KnowledgeCitationCatalog citationCatalog, KnowledgeAnswerSelection selection
 ) {
     public enum Status { RUNNING, SUCCEEDED, FAILED, CANCELLED }
     public enum Stage { RETRIEVAL, DRAFT, VALIDATION, REVIEW, EVIDENCE_RECHECK, MESSAGE_PERSISTENCE }

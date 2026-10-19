@@ -32,9 +32,11 @@ public class KnowledgeAnswerModelClient {
             引文必须保留影响结论的条件、否定、数字和单位。结论不得比原文更宽泛。
             不得在文本中自写 [E1] 等引用标签。必须返回单个 JSON 对象，无 Markdown 代码围栏。
             """;
-    private static final String DRAFT_PROMPT = RULES + """
-            返回格式：{"status":"ANSWERABLE","claims":[{"text":"结论",
-            "references":[{"evidenceId":"E1","quote":"证据中的完整原句"}]}],
+    private static final String DRAFT_PROMPT = RULES.replace(
+            "claims 中只写有证据的独立结论，每项 references 含本轮 evidenceId 及逐字连续 quote。",
+            "claims 中只写有证据的独立结论，每项 references 含本轮 evidenceId 及 paragraphId。") + """
+            返回格式：{"citationSetId":"原样返回输入的目录编号","status":"ANSWERABLE","claims":[{"text":"结论",
+            "references":[{"evidenceId":"E1","paragraphId":"E1-P1"}]}],
             "missingConditions":[],"conflicts":[]}
             status 只允许 ANSWERABLE、NEEDS_CLARIFICATION、INSUFFICIENT_EVIDENCE、CONFLICT。
             ANSWERABLE 必须完整回答问题且 claims 非空；仅能回答部分时用 INSUFFICIENT_EVIDENCE，
@@ -44,7 +46,12 @@ public class KnowledgeAnswerModelClient {
             有冲突时优先 CONFLICT，否则需要条件时 NEEDS_CLARIFICATION，否则证据不够时 INSUFFICIENT_EVIDENCE。
             只有 CONFLICT 能带 conflicts；只有 NEEDS_CLARIFICATION 能带 missingConditions。
             最多 8 项 claims、5 个问题、3 项冲突；每项结论最多 1000 字、问题和冲突事项最多 300 字；
-            每个 Claim 最多 5 个引用，quote 长度 4～1500 字。无内容的列表仍必须返回 []。
+            每个 Claim 最多 5 个引用。无内容的列表仍必须返回 []。
+            evidence 中的 sources 对应候选证据，每份资料包含编号段落 paragraphs。
+            citationSetId 必须原样返回 evidence.citationSetId。引用只能选对应 evidenceId 下 selectable=true 的段落。
+            不输出 quote，不修改段落原文，不自造编号；后端会提取所选段落的完整原文。
+            必须选齐支持结论及其条件、否定、数字和单位的段落；相邻段落仍可能限定其适用范围。
+            selectable=false 的段落仍是上下文，不能忽略其中限制或相反证据；无法引用充分依据时保留证据不足。
             """;
     private static final String REVIEW_PROMPT = RULES + """
             你现在独立复核 draft，不要续写草案。逐条检查全部结论、引文和问题，
@@ -73,10 +80,10 @@ public class KnowledgeAnswerModelClient {
     }
 
     /** 只提供本轮证据生成草案，不注册工单工具，也不引入旧轮事实。 */
-    public ModelResult<KnowledgeAnswerDraft> draft(ResolvedChatModel model, String question, String scope,
-                                                  List<KnowledgeAnswerReport.Evidence> evidence) {
+    public ModelResult<KnowledgeAnswerSelection> draft(ResolvedChatModel model, String question, String scope,
+                                                  KnowledgeCitationCatalog evidence) {
         return call(model, DRAFT_PROMPT, Map.of("question", question, "applicabilityScope", scope,
-                "evidence", evidence), KnowledgeAnswerDraft.class);
+                "evidence", evidence), KnowledgeAnswerSelection.class);
     }
 
     /** 使用完整候选证据独立复核草案，避免仅检查模型自己挑选的引用。 */

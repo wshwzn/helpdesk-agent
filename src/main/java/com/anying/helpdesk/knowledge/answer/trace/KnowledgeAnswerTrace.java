@@ -1,6 +1,8 @@
 package com.anying.helpdesk.knowledge.answer.trace;
 
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerDraft;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerSelection;
+import com.anying.helpdesk.knowledge.answer.KnowledgeCitationCatalog;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerModelClient;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerReport;
@@ -43,6 +45,8 @@ public final class KnowledgeAnswerTrace {
     private boolean retrievalTruncated;
     private List<KnowledgeAnswerReport.Evidence> evidence = List.of();
     private KnowledgeAnswerDraft draft;
+    private KnowledgeAnswerSelection selection;
+    private KnowledgeCitationCatalog citationCatalog;
     private KnowledgeAnswerModelClient.Review review;
     private KnowledgeAnswerReport.Reason answerReason;
     private long stageStartedNanos;
@@ -106,11 +110,21 @@ public final class KnowledgeAnswerTrace {
         if (status == Status.RUNNING) evidence = List.copyOf(value);
     }
 
-    /** 保存已解析但尚未核验的草案及厂商返回的用量。 */
-    public synchronized void drafted(KnowledgeAnswerModelClient.ModelResult<KnowledgeAnswerDraft> value) {
+    /** 保存模型原始片段选择及用量，即使后续引用解析失败也可诊断。 */
+    public synchronized void selected(KnowledgeAnswerModelClient.ModelResult<KnowledgeAnswerSelection> value) {
         if (status != Status.RUNNING) return;
-        draft = value.value();
+        selection = value.value();
         usage(new KnowledgeAnswerModelClient.TokenUsage(value.promptTokens(), value.completionTokens(), value.totalTokens()));
+    }
+
+    /** 保存本轮目录和原文偏移，供管理员核对模型的片段选择。 */
+    public synchronized void catalog(KnowledgeCitationCatalog value) {
+        if (status == Status.RUNNING) citationCatalog = value;
+    }
+
+    /** 保存后端完成引用解析与结构校验的草案，语义仍须复核。 */
+    public synchronized void resolved(KnowledgeAnswerDraft value) {
+        if (status == Status.RUNNING) draft = value;
     }
 
     /** 保存复核布尔结论及可选原因；原因只是模型判断而非人工金标准。 */
@@ -145,10 +159,10 @@ public final class KnowledgeAnswerTrace {
 
     /** 导出不可变列表快照，供持久化与确定性测试使用。 */
     public synchronized KnowledgeAnswerRunSnapshot snapshot() {
-        return new KnowledgeAnswerRunSnapshot(1, runId, messageId, conversationId, question, scope,
+        return new KnowledgeAnswerRunSnapshot(2, runId, messageId, conversationId, question, scope,
                 modelConfigId, modelName, status, errorCode, revision, writeFailures,
                 startedAt, LocalDateTime.now(clock), finishedAt, retrieval, retrievalTruncated,
-                evidence, draft, review, answerReason, List.copyOf(stages));
+                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection);
     }
 
     /** 在调用前持久化运行中阶段，进程中断时仍可定位最后进入的位置。 */

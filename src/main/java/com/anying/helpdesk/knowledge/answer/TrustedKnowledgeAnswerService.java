@@ -50,18 +50,20 @@ public class TrustedKnowledgeAnswerService {
             return empty(retrieved.reason(), retrieved.baseId(), retrieved.baseName(), scope);
         }
         var evidence = retrieved.evidence();
-        var draft = trace.stage(DRAFT, () -> {
-            var result = atStage(KNOWLEDGE_DRAFT_CALL_FAILED, () -> modelClient.draft(model, question, scope, evidence));
-            trace.drafted(result);
+        var catalog = retrieved.catalog();
+        var selection = trace.stage(DRAFT, () -> {
+            var result = atStage(KNOWLEDGE_DRAFT_CALL_FAILED, () -> modelClient.draft(model, question, scope, catalog));
+            trace.selected(result);
             return result;
         });
-        trace.stage(VALIDATION, () -> {
-            guard.validate(draft.value(), evidence);
-            return null;
+        var draft = trace.stage(VALIDATION, () -> {
+            var resolved = guard.resolve(selection.value(), catalog, evidence);
+            trace.resolved(resolved);
+            return resolved;
         });
         var review = trace.stage(REVIEW, () -> {
             var result = atStage(KNOWLEDGE_REVIEW_CALL_FAILED,
-                    () -> modelClient.review(model, question, scope, evidence, draft.value()));
+                    () -> modelClient.review(model, question, scope, evidence, draft));
             trace.reviewed(result);
             requireApproved(result.value());
             return result;
@@ -79,25 +81,25 @@ public class TrustedKnowledgeAnswerService {
             return now;
         });
         var report = new KnowledgeAnswerReport(1, KnowledgeAnswerReport.Reason.REVIEWED,
-                retrieved.baseId(), retrieved.baseName(), scope, checkedAt, draft.value(), evidence);
+                retrieved.baseId(), retrieved.baseName(), scope, checkedAt, draft, evidence);
         trace.answerReason(report.reason());
-        return new ChatCompletionResult(render(report), sum(draft.promptTokens(), review.promptTokens()),
-                sum(draft.completionTokens(), review.completionTokens()), sum(draft.totalTokens(), review.totalTokens()), report);
+        return new ChatCompletionResult(render(report), sum(selection.promptTokens(), review.promptTokens()),
+                sum(selection.completionTokens(), review.completionTokens()), sum(selection.totalTokens(), review.totalTokens()), report);
     }
 
     private record Retrieved(Long baseId, String baseName, KnowledgeAnswerReport.Reason reason,
-                             List<KnowledgeAnswerReport.Evidence> evidence) { }
+                             List<KnowledgeAnswerReport.Evidence> evidence, KnowledgeCitationCatalog catalog) { }
 
     /** 保存实际召回再按原有预算建立证据编号，诊断截断不会改变送入模型的证据。 */
     private Retrieved retrieve(String question, String scope, KnowledgeAnswerTrace trace) {
         var base = atStage(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault);
-        if (base.isEmpty()) return new Retrieved(null, null, KnowledgeAnswerReport.Reason.NOT_CONFIGURED, List.of());
+        if (base.isEmpty()) return new Retrieved(null, null, KnowledgeAnswerReport.Reason.NOT_CONFIGURED, List.of(), null);
         var knowledgeBase = base.get();
         var search = atStage(KNOWLEDGE_RETRIEVAL_FAILED,
                 () -> retrievalService.search(knowledgeBase.id(), new KnowledgeSearchRequest(question, scope)));
         trace.retrieved(search);
         if (search.results().isEmpty()) {
-            return new Retrieved(knowledgeBase.id(), knowledgeBase.name(), KnowledgeAnswerReport.Reason.NO_MATCH, List.of());
+            return new Retrieved(knowledgeBase.id(), knowledgeBase.name(), KnowledgeAnswerReport.Reason.NO_MATCH, List.of(), null);
         }
         List<KnowledgeAnswerReport.Evidence> evidence = new ArrayList<>();
         for (var hit : search.results()) {
@@ -112,7 +114,9 @@ public class TrustedKnowledgeAnswerService {
         }
         var immutableEvidence = List.copyOf(evidence);
         trace.evidence(immutableEvidence);
-        return new Retrieved(knowledgeBase.id(), knowledgeBase.name(), KnowledgeAnswerReport.Reason.REVIEWED, immutableEvidence);
+        var catalog = KnowledgeCitationCatalog.create(immutableEvidence);
+        trace.catalog(catalog);
+        return new Retrieved(knowledgeBase.id(), knowledgeBase.name(), KnowledgeAnswerReport.Reason.REVIEWED, immutableEvidence, catalog);
     }
 
     /** 拒绝不一致的复核协议，并把合法否决原因映射成固定枚举码，避免输出自由文本。 */

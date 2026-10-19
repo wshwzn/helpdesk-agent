@@ -68,7 +68,7 @@ V18 起，新知识助手消息的 `knowledgeRunId` 在成功和失败时都会�
 
 诊断采集失败不会把原问答从成功改为失败，也不会把失败改为通过。`--require-diagnostics` 只增加退出码条件。原来按成功消息计算的 Token 指标保留；新增 `diagnosticKnownAnswerTokens` 从已获取的完整诊断累计 DRAFT/REVIEW 阶段用量，可能包含失败调用。它与成功消息 Token 有重叠，**不能相加**；未知调用和 Embedding 仍不在已知总量内，`diagnosticModelStagesMissingUsage` 单列缺失用量的模型阶段。
 
-诊断中的 `draft` 可能是错的，`review` 也是模型判断。候选、逐字引文和结论需一起对照，不能拿未核验草案当答案。普通客户和客服不能查询此接口；管理员列表 `GET /api/admin/knowledge-answer-runs` 只返回摘要，支持 page/size、conversationId 和 status 筛选。原始 `results.json` 现在可能包含失败草案与知识原文，提交公开报告前只保留虚构测试资料并检查凭据字段。
+诊断版本 2 新增 `citationCatalog` 和 `selection`：前者记录本轮段落目录及原文偏移，后者记录模型实际选择。`draft` 是后端提取原文、完成引用与结构校验后的草案，仍可能在语义上错误；解析失败时看 `selection`，此时 `draft` 为空。版本 1 的历史诊断保留旧草案，新增字段为空。`review` 也是模型判断。候选、逐字引文和结论需一起对照，不能拿未核验草案当答案。普通客户和客服不能查询此接口；管理员列表 `GET /api/admin/knowledge-answer-runs` 只返回摘要，支持 page/size、conversationId 和 status 筛选。原始 `results.json` 现在可能包含失败草案与知识原文，提交公开报告前只保留虚构测试资料并检查凭据字段。
 
 诊断采用独立短事务。写入失败时业务仍继续，后续阶段尝试保存累计快照；进程中断或最后写入失败可能留下 RUNNING，不能单凭它断言模型仍在调用。详细设计见 `notes/27-问答运行记录与失败诊断.md`。
 
@@ -85,7 +85,7 @@ V18 起，新知识助手消息的 `knowledgeRunId` 在成功和失败时都会�
 | KNOWLEDGE_REVIEW_CALL_FAILED | 语义复核的模型调用失败 |
 | KNOWLEDGE_PROTOCOL_INVALID | 模型未按结构化 JSON 协议返回 |
 | KNOWLEDGE_STRUCTURE_INVALID | 状态与列表等结构约束不满足 |
-| KNOWLEDGE_CITATION_INVALID | 引用编号或逐字引文不合法 |
+| KNOWLEDGE_CITATION_INVALID | 目录身份不匹配、片段不属于对应证据、片段不可选，或逐字出处不合法 |
 | KNOWLEDGE_REVIEW_REJECTED | 模型复核否决草案 |
 | KNOWLEDGE_REVIEW_UNSUPPORTED_CLAIM | 复核模型认为存在无依据断言 |
 | KNOWLEDGE_REVIEW_WRONG_STATUS | 复核模型认为业务状态选择错误 |
@@ -116,3 +116,5 @@ Python 测试检查评测判分的边界；Java 测试检查服务端约束。�
 [2026-10-19 实测报告](runs/2026-10-19-可信问答实测报告.md)记录原版本、未采用的提示实验、定向诊断和最终代码的真实结果；[逐题数据](runs/2026-10-19-results.json)保留答案、候选原文和失败。不能只取其中最好的一轮作为项目准确率。
 
 [运行诊断验证](runs/2026-10-19-运行诊断验证.md)记录 V18 后的完整 15 题及管理员诊断覆盖情况；[对应数据](runs/2026-10-19-运行诊断数据.json)包含被拒绝的草案、复核结果和阶段用量。
+
+[片段引用验证](runs/2026-10-19-片段引用验证.md)记录模型选择段落、后端提取原文后的完整 15 题：引用解析全部通过，但整体自动通过率为 10/15，低于前一轮；[对应数据](runs/2026-10-19-片段引用数据.json)保留全部选择、目录、解析后草案和失败诊断。

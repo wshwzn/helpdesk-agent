@@ -102,7 +102,7 @@ class KnowledgeAnswerRunIntegrationTest {
         when(eligibility.findEligible(any(), any(), any())).thenReturn(Map.of(10L, document));
         when(modelClient.draft(any(), any(), any(), any())).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
-            return new KnowledgeAnswerModelClient.ModelResult<>(draft(QUOTE), 10, 5, 15);
+            return new KnowledgeAnswerModelClient.ModelResult<>(selection(invocation.getArgument(3), "E1-P1"), 10, 5, 15);
         });
         when(modelClient.review(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
@@ -134,6 +134,8 @@ class KnowledgeAnswerRunIntegrationTest {
             assertThat(stage.durationMs()).isGreaterThanOrEqualTo(0);
         });
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
+        assertThat(snapshot.schemaVersion()).isEqualTo(2);
+        assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.stages().get(1).usage().totalTokens()).isEqualTo(15);
         assertThat(snapshot.stages().get(3).usage().totalTokens()).isEqualTo(25);
         String url = "/api/admin/knowledge-answer-runs/" + runId;
@@ -165,6 +167,8 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.FAILED);
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
+        assertThat(snapshot.schemaVersion()).isEqualTo(2);
+        assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.review().approved()).isFalse();
         assertThat(snapshot.stages().getLast().errorCode()).isEqualTo(message.getErrorCode());
         assertThat(snapshot.stages().getLast().usage().totalTokens()).isEqualTo(25);
@@ -176,14 +180,17 @@ class KnowledgeAnswerRunIntegrationTest {
 
     /** 引用校验失败前已经保存草案，不会错记为已调用复核或零用量。 */
     @Test
-    @DisplayName("假引文被阻断时可以定位原草案且复核阶段不存在")
+    @DisplayName("假片段被阻断时保留模型选择且复核阶段不存在")
     void invalidCitationIsDiagnosable() throws Exception {
-        when(modelClient.draft(any(), any(), any(), any())).thenReturn(
-                new KnowledgeAnswerModelClient.ModelResult<>(draft("不存在的999元"), null, null, null));
+        doAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(
+                selection(invocation.getArgument(3), "E1-P999"), null, null, null))
+                .when(modelClient).draft(any(), any(), any(), any());
         send().andExpect(status().isBadGateway());
         var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.errorCode()).isEqualTo("KNOWLEDGE_CITATION_INVALID");
-        assertThat(snapshot.draft().claims().getFirst().references().getFirst().quote()).isEqualTo("不存在的999元");
+        assertThat(snapshot.draft()).isNull();
+        assertThat(snapshot.selection().claims().getFirst().references().getFirst().paragraphId()).isEqualTo("E1-P999");
+        assertThat(snapshot.citationCatalog().citationSetId()).isEqualTo(snapshot.selection().citationSetId());
         assertThat(snapshot.stages()).hasSize(3);
         assertThat(snapshot.stages().get(1).usage().totalTokens()).isNull();
         verify(modelClient, never()).review(any(), any(), any(), any(), any());
@@ -193,9 +200,9 @@ class KnowledgeAnswerRunIntegrationTest {
     @Test
     @DisplayName("草案协议失败的 Token 能进入管理员诊断")
     void failedModelUsageIsPersisted() throws Exception {
-        when(modelClient.draft(any(), any(), any(), any())).thenThrow(new KnowledgeAnswerFailure(
-                KnowledgeAnswerFailure.Code.KNOWLEDGE_PROTOCOL_INVALID, "invalid knowledge answer protocol",
-                new KnowledgeAnswerModelClient.TokenUsage(20, 8, 28)));
+        doThrow(new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PROTOCOL_INVALID,
+                "invalid knowledge answer protocol", new KnowledgeAnswerModelClient.TokenUsage(20, 8, 28)))
+                .when(modelClient).draft(any(), any(), any(), any());
         send().andExpect(status().isBadGateway());
         var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.draft()).isNull();
@@ -277,14 +284,14 @@ class KnowledgeAnswerRunIntegrationTest {
         var entered = new CountDownLatch(1);
         var release = new CountDownLatch(1);
         var returned = new CountDownLatch(1);
-        when(modelClient.draft(any(), any(), any(), any())).thenAnswer(invocation -> {
+        doAnswer(invocation -> {
             entered.countDown();
             while (release.getCount() > 0) {
                 try { release.await(100, TimeUnit.MILLISECONDS); } catch (InterruptedException ignored) { }
             }
             returned.countDown();
-            return new KnowledgeAnswerModelClient.ModelResult<>(draft(QUOTE), 10, 5, 15);
-        });
+            return new KnowledgeAnswerModelClient.ModelResult<>(selection(invocation.getArgument(3), "E1-P1"), 10, 5, 15);
+        }).when(modelClient).draft(any(), any(), any(), any());
         var subscription = service.streamMessage(conversationId,
                 new SendMessageRequest("住宿？", ChatMode.KNOWLEDGE, "SH"), CUSTOMER).subscribe();
         try {
@@ -298,6 +305,7 @@ class KnowledgeAnswerRunIntegrationTest {
                 var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
                 assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.CANCELLED);
                 assertThat(snapshot.draft()).isNull();
+                assertThat(snapshot.selection()).isNull();
                 assertThat(snapshot.stages().getLast().status()).isEqualTo(KnowledgeAnswerRunSnapshot.StageStatus.CANCELLED);
             });
             verify(modelClient, never()).review(any(), any(), any(), any(), any());
@@ -325,6 +333,33 @@ class KnowledgeAnswerRunIntegrationTest {
         return new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.ANSWERABLE,
                 List.of(new KnowledgeAnswerDraft.Claim(QUOTE, List.of(new KnowledgeAnswerDraft.Reference("E1", quote)))),
                 List.of(), List.of());
+    }
+
+    /** 模拟模型选择本轮片段，支持构造不存在的编号以验证失败诊断。 */
+    private KnowledgeAnswerSelection selection(KnowledgeCitationCatalog catalog, String paragraphId) {
+        return new KnowledgeAnswerSelection(catalog.citationSetId(), KnowledgeAnswerDraft.Status.ANSWERABLE,
+                List.of(new KnowledgeAnswerSelection.Claim(QUOTE,
+                        List.of(new KnowledgeAnswerSelection.Reference("E1", paragraphId)))), List.of(), List.of());
+    }
+
+    /** 老诊断仍按原版本读取，新增目录和选择字段不在读历史时补造。 */
+    @Test
+    @DisplayName("版本一诊断和旧引用报告可继续反序列化")
+    void readsLegacySnapshotAndReport() throws Exception {
+        send().andExpect(status().isOk());
+        var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
+        com.fasterxml.jackson.databind.node.ObjectNode legacy = mapper.valueToTree(snapshot);
+        legacy.put("schemaVersion", 1);
+        legacy.remove(List.of("citationCatalog", "selection"));
+        jdbc.update("UPDATE knowledge_answer_runs SET snapshot=? WHERE run_id=?",
+                mapper.writeValueAsString(legacy), snapshot.runId());
+        var loaded = runs.find(snapshot.runId()).orElseThrow();
+        assertThat(loaded.schemaVersion()).isEqualTo(1);
+        assertThat(loaded.citationCatalog()).isNull();
+        assertThat(loaded.selection()).isNull();
+        assertThat(loaded.draft()).isEqualTo(snapshot.draft());
+        var report = assistant().getKnowledgeAnswer();
+        assertThat(mapper.readValue(mapper.writeValueAsString(report), KnowledgeAnswerReport.class)).isEqualTo(report);
     }
 
     /** 为测试中的不同角色签发令牌，仅用于权限边界测试。 */
