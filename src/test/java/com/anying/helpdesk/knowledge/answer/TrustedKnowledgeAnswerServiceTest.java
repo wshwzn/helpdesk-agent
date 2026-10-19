@@ -186,7 +186,10 @@ class TrustedKnowledgeAnswerServiceTest {
     @DisplayName("检索故障不伪装为没有依据")
     void retrievalFailureIsNotRefusal() {
         when(retrieval.search(any(), any())).thenThrow(new IllegalStateException("search unavailable"));
-        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH")).hasMessage("search unavailable");
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
+                        error -> assertThat(error.errorCode()).isEqualTo("KNOWLEDGE_RETRIEVAL_FAILED"))
+                .hasMessage("KNOWLEDGE_RETRIEVAL_FAILED");
         verifyNoInteractions(client);
     }
 
@@ -197,6 +200,53 @@ class TrustedKnowledgeAnswerServiceTest {
         when(client.draft(any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
                 draft(KnowledgeAnswerDraft.Status.ANSWERABLE), null, null, null));
         assertThat(service.answer(model, QUESTION, "SH").totalTokens()).isNull();
+    }
+
+    /** 分开记录草案调用与复核调用故障，不泄露厂商异常携带的信息。 */
+    @Test
+    @DisplayName("外部模型故障按阶段分类并丢弃原始异常正文")
+    void classifiesExternalModelFailures() {
+        when(client.draft(any(), any(), any(), any())).thenThrow(new IllegalStateException("private provider secret"));
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class, failure -> {
+                    assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_DRAFT_CALL_FAILED");
+                    assertThat(failure.getMessage()).doesNotContain("private provider secret");
+                    assertThat(failure.getCause()).isNull();
+                });
+        doReturn(new KnowledgeAnswerModelClient.ModelResult<>(draft(KnowledgeAnswerDraft.Status.ANSWERABLE), 1, 1, 2))
+                .when(client).draft(any(), any(), any(), any());
+        when(client.review(any(), any(), any(), any(), any())).thenThrow(new IllegalStateException("private review secret"));
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
+                        failure -> assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_REVIEW_CALL_FAILED"));
+    }
+
+    /** 精确协议异常穿过阶段包装后仍保留原来的分类。 */
+    @Test
+    @DisplayName("模型协议错误不被笼统重标记为网络调用失败")
+    void preservesProtocolFailure() {
+        when(client.draft(any(), any(), any(), any())).thenThrow(new KnowledgeAnswerFailure(
+                KnowledgeAnswerFailure.Code.KNOWLEDGE_PROTOCOL_INVALID, "invalid protocol"));
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
+                        failure -> assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_PROTOCOL_INVALID"));
+    }
+
+    /** 不让复核模型的错误原因通过自由文本进入错误码或绕过布尔判定。 */
+    @Test
+    @DisplayName("复核否决原因被保留，批准和原因不一致时按协议错误处理")
+    void classifiesAndValidatesReviewReason() {
+        propose(draft(KnowledgeAnswerDraft.Status.ANSWERABLE));
+        when(client.review(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeAnswerModelClient.Review(false, KnowledgeAnswerModelClient.ReviewReason.UNSUPPORTED_CLAIM), 1, 1, 2));
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
+                        failure -> assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_REVIEW_UNSUPPORTED_CLAIM"));
+        when(client.review(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeAnswerModelClient.Review(true, KnowledgeAnswerModelClient.ReviewReason.UNSUPPORTED_CLAIM), 1, 1, 2));
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
+                        failure -> assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_PROTOCOL_INVALID"));
     }
 
     /** 组合固定草案以覆盖业务状态，不把模型桩结果作为真实准确率。 */

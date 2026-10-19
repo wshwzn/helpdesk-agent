@@ -69,6 +69,21 @@ class KnowledgeAnswerModelClientTest {
                 .hasMessage("answer requires supported claims");
     }
 
+    /** 原因字段必须来自固定枚举，不能把模型生成的任意文本用作诊断标签。 */
+    @Test
+    @DisplayName("复核协议解析固定原因枚举并拒绝未知自由文本")
+    void parsesReviewReasonEnum() {
+        respond("{\"approved\":false,\"reason\":\"WRONG_STATUS\"}");
+        var draft = new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.INSUFFICIENT_EVIDENCE,
+                List.of(), List.of(), List.of());
+        assertThat(client.review(model, "问题", "ALL", List.of(), draft).value().reason())
+                .isEqualTo(KnowledgeAnswerModelClient.ReviewReason.WRONG_STATUS);
+        respond("{\"approved\":false,\"reason\":\"private model text\"}");
+        assertThatThrownBy(() -> client.review(model, "问题", "ALL", List.of(), draft))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class, failure ->
+                        assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_PROTOCOL_INVALID"));
+    }
+
     /** 将测试 JSON 包装成厂商响应。 */
     private void respond(String content) {
         when(chatModel.call(any(Prompt.class))).thenReturn(new ChatResponse(

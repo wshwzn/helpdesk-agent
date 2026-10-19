@@ -42,3 +42,7 @@ src/main/resources/application-local.yml
 .env.*
 !.env.example
 data/
+
+### Python evaluation runner ###
+__pycache__/
+*.pyc

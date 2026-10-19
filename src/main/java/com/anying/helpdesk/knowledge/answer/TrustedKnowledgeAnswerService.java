@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.function.Supplier;
+import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,45 +36,80 @@ public class TrustedKnowledgeAnswerService {
                 || scope == null || !scope.matches("[A-Z][A-Z0-9_-]{0,39}")) {
             throw new IllegalArgumentException("invalid knowledge question");
         }
-        var base = knowledgeBaseService.findDefault();
+        var base = atStage(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault);
         if (base.isEmpty()) {
             return empty(KnowledgeAnswerReport.Reason.NOT_CONFIGURED, null, null, scope);
         }
         var knowledgeBase = base.get();
-        var search = retrievalService.search(knowledgeBase.id(), new KnowledgeSearchRequest(question, scope));
+        var search = atStage(KNOWLEDGE_RETRIEVAL_FAILED,
+                () -> retrievalService.search(knowledgeBase.id(), new KnowledgeSearchRequest(question, scope)));
         if (search.results().isEmpty()) {
             return empty(KnowledgeAnswerReport.Reason.NO_MATCH, knowledgeBase.id(), knowledgeBase.name(), scope);
         }
         List<KnowledgeAnswerReport.Evidence> evidence = new ArrayList<>();
         for (var hit : search.results()) {
             if (hit.documentId() == null || hit.metadata() == null || hit.content() == null || hit.content().isBlank()) {
-                throw new IllegalStateException("incomplete evidence metadata");
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_EVIDENCE_CHECK_FAILED, "incomplete evidence metadata");
             }
             evidence.add(new KnowledgeAnswerReport.Evidence("E" + (evidence.size() + 1), hit.documentId(),
                     hit.chunkSequence(), hit.originalName(), hit.content(), hit.metadata()));
         }
         if (evidence.size() > 50 || evidence.stream().mapToInt(item -> item.content().length()).sum() > 50000) {
-            throw new IllegalStateException("knowledge evidence exceeds budget");
+            throw new KnowledgeAnswerFailure(KNOWLEDGE_CONTEXT_TOO_LARGE, "knowledge evidence exceeds budget");
         }
-        evidence = List.copyOf(evidence);
-        var draft = modelClient.draft(model, question, scope, evidence);
-        guard.validate(draft.value(), evidence);
-        var review = modelClient.review(model, question, scope, evidence, draft.value());
-        if (review.value() == null || !Boolean.TRUE.equals(review.value().approved())) {
-            throw new IllegalStateException("knowledge answer review rejected");
-        }
+        var immutableEvidence = List.copyOf(evidence);
+        var draft = atStage(KNOWLEDGE_DRAFT_CALL_FAILED,
+                () -> modelClient.draft(model, question, scope, immutableEvidence));
+        guard.validate(draft.value(), immutableEvidence);
+        var review = atStage(KNOWLEDGE_REVIEW_CALL_FAILED,
+                () -> modelClient.review(model, question, scope, immutableEvidence, draft.value()));
+        requireApproved(review.value());
         LocalDateTime checkedAt = LocalDateTime.now(knowledgeClock);
-        var current = eligibilityService.findEligible(knowledgeBase.id(), scope, checkedAt);
+        var current = atStage(KNOWLEDGE_EVIDENCE_CHECK_FAILED,
+                () -> eligibilityService.findEligible(knowledgeBase.id(), scope, checkedAt));
         for (var item : evidence) {
             var document = current.get(item.documentId());
             if (document == null || !Objects.equals(item.metadata(), KnowledgeDocumentMetadata.from(document))) {
-                throw new IllegalStateException("knowledge evidence changed during generation");
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_EVIDENCE_CHANGED, "knowledge evidence changed during generation");
             }
         }
         var report = new KnowledgeAnswerReport(1, KnowledgeAnswerReport.Reason.REVIEWED,
-                knowledgeBase.id(), knowledgeBase.name(), scope, checkedAt, draft.value(), evidence);
+                knowledgeBase.id(), knowledgeBase.name(), scope, checkedAt, draft.value(), immutableEvidence);
         return new ChatCompletionResult(render(report), sum(draft.promptTokens(), review.promptTokens()),
                 sum(draft.completionTokens(), review.completionTokens()), sum(draft.totalTokens(), review.totalTokens()), report);
+    }
+
+    /** 拒绝不一致的复核协议，并把合法否决原因映射成固定枚举码，避免输出自由文本。 */
+    private void requireApproved(KnowledgeAnswerModelClient.Review review) {
+        if (review == null || review.approved() == null
+                || (Boolean.TRUE.equals(review.approved()) && review.reason() != null
+                && review.reason() != KnowledgeAnswerModelClient.ReviewReason.NONE)
+                || (Boolean.FALSE.equals(review.approved()) && review.reason() == KnowledgeAnswerModelClient.ReviewReason.NONE)) {
+            throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "inconsistent review result");
+        }
+        if (!review.approved()) {
+            var code = review.reason() == null ? KNOWLEDGE_REVIEW_REJECTED : switch (review.reason()) {
+                case UNSUPPORTED_CLAIM -> KNOWLEDGE_REVIEW_UNSUPPORTED_CLAIM;
+                case WRONG_STATUS -> KNOWLEDGE_REVIEW_WRONG_STATUS;
+                case MISSED_CONFLICT -> KNOWLEDGE_REVIEW_MISSED_CONFLICT;
+                case INCOMPLETE_ANSWER -> KNOWLEDGE_REVIEW_INCOMPLETE_ANSWER;
+                case UNNECESSARY_CLARIFICATION -> KNOWLEDGE_REVIEW_UNNECESSARY_CLARIFICATION;
+                case UNCERTAIN -> KNOWLEDGE_REVIEW_UNCERTAIN;
+                case NONE -> throw new IllegalStateException("unreachable approved reason");
+            };
+            throw new KnowledgeAnswerFailure(code, "knowledge answer review rejected");
+        }
+    }
+
+    /** 外部依赖失败只记录当前阶段，已有确定性错误保留精确分类，避免暴露敏感异常正文。 */
+    private <T> T atStage(KnowledgeAnswerFailure.Code code, Supplier<T> action) {
+        try {
+            return action.get();
+        } catch (KnowledgeAnswerFailure failure) {
+            throw failure;
+        } catch (RuntimeException exception) {
+            throw new KnowledgeAnswerFailure(code, code.name());
+        }
     }
 
     /** 没有可用资料时直接返回明确原因，不让模型凭记忆补全回答。 */

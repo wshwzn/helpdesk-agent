@@ -117,7 +117,7 @@
 - `knowledge_answer` 中 `reason` 为 `REVIEWED`、`NO_MATCH`、`NOT_CONFIGURED`；`answer.status` 为 `ANSWERABLE`、`NEEDS_CLARIFICATION`、`INSUFFICIENT_EVIDENCE`、`CONFLICT`。无命中/未配置时状态为证据不足，但不调用回答模型。
 - 报告的 `evidence[].id` 为本轮临时编号 E1/E2；`documentId`、`chunkSequence` 逻辑关联知识文档及 ES Chunk。`sourceName`、正文与业务元数据是历史快照，文档撤回或删除后仍保留，不用外键级联删除。
 - 应用保证每项事实结论有本轮证据引用，`quote` 是连续原文；冲突双方至少涉及两份文档。正文与报告在同一个带乐观锁的完成事务写入。JSON 结构和模式/范围关系由应用约束，数据库不校验 JSON 内部结构。
-- 知识链路技术失败使用 `KNOWLEDGE_ANSWER_FAILED`，取消使用 `STREAM_CANCELLED`；失败消息不保存草案或成功报告。核验时间采用 Asia/Shanghai；历史报告表示当时的结果，不保证资料现在仍有效。
+- 知识链路技术失败保存固定阶段码，如 `KNOWLEDGE_RETRIEVAL_FAILED`、`KNOWLEDGE_DRAFT_CALL_FAILED`、`KNOWLEDGE_PROTOCOL_INVALID`、`KNOWLEDGE_CITATION_INVALID`、`KNOWLEDGE_REVIEW_REJECTED`、`KNOWLEDGE_REVIEW_WRONG_STATUS`、`KNOWLEDGE_EVIDENCE_CHANGED`；未知或历史旧版本失败保留 `KNOWLEDGE_ANSWER_FAILED`。取消使用 `STREAM_CANCELLED`。全部码不超过 50 字符，完整分类见 `docs/evaluation/README.md`；无新增列或约束。失败消息不保存草案或成功报告。核验时间采用 Asia/Shanghai；历史报告表示当时的结果，不保证资料现在仍有效。
 - KNOWLEDGE 的 Token 用量合计草案与复核两次回答模型调用，任一调用未返回某项用量时该项为 NULL；无回答模型调用时为 0，不含检索 Embedding 用量。
 
 ## `agent_tool_calls` Agent 工具调用表

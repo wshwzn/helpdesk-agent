@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*;
 
 @Component
 @RequiredArgsConstructor
@@ -58,7 +59,17 @@ public class KnowledgeAnswerModelClient {
     private final ObjectMapper objectMapper;
 
     public record ModelResult<T>(T value, Integer promptTokens, Integer completionTokens, Integer totalTokens) { }
-    public record Review(Boolean approved) { }
+    public enum ReviewReason {
+        NONE, UNSUPPORTED_CLAIM, WRONG_STATUS, MISSED_CONFLICT, INCOMPLETE_ANSWER,
+        UNNECESSARY_CLARIFICATION, UNCERTAIN
+    }
+
+    public record Review(Boolean approved, ReviewReason reason) {
+        /** 兼容旧的复核桩和仅含布尔值的模型结果，未知拒绝仍记录通用码。 */
+        public Review(Boolean approved) {
+            this(approved, null);
+        }
+    }
 
     /** 只提供本轮证据生成草案，不注册工单工具，也不引入旧轮事实。 */
     public ModelResult<KnowledgeAnswerDraft> draft(ResolvedChatModel model, String question, String scope,
@@ -79,17 +90,17 @@ public class KnowledgeAnswerModelClient {
         try {
             String payload = objectMapper.writeValueAsString(input);
             if (payload.length() > 100000) {
-                throw new IllegalStateException("knowledge prompt exceeds budget");
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_CONTEXT_TOO_LARGE, "knowledge prompt exceeds budget");
             }
             ChatResponse response = model.chatModel().call(new Prompt(List.of(
                     new SystemMessage(instruction), new UserMessage(payload))));
             if (response == null || response.getResult() == null || response.getResult().getOutput() == null
                     || response.getResult().getOutput().hasToolCalls()) {
-                throw new IllegalStateException("missing structured answer");
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "missing structured answer");
             }
             String content = response.getResult().getOutput().getText();
             if (content == null || content.isBlank() || content.length() > 32000) {
-                throw new IllegalStateException("invalid structured answer size");
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "invalid structured answer size");
             }
             T value = objectMapper.readerFor(type)
                     .with(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -102,7 +113,7 @@ public class KnowledgeAnswerModelClient {
             return new ModelResult<>(value, usage == null ? null : usage.getPromptTokens(),
                     usage == null ? null : usage.getCompletionTokens(), usage == null ? null : usage.getTotalTokens());
         } catch (JsonProcessingException exception) {
-            throw new IllegalStateException("invalid knowledge answer protocol");
+            throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "invalid knowledge answer protocol");
         }
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*;
 
 /** 确定性校验只负责结构、证据身份与逐字引文；不声称验证语义蕴含。 */
 @Component
@@ -50,9 +51,13 @@ public class KnowledgeAnswerGuard {
         for (var reference : claim.references()) {
             require(reference != null && reference.evidenceId() != null, "missing evidence id");
             var source = evidence.get(reference.evidenceId());
-            require(source != null, "unknown evidence id");
-            require(validText(reference.quote(), 1500) && reference.quote().strip().length() >= 4
-                    && source.content().contains(reference.quote()), "quote is absent from evidence");
+            if (source == null) {
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "unknown evidence id");
+            }
+            if (!validText(reference.quote(), 1500) || reference.quote().strip().length() < 4
+                    || !source.content().contains(reference.quote())) {
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "quote is absent from evidence");
+            }
         }
     }
 
@@ -65,7 +70,7 @@ public class KnowledgeAnswerGuard {
     /** 核验不通过时终止生成，禁止把技术失败伪装为证据不足。 */
     private void require(boolean valid, String reason) {
         if (!valid) {
-            throw new IllegalStateException(reason);
+            throw new KnowledgeAnswerFailure(KNOWLEDGE_STRUCTURE_INVALID, reason);
         }
     }
 }

@@ -7,6 +7,7 @@ import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ChatMode;
 import com.anying.helpdesk.knowledge.answer.TrustedKnowledgeAnswerService;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure;
 import com.anying.helpdesk.conversation.domain.ConversationStatus;
 import com.anying.helpdesk.conversation.dto.ChatExchangeResponse;
 import com.anying.helpdesk.conversation.dto.ChatMessageResponse;
@@ -112,7 +113,7 @@ public class ConversationServiceImpl implements ConversationService {
             assistantMessage = persistenceService.completeAssistant(prepared.assistantMessageId(), completion);
         } catch (RuntimeException exception) {
             markGenerationFailed(prepared.assistantMessageId(), id,
-                    request.mode() == ChatMode.KNOWLEDGE ? KNOWLEDGE_ANSWER_FAILED : MODEL_CALL_FAILED, exception);
+                    request.mode() == ChatMode.KNOWLEDGE ? knowledgeErrorCode(exception) : MODEL_CALL_FAILED, exception);
             throw new ChatGenerationException();
         }
         List<PendingActionResponse> pendingActions = pendingActionService.listPendingByAssistantMessageId(
@@ -233,11 +234,16 @@ public class ConversationServiceImpl implements ConversationService {
         return Flux.concat(Mono.just(ChatStreamEvent.start(ChatMessageResponse.from(prepared.userMessage()),
                         prepared.assistantMessageId())), completed)
                 .onErrorResume(exception -> Mono.fromCallable(() -> {
-                    markGenerationFailed(prepared.assistantMessageId(), id, KNOWLEDGE_ANSWER_FAILED, exception);
+                    markGenerationFailed(prepared.assistantMessageId(), id, knowledgeErrorCode(exception), exception);
                     finalized.set(true);
                     return ChatStreamEvent.error("CHAT_GENERATION_FAILED", ChatGenerationException.USER_MESSAGE);
                 }).subscribeOn(Schedulers.boundedElastic()))
                 .doOnCancel(() -> markCancelledStream(prepared.assistantMessageId(), id, finalized));
+    }
+
+    /** 将知识异常映射为安全的阶段码，未分类错误仍使用兼容的通用码。 */
+    private String knowledgeErrorCode(Throwable exception) {
+        return exception instanceof KnowledgeAnswerFailure failure ? failure.errorCode() : KNOWLEDGE_ANSWER_FAILED;
     }
 
     /**

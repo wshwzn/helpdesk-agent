@@ -13,6 +13,7 @@ import com.anying.helpdesk.conversation.model.ConversationModelClient;
 import com.anying.helpdesk.conversation.service.ConversationService;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerDraft;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerReport;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure;
 import com.anying.helpdesk.knowledge.answer.TrustedKnowledgeAnswerService;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentMetadata;
 import com.anying.helpdesk.modelconfig.factory.DefaultChatModelProvider;
@@ -177,6 +178,23 @@ class TrustedKnowledgeConversationIntegrationTest {
         assertThat(assistant().getKnowledgeAnswer()).isNull();
         assertThat(assistant().getApplicabilityScope()).isEqualTo("ALL");
         assertThat(assistant().getErrorCode()).isEqualTo("KNOWLEDGE_ANSWER_FAILED");
+    }
+
+    /** 同步和流式两条入口持久化同一个分类码，客户端错误正文仍脱敏。 */
+    @Test
+    @DisplayName("知识失败阶段能从历史消息追溯且不会暴露内部说明")
+    void persistsSafeFailureStageInBothModes() throws Exception {
+        when(knowledge.answer(any(), any(), any())).thenThrow(new KnowledgeAnswerFailure(
+                KnowledgeAnswerFailure.Code.KNOWLEDGE_CITATION_INVALID, "private unverified draft"));
+        String response = send("{\"content\":\"问题\",\"mode\":\"KNOWLEDGE\"}")
+                .andExpect(status().isBadGateway()).andReturn().getResponse().getContentAsString();
+        assertThat(response).doesNotContain("private unverified draft");
+        assertThat(assistant().getErrorCode()).isEqualTo("KNOWLEDGE_CITATION_INVALID");
+        var events = service.streamMessage(conversationId,
+                new SendMessageRequest("问题", ChatMode.KNOWLEDGE, "ALL"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
+        assertThat(events).extracting(event -> event.type()).containsExactly("start", "error");
+        assertThat(assistant().getErrorCode()).isEqualTo("KNOWLEDGE_CITATION_INVALID");
+        assertThat(assistant().getKnowledgeAnswer()).isNull();
     }
 
     /** SSE 只展示经过知识服务核验的最终正文，不要求模型厂商支持流式。 */

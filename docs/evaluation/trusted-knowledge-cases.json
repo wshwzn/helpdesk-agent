@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "description": "虚构差旅制度固定题集；自动检查仅检查结构和关键点，语义结果需人工复核。有效期为 2026-10-01 至 2027-01-01 之前。",
+  "cases": [
+    {"id":"B01","scenario":"baseline","question":"差旅结束后多少个自然日内需要提交报销申请？","scope":"ALL","expectedStatus":"ANSWERABLE","requiredSources":["expense-process:v1:ALL"],"requiredPatterns":["十五|15"]},
+    {"id":"B02","scenario":"baseline","question":"员工提交差旅报销申请时，需要附哪些材料？","scope":"ALL","expectedStatus":"ANSWERABLE","requiredSources":["expense-process:v1:ALL"],"requiredPatterns":["行程","审批","票据"]},
+    {"id":"B03","scenario":"baseline","question":"上海地区普通员工因公出差，目前住宿报销上限为每人每晚多少元？","scope":"CN_SH","expectedStatus":"ANSWERABLE","requiredSources":["travel-policy:v2:CN_SH"],"requiredPatterns":["600|六百"]},
+    {"id":"B04","scenario":"baseline","question":"上海地区普通员工因公出差，住宿费用超出每人每晚上限的部分是否报销？","scope":"CN_SH","expectedStatus":"ANSWERABLE","requiredSources":["travel-policy:v2:CN_SH"],"requiredPatterns":["不予报销|不报销|不能报销|不予.*报销|不.*报销"]},
+    {"id":"B05","scenario":"baseline","question":"上海普通员工现在出差，住宿上限还是每人每晚500元吗？请按当前有效标准回答。","scope":"CN_SH","expectedStatus":"ANSWERABLE","requiredSources":["travel-policy:v2:CN_SH"],"requiredPatterns":["600|六百"]},
+    {"id":"B06","scenario":"baseline","question":"上海普通员工现在国内出差，可以直接按未来标准每人每晚700元报销住宿吗？","scope":"CN_SH","expectedStatus":"ANSWERABLE","requiredSources":["travel-policy:v2:CN_SH"],"requiredPatterns":["600|六百"]},
+    {"id":"B07","scenario":"baseline","question":"北京地区普通员工因公出差，住宿报销上限为每人每晚多少元？","scope":"CN_BJ","expectedStatus":"ANSWERABLE","requiredSources":["travel-policy:v1:CN_BJ"],"requiredPatterns":["450|四百五十"]},
+    {"id":"B08","scenario":"baseline","question":"普通员工因公出差，住宿报销上限是多少？","scope":"ALL","expectedStatus":"NEEDS_CLARIFICATION","allowNoMatch":true,"requiredSources":[]},
+    {"id":"B09","scenario":"baseline","question":"差旅结束后多久内提交报销？另外飞机延误补贴每次是多少元？","scope":"ALL","expectedStatus":"INSUFFICIENT_EVIDENCE","requiredSources":["expense-process:v1:ALL"],"requiredPatterns":["十五|15"]},
+    {"id":"B10","scenario":"baseline","question":"公司停车月卡补贴每月具体是多少元？","scope":"ALL","expectedStatus":"INSUFFICIENT_EVIDENCE","requiredSources":[]},
+    {"id":"C01","scenario":"conflict","question":"上海地区普通员工国内出差，目前住宿报销上限为每人每晚多少元？","scope":"CN_SH","expectedStatus":"CONFLICT","requiredSources":["travel-policy:v2:CN_SH","travel-notice:v1:CN_SH"],"requiredPatterns":["600|六百","650|六百五十"]},
+    {"id":"C02","scenario":"conflict","question":"上海普通员工国内出差，600元和650元两种住宿报销说法现在应以哪一个为准？","scope":"CN_SH","expectedStatus":"CONFLICT","requiredSources":["travel-policy:v2:CN_SH","travel-notice:v1:CN_SH"],"requiredPatterns":["600|六百","650|六百五十"]},
+    {"id":"R01","scenario":"restored","question":"上海地区普通员工国内出差，目前住宿报销上限为每人每晚多少元？","scope":"CN_SH","expectedStatus":"ANSWERABLE","requiredSources":["travel-policy:v2:CN_SH"],"requiredPatterns":["600|六百"]},
+    {"id":"W01","scenario":"withdrawn","question":"上海地区普通员工国内出差，目前住宿报销上限为每人每晚多少元？","scope":"CN_SH","expectedStatus":"INSUFFICIENT_EVIDENCE","requiredSources":[]},
+    {"id":"W02","scenario":"withdrawn","question":"差旅结束后多少个自然日内需要提交报销申请？","scope":"ALL","expectedStatus":"ANSWERABLE","requiredSources":["expense-process:v1:ALL"],"requiredPatterns":["十五|15"]}
+  ]
+}
