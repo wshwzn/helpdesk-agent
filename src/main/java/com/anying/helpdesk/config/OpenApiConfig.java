@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "智能工单助手 API",
+                title = "企业知识助手 API",
                 version = "v1",
-                description = "面向外部客户服务场景的认证、工单处理和 AI 模型配置接口"
+                description = "面向企业内部的可信知识问答、资料维护与模型配置接口；保留旧工单接口兼容历史业务"
         )
 )
 @SecurityScheme(

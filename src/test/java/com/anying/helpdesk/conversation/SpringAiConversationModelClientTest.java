@@ -1,12 +1,9 @@
 package com.anying.helpdesk.conversation;
 
 import com.anying.helpdesk.agent.AgentExecutionContext;
-import com.anying.helpdesk.agent.action.service.PendingActionService;
 import com.anying.helpdesk.agent.domain.AgentToolCall;
 import com.anying.helpdesk.agent.domain.AgentToolCallStatus;
 import com.anying.helpdesk.agent.service.AgentToolCallService;
-import com.anying.helpdesk.agent.tool.CustomerTicketTools;
-import com.anying.helpdesk.agent.tool.CustomerTicketActionTools;
 import com.anying.helpdesk.agent.tool.KnowledgeSearchTools;
 import com.anying.helpdesk.agent.tool.RecordingToolCallbackFactory;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
@@ -18,7 +15,6 @@ import com.anying.helpdesk.conversation.model.SpringAiConversationModelClient;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
 import com.anying.helpdesk.knowledge.service.KnowledgeRetrievalService;
-import com.anying.helpdesk.ticket.service.TicketService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -50,8 +46,6 @@ class SpringAiConversationModelClientTest {
 
     private final AgentToolCallService toolCallService = mock(AgentToolCallService.class);
     private final SpringAiConversationModelClient client = new SpringAiConversationModelClient(
-            new CustomerTicketTools(mock(TicketService.class)),
-            new CustomerTicketActionTools(mock(PendingActionService.class)),
             new KnowledgeSearchTools(
                     mock(KnowledgeBaseService.class),
                     mock(KnowledgeRetrievalService.class)
@@ -59,7 +53,9 @@ class SpringAiConversationModelClientTest {
             new RecordingToolCallbackFactory(toolCallService)
     );
 
+    /** 旧客户端仍能读取上下文和用量，但只获得知识检索能力。 */
     @Test
+    @DisplayName("显式旧模式只注册知识工具并保留消息和用量")
     void convertsHistoryAndReadsTokenUsage() {
         ChatModel chatModel = mock(ChatModel.class);
         ChatResponse response = new ChatResponse(
@@ -97,16 +93,14 @@ class SpringAiConversationModelClientTest {
         assertThat(promptCaptor.getValue().getInstructions().get(2))
                 .isInstanceOfSatisfying(AssistantMessage.class, message ->
                         assertThat(message.getText()).isEqualTo("请确认登录名"));
+        assertThat(promptCaptor.getValue().getSystemMessage().getText())
+                .contains("企业知识助手", "旧客户端兼容", "不得声称回答已经通过可信核验")
+                .doesNotContain("prepare_create_ticket", "list_my_tickets", "get_my_ticket");
         assertThat(promptCaptor.getValue().getOptions())
                 .isInstanceOfSatisfying(ToolCallingChatOptions.class, options -> {
                     assertThat(options.getToolCallbacks()).extracting(callback ->
                             callback.getToolDefinition().name()
-                    ).containsExactlyInAnyOrder(
-                            "list_my_tickets",
-                            "get_my_ticket",
-                            "prepare_create_ticket",
-                            "search_knowledge_base"
-                    );
+                    ).containsExactly("search_knowledge_base");
                     assertThat(options.getToolContext()).containsValue(EXECUTION_CONTEXT);
                 });
     }
@@ -166,69 +160,62 @@ class SpringAiConversationModelClientTest {
         assertThat(promptCaptor.getValue().getInstructions())
                 .hasSize(2)
                 .element(0).isInstanceOf(SystemMessage.class);
+        assertThat(promptCaptor.getValue().getSystemMessage().getText())
+                .contains("企业知识助手", "旧客户端兼容", "不得声称回答已经通过可信核验")
+                .doesNotContain("prepare_create_ticket", "list_my_tickets", "get_my_ticket");
         assertThat(promptCaptor.getValue().getOptions())
                 .isInstanceOfSatisfying(ToolCallingChatOptions.class, options ->
                         assertThat(options.getToolCallbacks()).extracting(callback ->
                                 callback.getToolDefinition().name()
-                        ).contains("search_knowledge_base")
+                        ).containsExactly("search_knowledge_base")
                 );
     }
 
-    /**
-     * 验证上一条 AI 回复的多次工具调用会按顺序还原为工具请求和工具响应消息。
-     */
+    /** 历史客服记录仍可读，但只将本轮仍注册的知识工具成对回放给模型。 */
     @Test
-    @DisplayName("最近一轮多次工具调用应完整拼接到模型上下文")
-    void replaysAllToolCallsFromPreviousAssistantMessage() {
+    @DisplayName("过滤已退出和未知工具的回放，保留知识调用顺序及旧消息正文")
+    void replaysOnlyRegisteredKnowledgeTools() {
         ChatModel chatModel = mock(ChatModel.class);
         when(chatModel.call(any(Prompt.class))).thenReturn(new ChatResponse(
-                List.of(new Generation(new AssistantMessage("第二张工单仍在处理中")))
-        ));
-        ChatMessage previousUser = message(40L, ChatMessageRole.USER, "查询我的工单");
-        ChatMessage previousAssistant = message(41L, ChatMessageRole.ASSISTANT, "你有两张工单");
-        ChatMessage currentUser = message(42L, ChatMessageRole.USER, "第二张呢？");
+                List.of(new Generation(new AssistantMessage("请查询当前制度")))));
+        ChatMessage previousUser = message(40L, ChatMessageRole.USER, "旧问题");
+        ChatMessage previousAssistant = message(41L, ChatMessageRole.ASSISTANT, "历史工单草稿");
+        ChatMessage currentUser = message(42L, ChatMessageRole.USER, "现在的制度呢？");
         List<AgentToolCall> toolCalls = List.of(
-                toolCall(41L, 1, "call-list", "list_my_tickets", "{}", "{\"total\":2}"),
-                toolCall(
-                        41L,
-                        2,
-                        "call-detail",
-                        "get_my_ticket",
-                        "{\"ticketNo\":\"HD20260927012345AB12CD34\"}",
-                        "{\"status\":\"PROCESSING\"}"
-                )
-        );
+                toolCall(41L, 1, "old-list", "list_my_tickets", "{}", "retired-list"),
+                toolCall(41L, 2, "knowledge-1", "search_knowledge_base", "{}", "first-source"),
+                toolCall(41L, 3, "old-create", "prepare_create_ticket", "{}", "retired-draft"),
+                toolCall(41L, 4, "old-detail", "get_my_ticket", "{}", "retired-detail"),
+                toolCall(41L, 5, "unknown", "unknown_tool", "{}", "unknown-result"),
+                toolCall(41L, 6, "knowledge-2", "search_knowledge_base", "{}", "second-source"),
+                toolCall(99L, 1, "other-message", "search_knowledge_base", "{}", "unrelated-result"));
+        client.complete(new ResolvedChatModel(9L, "test-model", true, chatModel),
+                new ConversationModelHistory(List.of(previousUser, previousAssistant, currentUser), toolCalls),
+                EXECUTION_CONTEXT);
 
-        client.complete(
-                new ResolvedChatModel(9L, "test-model", true, chatModel),
-                new ConversationModelHistory(
-                        List.of(previousUser, previousAssistant, currentUser),
-                        toolCalls
-                ),
-                EXECUTION_CONTEXT
-        );
-
-        ArgumentCaptor<Prompt> promptCaptor = ArgumentCaptor.forClass(Prompt.class);
-        verify(chatModel).call(promptCaptor.capture());
-        List<org.springframework.ai.chat.messages.Message> instructions = promptCaptor.getValue().getInstructions();
+        ArgumentCaptor<Prompt> captor = ArgumentCaptor.forClass(Prompt.class);
+        verify(chatModel).call(captor.capture());
+        var instructions = captor.getValue().getInstructions();
         assertThat(instructions).hasSize(8);
         assertThat(instructions.get(2)).isInstanceOfSatisfying(AssistantMessage.class, message ->
-                assertThat(message.getToolCalls()).singleElement().satisfies(toolCall -> {
-                    assertThat(toolCall.id()).isEqualTo("call-list");
-                    assertThat(toolCall.name()).isEqualTo("list_my_tickets");
+                assertThat(message.getToolCalls()).singleElement().satisfies(call -> {
+                    assertThat(call.id()).isEqualTo("knowledge-1");
+                    assertThat(call.name()).isEqualTo("search_knowledge_base");
                 }));
         assertThat(instructions.get(3)).isInstanceOfSatisfying(ToolResponseMessage.class, message ->
                 assertThat(message.getResponses()).singleElement().satisfies(response ->
-                        assertThat(response.responseData()).isEqualTo("{\"total\":2}")
-                ));
-        assertThat(instructions.get(4)).isInstanceOf(AssistantMessage.class);
-        assertThat(instructions.get(5)).isInstanceOf(ToolResponseMessage.class);
-        assertThat(instructions.get(6)).isInstanceOfSatisfying(AssistantMessage.class, message ->
-                assertThat(message.getText()).isEqualTo("你有两张工单"));
-        assertThat(instructions.get(7)).isInstanceOfSatisfying(UserMessage.class, message ->
-                assertThat(message.getText()).isEqualTo("第二张呢？"));
+                        assertThat(response.responseData()).isEqualTo("first-source")));
+        assertThat(instructions.get(4)).isInstanceOfSatisfying(AssistantMessage.class, message ->
+                assertThat(message.getToolCalls()).singleElement().satisfies(call ->
+                        assertThat(call.id()).isEqualTo("knowledge-2")));
+        assertThat(instructions.get(5)).isInstanceOfSatisfying(ToolResponseMessage.class, message ->
+                assertThat(message.getResponses()).singleElement().satisfies(response ->
+                        assertThat(response.responseData()).isEqualTo("second-source")));
+        assertThat(instructions.get(6).getText()).isEqualTo("历史工单草稿");
+        assertThat(instructions.get(7).getText()).isEqualTo("现在的制度呢？");
     }
 
+    /** 构造未持久化消息以校验普通正文的上下文拼接。 */
     private ChatMessage message(ChatMessageRole role, String content) {
         return message(null, role, content);
     }

@@ -10,17 +10,17 @@ import jakarta.validation.constraints.Size;
 
 @Schema(description = "发送消息请求")
 public record SendMessageRequest(
-        @Schema(description = "客户消息内容", example = "为什么我无法登录控制台？")
+        @Schema(description = "员工提问内容", example = "差旅结束后多久内提交报销？")
         @NotBlank @Size(max = 10000) String content,
-        @Schema(description = "对话模式，默认 AGENT；KNOWLEDGE 强制检索和核验，问题最多 2000 字") ChatMode mode,
-        @Schema(description = "KNOWLEDGE 的适用范围代码，默认 ALL；不从自然语言猜测", example = "SH")
+        @Schema(description = "默认 KNOWLEDGE，强制检索和核验，问题最多 2000 字；显式 AGENT 仅为旧客户端兼容，不具备完整核验保证", defaultValue = "KNOWLEDGE") ChatMode mode,
+        @Schema(description = "KNOWLEDGE 的适用范围代码，默认 ALL；不从自然语言猜测", example = "CN_SH")
         @Pattern(regexp = "[A-Z][A-Z0-9_-]{0,39}") String applicabilityScope,
         @Schema(description = "续答的澄清助手消息 ID；必须显式选择其提供的范围")
         @jakarta.validation.constraints.Positive Long clarificationMessageId
 ) {
-    /** 为旧客户端保留普通 Agent 模式，知识问答未指定范围时仅使用通用资料。 */
+    /** 新请求默认进入可信问答，显式旧模式保持兼容；知识问答省略范围时仅查通用资料。 */
     public SendMessageRequest {
-        mode = mode == null ? ChatMode.AGENT : mode;
+        mode = mode == null ? ChatMode.KNOWLEDGE : mode;
         if (mode == ChatMode.KNOWLEDGE && applicabilityScope == null) {
             applicabilityScope = "ALL";
         }
@@ -31,9 +31,9 @@ public record SendMessageRequest(
         this(content, mode, applicabilityScope, null);
     }
 
-    /** 兼容仅传入正文的内部调用。 */
+    /** 仅传正文的内部调用同样进入可信问答，避免与 HTTP 默认行为不一致。 */
     public SendMessageRequest(String content) {
-        this(content, ChatMode.AGENT, null);
+        this(content, null, null);
     }
 
     /** 校验知识检索的问题长度，并避免在普通模式静默忽略范围参数。 */

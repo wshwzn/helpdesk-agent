@@ -168,7 +168,7 @@ public class ConversationPersistenceService {
         );
     }
 
-    /** 兼容普通 Agent 调用，使用默认消息模式创建本轮记录。 */
+    /** 仅传正文时使用默认 KNOWLEDGE 模式创建本轮记录，与 HTTP 请求的默认值保持一致。 */
     @Transactional
     public PreparedChatExchange prepareExchange(Long conversationId, Long customerId, String content,
                                                  ResolvedChatModel model) {

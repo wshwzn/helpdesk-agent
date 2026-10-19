@@ -1,6 +1,10 @@
-# 智能工单助手
+# 企业知识助手
 
-一个面向 SaaS 外部客户服务场景的智能工单助手后端。Agent 可以查询客户工单，并在需要人工处理时生成可修改、可确认的工单草稿；只有客户确认后才会创建真实工单。
+面向单个企业内部的知识问答后端，支持版本与适用范围过滤、混合检索、引用解析、语义复核、条件澄清和运行诊断。员工查询制度及操作流程，管理员维护资料与模型配置。
+
+新消息默认走 KNOWLEDGE 可信问答。显式 AGENT 暂作旧客户端兼容，只提供知识检索工具，不具备完整核验保证。客服工单已退出问答工具列表，历史模块与接口保留；增量更新、多跳检索和最终入口统一仍按[后续路线](docs/企业知识问答后续路线.md)推进。
+
+当前员工账号继续使用 CUSTOMER 角色代码，管理员使用 ADMIN；本轮没有角色或数据库迁移。
 
 ## 环境要求
 
@@ -200,9 +204,9 @@ DELETE /api/admin/knowledge-bases/{id}/evaluation/runs/{runId}
 
 每次运行会固定使用开始时的候选数量、相似度下限和最终结果数量，保存文档级 `Hit@K`、平均 `Recall@K`、MRR、平均耗时及逐题实际召回 Chunk。相同文档出现多个 Chunk 时只计一次文档命中；历史运行保存问题、期望文档和召回结果快照，不受后续用例修改影响。删除某次运行会同时删除汇总和逐题快照，但不会影响评测用例。被当前评测用例引用的文档不能删除，应先调整对应评测用例。
 
-管理员可通过 `POST /api/admin/knowledge-bases/{id}/default` 设置唯一默认知识库。客户对话中的 `search_knowledge_base` 工具接收查询文本及可选适用范围代码，范围必须来自用户明确提供的条件；知识库 ID 由后端读取默认配置，不向模型开放。工具调用及返回的 Chunk 会沿用 `agent_tool_calls` 完整落库，同步和流式对话共享同一套实现。现有检索评测尚无范围字段，默认只评测 `ALL` 通用资料。
+管理员可通过 `POST /api/admin/knowledge-bases/{id}/default` 设置唯一默认知识库。显式旧 `AGENT` 模式中的 `search_knowledge_base` 工具接收查询文本及可选适用范围代码，范围必须来自用户明确提供的条件；知识库 ID 由后端读取默认配置，不向模型开放。工具调用及返回的 Chunk 会沿用 `agent_tool_calls` 完整落库，同步和流式对话共享同一套实现。现有检索评测尚无范围字段，默认只评测 `ALL` 通用资料。
 
-知识检索成功时，AI 消息的 `citations` 字段会返回本轮命中的知识库名称、来源文件名、Chunk 序号、完整片段内容、`documentId` 和 `metadata` 业务版本快照。同名不同文档按主键区分，旧工具记录缺少新字段时仍能显示。同步对话、流式 `done` 事件和历史消息查询使用相同结构；未调用知识库或没有命中时返回空数组。引用代表检索来源，尚不代表已验证其支持回答中的每项结论。历史引用保留当时快照，新问答必须重新检索。
+旧 AGENT 模式知识检索成功时，AI 消息的 `citations` 字段会返回本轮命中的知识库名称、来源文件名、Chunk 序号、完整片段内容、`documentId` 和 `metadata` 业务版本快照。同名不同文档按主键区分，旧工具记录缺少新字段时仍能显示。同步对话、流式 `done` 事件和历史消息查询使用相同结构；未调用知识库或没有命中时返回空数组。引用代表检索来源，尚不代表已验证其支持回答中的每项结论。历史引用保留当时快照，新问答必须重新检索。
 
 ## 登录认证
 
@@ -318,9 +322,9 @@ POST /api/admin/model-configs/{id}/disable
 
 更新配置时省略 `apiKey` 会保留原密钥，更新 Embedding 配置时省略 `embeddingDimensions` 会保留原维度。创建请求省略 `modelType` 时按 `CHAT` 兼容，更新时省略则保留当前类型。接口响应中的 `protocol` 固定为 `OPENAI_COMPATIBLE`；`vendor` 只为聊天模型提供地址预设，Embedding 固定使用 `CUSTOM`。`CHAT` 和 `EMBEDDING` 分别维护一个默认模型。默认模型必须处于启用状态，也不能直接禁用；应先切换默认模型。连接测试会按类型发送一个极短对话或向量请求，可能产生少量费用。
 
-## 智能对话接口
+## 企业知识问答接口
 
-发送消息前需要先配置并启用一个默认模型。创建客户对话：
+发送消息前需要配置并启用默认 Chat 模型；有资料的知识检索还需默认 Embedding 模型和 ES。创建员工对话：
 
 ```http
 POST /api/conversations
@@ -328,7 +332,7 @@ Authorization: Bearer <客户 accessToken>
 Content-Type: application/json
 
 {
-  "title": "登录问题咨询"
+  "title": "差旅制度咨询"
 }
 ```
 
@@ -340,11 +344,11 @@ Authorization: Bearer <客户 accessToken>
 Content-Type: application/json
 
 {
-  "content": "为什么我无法登录控制台？"
+  "content": "差旅结束后多久内提交报销？"
 }
 ```
 
-普通 `AGENT` 模式下，默认模型配置的 `supportsStreaming` 为 `true` 时，可以通过 SSE 流式获取回答。调用方应同时声明接受 SSE 和 JSON：正常生成时返回事件流，权限、参数或模型能力预检失败时仍可接收标准 JSON 错误响应。
+省略 `mode` 或传 `null` 默认进入 `KNOWLEDGE`，正文最多 2000 字，省略范围使用 `ALL`。SSE 先发送 start，待核验并保存后发送完整正文，无需厂商支持流式。调用方应同时声明接受 SSE 和 JSON，以接收前置校验错误。显式旧 `AGENT` 仍要求模型支持流式，且不具备完整核验保证。
 
 ```http
 POST /api/conversations/{id}/messages/stream
@@ -353,7 +357,7 @@ Content-Type: application/json
 Accept: text/event-stream, application/json
 
 {
-  "content": "为什么我无法登录控制台？"
+  "content": "差旅结束后多久内提交报销？"
 }
 ```
 
@@ -361,8 +365,7 @@ Accept: text/event-stream, application/json
 
 ```text
 event: start   已保存客户消息，并创建 PENDING 状态的 AI 消息
-event: delta   本次新增的回答文本，可能出现多次
-event: action_required   AI 已生成需要客户确认的工单草稿
+event: delta   核验和保存后的一次完整正文
 event: done    回答完成，携带最终保存的 AI 消息
 event: error   生成失败，携带脱敏错误码和说明
 ```
@@ -387,11 +390,11 @@ GET /api/conversations/{id}/messages?page=1&size=50
 DELETE /api/conversations/{id}
 ```
 
-客户只能访问自己的对话。普通 AGENT 模式默认携带最近 20 条已完成消息作为模型上下文，可通过 `CHAT_HISTORY_LIMIT` 调整为 1 至 100。同步接口调用失败时返回 `502 CHAT_GENERATION_FAILED`；流式接口开始传输后调用失败时返回 `error` 事件。两种方式都会保留客户消息和一条 `FAILED` AI 消息，且不会向客户端暴露厂商原始异常。
+员工只能访问自己的对话。显式旧 AGENT 模式默认携带最近 20 条已完成消息作为模型上下文，可通过 `CHAT_HISTORY_LIMIT` 调整为 1 至 100；仅回放仍注册的知识检索调用，不再回放工单或未知工具。历史正文和工具记录仍可审计。同步接口调用失败时返回 `502 CHAT_GENERATION_FAILED`；流式接口开始传输后调用失败时返回 `error` 事件。两种方式都会保留客户消息和一条 `FAILED` AI 消息，且不会向客户端暴露厂商原始异常。
 
 ### 证据约束知识问答
 
-同一消息接口增加可选 `mode`，省略仍为 `AGENT`。显式传 `KNOWLEDGE` 才进入服务端强制的“本轮检索 → 结构化草案 → 引用校验 → 独立语义复核 → 准入复查 → 保存并返回”链路：
+同一消息接口的 `mode` 省略或为 `null` 时默认 `KNOWLEDGE`，与显式传入效果相同，进入服务端强制的“本轮检索 → 结构化草案 → 引用校验 → 独立语义复核 → 准入复查 → 保存并返回”链路：
 
 ```http
 POST /api/conversations/{id}/messages
@@ -410,7 +413,8 @@ Content-Type: application/json
 - 草案模型只返回本轮 `citationSetId` 与 `evidenceId + paragraphId`。后端按空行建立片段目录、验证所属证据并逐字提取完整原文；跨轮目录、未知片段、跨证据片段均拒绝，不放宽引用校验。过长段落保留上下文但不可引用。
 - 报告含 `claims[].references[]` 的 `evidenceId` 和逐字 `quote`，通过 `evidence[]` 对应真实 `documentId`、`chunkSequence`、原文与业务版本。正文中的 `[E1]` 由服务端生成。兼容字段 `citations` 只包含实际使用的证据；报告还保留未被引用的本轮候选，便于审计遗漏。
 - `reason=NO_MATCH/NOT_CONFIGURED` 区分无命中与未配置；`REVIEWED` 表示有证据且通过复核。检索异常、协议错误、引用伪造、复核否决、生成期间证据失效均是技术失败，不能当作正确拒答统计；消息历史保存安全的知识阶段错误码（如 `KNOWLEDGE_CITATION_INVALID`），未知或旧版本错误仍为 `KNOWLEDGE_ANSWER_FAILED`，无草案正文。
-- `/messages/stream` 同样接受这三个参数：先 `start`，核验和保存完成后一次性 `delta`，最后 `done`。因此知识模式无需厂商流式能力，但首段正文会等待两次模型调用；失败只有 `start/error`。普通 AGENT 流程不变。
+- `/messages/stream` 同样接受这三个参数：先 `start`，核验和保存完成后一次性 `delta`，最后 `done`。因此知识模式无需厂商流式能力，但首段正文会等待两次模型调用；失败只有 `start/error`。显式 AGENT 保留旧流式协议，但已移除工单工具。
+- 升级注意：旧客户端如果一直省略 `mode`，将改走知识链路并采用 2000 字限制及完整正文 SSE；若仍显式发送 `AGENT`，会保持旧兼容路径。前端应显示模式并只在存在有效核验报告时展示核验标记，不能因有 `citations` 就标成已核验。本轮未修改任何前端项目。
 - 历史消息保存 `mode`、范围和完整核验报告；历史证据不会随知识库撤回而消失，不能据此推断今天的规则。V17 会自动迁移旧消息为 AGENT。
 - V18 为新知识助手消息增加 `knowledgeRunId`，成功或失败均保留。管理员可通过 `GET /api/admin/knowledge-answer-runs/{runId}` 查询候选、草案、核验结果、分阶段耗时及已知用量；列表接口只返回摘要。客户消息不会返回未核验草案。诊断存储故障与业务结果隔离，可能留下缺失或未结束快照，不能把运行 ID 当作诊断完整性的保证。新诊断版本 2 额外保留 `citationCatalog` 和模型原始 `selection`；`draft` 是引用解析后的草案。旧诊断仍可读取。设计见 `notes/27-问答运行记录与失败诊断.md` 和 `notes/28-片段选择与原文引用.md`。
 
@@ -420,7 +424,9 @@ Content-Type: application/json
 
 删除对话采用归档方式：对话更新为 `ARCHIVED` 后不再出现在默认客户列表中，也不能继续发送消息，但消息、工具调用和工单草稿仍保留用于审计。列表接口默认查询 `ACTIVE`，需要审计归档记录时可显式传入 `status=ARCHIVED`。正在生成回答的对话不能删除；已经归档的对话重复删除保持幂等。
 
-## 工单接口
+## 历史兼容：工单接口
+
+这些接口和权限规则保留供历史业务使用，不属于企业知识问答主线，问答模型不再注册工单工具。
 
 创建工单：
 
@@ -450,9 +456,9 @@ GET /api/tickets?page=1&size=20&status=PENDING
 
 客户只能查询自己的工单，创建人编号从 JWT 获取。优先级可选值为 `LOW`、`MEDIUM`、`HIGH`；当前新工单的初始状态为 `PENDING`。
 
-## AI 工单确认流程
+## 历史兼容：工单草稿确认
 
-当 AI 判断需要人工处理时，会调用 `prepare_create_ticket` 工具生成草稿。同步对话响应通过 `pendingActions` 返回草稿，流式对话通过 `action_required` 事件返回；此时真实工单尚未创建。
+旧客服版本通过 `prepare_create_ticket` 生成待确认草稿，并使用 `pendingActions` / `action_required` 返回。当前模型已不再注册该工具，新问答不产生工单草稿；未过期的历史草稿仍按原权限、版本和有效期规则处理。以下接口保留用于历史操作。
 
 查询对话中的操作卡片：
 
@@ -488,7 +494,7 @@ POST /api/agent/actions/{actionId}/cancel
 
 草稿有效期为 24 小时。确认接口具有幂等性，重复确认只返回第一次创建的工单，不会重复建单。
 
-## 工单处理流程
+## 历史兼容：工单处理流程
 
 工单状态按照以下规则流转：
 

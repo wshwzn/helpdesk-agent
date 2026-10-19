@@ -100,7 +100,7 @@
 | `completion_tokens` | `INT` | 是 | `NULL` | 厂商返回的输出 Token 数。 |
 | `total_tokens` | `INT` | 是 | `NULL` | 厂商返回的总 Token 数。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 生成失败时保存的内部脱敏错误码，例如模型失败 `MODEL_CALL_FAILED`、进程中断超时恢复 `GENERATION_INTERRUPTED`。 |
-| `mode` | `VARCHAR(20)` | 否 | `AGENT` | 本条消息的模式：`AGENT` 自动工具对话、`KNOWLEDGE` 强制证据核验；历史记录默认为 AGENT。 |
+| `mode` | `VARCHAR(20)` | 否 | `AGENT` | 本条消息的模式：`AGENT` 旧兼容工具对话、`KNOWLEDGE` 强制证据核验；历史记录及数据库默认值仍为 AGENT，应用新请求默认显式写入 KNOWLEDGE。 |
 | `applicability_scope` | `VARCHAR(40)` | 是 | `NULL` | 本轮请求显式选择的业务范围快照。KNOWLEDGE 未指定时为 `ALL`，AGENT 为空；非权限字段。 |
 | `knowledge_answer` | `MEDIUMTEXT` | 是 | `NULL` | 核验报告 JSON；仅成功完成的 KNOWLEDGE 助手消息写入。包含 `schemaVersion=1`（普通结果）或 `2`（结构化澄清/续答）、原因、知识库身份快照、范围、核验时间、结构化回答及本轮证据快照。 |
 | `knowledge_run_id` | `VARCHAR(36)` | 是 | `NULL` | V18 新增，服务端为新 KNOWLEDGE 助手消息分配的 UUID，逻辑关联 `knowledge_answer_runs.run_id`。客户消息、AGENT 消息及升级前历史消息为空；成功或失败后均保留。 |

@@ -13,6 +13,8 @@ import com.anying.helpdesk.auth.domain.User;
 import com.anying.helpdesk.auth.domain.UserRole;
 import com.anying.helpdesk.auth.mapper.UserMapper;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
+import com.anying.helpdesk.conversation.domain.ChatMode;
+import com.anying.helpdesk.conversation.dto.SendMessageRequest;
 import com.anying.helpdesk.conversation.domain.ChatMessageRole;
 import com.anying.helpdesk.conversation.domain.ChatMessageStatus;
 import com.anying.helpdesk.conversation.mapper.ChatMessageMapper;
@@ -69,6 +71,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 显式旧模式的会话兼容回归；工单动作由测试桩模拟，实际模型注册边界另有专项测试。 */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -489,7 +492,7 @@ class ConversationControllerIntegrationTest {
         conversationPersistenceService.prepareExchange(
                 conversationId,
                 customer.getId(),
-                "第一条消息",
+                new SendMessageRequest("第一条消息", ChatMode.AGENT, null),
                 resolvedModel
         );
 
@@ -501,7 +504,7 @@ class ConversationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.TEXT_EVENT_STREAM, MediaType.APPLICATION_JSON)
                         .content("""
-                                {"content": "第三条消息"}
+                                {"mode": "AGENT", "content": "第三条消息"}
                                 """))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("CONVERSATION_GENERATION_IN_PROGRESS"));
@@ -546,7 +549,7 @@ class ConversationControllerIntegrationTest {
         PreparedChatExchange abandoned = conversationPersistenceService.prepareExchange(
                 conversationId,
                 customer.getId(),
-                "生成时服务被关闭",
+                new SendMessageRequest("生成时服务被关闭", ChatMode.AGENT, null),
                 resolvedModel
         );
         AgentExecutionContext abandonedContext = new AgentExecutionContext(
@@ -606,7 +609,7 @@ class ConversationControllerIntegrationTest {
         PreparedChatExchange abandoned = conversationPersistenceService.prepareExchange(
                 conversationId,
                 customer.getId(),
-                "等待后台恢复",
+                new SendMessageRequest("等待后台恢复", ChatMode.AGENT, null),
                 new ResolvedChatModel(106L, "recovery-model", true, mock(ChatModel.class))
         );
         chatMessageMapper.update(null, new LambdaUpdateWrapper<ChatMessage>()
@@ -676,7 +679,7 @@ class ConversationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.TEXT_EVENT_STREAM)
                         .content("""
-                                {"content": "我忘记密码了"}
+                                {"mode": "AGENT", "content": "我忘记密码了"}
                                 """))
                 .andExpect(request().asyncStarted())
                 .andReturn();
@@ -736,7 +739,7 @@ class ConversationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.TEXT_EVENT_STREAM)
                         .content("""
-                                {"content": "触发流式失败"}
+                                {"mode": "AGENT", "content": "触发流式失败"}
                                 """))
                 .andExpect(request().asyncStarted())
                 .andReturn();
@@ -778,7 +781,7 @@ class ConversationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.TEXT_EVENT_STREAM, MediaType.APPLICATION_JSON)
                         .content("""
-                                {"content": "尝试流式调用"}
+                                {"mode": "AGENT", "content": "尝试流式调用"}
                                 """))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("MODEL_STREAMING_NOT_SUPPORTED"));
@@ -788,6 +791,7 @@ class ConversationControllerIntegrationTest {
         verify(modelClient, never()).stream(any(), any(ConversationModelHistory.class), any());
     }
 
+    /** 显式选择旧模式以覆盖兼容协议，缺省请求由可信问答集成测试验证。 */
     private org.springframework.test.web.servlet.ResultActions sendMessage(
             String token,
             long conversationId,
@@ -797,7 +801,7 @@ class ConversationControllerIntegrationTest {
                 .header(HttpHeaders.AUTHORIZATION, bearer(token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"content": "%s"}
+                        {"mode": "AGENT", "content": "%s"}
                         """.formatted(message)));
     }
 

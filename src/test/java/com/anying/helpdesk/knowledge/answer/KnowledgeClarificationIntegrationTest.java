@@ -139,6 +139,33 @@ class KnowledgeClarificationIntegrationTest {
         assertThat(history.get(3).knowledgeAnswer()).isEqualTo(second.knowledgeAnswer());
     }
 
+    /** 不传模式的 HTTP 请求同样支持澄清及续答，保留原问题和证据绑定。 */
+    @Test
+    @DisplayName("省略模式也能完成范围澄清与续答并回读报告")
+    void defaultHttpRequestsCompleteClarification() throws Exception {
+        Long id = conversation();
+        mvc.perform(post("/api/conversations/{id}/messages", id).header("Authorization", customer)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("content", QUESTION))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.assistantMessage.mode").value("KNOWLEDGE"))
+                .andExpect(jsonPath("$.data.assistantMessage.knowledgeAnswer.reason").value("APPLICABILITY_REQUIRED"))
+                .andExpect(jsonPath("$.data.pendingActions").isEmpty());
+        var first = conversations.pageMessages(id, 1, 20, CUSTOMER).records().getLast();
+        mvc.perform(post("/api/conversations/{id}/messages", id).header("Authorization", customer)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("content", "我选择上海",
+                                "applicabilityScope", "CN_SH", "clarificationMessageId", first.id()))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.assistantMessage.knowledgeAnswer.answer.status").value("ANSWERABLE"))
+                .andExpect(jsonPath("$.data.assistantMessage.knowledgeAnswer.continuationOfMessageId").value(first.id()))
+                .andExpect(jsonPath("$.data.pendingActions").isEmpty());
+        verify(retrieval).search(baseId, new KnowledgeSearchRequest(QUESTION, "CN_SH"));
+        var history = conversations.pageMessages(id, 1, 20, CUSTOMER).records();
+        assertThat(history.get(1).knowledgeAnswer()).isEqualTo(first.knowledgeAnswer());
+        assertThat(history.get(3).knowledgeAnswer().continuationOfMessageId()).isEqualTo(first.id());
+    }
+
     /** 通用主题不需要地区，无配置的库保持原路径，并正确累加路由费用。 */
     @Test
     @DisplayName("通用问题不多问地区，关闭配置后不调用路由")

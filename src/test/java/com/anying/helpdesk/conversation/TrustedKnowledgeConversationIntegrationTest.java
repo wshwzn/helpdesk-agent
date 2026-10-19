@@ -26,6 +26,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.flywaydb.core.Flyway;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -88,7 +90,7 @@ class TrustedKnowledgeConversationIntegrationTest {
         when(provider.get()).thenReturn(new ResolvedChatModel(1L, "test", false, mock(ChatModel.class)));
         when(knowledge.answer(any(), any(), any(), any())).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
-            return completion();
+            return completion(invocation.getArgument(2));
         });
     }
 
@@ -160,7 +162,11 @@ class TrustedKnowledgeConversationIntegrationTest {
                 .andExpect(status().isBadRequest());
         send("{\"content\":\"问题\",\"mode\":\"KNOWLEDGE\",\"applicabilityScope\":\"sh\"}")
                 .andExpect(status().isBadRequest());
-        send("{\"content\":\"问题\",\"applicabilityScope\":\"SH\"}")
+        send("{\"content\":\"问题\",\"mode\":\"AGENT\",\"applicabilityScope\":\"SH\"}")
+                .andExpect(status().isBadRequest());
+        send(mapper.writeValueAsString(new SendMessageRequest("问".repeat(2001))))
+                .andExpect(status().isBadRequest());
+        send("{\"content\":\"问题\",\"clarificationMessageId\":1}")
                 .andExpect(status().isBadRequest());
         assertThat(messages.selectCount(new LambdaQueryWrapper<ChatMessage>()
                 .eq(ChatMessage::getConversationId, conversationId))).isZero();
@@ -172,7 +178,7 @@ class TrustedKnowledgeConversationIntegrationTest {
     @DisplayName("知识核验失败时无正文无报告且异常细节不会外泄")
     void failsClosed() throws Exception {
         when(knowledge.answer(any(), any(), any(), any())).thenThrow(new IllegalStateException("private draft secret"));
-        var response = send("{\"content\":\"问题\",\"mode\":\"KNOWLEDGE\"}")
+        var response = send("{\"content\":\"问题\"}")
                 .andExpect(status().isBadGateway()).andReturn().getResponse().getContentAsString();
         assertThat(response).doesNotContain("private draft secret");
         assertThat(assistant().getStatus()).isEqualTo(ChatMessageStatus.FAILED);
@@ -180,6 +186,7 @@ class TrustedKnowledgeConversationIntegrationTest {
         assertThat(assistant().getKnowledgeAnswer()).isNull();
         assertThat(assistant().getApplicabilityScope()).isEqualTo("ALL");
         assertThat(assistant().getErrorCode()).isEqualTo("KNOWLEDGE_ANSWER_FAILED");
+        verifyNoInteractions(agentClient);
     }
 
     /** 同步和流式两条入口持久化同一个分类码，客户端错误正文仍脱敏。 */
@@ -206,14 +213,16 @@ class TrustedKnowledgeConversationIntegrationTest {
         var pending = mvc.perform(post("/api/conversations/{id}/messages/stream", conversationId)
                         .header("Authorization", authorization).contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.TEXT_EVENT_STREAM)
-                        .content("{\"content\":\"上海住宿额度？\",\"mode\":\"KNOWLEDGE\",\"applicabilityScope\":\"SH\"}"))
+                        .content("{\"content\":\"上海住宿额度？\",\"applicabilityScope\":\"SH\"}"))
                 .andExpect(request().asyncStarted()).andReturn();
         var response = mvc.perform(asyncDispatch(pending)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         assertThat(response).contains("event:start", "event:delta", "event:done", "knowledgeAnswer");
+        assertThat(response).doesNotContain("event:action_required");
         assertThat(response.indexOf("event:start")).isLessThan(response.indexOf("event:delta"));
         assertThat(response.indexOf("event:delta")).isLessThan(response.indexOf("event:done"));
         assertThat(assistant().getKnowledgeAnswer()).isNotNull();
+        assertThat(assistant().getMode()).isEqualTo(ChatMode.KNOWLEDGE);
         verifyNoInteractions(agentClient);
     }
 
@@ -223,9 +232,55 @@ class TrustedKnowledgeConversationIntegrationTest {
     void failedStreamNeverEmitsDelta() throws Exception {
         when(knowledge.answer(any(), any(), any(), any())).thenThrow(new IllegalStateException("unverified draft"));
         var events = service.streamMessage(conversationId,
-                new SendMessageRequest("问题", ChatMode.KNOWLEDGE, "ALL"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
+                new SendMessageRequest("问题"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
         assertThat(events).extracting(event -> event.type()).containsExactly("start", "error");
         assertThat(assistant().getContent()).isNull();
+        verifyNoInteractions(agentClient);
+    }
+
+    /** 缺省、显式空值和显式知识模式均使用同一可信路径，历史回读保持核验报告。 */
+    @ParameterizedTest
+    @ValueSource(strings = {"{\"content\":\"报销期限？\"}",
+            "{\"content\":\"报销期限？\",\"mode\":null}",
+            "{\"content\":\"报销期限？\",\"mode\":\"KNOWLEDGE\"}"})
+    @DisplayName("默认与显式知识请求均持久化核验报告且不触发旧模型")
+    void defaultsToTrustedKnowledge(String body) throws Exception {
+        send(body).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.userMessage.mode").value("KNOWLEDGE"))
+                .andExpect(jsonPath("$.data.assistantMessage.mode").value("KNOWLEDGE"))
+                .andExpect(jsonPath("$.data.assistantMessage.applicabilityScope").value("ALL"))
+                .andExpect(jsonPath("$.data.assistantMessage.knowledgeAnswer.applicabilityScope").value("ALL"))
+                .andExpect(jsonPath("$.data.assistantMessage.knowledgeRunId").isNotEmpty())
+                .andExpect(jsonPath("$.data.pendingActions").isEmpty());
+        assertThat(assistant().getKnowledgeAnswer()).isNotNull();
+        mvc.perform(get("/api/conversations/{id}/messages", conversationId).header("Authorization", authorization))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[1].mode").value("KNOWLEDGE"))
+                .andExpect(jsonPath("$.data.records[1].knowledgeAnswer").exists());
+        verify(knowledge).answer(any(), eq("报销期限？"), eq("ALL"), any());
+        verifyNoInteractions(agentClient);
+    }
+
+    /** 旧模式历史保持原标记；同一会话的新缺省请求改用知识链路，不给旧回答补造核验。 */
+    @Test
+    @DisplayName("显式AGENT可兼容且切换默认知识模式后两类历史仍可回读")
+    void preservesLegacyHistoryWithoutUpgradingItsTrust() throws Exception {
+        when(agentClient.complete(any(), any(), any())).thenReturn(new ChatCompletionResult("旧模式回答", 2, 1, 3));
+        send("{\"content\":\"旧问题\",\"mode\":\"AGENT\"}")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.assistantMessage.mode").value("AGENT"))
+                .andExpect(jsonPath("$.data.assistantMessage.knowledgeAnswer").doesNotExist());
+        assertThat(assistant().getKnowledgeRunId()).isNull();
+        verifyNoInteractions(knowledge);
+        send("{\"content\":\"新问题\"}").andExpect(status().isOk());
+        mvc.perform(get("/api/conversations/{id}/messages", conversationId).header("Authorization", authorization))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[1].mode").value("AGENT"))
+                .andExpect(jsonPath("$.data.records[1].content").value("旧模式回答"))
+                .andExpect(jsonPath("$.data.records[1].knowledgeAnswer").doesNotExist())
+                .andExpect(jsonPath("$.data.records[3].mode").value("KNOWLEDGE"))
+                .andExpect(jsonPath("$.data.records[3].knowledgeAnswer").exists());
+        verify(agentClient, times(1)).complete(any(), any(), any());
     }
 
     /** 模拟忽略线程中断的迟到模型响应，检查取消后不落库为完成。 */
@@ -273,11 +328,16 @@ class TrustedKnowledgeConversationIntegrationTest {
 
     /** 提供一份已核验报告作为会话边界测试输入，语义判断另由知识服务测试覆盖。 */
     private ChatCompletionResult completion() {
+        return completion("SH");
+    }
+
+    /** 为入口边界测试返回与请求范围一致的核验报告，不访问真实模型。 */
+    private ChatCompletionResult completion(String scope) {
         String quote = "上海住宿上限每晚600元。";
         var draft = new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.ANSWERABLE,
                 List.of(new KnowledgeAnswerDraft.Claim(quote,
                         List.of(new KnowledgeAnswerDraft.Reference("E1", quote)))), List.of(), List.of());
-        var report = new KnowledgeAnswerReport(1, KnowledgeAnswerReport.Reason.REVIEWED, 2L, "制度库", "SH",
+        var report = new KnowledgeAnswerReport(1, KnowledgeAnswerReport.Reason.REVIEWED, 2L, "制度库", scope,
                 LocalDateTime.of(2026, 10, 18, 8, 0), draft,
                 List.of(new KnowledgeAnswerReport.Evidence("E1", 10L, 1, "住宿.md", quote,
                         new KnowledgeDocumentMetadata("travel", "v2", "SH", LocalDateTime.of(2026, 10, 1, 0, 0), null))));

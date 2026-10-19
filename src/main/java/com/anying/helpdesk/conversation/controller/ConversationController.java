@@ -116,7 +116,7 @@ public class ConversationController {
     @PostMapping("/{id}/messages")
     @Operation(
             summary = "发送消息并获取 AI 回答",
-            description = "mode 默认 AGENT；KNOWLEDGE 强制本轮检索、引用校验和语义复核。失败消息仍会保留"
+            description = "mode 省略或为 null 时默认 KNOWLEDGE，强制检索和核验，正文最多 2000 字；显式 AGENT 仅为旧客户端兼容，不提供工单工具或完整核验。失败消息仍会保留"
     )
     public ApiResponse<ChatExchangeResponse> sendMessage(
             @Parameter(description = "对话主键", example = "1")
@@ -136,7 +136,7 @@ public class ConversationController {
     @PostMapping(value = "/{id}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(
             summary = "发送消息并流式获取 AI 回答",
-            description = "依次返回 start、delta、done；KNOWLEDGE 核验并保存后一次性发送 delta，无未审核正文。失败时返回 error"
+            description = "默认 KNOWLEDGE：先返回 start，核验并保存后发送完整 delta 和 done，无未审核正文；失败时返回 error。显式 AGENT 保留旧流式协议，不具备完整核验保证"
     )
     public Flux<ServerSentEvent<ChatStreamEvent>> streamMessage(
             @Parameter(description = "对话主键", example = "1")

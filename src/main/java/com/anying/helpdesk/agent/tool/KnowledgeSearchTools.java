@@ -28,10 +28,10 @@ public class KnowledgeSearchTools {
      */
     @Tool(
             name = "search_knowledge_base",
-            description = "查询产品说明、使用方法、故障排查和服务规则等通用知识。回答此类事实问题前使用；不要用于查询客户个人工单。"
+            description = "查询企业制度、产品资料和操作流程。只返回检索证据，不代表答案已经完成语义核验；不能用于执行业务操作。"
     )
     public KnowledgeSearchToolResult searchKnowledgeBase(
-            @ToolParam(description = "根据客户问题整理出的完整、独立的自然语言检索句") String query,
+            @ToolParam(description = "根据员工问题整理出的完整、独立的自然语言检索句") String query,
             @ToolParam(required = false, description = "用户明确说明的适用范围代码，如 CN_SH；未知时省略，仅检索 ALL 通用资料，不能猜测范围。范围不是访问权限。") String applicabilityScope,
             ToolContext toolContext
     ) {
