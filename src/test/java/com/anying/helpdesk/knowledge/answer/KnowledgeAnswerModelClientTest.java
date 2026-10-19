@@ -11,6 +11,8 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.metadata.ChatResponseMetadata;
+import org.springframework.ai.chat.metadata.DefaultUsage;
 import org.springframework.ai.chat.prompt.Prompt;
 
 import java.util.List;
@@ -82,6 +84,21 @@ class KnowledgeAnswerModelClientTest {
         assertThatThrownBy(() -> client.review(model, "问题", "ALL", List.of(), draft))
                 .isInstanceOfSatisfying(KnowledgeAnswerFailure.class, failure ->
                         assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_PROTOCOL_INVALID"));
+    }
+
+    /** 厂商已经返回计费信息但协议解析失败时，仍将用量交给安全的阶段诊断。 */
+    @Test
+    @DisplayName("畸形模型响应保留已知 Token 且不保留原始正文")
+    void protocolFailureKeepsKnownUsage() {
+        when(chatModel.call(any(Prompt.class))).thenReturn(new ChatResponse(
+                List.of(new Generation(new AssistantMessage("private malformed response"))),
+                ChatResponseMetadata.builder().usage(new DefaultUsage(20, 8, 28)).build()));
+        assertThatThrownBy(() -> client.draft(model, "问题", "ALL", List.of()))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class, failure -> {
+                    assertThat(failure.usage().totalTokens()).isEqualTo(28);
+                    assertThat(failure.getMessage()).doesNotContain("private malformed response");
+                    assertThat(failure.getCause()).isNull();
+                });
     }
 
     /** 将测试 JSON 包装成厂商响应。 */

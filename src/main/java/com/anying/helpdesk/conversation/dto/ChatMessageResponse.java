@@ -28,6 +28,7 @@ public record ChatMessageResponse(
         @Schema(description = "本条消息的对话模式") ChatMode mode,
         @Schema(description = "知识问答显式选择的适用范围") String applicabilityScope,
         @Schema(description = "知识问答核验报告；普通对话、生成中或失败时为空") KnowledgeAnswerReport knowledgeAnswer,
+        @Schema(description = "知识助手消息的运行编号；仅管理员可查询诊断，旧消息为空") String knowledgeRunId,
         @Schema(description = "创建时间") LocalDateTime createdAt,
         @Schema(description = "最后更新时间") LocalDateTime updatedAt
 ) {
@@ -66,6 +67,7 @@ public record ChatMessageResponse(
                 message.getMode(),
                 message.getApplicabilityScope(),
                 message.getKnowledgeAnswer(),
+                message.getKnowledgeRunId(),
                 message.getCreatedAt(),
                 message.getUpdatedAt()
         );

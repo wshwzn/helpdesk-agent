@@ -66,6 +66,7 @@ class TrustedKnowledgeConversationIntegrationTest {
     @Autowired private ConversationMapper conversations;
     @Autowired private ConversationService service;
     @Autowired private ObjectMapper mapper;
+    @Autowired private JdbcTemplate jdbc;
     @MockitoBean private DefaultChatModelProvider provider;
     @MockitoBean private ConversationModelClient agentClient;
     @MockitoBean private TrustedKnowledgeAnswerService knowledge;
@@ -85,7 +86,7 @@ class TrustedKnowledgeConversationIntegrationTest {
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         conversationId = ((Number) JsonPath.read(body, "$.data.id")).longValue();
         when(provider.get()).thenReturn(new ResolvedChatModel(1L, "test", false, mock(ChatModel.class)));
-        when(knowledge.answer(any(), any(), any())).thenAnswer(invocation -> {
+        when(knowledge.answer(any(), any(), any(), any())).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
             return completion();
         });
@@ -94,6 +95,7 @@ class TrustedKnowledgeConversationIntegrationTest {
     /** 清理本类创建的数据，保留其他用例的知识文档。 */
     @AfterEach
     void cleanup() {
+        jdbc.update("DELETE FROM knowledge_answer_runs WHERE conversation_id=?", conversationId);
         messages.delete(new LambdaQueryWrapper<ChatMessage>().eq(ChatMessage::getConversationId, conversationId));
         conversations.deleteById(conversationId);
     }
@@ -169,7 +171,7 @@ class TrustedKnowledgeConversationIntegrationTest {
     @Test
     @DisplayName("知识核验失败时无正文无报告且异常细节不会外泄")
     void failsClosed() throws Exception {
-        when(knowledge.answer(any(), any(), any())).thenThrow(new IllegalStateException("private draft secret"));
+        when(knowledge.answer(any(), any(), any(), any())).thenThrow(new IllegalStateException("private draft secret"));
         var response = send("{\"content\":\"问题\",\"mode\":\"KNOWLEDGE\"}")
                 .andExpect(status().isBadGateway()).andReturn().getResponse().getContentAsString();
         assertThat(response).doesNotContain("private draft secret");
@@ -184,7 +186,7 @@ class TrustedKnowledgeConversationIntegrationTest {
     @Test
     @DisplayName("知识失败阶段能从历史消息追溯且不会暴露内部说明")
     void persistsSafeFailureStageInBothModes() throws Exception {
-        when(knowledge.answer(any(), any(), any())).thenThrow(new KnowledgeAnswerFailure(
+        when(knowledge.answer(any(), any(), any(), any())).thenThrow(new KnowledgeAnswerFailure(
                 KnowledgeAnswerFailure.Code.KNOWLEDGE_CITATION_INVALID, "private unverified draft"));
         String response = send("{\"content\":\"问题\",\"mode\":\"KNOWLEDGE\"}")
                 .andExpect(status().isBadGateway()).andReturn().getResponse().getContentAsString();
@@ -219,7 +221,7 @@ class TrustedKnowledgeConversationIntegrationTest {
     @Test
     @DisplayName("知识 SSE 核验失败时只发 start 和 error")
     void failedStreamNeverEmitsDelta() throws Exception {
-        when(knowledge.answer(any(), any(), any())).thenThrow(new IllegalStateException("unverified draft"));
+        when(knowledge.answer(any(), any(), any(), any())).thenThrow(new IllegalStateException("unverified draft"));
         var events = service.streamMessage(conversationId,
                 new SendMessageRequest("问题", ChatMode.KNOWLEDGE, "ALL"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
         assertThat(events).extracting(event -> event.type()).containsExactly("start", "error");
@@ -233,7 +235,7 @@ class TrustedKnowledgeConversationIntegrationTest {
         CountDownLatch entered = new CountDownLatch(1);
         CountDownLatch finished = new CountDownLatch(1);
         CompletableFuture<Void> release = new CompletableFuture<>();
-        when(knowledge.answer(any(), any(), any())).thenAnswer(invocation -> {
+        when(knowledge.answer(any(), any(), any(), any())).thenAnswer(invocation -> {
             entered.countDown();
             release.join();
             finished.countDown();

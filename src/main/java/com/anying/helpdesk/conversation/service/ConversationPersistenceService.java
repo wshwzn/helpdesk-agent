@@ -206,6 +206,9 @@ public class ConversationPersistenceService {
         assistantMessage.setRole(ChatMessageRole.ASSISTANT);
         assistantMessage.setMode(request.mode());
         assistantMessage.setApplicabilityScope(request.applicabilityScope());
+        if (request.mode() == ChatMode.KNOWLEDGE) {
+            assistantMessage.setKnowledgeRunId(java.util.UUID.randomUUID().toString());
+        }
         assistantMessage.setStatus(ChatMessageStatus.PENDING);
         assistantMessage.setModelConfigId(model.configId());
         assistantMessage.setModelName(model.modelName());
@@ -223,7 +226,8 @@ public class ConversationPersistenceService {
         return new PreparedChatExchange(
                 userMessage,
                 assistantMessage.getId(),
-                new ConversationModelHistory(history, loadRecentToolCalls(history))
+                new ConversationModelHistory(history, loadRecentToolCalls(history)),
+                assistantMessage.getKnowledgeRunId()
         );
     }
 

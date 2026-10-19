@@ -22,11 +22,23 @@ public class KnowledgeAnswerFailure extends IllegalStateException {
     }
 
     private final Code code;
+    private final KnowledgeAnswerModelClient.TokenUsage usage;
 
     /** 使用固定错误码及内部说明记录可诊断的失败，不携带原始模型异常。 */
     public KnowledgeAnswerFailure(Code code, String message) {
+        this(code, message, null);
+    }
+
+    /** 协议失败仍保留厂商已返回的用量，绝不附带原始响应或密钥。 */
+    public KnowledgeAnswerFailure(Code code, String message, KnowledgeAnswerModelClient.TokenUsage usage) {
         super(message);
         this.code = code;
+        this.usage = usage;
+    }
+
+    /** 提供失败调用中已知的用量，未知时返回空值。 */
+    public KnowledgeAnswerModelClient.TokenUsage usage() {
+        return usage;
     }
 
     /** 返回可以安全持久化到用户消息历史的分类码。 */

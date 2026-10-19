@@ -6,6 +6,7 @@ import com.anying.helpdesk.conversation.model.ConversationModelHistory;
 public record PreparedChatExchange(
         ChatMessage userMessage,
         Long assistantMessageId,
-        ConversationModelHistory history
+        ConversationModelHistory history,
+        String knowledgeRunId
 ) {
 }

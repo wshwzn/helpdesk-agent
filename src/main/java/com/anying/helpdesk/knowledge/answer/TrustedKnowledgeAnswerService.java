@@ -7,6 +7,8 @@ import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentEligibilityService;
 import com.anying.helpdesk.knowledge.service.KnowledgeRetrievalService;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
+import com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerTrace;
+import static com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerRunSnapshot.Stage.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,21 +32,72 @@ public class TrustedKnowledgeAnswerService {
     private final KnowledgeAnswerGuard guard;
     private final Clock knowledgeClock;
 
-    /** 执行检索、草案校验、语义复核及准入复查，只返回可以落库展示的回答。 */
+    /** 兼容直接业务调用；正式会话入口使用显式关联助手消息的诊断上下文。 */
     public ChatCompletionResult answer(ResolvedChatModel model, String question, String scope) {
+        return answer(model, question, scope, new KnowledgeAnswerTrace(null, null, null, question, scope,
+                model, knowledgeClock, ignored -> { }));
+    }
+
+    /** 执行原有核验链路并记录阶段快照，诊断信息不进入客户可见回答。 */
+    public ChatCompletionResult answer(ResolvedChatModel model, String question, String scope, KnowledgeAnswerTrace trace) {
         if (question == null || question.isBlank() || question.length() > 2000
                 || scope == null || !scope.matches("[A-Z][A-Z0-9_-]{0,39}")) {
             throw new IllegalArgumentException("invalid knowledge question");
         }
-        var base = atStage(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault);
-        if (base.isEmpty()) {
-            return empty(KnowledgeAnswerReport.Reason.NOT_CONFIGURED, null, null, scope);
+        var retrieved = trace.stage(RETRIEVAL, () -> retrieve(question, scope, trace));
+        if (retrieved.reason() != KnowledgeAnswerReport.Reason.REVIEWED) {
+            trace.answerReason(retrieved.reason());
+            return empty(retrieved.reason(), retrieved.baseId(), retrieved.baseName(), scope);
         }
+        var evidence = retrieved.evidence();
+        var draft = trace.stage(DRAFT, () -> {
+            var result = atStage(KNOWLEDGE_DRAFT_CALL_FAILED, () -> modelClient.draft(model, question, scope, evidence));
+            trace.drafted(result);
+            return result;
+        });
+        trace.stage(VALIDATION, () -> {
+            guard.validate(draft.value(), evidence);
+            return null;
+        });
+        var review = trace.stage(REVIEW, () -> {
+            var result = atStage(KNOWLEDGE_REVIEW_CALL_FAILED,
+                    () -> modelClient.review(model, question, scope, evidence, draft.value()));
+            trace.reviewed(result);
+            requireApproved(result.value());
+            return result;
+        });
+        LocalDateTime checkedAt = trace.stage(EVIDENCE_RECHECK, () -> {
+            LocalDateTime now = LocalDateTime.now(knowledgeClock);
+            var current = atStage(KNOWLEDGE_EVIDENCE_CHECK_FAILED,
+                    () -> eligibilityService.findEligible(retrieved.baseId(), scope, now));
+            for (var item : evidence) {
+                var document = current.get(item.documentId());
+                if (document == null || !Objects.equals(item.metadata(), KnowledgeDocumentMetadata.from(document))) {
+                    throw new KnowledgeAnswerFailure(KNOWLEDGE_EVIDENCE_CHANGED, "knowledge evidence changed during generation");
+                }
+            }
+            return now;
+        });
+        var report = new KnowledgeAnswerReport(1, KnowledgeAnswerReport.Reason.REVIEWED,
+                retrieved.baseId(), retrieved.baseName(), scope, checkedAt, draft.value(), evidence);
+        trace.answerReason(report.reason());
+        return new ChatCompletionResult(render(report), sum(draft.promptTokens(), review.promptTokens()),
+                sum(draft.completionTokens(), review.completionTokens()), sum(draft.totalTokens(), review.totalTokens()), report);
+    }
+
+    private record Retrieved(Long baseId, String baseName, KnowledgeAnswerReport.Reason reason,
+                             List<KnowledgeAnswerReport.Evidence> evidence) { }
+
+    /** 保存实际召回再按原有预算建立证据编号，诊断截断不会改变送入模型的证据。 */
+    private Retrieved retrieve(String question, String scope, KnowledgeAnswerTrace trace) {
+        var base = atStage(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault);
+        if (base.isEmpty()) return new Retrieved(null, null, KnowledgeAnswerReport.Reason.NOT_CONFIGURED, List.of());
         var knowledgeBase = base.get();
         var search = atStage(KNOWLEDGE_RETRIEVAL_FAILED,
                 () -> retrievalService.search(knowledgeBase.id(), new KnowledgeSearchRequest(question, scope)));
+        trace.retrieved(search);
         if (search.results().isEmpty()) {
-            return empty(KnowledgeAnswerReport.Reason.NO_MATCH, knowledgeBase.id(), knowledgeBase.name(), scope);
+            return new Retrieved(knowledgeBase.id(), knowledgeBase.name(), KnowledgeAnswerReport.Reason.NO_MATCH, List.of());
         }
         List<KnowledgeAnswerReport.Evidence> evidence = new ArrayList<>();
         for (var hit : search.results()) {
@@ -58,25 +111,8 @@ public class TrustedKnowledgeAnswerService {
             throw new KnowledgeAnswerFailure(KNOWLEDGE_CONTEXT_TOO_LARGE, "knowledge evidence exceeds budget");
         }
         var immutableEvidence = List.copyOf(evidence);
-        var draft = atStage(KNOWLEDGE_DRAFT_CALL_FAILED,
-                () -> modelClient.draft(model, question, scope, immutableEvidence));
-        guard.validate(draft.value(), immutableEvidence);
-        var review = atStage(KNOWLEDGE_REVIEW_CALL_FAILED,
-                () -> modelClient.review(model, question, scope, immutableEvidence, draft.value()));
-        requireApproved(review.value());
-        LocalDateTime checkedAt = LocalDateTime.now(knowledgeClock);
-        var current = atStage(KNOWLEDGE_EVIDENCE_CHECK_FAILED,
-                () -> eligibilityService.findEligible(knowledgeBase.id(), scope, checkedAt));
-        for (var item : evidence) {
-            var document = current.get(item.documentId());
-            if (document == null || !Objects.equals(item.metadata(), KnowledgeDocumentMetadata.from(document))) {
-                throw new KnowledgeAnswerFailure(KNOWLEDGE_EVIDENCE_CHANGED, "knowledge evidence changed during generation");
-            }
-        }
-        var report = new KnowledgeAnswerReport(1, KnowledgeAnswerReport.Reason.REVIEWED,
-                knowledgeBase.id(), knowledgeBase.name(), scope, checkedAt, draft.value(), immutableEvidence);
-        return new ChatCompletionResult(render(report), sum(draft.promptTokens(), review.promptTokens()),
-                sum(draft.completionTokens(), review.completionTokens()), sum(draft.totalTokens(), review.totalTokens()), report);
+        trace.evidence(immutableEvidence);
+        return new Retrieved(knowledgeBase.id(), knowledgeBase.name(), KnowledgeAnswerReport.Reason.REVIEWED, immutableEvidence);
     }
 
     /** 拒绝不一致的复核协议，并把合法否决原因映射成固定枚举码，避免输出自由文本。 */

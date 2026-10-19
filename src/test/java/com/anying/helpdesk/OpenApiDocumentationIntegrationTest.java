@@ -54,6 +54,8 @@ class OpenApiDocumentationIntegrationTest {
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
                 .andExpect(jsonPath("$.paths['/api/tickets'].post.security[0].bearerAuth").isArray())
                 .andExpect(jsonPath("$.paths['/api/conversations'].post.security[0].bearerAuth").isArray())
+                .andExpect(jsonPath("$.paths['/api/admin/knowledge-answer-runs'].get.security[0].bearerAuth").isArray())
+                .andExpect(jsonPath("$.paths['/api/admin/knowledge-answer-runs/{runId}'].get.security[0].bearerAuth").isArray())
                 .andExpect(jsonPath("$.paths['/api/auth/login'].post.security").doesNotExist())
                 .andExpect(jsonPath("$.components.schemas.LoginRequest.properties.password.writeOnly")
                         .value(true))

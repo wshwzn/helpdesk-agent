@@ -85,7 +85,7 @@
 
 ## `chat_messages` 对话消息表
 
-保存客户消息、AI 回答及生成状态，由 Flyway V6 创建，V17 增加知识问答模式与证据报告。
+保存客户消息、AI 回答及生成状态，由 Flyway V6 创建，V17 增加知识问答模式与证据报告，V18 增加诊断运行编号。
 
 | 字段 | 类型 | 可空 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -103,6 +103,7 @@
 | `mode` | `VARCHAR(20)` | 否 | `AGENT` | 本条消息的模式：`AGENT` 自动工具对话、`KNOWLEDGE` 强制证据核验；历史记录默认为 AGENT。 |
 | `applicability_scope` | `VARCHAR(40)` | 是 | `NULL` | 本轮请求显式选择的业务范围快照。KNOWLEDGE 未指定时为 `ALL`，AGENT 为空；非权限字段。 |
 | `knowledge_answer` | `MEDIUMTEXT` | 是 | `NULL` | 核验报告 JSON；仅成功完成的 KNOWLEDGE 助手消息写入。包含 `schemaVersion=1`、原因、知识库身份快照、范围、核验时间、结构化回答及本轮证据快照。 |
+| `knowledge_run_id` | `VARCHAR(36)` | 是 | `NULL` | V18 新增，服务端为新 KNOWLEDGE 助手消息分配的 UUID，逻辑关联 `knowledge_answer_runs.run_id`。客户消息、AGENT 消息及升级前历史消息为空；成功或失败后均保留。 |
 | `version` | `INT` | 否 | `0` | 乐观锁版本号，防止生成完成与失败状态互相覆盖。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息创建时间。 |
 | `updated_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息状态或内容最后更新时间。 |
@@ -111,6 +112,7 @@
 
 - 主键：`PRIMARY KEY (id)`。
 - 普通索引：`idx_chat_messages_conversation_id (conversation_id, id)`，支持按对话顺序读取消息。
+- V18 唯一约束：`uk_chat_messages_knowledge_run (knowledge_run_id)`，非空运行编号只能属于一条助手消息；允许多个 NULL。
 - 普通索引：`idx_chat_messages_status_role_updated (status, role, updated_at)`，支持后台快速扫描超时的 `PENDING` 助手消息。
 - 超过配置阈值仍为 `PENDING` 的助手消息会被条件更新为 `FAILED` 并递增版本号，防止迟到的模型结果覆盖恢复状态。
 - V17 检查约束：`ck_chat_message_mode` 限定 `AGENT`、`KNOWLEDGE`。本次未新增索引。
@@ -119,6 +121,37 @@
 - 应用保证每项事实结论有本轮证据引用，`quote` 是连续原文；冲突双方至少涉及两份文档。正文与报告在同一个带乐观锁的完成事务写入。JSON 结构和模式/范围关系由应用约束，数据库不校验 JSON 内部结构。
 - 知识链路技术失败保存固定阶段码，如 `KNOWLEDGE_RETRIEVAL_FAILED`、`KNOWLEDGE_DRAFT_CALL_FAILED`、`KNOWLEDGE_PROTOCOL_INVALID`、`KNOWLEDGE_CITATION_INVALID`、`KNOWLEDGE_REVIEW_REJECTED`、`KNOWLEDGE_REVIEW_WRONG_STATUS`、`KNOWLEDGE_EVIDENCE_CHANGED`；未知或历史旧版本失败保留 `KNOWLEDGE_ANSWER_FAILED`。取消使用 `STREAM_CANCELLED`。全部码不超过 50 字符，完整分类见 `docs/evaluation/README.md`；无新增列或约束。失败消息不保存草案或成功报告。核验时间采用 Asia/Shanghai；历史报告表示当时的结果，不保证资料现在仍有效。
 - KNOWLEDGE 的 Token 用量合计草案与复核两次回答模型调用，任一调用未返回某项用量时该项为 NULL；无回答模型调用时为 0，不含检索 Embedding 用量。
+
+## `knowledge_answer_runs` 知识问答诊断表
+
+由 Flyway V18 创建，保存已接受知识消息的运行快照。仅管理员诊断接口可读取；即使草案被拒绝，普通客户历史消息也只返回运行编号，不返回该表内容。诊断与客户消息使用独立事务，因此消息有运行编号不保证诊断表一定存在对应记录。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `id` | `BIGINT` | 否 | 自增 | 内部主键，按插入顺序分页。 |
+| `run_id` | `VARCHAR(36)` | 否 | 无 | 服务端 UUID，外部诊断查询编号，逻辑关联消息中的 `knowledge_run_id`。 |
+| `assistant_message_id` | `BIGINT` | 否 | 无 | 对应 `chat_messages.id`；一条助手消息最多一条运行记录。 |
+| `conversation_id` | `BIGINT` | 否 | 无 | 所属 `conversations.id` 快照，用于按会话定位。 |
+| `status` | `VARCHAR(20)` | 否 | 无 | `RUNNING`、`SUCCEEDED`、`FAILED`、`CANCELLED`。成功指最终消息已落库；未结束快照不能视为模型还在运行的实时证明。 |
+| `error_code` | `VARCHAR(50)` | 是 | `NULL` | 固定失败码，无自由文本。除知识阶段码外可为 `STREAM_CANCELLED`、诊断专用的 `KNOWLEDGE_MESSAGE_SAVE_FAILED`；客户消息仍按原协议记录错误。 |
+| `revision` | `BIGINT` | 否 | 无 | 本次运行内递增的快照修订号，从 1 开始；不是 MyBatis 实体乐观锁。写入失败后下次修订可跳号。 |
+| `snapshot` | `MEDIUMTEXT` | 否 | 无 | `schemaVersion=1` JSON：身份、问题、范围、回答模型配置 ID/名称、运行状态、阶段耗时、召回参数与结果、证据编号、草案、复核结果、回答原因、逐模型阶段用量、诊断写入失败次数。不得加入凭据、模型客户端对象或厂商原始异常。 |
+| `started_at` | `TIMESTAMP(6)` | 否 | 无 | 在已接受消息上开始诊断的时间，应用按 Asia/Shanghai 写入。 |
+| `updated_at` | `TIMESTAMP(6)` | 否 | 无 | 此快照生成时间。 |
+| `finished_at` | `TIMESTAMP(6)` | 是 | `NULL` | 终态时间；运行中为空。 |
+
+索引、约束与应用规则：
+
+- 主键：`PRIMARY KEY (id)`；唯一约束 `uk_knowledge_answer_runs_run (run_id)` 和 `uk_knowledge_answer_runs_message (assistant_message_id)`。
+- 普通索引 `idx_knowledge_answer_runs_conversation (conversation_id, id)`、`idx_knowledge_answer_runs_status (status, id)` 支持管理员筛选和分页。
+- 检查约束 `ck_knowledge_answer_runs_status` 限定四种运行状态；`ck_knowledge_answer_runs_revision` 要求修订号大于 0。逻辑关系不建立外键，避免诊断写入依赖或锁住客户消息事务。
+- 更新必须满足原记录 `status=RUNNING` 且新修订号更大；终态不允许被迟到快照覆盖。首次写入失败后，后续阶段可以插入完整累计快照。
+- 阶段按顺序为 `RETRIEVAL`、`DRAFT`、`VALIDATION`、`REVIEW`、`EVIDENCE_RECHECK`、`MESSAGE_PERSISTENCE`；未执行阶段不补造。每阶段状态为 `RUNNING`、`SUCCEEDED`、`FAILED`、`CANCELLED`，活跃阶段的耗时为空，结束后用单调时钟记录毫秒。
+- 阶段耗时包含进入阶段时保存诊断的开销，不含结束时的快照写入；端到端耗时另由评测脚本记录。
+- `retrieval` 保存实际候选、排序和检索参数，最多 50 个 Chunk、50000 字；超限会标记 `retrievalTruncated`，不影响原问答链路的上下文超限拒绝。合法预算内的 `evidence` 对应本轮 E 编号；草案仅保存已解析的结构化对象，畸形原始响应不保存。
+- `usage` 仅出现在已进入的模型阶段，字段未知时为 NULL。协议失败若厂商已经返回用量仍保留；未调用、无用量、零用量是不同状态。不统计 Embedding，不把阶段用量再与成功消息累计用量相加。
+- `review` 是模型判断，不是人工确认结论。`draft` 未必通过引用或语义核验，禁止作为客户答案复用；`answerReason` 未产生时为空。
+- 无表间原子提交保证：进程中断或最后一次诊断写入失败可能留下 RUNNING；需同时核对客户消息状态和时间。当前没有诊断补偿任务或自动保留期清理，不应把残留状态伪装为正常终态。
 
 ## `agent_tool_calls` Agent 工具调用表
 

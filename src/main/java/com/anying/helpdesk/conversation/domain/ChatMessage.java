@@ -31,6 +31,7 @@ public class ChatMessage {
     private String errorCode;
     private ChatMode mode;
     private String applicabilityScope;
+    private String knowledgeRunId;
     @TableField(typeHandler = KnowledgeAnswerReportTypeHandler.class)
     private KnowledgeAnswerReport knowledgeAnswer;
     @Version

@@ -157,6 +157,9 @@ def measures(report):
     outcomes = Counter(item["outcome"] for item in results)
     available = [item for item in results if item.get("message")]
     known_usage = [item["message"]["totalTokens"] for item in available if item["message"].get("totalTokens") is not None]
+    diagnostics = [item["diagnostic"] for item in results if item.get("diagnosticState") == "CAPTURED"]
+    model_stages = [stage for item in diagnostics for stage in item["stages"] if stage["stage"] in ("DRAFT", "REVIEW")]
+    diagnostic_usage = [(stage.get("usage") or {}).get("totalTokens") for stage in model_stages]
     return {"planned": report["planned"], "executed": len(results),
             "automaticPassed": outcomes["CHECK_PASSED"], "technicalFailures": outcomes["TECHNICAL_ERROR"],
             "checkFailures": outcomes["CHECK_FAILED"], "completedWithReport": len(available),
@@ -164,7 +167,11 @@ def measures(report):
             "knownAnswerTokens": sum(known_usage), "completedAnswersMissingUsage": len(available) - len(known_usage),
             "failedCallUsageUnavailable": outcomes["TECHNICAL_ERROR"],
             "referenceCount": sum(item.get("referenceCount", 0) for item in results),
-            "invalidReferenceCount": sum(item.get("invalidReferenceCount", 0) for item in results)}
+            "invalidReferenceCount": sum(item.get("invalidReferenceCount", 0) for item in results),
+            "diagnosticCaptured": len(diagnostics),
+            "diagnosticMissing": len(results) - len(diagnostics),
+            "diagnosticKnownAnswerTokens": sum(value for value in diagnostic_usage if value is not None),
+            "diagnosticModelStagesMissingUsage": sum(value is None for value in diagnostic_usage)}
 
 
 def snapshot(client):
@@ -279,7 +286,36 @@ def execute_case(client, case, state):
             except ApiError:
                 result["historyUnavailable"] = True
     result["elapsedSeconds"] = round(time.monotonic() - start, 3)
+    collect_diagnostics(client, result)
     return result
+
+
+def collect_diagnostics(client, result):
+    """管理员按消息的运行编号读取诊断；获取失败单独记录，不覆盖实际问答成绩。"""
+    message = result.get("message") or result.get("failedMessage") or {}
+    run_id = message.get("knowledgeRunId")
+    if not run_id:
+        result["diagnosticState"] = "NO_RUN_ID"
+        return
+    result["knowledgeRunId"] = run_id
+    try:
+        if str(uuid.UUID(run_id)) != run_id:
+            raise ValueError("noncanonical run ID")
+        diagnostic = client.call("GET", "/api/admin/knowledge-answer-runs/" + run_id)
+        if (diagnostic["runId"] != run_id or diagnostic["assistantMessageId"] != message["id"]
+                or diagnostic["conversationId"] != result["conversationId"]
+                or diagnostic["question"] != result["question"] or diagnostic["applicabilityScope"] != result["scope"]):
+            raise ValueError("diagnostic identity mismatch")
+        expected = {"COMPLETED": "SUCCEEDED", "FAILED": "CANCELLED" if message.get("errorCode") == "STREAM_CANCELLED" else "FAILED"}
+        if message.get("status") in expected and diagnostic["status"] != expected[message["status"]]:
+            result["diagnosticState"] = "INCOMPLETE"
+        else:
+            result["diagnosticState"] = "CAPTURED"
+        result["diagnostic"] = diagnostic
+    except ApiError as error:
+        result.update(diagnosticState="UNAVAILABLE", diagnosticError=str(error))
+    except (ValueError, KeyError, TypeError):
+        result["diagnosticState"] = "INVALID"
 
 
 def save_report(path, report):
@@ -303,12 +339,18 @@ def save_report(path, report):
         lines.extend(["", "## " + item["id"], "", item["question"], "",
                       "自动问题：" + ", ".join(item.get("problems", [])), "",
                       "错误码：" + str(item.get("failedMessage", {}).get("errorCode", item.get("errorCode", "无"))), "",
+                      "运行编号：" + str(item.get("knowledgeRunId", "旧服务或未获得")) +
+                      "；诊断状态：" + str(item.get("diagnosticState", "未收集")), "",
                       item.get("message", {}).get("content") or "（未生成正文）", "", "人工语义核验：待标注"])
     if results:
         lines.extend(["", f"平均端到端耗时（含失败）：{statistics.mean(r['elapsedSeconds'] for r in results):.3f} 秒。"])
     lines.extend(["", "默认库恢复状态：" + str(report.get("restoration", "NOT_NEEDED")), ""])
     lines.extend(["运行是否完成：" + str(len(results) == report["planned"] and not report.get("runError")), "",
-                  "用量：仅含成功消息提供的回答模型 Token；失败调用及 Embedding 消耗未统计，不能当作总费用。", ""])
+                  "消息口径用量：仅含成功消息的回答 Token，不含失败调用及 Embedding；诊断口径另列如下。", ""])
+    lines.extend([f"诊断获取：{report['metrics']['diagnosticCaptured']}/{len(results)}；"
+                  f"诊断中的已知回答 Token：{report['metrics']['diagnosticKnownAnswerTokens']}；"
+                  f"缺用量的模型阶段：{report['metrics']['diagnosticModelStagesMissingUsage']}。",
+                  "诊断 Token 与成功消息 Token 有重叠，不能相加；仍不含 Embedding 和未知厂商用量。", ""])
     (path / "report.md").write_text("\n".join(lines), encoding="utf-8")
 
 
@@ -382,6 +424,7 @@ def main():
     parser.add_argument("--dataset", type=Path, default=ROOT / "docs/evaluation/trusted-knowledge-cases.json")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--isolated", action="store_true", help="新建评测库，临时切换默认库并在结束时恢复")
+    parser.add_argument("--require-diagnostics", action="store_true", help="诊断缺失、身份不符或未终结时也返回非零退出码")
     parser.add_argument("--scenario", choices=["baseline", "conflict", "restored", "withdrawn"], default="conflict")
     args = parser.parse_args()
     load_credentials(args.env_file)
@@ -448,7 +491,8 @@ def main():
         report["finishedAt"] = datetime.now(CST).isoformat()
         save_report(args.output, report)
     restored = report.get("restoration", "NOT_NEEDED") in ("NOT_NEEDED", "RESTORED")
-    return 0 if restored and all(item["outcome"] == "CHECK_PASSED" for item in report["results"]) else 1
+    diagnostics_ok = not args.require_diagnostics or all(item.get("diagnosticState") == "CAPTURED" for item in report["results"])
+    return 0 if restored and diagnostics_ok and all(item["outcome"] == "CHECK_PASSED" for item in report["results"]) else 1
 
 
 if __name__ == "__main__":

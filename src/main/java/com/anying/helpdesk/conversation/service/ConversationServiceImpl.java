@@ -8,6 +8,9 @@ import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ChatMode;
 import com.anying.helpdesk.knowledge.answer.TrustedKnowledgeAnswerService;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure;
+import com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerRunService;
+import com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerTrace;
+import com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerRunSnapshot;
 import com.anying.helpdesk.conversation.domain.ConversationStatus;
 import com.anying.helpdesk.conversation.dto.ChatExchangeResponse;
 import com.anying.helpdesk.conversation.dto.ChatMessageResponse;
@@ -50,6 +53,7 @@ public class ConversationServiceImpl implements ConversationService {
     private final PendingActionService pendingActionService;
     private final KnowledgeCitationService knowledgeCitationService;
     private final TrustedKnowledgeAnswerService trustedKnowledgeAnswerService;
+    private final KnowledgeAnswerRunService knowledgeAnswerRunService;
 
     @Override
     public ConversationResponse create(CreateConversationRequest request, Long customerId) {
@@ -101,17 +105,22 @@ public class ConversationServiceImpl implements ConversationService {
                 model
         );
 
+        KnowledgeAnswerTrace trace = request.mode() == ChatMode.KNOWLEDGE ? knowledgeAnswerRunService.start(prepared, model) : null;
         ChatMessage assistantMessage;
         try {
             ChatCompletionResult completion = request.mode() == ChatMode.KNOWLEDGE
-                    ? trustedKnowledgeAnswerService.answer(model, request.content().trim(), request.applicabilityScope())
+                    ? trustedKnowledgeAnswerService.answer(model, request.content().trim(), request.applicabilityScope(), trace)
                     : modelClient.complete(
                     model,
                     prepared.history(),
                     new AgentExecutionContext(customerId, id, prepared.assistantMessageId())
             );
-            assistantMessage = persistenceService.completeAssistant(prepared.assistantMessageId(), completion);
+            assistantMessage = trace == null ? persistenceService.completeAssistant(prepared.assistantMessageId(), completion)
+                    : trace.stage(KnowledgeAnswerRunSnapshot.Stage.MESSAGE_PERSISTENCE,
+                    () -> persistenceService.completeAssistant(prepared.assistantMessageId(), completion));
+            if (trace != null) trace.succeeded();
         } catch (RuntimeException exception) {
+            if (trace != null) trace.failed(exception);
             markGenerationFailed(prepared.assistantMessageId(), id,
                     request.mode() == ChatMode.KNOWLEDGE ? knowledgeErrorCode(exception) : MODEL_CALL_FAILED, exception);
             throw new ChatGenerationException();
@@ -214,16 +223,19 @@ public class ConversationServiceImpl implements ConversationService {
     private Flux<ChatStreamEvent> streamKnowledge(Long id, SendMessageRequest request,
                                                  ResolvedChatModel model, PreparedChatExchange prepared) {
         AtomicBoolean finalized = new AtomicBoolean(false);
+        KnowledgeAnswerTrace trace = knowledgeAnswerRunService.start(prepared, model);
         Flux<ChatStreamEvent> completed = Mono.fromCallable(() -> {
                     var completion = trustedKnowledgeAnswerService.answer(
-                            model, request.content().trim(), request.applicabilityScope());
+                            model, request.content().trim(), request.applicabilityScope(), trace);
                     ChatMessage assistant;
                     // 取消与落库共用临界区，已取消的生成即使迟到也不能写入完成状态。
                     synchronized (finalized) {
                         if (finalized.get()) {
                             throw new CancellationException("knowledge stream already cancelled");
                         }
-                        assistant = persistenceService.completeAssistant(prepared.assistantMessageId(), completion);
+                        assistant = trace.stage(KnowledgeAnswerRunSnapshot.Stage.MESSAGE_PERSISTENCE,
+                                () -> persistenceService.completeAssistant(prepared.assistantMessageId(), completion));
+                        trace.succeeded();
                         finalized.set(true);
                     }
                     return List.of(ChatStreamEvent.delta(completion.content()),
@@ -234,11 +246,17 @@ public class ConversationServiceImpl implements ConversationService {
         return Flux.concat(Mono.just(ChatStreamEvent.start(ChatMessageResponse.from(prepared.userMessage()),
                         prepared.assistantMessageId())), completed)
                 .onErrorResume(exception -> Mono.fromCallable(() -> {
+                    trace.failed(exception);
                     markGenerationFailed(prepared.assistantMessageId(), id, knowledgeErrorCode(exception), exception);
                     finalized.set(true);
                     return ChatStreamEvent.error("CHAT_GENERATION_FAILED", ChatGenerationException.USER_MESSAGE);
                 }).subscribeOn(Schedulers.boundedElastic()))
-                .doOnCancel(() -> markCancelledStream(prepared.assistantMessageId(), id, finalized));
+                .doOnCancel(() -> {
+                    synchronized (finalized) {
+                        if (!finalized.get()) trace.cancelled();
+                        markCancelledStream(prepared.assistantMessageId(), id, finalized);
+                    }
+                });
     }
 
     /** 将知识异常映射为安全的阶段码，未分类错误仍使用兼容的通用码。 */

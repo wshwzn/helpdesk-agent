@@ -133,6 +133,43 @@ class EvaluationTest(unittest.TestCase):
         client.call.side_effect = evaluation.ApiError(0, "TRANSPORT_OR_TIMEOUT")
         self.assertEqual("FAILED_MANUAL_RESTORE_REQUIRED", evaluation.restore_default(client, 7, 9))
 
+    def test_admin_diagnostic_does_not_change_business_outcome(self):
+        """诊断失败不能覆盖问答判分，成功获取时核对消息身份并保存失败阶段。"""
+        run_id = "d62f598e-8adc-4bdb-aa6a-0a8ebef708c3"
+        result = {"outcome": "TECHNICAL_ERROR", "conversationId": 100, "question": "住宿？", "scope": "CN_SH",
+                  "failedMessage": {"id": 5, "status": "FAILED", "knowledgeRunId": run_id}}
+        client = Mock()
+        client.call.side_effect = evaluation.ApiError(403, "FORBIDDEN")
+        evaluation.collect_diagnostics(client, result)
+        self.assertEqual("TECHNICAL_ERROR", result["outcome"])
+        self.assertEqual("UNAVAILABLE", result["diagnosticState"])
+        client.call.side_effect = None
+        client.call.return_value = {"runId": run_id, "assistantMessageId": 5, "conversationId": 100,
+                                   "question": "住宿？", "applicabilityScope": "CN_SH", "status": "FAILED",
+                                   "stages": [{"stage": "DRAFT", "usage": {"totalTokens": 12}},
+                                              {"stage": "REVIEW", "usage": None}]}
+        evaluation.collect_diagnostics(client, result)
+        self.assertEqual("CAPTURED", result["diagnosticState"])
+        metrics = evaluation.measures({"planned": 1, "results": [result]})
+        self.assertEqual(12, metrics["diagnosticKnownAnswerTokens"])
+        self.assertEqual(1, metrics["diagnosticModelStagesMissingUsage"])
+        self.assertEqual(1, metrics["technicalFailures"])
+        client.call.return_value["assistantMessageId"] = 6
+        evaluation.collect_diagnostics(client, result)
+        self.assertEqual("INVALID", result["diagnosticState"])
+
+    def test_unfinished_trace_not_counted_as_complete_diagnostics(self):
+        """消息已失败而快照仍运行中，不能把部分记录计作完整诊断。"""
+        run_id = "d62f598e-8adc-4bdb-aa6a-0a8ebef708c3"
+        result = {"outcome": "TECHNICAL_ERROR", "conversationId": 100, "question": "住宿？", "scope": "CN_SH",
+                  "failedMessage": {"id": 5, "status": "FAILED", "knowledgeRunId": run_id}}
+        client = Mock()
+        client.call.return_value = {"runId": run_id, "assistantMessageId": 5, "conversationId": 100,
+                                   "question": "住宿？", "applicabilityScope": "CN_SH", "status": "RUNNING", "stages": []}
+        evaluation.collect_diagnostics(client, result)
+        self.assertEqual("INCOMPLETE", result["diagnosticState"])
+        self.assertEqual(0, evaluation.measures({"planned": 1, "results": [result]})["diagnosticCaptured"])
+
 
 if __name__ == "__main__":
     unittest.main()

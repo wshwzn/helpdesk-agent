@@ -59,6 +59,7 @@ public class KnowledgeAnswerModelClient {
     private final ObjectMapper objectMapper;
 
     public record ModelResult<T>(T value, Integer promptTokens, Integer completionTokens, Integer totalTokens) { }
+    public record TokenUsage(Integer promptTokens, Integer completionTokens, Integer totalTokens) { }
     public enum ReviewReason {
         NONE, UNSUPPORTED_CLAIM, WRONG_STATUS, MISSED_CONFLICT, INCOMPLETE_ANSWER,
         UNNECESSARY_CLARIFICATION, UNCERTAIN
@@ -87,6 +88,7 @@ public class KnowledgeAnswerModelClient {
 
     /** 严格解析模型协议；畸形、超长、未知字段或多段 JSON 均视为生成失败。 */
     private <T> ModelResult<T> call(ResolvedChatModel model, String instruction, Object input, Class<T> type) {
+        TokenUsage tokens = null;
         try {
             String payload = objectMapper.writeValueAsString(input);
             if (payload.length() > 100000) {
@@ -94,26 +96,26 @@ public class KnowledgeAnswerModelClient {
             }
             ChatResponse response = model.chatModel().call(new Prompt(List.of(
                     new SystemMessage(instruction), new UserMessage(payload))));
+            var usage = response == null || response.getMetadata() == null ? null : response.getMetadata().getUsage();
+            if (usage != null && !(usage instanceof EmptyUsage)) {
+                tokens = new TokenUsage(usage.getPromptTokens(), usage.getCompletionTokens(), usage.getTotalTokens());
+            }
             if (response == null || response.getResult() == null || response.getResult().getOutput() == null
                     || response.getResult().getOutput().hasToolCalls()) {
-                throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "missing structured answer");
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "missing structured answer", tokens);
             }
             String content = response.getResult().getOutput().getText();
             if (content == null || content.isBlank() || content.length() > 32000) {
-                throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "invalid structured answer size");
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "invalid structured answer size", tokens);
             }
             T value = objectMapper.readerFor(type)
                     .with(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
                     .with(JsonParser.Feature.STRICT_DUPLICATE_DETECTION).readValue(content);
-            var usage = response.getMetadata() == null ? null : response.getMetadata().getUsage();
-            if (usage instanceof EmptyUsage) {
-                usage = null;
-            }
-            return new ModelResult<>(value, usage == null ? null : usage.getPromptTokens(),
-                    usage == null ? null : usage.getCompletionTokens(), usage == null ? null : usage.getTotalTokens());
+            return new ModelResult<>(value, tokens == null ? null : tokens.promptTokens(),
+                    tokens == null ? null : tokens.completionTokens(), tokens == null ? null : tokens.totalTokens());
         } catch (JsonProcessingException exception) {
-            throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "invalid knowledge answer protocol");
+            throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "invalid knowledge answer protocol", tokens);
         }
     }
 }
