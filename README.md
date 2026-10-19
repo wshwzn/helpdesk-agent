@@ -528,3 +528,7 @@ Authorization: Bearer <客服 accessToken>
 ```
 
 Spring Security 根据 JWT 中的角色限制访问：`CUSTOMER` 可以操作自己的工单，`SUPPORT` 可以访问客服处理接口。客户和客服编号均从已验证的 JWT 中获取，不接受客户端传值。
+
+### 复核专项评测
+
+提供固定问题、证据与草案的 12 组正反例，可单独比较复核误杀、漏检、技术失败和成本。运行说明见 [复核专项评测](docs/evaluation/knowledge-review.md)。默认策略仍为 `BASELINE`，`app.knowledge.review-strategy=CHECKLIST` 仅用于显式实验；本轮候选退化且更耗 Token，未被采用，完整数据见 [专项对比报告](docs/evaluation/runs/2026-10-19-复核专项对比.md)。普通单元测试不会调用真实模型。
