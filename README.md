@@ -222,6 +222,10 @@ V22 支持登记当前 OSS Bucket 中的独立 `external-knowledge/{slug}/` 目�
 
 管理员使用 `/api/admin/knowledge-bases/{baseId}/sources` 创建来源，通过 `/{sourceId}/scan` 手动扫描、`/{sourceId}/items` 查看结果。默认定时扫描每 60 秒启动，来源有独立数据库租约，扫描线程不阻塞索引任务心跳。配置、接口、元数据格式和真实联调脚本见 [OSS 来源同步验收](docs/demo/oss-source/README.md)，设计和验证记录见 [阶段 35](notes/35-OSS来源同步与变更识别.md)。
 
+### 多跳开发基线
+
+当前 KNOWLEDGE 仍为单轮检索。C1 已固定 18 份虚构资料、12 道依赖链/直接/不足/冲突问题并完成真实基线：自动检查 6 通过、5 未通过、1 技术失败，完整来源链召回 6/12。结果保留了漏冲突后的错误确定回答，不能把引用逐字有效等同于答案全面可靠。后续 C2 将在相同题集上验证受控补查。详见 [题集与运行方法](docs/demo/multihop/README.md)、[真实基线报告](docs/evaluation/runs/2026-10-20-多跳单轮基线.md) 和 [阶段 36](notes/36-多跳题集与单轮基线.md)。
+
 检索请求可以增加 `"applicabilityScope": "CN_SH"`，同时查询该范围与 `ALL`；省略范围只查通用资料。MySQL 先产生可用文档 ID，BM25 和 KNN 都在召回前过滤；返回后再复核撤回和到期情况。单次准入超过 10000 份文档会明确失败，需要拆分知识库。新旧有效期重叠时保留双方，正文冲突检测尚待后续实现。
 
 公开虚构演示资料及固定问题见 [`docs/demo/trusted-knowledge/README.md`](docs/demo/trusted-knowledge/README.md)。

@@ -1,0 +1,5 @@
+# 冻结评测文件的换行，保证跨平台检出后仍匹配真实基线的字节摘要。
+docs/demo/multihop/*.md text eol=lf
+docs/evaluation/multihop-cases.json text eol=lf
+# 已运行的原文含末尾空行，保留字节，不为格式检查改写冻结资料。
+docs/demo/multihop/[0-9]*.md whitespace=-blank-at-eof

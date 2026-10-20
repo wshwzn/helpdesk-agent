@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "enterprise-multihop-v1",
+  "validEvaluationFrom": "2021-01-01T00:00:00",
+  "validEvaluationUntil": "2099-01-01T00:00:00",
+  "retrievalSettings": {
+    "candidateLimit": 50,
+    "vectorMinSimilarity": 0.65,
+    "resultLimit": 5
+  },
+  "documents": [
+    {
+      "file": "01-星桥计划.md",
+      "sourceKey": "star-plan",
+      "businessVersion": "v1",
+      "scope": "ALL",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "02-R7保障映射.md",
+      "sourceKey": "r7-profile",
+      "businessVersion": "v1",
+      "scope": "ALL",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "03-L2上海额度.md",
+      "sourceKey": "l2-sh",
+      "businessVersion": "v1",
+      "scope": "CN_SH",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "04-海岚计划.md",
+      "sourceKey": "sea-plan",
+      "businessVersion": "v1",
+      "scope": "ALL",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "05-L3上海额度.md",
+      "sourceKey": "l3-sh",
+      "businessVersion": "v1",
+      "scope": "CN_SH",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "06-L2北京额度.md",
+      "sourceKey": "l2-bj",
+      "businessVersion": "v1",
+      "scope": "CN_BJ",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "07-报销提交期限.md",
+      "sourceKey": "expense-deadline",
+      "businessVersion": "v1",
+      "scope": "ALL",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "08-寒星计划.md",
+      "sourceKey": "cold-plan",
+      "businessVersion": "v1",
+      "scope": "ALL",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "09-双柏计划.md",
+      "sourceKey": "twin-plan",
+      "businessVersion": "v1",
+      "scope": "ALL",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "10-Z5上海额度.md",
+      "sourceKey": "z5-table",
+      "businessVersion": "v1",
+      "scope": "CN_SH",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "11-Z5上海通知.md",
+      "sourceKey": "z5-notice",
+      "businessVersion": "v1",
+      "scope": "CN_SH",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "12-环A指引.md",
+      "sourceKey": "loop-a",
+      "businessVersion": "v1",
+      "scope": "ALL",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "13-环B指引.md",
+      "sourceKey": "loop-b",
+      "businessVersion": "v1",
+      "scope": "ALL",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "14-L2上海历史额度.md",
+      "sourceKey": "l2-sh-old",
+      "businessVersion": "v1",
+      "scope": "CN_SH",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": "2021-01-01T00:00:00",
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "15-L2上海未来额度.md",
+      "sourceKey": "l2-sh-future",
+      "businessVersion": "v1",
+      "scope": "CN_SH",
+      "validFrom": "2099-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "16-L2上海草稿额度.md",
+      "sourceKey": "l2-sh-draft",
+      "businessVersion": "v1",
+      "scope": "CN_SH",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "DRAFT"
+    },
+    {
+      "file": "17-L1上海额度.md",
+      "sourceKey": "l1-sh",
+      "businessVersion": "v1",
+      "scope": "CN_SH",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    },
+    {
+      "file": "18-L4上海额度.md",
+      "sourceKey": "l4-sh",
+      "businessVersion": "v1",
+      "scope": "CN_SH",
+      "validFrom": "2020-01-01T00:00:00",
+      "validUntil": null,
+      "publicationStatus": "PUBLISHED"
+    }
+  ],
+  "cases": [
+    {
+      "id": "D01",
+      "scenario": "single_pass",
+      "kind": "direct",
+      "question": "住宿等级 L2 的员工去上海出差，每晚住宿报销上限是多少？",
+      "scope": "CN_SH",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "l2-sh:v1:CN_SH"
+      ],
+      "requiredPatterns": [
+        "680|六百八十"
+      ],
+      "probeQueries": [],
+      "rationale": "直接额度控制，排除历史、未来及草稿。"
+    },
+    {
+      "id": "D02",
+      "scenario": "single_pass",
+      "kind": "direct",
+      "question": "差旅结束后，应在多少个自然日内提交报销申请？",
+      "scope": "ALL",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "expense-deadline:v1:ALL"
+      ],
+      "requiredPatterns": [
+        "十五|15"
+      ],
+      "probeQueries": [],
+      "rationale": "直接流程控制。"
+    },
+    {
+      "id": "D03",
+      "scenario": "single_pass",
+      "kind": "direct",
+      "question": "住宿等级 L2 的员工去北京出差，每晚住宿报销上限是多少？",
+      "scope": "CN_BJ",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "l2-bj:v1:CN_BJ"
+      ],
+      "requiredPatterns": [
+        "520|五百二十"
+      ],
+      "probeQueries": [],
+      "rationale": "地区隔离控制。"
+    },
+    {
+      "id": "H01",
+      "scenario": "single_pass",
+      "kind": "two_hop",
+      "question": "海岚计划成员到上海驻场，每晚住宿报销上限是多少？",
+      "scope": "CN_SH",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "sea-plan:v1:ALL",
+        "l3-sh:v1:CN_SH"
+      ],
+      "requiredPatterns": [
+        "760|七百六十"
+      ],
+      "probeQueries": [
+        "海岚计划成员住宿等级",
+        "住宿等级 L3 上海每晚住宿报销上限"
+      ],
+      "rationale": "计划→L3→上海额度。"
+    },
+    {
+      "id": "H02",
+      "scenario": "single_pass",
+      "kind": "three_hop",
+      "question": "星桥计划成员到上海驻场，每晚住宿报销上限是多少？",
+      "scope": "CN_SH",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "star-plan:v1:ALL",
+        "r7-profile:v1:ALL",
+        "l2-sh:v1:CN_SH"
+      ],
+      "requiredPatterns": [
+        "680|六百八十"
+      ],
+      "probeQueries": [
+        "星桥计划保障编码",
+        "保障编码 R7 对应住宿等级",
+        "住宿等级 L2 上海每晚住宿报销上限"
+      ],
+      "rationale": "计划→R7→L2→上海额度。"
+    },
+    {
+      "id": "H03",
+      "scenario": "single_pass",
+      "kind": "three_hop",
+      "question": "星桥计划成员到北京驻场，每晚住宿报销上限是多少？",
+      "scope": "CN_BJ",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "star-plan:v1:ALL",
+        "r7-profile:v1:ALL",
+        "l2-bj:v1:CN_BJ"
+      ],
+      "requiredPatterns": [
+        "520|五百二十"
+      ],
+      "probeQueries": [
+        "星桥计划保障编码",
+        "保障编码 R7 对应住宿等级",
+        "住宿等级 L2 北京每晚住宿报销上限"
+      ],
+      "rationale": "同一计划查询北京，不能引用上海额度。"
+    },
+    {
+      "id": "H04",
+      "scenario": "single_pass",
+      "kind": "parallel",
+      "question": "星桥计划成员到上海驻场，每晚住宿报销上限是多少，出差结束后多久提交报销？",
+      "scope": "CN_SH",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "star-plan:v1:ALL",
+        "r7-profile:v1:ALL",
+        "l2-sh:v1:CN_SH",
+        "expense-deadline:v1:ALL"
+      ],
+      "requiredPatterns": [
+        "680|六百八十",
+        "十五|15"
+      ],
+      "probeQueries": [
+        "星桥计划保障编码",
+        "保障编码 R7 对应住宿等级",
+        "住宿等级 L2 上海每晚住宿报销上限",
+        "差旅报销提交期限"
+      ],
+      "rationale": "依赖链与提交期限两项都须回答。"
+    },
+    {
+      "id": "H05",
+      "scenario": "single_pass",
+      "kind": "paraphrase",
+      "question": "参加星桥驻场计划，在上海住一晚最多可以报销多少？",
+      "scope": "CN_SH",
+      "expectedStatus": "ANSWERABLE",
+      "requiredSources": [
+        "star-plan:v1:ALL",
+        "r7-profile:v1:ALL",
+        "l2-sh:v1:CN_SH"
+      ],
+      "requiredPatterns": [
+        "680|六百八十"
+      ],
+      "probeQueries": [
+        "星桥计划保障编码",
+        "保障编码 R7 对应住宿等级",
+        "住宿等级 L2 上海每晚住宿报销上限"
+      ],
+      "rationale": "与 H02 同义但独立会话，不借用上一题记忆。"
+    },
+    {
+      "id": "N01",
+      "scenario": "single_pass",
+      "kind": "missing_rule",
+      "question": "寒星计划成员在上海驻场，每日驻场补助是多少？",
+      "scope": "CN_SH",
+      "expectedStatus": "INSUFFICIENT_EVIDENCE",
+      "requiredSources": [
+        "cold-plan:v1:ALL"
+      ],
+      "requiredPatterns": [],
+      "probeQueries": [
+        "寒星计划补助规则",
+        "M9 驻场补助金额"
+      ],
+      "rationale": "已知指向 M9，但库中故意没有 M9 金额表，不能猜额度。"
+    },
+    {
+      "id": "N02",
+      "scenario": "single_pass",
+      "kind": "conflict",
+      "question": "双柏计划成员到上海驻场，每晚住宿报销上限是多少？",
+      "scope": "CN_SH",
+      "expectedStatus": "CONFLICT",
+      "requiredSources": [
+        "twin-plan:v1:ALL",
+        "z5-table:v1:CN_SH",
+        "z5-notice:v1:CN_SH"
+      ],
+      "requiredPatterns": [
+        "540|五百四十",
+        "590|五百九十"
+      ],
+      "probeQueries": [
+        "双柏计划住宿等级",
+        "住宿等级 Z5 上海住宿上限"
+      ],
+      "rationale": "必须展示 540/590 冲突，不能按标题或上传顺序选边。"
+    },
+    {
+      "id": "N03",
+      "scenario": "single_pass",
+      "kind": "cycle",
+      "question": "环 A 项目在上海的驻场补助金额是多少？",
+      "scope": "CN_SH",
+      "expectedStatus": "INSUFFICIENT_EVIDENCE",
+      "requiredSources": [
+        "loop-a:v1:ALL",
+        "loop-b:v1:ALL"
+      ],
+      "requiredPatterns": [],
+      "probeQueries": [
+        "环 A 驻场补助指引",
+        "环 B 驻场补助指引"
+      ],
+      "rationale": "A→B→A 都没有金额；后续多跳应去重并停止，不声明当前单轮已验证循环停止。"
+    },
+    {
+      "id": "N04",
+      "scenario": "single_pass",
+      "kind": "partial",
+      "question": "星桥计划成员到上海驻场，每晚住宿报销上限和航班延误补贴各是多少？",
+      "scope": "CN_SH",
+      "expectedStatus": "INSUFFICIENT_EVIDENCE",
+      "requiredSources": [
+        "star-plan:v1:ALL",
+        "r7-profile:v1:ALL",
+        "l2-sh:v1:CN_SH"
+      ],
+      "requiredPatterns": [
+        "680|六百八十"
+      ],
+      "probeQueries": [
+        "星桥计划保障编码",
+        "保障编码 R7 对应住宿等级",
+        "住宿等级 L2 上海每晚住宿报销上限",
+        "航班延误补贴金额"
+      ],
+      "rationale": "保留有据的 680 元，明确未提供延误补贴，不能把整个问题写成已完整回答。"
+    }
+  ]
+}
