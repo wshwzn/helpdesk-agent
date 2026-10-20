@@ -19,6 +19,8 @@ app:
     provider: local
     local-root-directory: ./target/test-object-storage
   knowledge:
+    sources:
+      enabled: false
     index-tasks:
       enabled: false
     processing:

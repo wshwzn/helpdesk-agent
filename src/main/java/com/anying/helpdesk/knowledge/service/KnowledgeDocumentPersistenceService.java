@@ -198,7 +198,7 @@ public class KnowledgeDocumentPersistenceService {
 
     /** 保留已审核交接及被其他候选引用的文档，禁止物理删除破坏版本追溯。 */
     public void requireNoRevisionHistory(KnowledgeDocument document) {
-        if (document.getActivatedAt() != null || document.getSuccessorDocumentId() != null
+        if (document.getSourceItemId() != null || document.getActivatedAt() != null || document.getSuccessorDocumentId() != null
                 || knowledgeDocumentMapper.selectCount(new LambdaQueryWrapper<KnowledgeDocument>()
                 .eq(KnowledgeDocument::getPredecessorDocumentId, document.getId())) > 0) {
             throw new KnowledgeDocumentConflictException("documents with revision history must be retained");

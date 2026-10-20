@@ -33,6 +33,11 @@ app:
   model-config:
     encryption-key: ${MODEL_CONFIG_ENCRYPTION_KEY}
   knowledge:
+    sources:
+      enabled: ${KNOWLEDGE_SOURCES_ENABLED:true}
+      scan-delay-ms: ${KNOWLEDGE_SOURCE_SCAN_DELAY_MS:60000}
+      max-objects: ${KNOWLEDGE_SOURCE_MAX_OBJECTS:200}
+      lease-seconds: ${KNOWLEDGE_SOURCE_LEASE_SECONDS:300}
     index-tasks:
       enabled: ${KNOWLEDGE_INDEX_TASKS_ENABLED:true}
       max-attempts: ${KNOWLEDGE_INDEX_MAX_ATTEMPTS:3}

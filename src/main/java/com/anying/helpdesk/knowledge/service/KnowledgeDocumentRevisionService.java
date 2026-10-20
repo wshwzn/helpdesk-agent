@@ -16,10 +16,15 @@ public class KnowledgeDocumentRevisionService {
     private final KnowledgeUploadSupport uploads;
     private final KnowledgeRevisionPersistenceService revisions;
     private final ObjectStorageService storage;
+    private final KnowledgeDocumentPersistenceService documents;
 
     /** 创建独立候选并自动入队；完全相同的重复请求复用结果，不重复上传或向量化。 */
     public KnowledgeRevisionUploadResponse upload(Long baseId, Long predecessorId, MultipartFile file,
                                                  UploadKnowledgeRevisionRequest request, Long adminId) {
+        if (documents.get(baseId, predecessorId).getSourceItemId() != null) {
+            throw new com.anying.helpdesk.knowledge.exception.KnowledgeDocumentConflictException(
+                    "external documents must be updated at their OSS source");
+        }
         KnowledgeUploadFile prepared = uploads.prepare(file);
         KnowledgeRevisionPreparation result = revisions.prepare(baseId, predecessorId, request, prepared,
                 storage.provider(), storage.bucketName(), uploads.objectKey(baseId, prepared.extension()), adminId);

@@ -31,7 +31,8 @@ public record KnowledgeDocumentResponse(
         @Schema(description = "本候选明确接替的文档；普通上传为空") Long predecessorDocumentId,
         @Schema(description = "已审核的接替文档；尚未交接也会有值") Long successorDocumentId,
         @Schema(description = "审核确定的实际启用时间，含边界") LocalDateTime activatedAt,
-        @Schema(description = "被新版接替的时间，不含边界") LocalDateTime supersededAt
+        @Schema(description = "被新版接替的时间，不含边界") LocalDateTime supersededAt,
+        @Schema(description = "外部来源对象 ID；非空时文件和业务元数据只能在来源端维护") Long sourceItemId
 ) {
 
     /**
@@ -61,7 +62,8 @@ public record KnowledgeDocumentResponse(
                 document.getPredecessorDocumentId(),
                 document.getSuccessorDocumentId(),
                 document.getActivatedAt(),
-                document.getSupersededAt()
+                document.getSupersededAt(),
+                document.getSourceItemId()
         );
     }
 }

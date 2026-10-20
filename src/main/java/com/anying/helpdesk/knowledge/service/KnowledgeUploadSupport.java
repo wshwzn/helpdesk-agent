@@ -27,7 +27,18 @@ public class KnowledgeUploadSupport {
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new InvalidKnowledgeDocumentException("document file must not exceed 20 MB");
         }
-        String name = file.getOriginalFilename();
+        try {
+            return prepare(file.getOriginalFilename(), file.getBytes());
+        } catch (IOException exception) {
+            throw new InvalidKnowledgeDocumentException("failed to read uploaded document");
+        }
+    }
+
+    /** 外部来源快照与人工上传共用格式和内容校验，避免引入伪造的 MultipartFile。 */
+    public KnowledgeUploadFile prepare(String name, byte[] bytes) {
+        if (bytes == null || bytes.length == 0 || bytes.length > MAX_FILE_SIZE) {
+            throw new InvalidKnowledgeDocumentException("document must be between 1 byte and 20 MB");
+        }
         if (name == null || name.isBlank()) {
             throw new InvalidKnowledgeDocumentException("document filename must not be blank");
         }
@@ -42,11 +53,8 @@ public class KnowledgeUploadSupport {
             throw new InvalidKnowledgeDocumentException("only txt, md, pdf, and docx documents are supported");
         }
         try {
-            byte[] bytes = file.getBytes();
             String hash = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
             return new KnowledgeUploadFile(bytes, name, extension, CONTENT_TYPES.get(extension), hash);
-        } catch (IOException exception) {
-            throw new InvalidKnowledgeDocumentException("failed to read uploaded document");
         } catch (NoSuchAlgorithmException exception) {
             throw new IllegalStateException("SHA-256 is not available", exception);
         }

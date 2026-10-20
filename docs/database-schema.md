@@ -5,10 +5,10 @@
 ## 通用约定
 
 - 业务实体主键通常使用 `BIGINT AUTO_INCREMENT`；一对一任务表使用所属文档 ID 作为主键。
-- 时间字段使用 `TIMESTAMP(6)`，保留微秒精度。
+- 时间字段使用 `TIMESTAMP(6)` 或 `DATETIME(6)`，保留微秒精度；业务时间按 Asia/Shanghai 解释，任务租约使用数据库时钟。
 - Java 枚举以字符串名称入库，禁止直接修改已使用的枚举名称。
 - `updated_at` 由应用服务在更新数据时写入，没有配置数据库 `ON UPDATE`。
-- 业务表主要使用逻辑关联；V20 的索引任务对所属文档建立级联删除外键，V21 的版本链建立限制删除的自引用外键。应用层仍必须校验数据归属与引用对象。
+- 业务表主要使用逻辑关联；V20 的索引任务对所属文档建立级联删除外键，V21 的版本链建立限制删除的自引用外键，V22 为来源、对象映射与文档追溯建立外键。应用层仍必须校验数据归属与引用对象。
 - `version` 是 MyBatis-Plus 乐观锁版本号，每次成功更新后递增。
 
 ## `users` 用户表
@@ -290,6 +290,7 @@ V19 增加适用条件配置，更新不需要重建 ES 索引：
 | `successor_document_id` | `BIGINT` | 是 | `NULL` | V21：已审核的接替文档 ID，自引用外键且唯一；未来交接也提前记录。撤回尚未生效的接替文档时清空。 |
 | `activated_at` | `DATETIME(6)` | 是 | `NULL` | V21：候选经审核后的实际启用边界，含边界；取审核时刻与声明 valid_from 的较晚值。普通发布、未审核候选和历史资料为空。撤回后保留审计值。 |
 | `superseded_at` | `DATETIME(6)` | 是 | `NULL` | V21：旧版被接替的时间，不含边界，与 successor_document_id 成对设置或清空。原 valid_until 不变。 |
+| `source_item_id` | `BIGINT` | 是 | `NULL` | V22：外部来源对象映射，关联 knowledge_source_items.id。非空时文件、业务元数据只能从来源维护；历代候选保留同一映射，普通上传与历史文档为空。 |
 | `created_by` | `BIGINT` | 否 | 无 | 上传管理员的 `users.id`，逻辑关联。 |
 | `version` | `INT` | 否 | `0` | 文档状态推进使用的乐观锁版本号。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 元数据创建时间。 |
@@ -306,6 +307,7 @@ V19 增加适用条件配置，更新不需要重建 ES 索引：
 - 普通索引：`idx_knowledge_documents_base_sha256 (knowledge_base_id, sha256)`，支持后续识别同一知识库中的重复内容；当前不禁止重复上传。
 - V21 普通索引：`idx_knowledge_document_predecessor (predecessor_document_id)`，用于版本关系查询及删除保护；唯一约束 `uk_knowledge_document_successor (successor_document_id)` 保证同一接替文档不会被多份旧版引用，允许多行 NULL。
 - V21 外键：`fk_knowledge_document_predecessor`、`fk_knowledge_document_successor` 均引用本表 `id`，使用默认限制删除行为，无级联修改或删除。来源、范围、知识库一致及双向关系配对由应用保证。
+- V22：`idx_knowledge_document_source_item (source_item_id)`；`fk_knowledge_document_source_item` 限制删除所引用的来源映射，不级联。应用在对象删除前拒绝物理删除外部托管文档，保护历代快照；发布、撤回和索引重试仍走既有规则。
 - 上传时先写入 `UPLOADING`，对象保存成功后改为 `PENDING`；提交索引后文档状态与任务同事务写入，`PROCESSING` 包括排队、执行和退避重试。成功写入 ES 并激活批次后改为 `READY`；确定性解析错误或重试耗尽改为 `FAILED`。
 - `PROCESSING` 状态禁止修改元数据和删除，`UPLOADING` 同样禁止删除；重复调用原索引接口返回活动任务对应的文档，不重复入队。文档行锁、乐观锁及执行令牌分别保护提交、编辑及后台完成。
 - 被当前 RAG 评测用例选为期望文档时禁止删除；应先修改或删除对应评测用例。
@@ -499,7 +501,7 @@ knowledge_bases.id ──< rag_evaluation_runs.knowledge_base_id
 rag_evaluation_runs.id ──< rag_evaluation_run_results.run_id
 ```
 
-除图中明确标出的 V20/V21 外键外，其余关系为应用维护的逻辑关联；不要将文档版本链当作可级联删除的数据。
+V22 另有 `knowledge_bases → knowledge_sources → knowledge_source_items` 级联外键，以及 `users → knowledge_sources.created_by`、`knowledge_source_items.last_document_id → knowledge_documents`、`knowledge_documents.source_item_id → knowledge_source_items` 限制外键。最后两条形成追溯关系；应用不提供直接删除已导入来源的入口。其余未明确标出的关系为应用维护的逻辑关联；不要将版本链当作可级联删除的数据。
 
 ## `flyway_schema_history` 迁移历史表
 
@@ -530,5 +532,51 @@ rag_evaluation_runs.id ──< rag_evaluation_run_results.run_id
 | V19 | `V19__add_knowledge_clarification_policy.sql` | 在 knowledge_bases 增加适用条件 JSON 与独立修订号；旧库默认关闭。 |
 | V20 | `V20__create_knowledge_index_tasks.sql` | 增加文档有效索引批次与持久任务表、调度索引、检查约束及级联外键；显式标记旧内存任务失败。 |
 | V21 | `V21__add_knowledge_document_revisions.sql` | 增加前后版本关联、审核启用/被替代时间、前驱索引、后继唯一约束及两个限制删除自引用外键；历史资料默认不关联。 |
+| V22 | `V22__add_knowledge_oss_sources.sql` | 新增 OSS 来源、对象映射、扫描租约和结果，以及文档 source_item_id 追溯关联；普通历史资料不纳入同步。 |
+
+## `knowledge_sources` OSS 来源表（V22）
+
+固定应用配置的 OSS Bucket 与管理员指定的专属前缀，不保存 AccessKey。来源身份创建后不可编辑；可暂停或恢复。
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| id | BIGINT | 否 | 自增 | 来源主键。 |
+| knowledge_base_id | BIGINT | 否 | 无 | 所属知识库。 |
+| bucket_name | VARCHAR(255) | 否 | 无 | 登记时的 Bucket；与运行配置不一致时扫描失败。 |
+| object_prefix | VARCHAR(120) | 否 | 无 | `external-knowledge/{小写 slug}/`；应用校验顶层固定、末尾斜线、无嵌套。 |
+| enabled | BOOLEAN | 否 | TRUE | 是否接受手动及定时扫描。 |
+| created_by | BIGINT | 否 | 无 | 创建管理员，后续导入文档沿用此维护者身份。 |
+| scan_status | VARCHAR(20) | 否 | IDLE | IDLE / RUNNING / SUCCEEDED / PARTIAL / FAILED。 |
+| run_token | VARCHAR(36) | 是 | NULL | 扫描执行令牌，每次领取更换，暂停清空。 |
+| lease_until | DATETIME(6) | 是 | NULL | 扫描租约截止；仅有效令牌可续租或提交。完成、失败、暂停清空。 |
+| last_scan_at | DATETIME(6) | 是 | NULL | 最近成功、部分成功或失败的完成时间。 |
+| error_code | VARCHAR(80) | 是 | NULL | SOURCE_ITEM_ERRORS / SOURCE_SCAN_FAILED / SOURCE_SCAN_CANCELLED；无明文异常。 |
+| added_count | INT | 否 | 0 | 本轮首次导入数，领取时重置。 |
+| updated_count | INT | 否 | 0 | 本轮新业务版本导入数。 |
+| unchanged_count | INT | 否 | 0 | 本轮确认未变数，包含指纹变化但内容与业务规则相同。 |
+| failed_count | INT | 否 | 0 | 本轮单对象失败数；整轮清单失败以 scan_status / error_code 表示。 |
+| missing_count | INT | 否 | 0 | 完成时已标记 MISSING 的对象总数；不是本轮新增缺失数。 |
+| created_at | DATETIME(6) | 否 | 当前时间 | 登记时间。 |
+
+约束：主键 id；`uk_knowledge_source_prefix (bucket_name, object_prefix)` 防止目录重复登记；`idx_knowledge_source_base (knowledge_base_id)`；`fk_knowledge_source_base` 引用 knowledge_bases.id ON DELETE CASCADE；`fk_knowledge_source_creator` 引用 users.id 默认限制删除；`ck_knowledge_source_status` 限定上述状态。计数非负、令牌和租约配对由应用保证。
+
+扫描先完整列举，再逐项检查。默认最多 200 个对象（包括目录占位），超过限制整轮失败。只有完整且没有单项错误的扫描才能新增 MISSING；扫描不是跨页事务快照，缺失只供管理员确认，不自动撤回资料。普通文档 PENDING 状态不触发此扫描。
+
+## `knowledge_source_items` 外部对象映射表（V22）
+
+| 字段 | 类型 | 可空 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| id | BIGINT | 否 | 自增 | 外部对象稳定身份。 |
+| source_id | BIGINT | 否 | 无 | 所属来源。 |
+| object_key | VARCHAR(1024) | 否 | 无 | 精确 OSS 键，大小写敏感比较；不暴露给员工。 |
+| key_hash | VARCHAR(64) | 否 | 无 | 原始键 UTF-8 的 SHA-256，解决长键及默认大小写不敏感排序规则的索引问题；命中后仍比较原始键。 |
+| accepted_fingerprint | VARCHAR(64) | 是 | NULL | 最近成功接收的 HEAD 指纹（ETag、大小、修改时间、自定义元数据）。失败不推进；文件内容仍单独计算 SHA-256。 |
+| last_document_id | BIGINT | 是 | NULL | 最近导入文档，不代表当前生效版本；可能是处理中、待审或被拒绝候选。 |
+| last_seen_token | VARCHAR(36) | 是 | NULL | 最近看到对象的扫描令牌，用于完整扫描后的缺失推断。 |
+| item_status | VARCHAR(20) | 否 | ERROR | SYNCED / ERROR / MISSING。SYNCED 表示已导入或未变，不代表已索引或已发布。 |
+| error_code | VARCHAR(80) | 是 | NULL | SOURCE_METADATA_OR_FILE_INVALID / SOURCE_VERSION_CONFLICT / SOURCE_OBJECT_FAILED。初次占位 ERROR 可暂时无错误码；异常中断由下次扫描重试。 |
+| updated_at | DATETIME(6) | 否 | 当前时间 | 应用更新同步结论时写入。 |
+
+约束：主键 id；`uk_knowledge_source_item (source_id, key_hash)`；`fk_knowledge_source_item_source` 引用 knowledge_sources.id ON DELETE CASCADE；`fk_knowledge_source_item_document` 引用 knowledge_documents.id 默认限制删除；`ck_knowledge_source_item_status` 限定上述状态。映射、文档及知识库归属一致、同对象来源标识/范围不变由应用保证。导入提交锁定来源并核对租约，再锁知识库以串行化不同来源对业务身份的认领；快照上传在事务外，候选、任务和 last_document_id / accepted_fingerprint 在同一事务提交。
 
 诊断阶段补充：需要判断适用条件时先执行 `APPLICABILITY`；只有 `applicability.routingAttempted=true` 才实际调用路由模型并计入模型用量。配置未启用/续答不调用路由；DRAFT、REVIEW 仍分别记账，Embedding 用量不在此统计内。

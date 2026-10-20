@@ -36,6 +36,7 @@ public class KnowledgeDocument {
     private String errorCode;
     private String activeIndexBuildId;
     private Long predecessorDocumentId;
+    private Long sourceItemId;
     private Long successorDocumentId;
     private LocalDateTime activatedAt;
     private LocalDateTime supersededAt;

@@ -37,7 +37,7 @@ public class KnowledgeDocumentPublicationService {
                                                    UpdateKnowledgeDocumentMetadataRequest request) {
         KnowledgeDocument document = persistenceService.get(knowledgeBaseId, documentId);
         requireVersion(document, request.version());
-        if (document.getPredecessorDocumentId() != null) {
+        if (document.getSourceItemId() != null || document.getPredecessorDocumentId() != null) {
             throw new KnowledgeDocumentConflictException("revision metadata is fixed at upload; create a new candidate to change it");
         }
         if (document.getPublicationStatus() != KnowledgePublicationStatus.DRAFT
