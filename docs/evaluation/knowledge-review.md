@@ -76,6 +76,18 @@ python -X utf8 scripts/evaluate_knowledge_review.py --repeats 2 --output target/
 python -X utf8 scripts/evaluate_knowledge_review.py --dataset docs/evaluation/knowledge-review-replay-cases.json --candidate CONTEXTUAL --repeats 2 --output target/knowledge-review/contextual-replay-02
 ```
 
-`--candidate` 可选 CHECKLIST 或 CONTEXTUAL，默认 CHECKLIST；每次仅比较 BASELINE 与所选候选。上述 28 题两轮共 112 次调用，沿用相同采用门槛，不因新增候选而放宽条件。输出目录必须是新的目录，示例 `-02` 不是自动重试指令。
+`--candidate` 可选 CHECKLIST、CONTEXTUAL 或 REASONED，默认 CHECKLIST；每次仅比较 BASELINE 与所选候选。上述 28 题两轮共 112 次调用，CHECKLIST/CONTEXTUAL 沿用相同采用门槛。输出目录必须是新的目录，示例 `-02` 不是自动重试指令。
 
 实际首轮实验已完成：BASELINE 误杀 6/28、错误放行 3/28；CONTEXTUAL 误杀 4/28、错误放行 3/28，双方技术失败均为 0。但候选第一轮错误放行增加、CHALLENGE 退化，已知 Token 增加约 28.8%，故未进入候选端到端验证，默认保留 BASELINE。B03 历史误杀未复现，B09 两种策略两轮都否决。详见 [完整报告](runs/2026-10-19-真实失败复核与练习环境.md)。
+
+## REASONED 诊断增强候选
+
+要求复核同时提供固定 reason 和 issues（结论路径、来源编号、简短缺陷说明）；不要求思维过程，不据此自动重写或放行草案。批准必须 reason=NONE、issues=[]；否决必须有有效问题位置。输出缺失或引用不存在的路径/来源按协议失败处理。
+
+```powershell
+python -X utf8 scripts/evaluate_knowledge_review.py --candidate REASONED --repeats 2 --output target/knowledge-review/reasoned-01
+```
+
+本候选事前目标为诊断增强：每轮误拒、误放、技术失败及挑战集均不得退化，两轮必须完整且原因协议有效。允许与 BASELINE 判定质量持平，不宣称准确率提升；不修改其他候选的门槛。
+
+阶段 38 已在原 24 题执行 96 次调用：候选第二轮误拒/技术失败退化，未准入，默认仍为 BASELINE。具体原因并非总是可靠，完整结果见 [对照报告](runs/2026-10-21-规则核查与状态衔接对照.md)。

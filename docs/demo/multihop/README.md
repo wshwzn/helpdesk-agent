@@ -63,3 +63,9 @@ python scripts/evaluate_knowledge_multihop.py --output target/multihop-baseline-
 ## C2 运行
 
 已有冻结资料库时可传 `--knowledge-base-id <库ID> --skip-probes`，省去重复导入和人工探针。运行前确认后端已启用多跳并填真实制品标签；题集与 18 份原文保持冻结。诊断 retrieval 是首轮，retrievalRun.searches 是全部实际搜索，evidence 是累计去重证据，规划模型生成的缺口不能当作事实依据。
+
+## 阶段 38 实验开关
+
+规则核查与回答状态衔接候选须显式配置 `app.knowledge.multihop.rule-checks-enabled=true`（或环境变量 `KNOWLEDGE_MULTIHOP_RULE_CHECKS_ENABLED=true`）。默认 false，沿用阶段 37 规划与草案流程。候选仍受同一三轮/五次搜索预算约束；可空 answerContext 不是制度事实，不应作为答案证据。
+
+[首次候选对照](../../evaluation/runs/2026-10-21-规则核查与状态衔接对照.md)为 7 通过、1 未通过、4 技术失败，未准入。实验时需记录实际开关和制品标签；不要把默认关闭的新制品误认为已跑过同一候选对照。REASONED 复核候选也未采用，复现本次问答实验应保留 BASELINE。

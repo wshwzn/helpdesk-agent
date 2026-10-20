@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "app.knowledge.multihop")
 public class KnowledgeMultihopProperties {
     private boolean enabled = true;
+    private boolean ruleChecksEnabled = false;
     @Min(1) @Max(180)
     private int schedulingBudgetSeconds = 90;
 }

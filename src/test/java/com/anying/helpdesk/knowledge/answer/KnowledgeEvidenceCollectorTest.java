@@ -28,8 +28,70 @@ class KnowledgeEvidenceCollectorTest {
     private final AtomicLong nanos = new AtomicLong();
     private final KnowledgeEvidenceCollector collector = new KnowledgeEvidenceCollector(retrieval, client, properties, nanos::get);
     private final ResolvedChatModel model = new ResolvedChatModel(1L, "test", false, mock(ChatModel.class));
-    private final KnowledgeAnswerTrace trace = new KnowledgeAnswerTrace("test", 1L, 2L, "计划额度", "SH",
+    private final KnowledgeAnswerTrace trace = new KnowledgeAnswerTrace("test", 1L, 2L, "资料计划额度", "SH",
             model, Clock.systemUTC(), ignored -> { });
+
+    /** 现有实验场景显式开启候选，默认关闭另有独立验证。 */
+    @org.junit.jupiter.api.BeforeEach
+    void enableCandidate() { properties.setRuleChecksEnabled(true); }
+
+    /** 候选未通过真实对照时默认保留旧规划，不让实验约束进入正式回答。 */
+    @Test @DisplayName("默认关闭规则核查候选并沿用原规划与草案上下文")
+    void defaultUsesLegacyPlanner() {
+        var defaults = new KnowledgeMultihopProperties();
+        assertThat(defaults.isRuleChecksEnabled()).isFalse();
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "计划额度")));
+        when(client.planLegacy(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 1, 1, 2));
+        var result = new KnowledgeEvidenceCollector(retrieval, client, defaults, nanos::get)
+                .collect(7L, model, "计划额度", "SH", trace);
+        assertThat(result.context()).isNull();
+        assertThat(trace.snapshot().retrievalRun().stopReason()).isEqualTo(SUFFICIENT);
+        verify(retrieval).search(any(), any());
+        verify(client, never()).plan(any(), any(), any(), any(), any());
+    }
+
+    /** 模型宣称充分也必须完成已声明规则核查，未知规则金额不会成为程序预设。 */
+    @Test @DisplayName("充分决策不能跳过有原文锚点的规则补查")
+    void sufficientStillExecutesRequiredRuleCheck() {
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "计划使用 Q8 等级")));
+        when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
+                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "Q8", "Q8 上海额度")), List.of()), 10, 2, 12));
+        var result = collect();
+        verify(retrieval).search(7L, new KnowledgeSearchRequest("Q8 上海额度", "SH"));
+        assertThat(result.context().pendingRuleQueries()).isEmpty();
+        assertThat(result.context().searchedAfterAssessment()).isTrue();
+        assertThat(trace.snapshot().retrievalRun().stopReason()).isEqualTo(NO_NEW_EVIDENCE);
+    }
+
+    /** 预算限制优先于补查，未完成任务必须进入回答约束而不是伪装完成。 */
+    @Test @DisplayName("时间耗尽时保留待查规则且禁止确定回答")
+    void budgetKeepsPendingRule() {
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "采用 Q8")));
+        when(client.plan(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
+            nanos.set(90_000_000_000L);
+            return new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(
+                    KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
+                    List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "Q8", "Q8 额度")), List.of()), 1, 1, 2);
+        });
+        var result = collect();
+        assertThat(result.context().pendingRuleQueries()).containsExactly("Q8 额度");
+        assertThatThrownBy(() -> result.context().validate(new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.ANSWERABLE,
+                List.of(), List.of(), List.of()))).hasMessage("required rule search was not executed");
+        verify(retrieval).search(any(), any());
+    }
+
+    /** 伪造引用编号和原文没有的规则词均不能生成检索任务。 */
+    @Test @DisplayName("规则锚点不在实际证据中时按协议错误拒绝")
+    void rejectsInventedRuleAnchor() {
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "采用 Q8")));
+        when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
+                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "Q9", "Q9 额度")), List.of()), 1, 1, 2));
+        assertThatThrownBy(this::collect).hasMessage("rule check has no evidence anchor");
+        verify(retrieval).search(any(), any());
+    }
 
     /** 验证链式和并列补查累计同一批证据、保留稳定编号并严格限制调用次数。 */
     @Test @DisplayName("三轮五次搜索绑定范围并保留中间关系及新增冲突来源")
@@ -47,7 +109,7 @@ class KnowledgeEvidenceCollectorTest {
         assertThat(run.searches().getLast().addedEvidenceIds()).containsExactly("E5");
         assertThat(trace.snapshot().retrieval().results()).hasSize(1);
         verify(retrieval, times(5)).search(eq(7L), argThat(request -> request.applicabilityScope().equals("SH")));
-        verify(client).plan(eq(model), eq("计划额度"), eq("SH"), argThat(items -> items.size() == 3), eq(List.of("计划额度", "R7等级", "提交期限")));
+        verify(client).plan(eq(model), eq("资料计划额度"), eq("SH"), argThat(items -> items.size() == 3), eq(List.of("资料计划额度", "R7等级", "提交期限")));
     }
 
     /** 直接问题充分、真实需用户条件、穷尽资料均由不同原因停止，不绕过最终核验。 */
@@ -56,7 +118,9 @@ class KnowledgeEvidenceCollectorTest {
     void plannedStops(KnowledgeRetrievalPlan.Decision decision) {
         when(retrieval.search(any(), any())).thenReturn(response(hit(1, "资料")));
         when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
-                new KnowledgeRetrievalPlan(decision, decision == KnowledgeRetrievalPlan.Decision.SUFFICIENT ? List.of() : List.of("缺少条件"), List.of()), 10, 2, 12));
+                new KnowledgeRetrievalPlan(decision, decision == KnowledgeRetrievalPlan.Decision.EXHAUSTED ? List.of("缺内部资料") : List.of(), List.of(),
+                        decision == KnowledgeRetrievalPlan.Decision.SUFFICIENT ? List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "资料", "资料计划额度")) : List.of(),
+                        decision == KnowledgeRetrievalPlan.Decision.NEEDS_USER_INPUT ? List.of("实际员工类别") : List.of()), 10, 2, 12));
         collect();
         assertThat(trace.snapshot().retrievalRun().stopReason().name()).isEqualTo(decision.name());
         verify(retrieval).search(any(), any());
@@ -77,7 +141,7 @@ class KnowledgeEvidenceCollectorTest {
     @Test @DisplayName("重复查询规范化后被跳过")
     void stopsRepeatedQueries() {
         when(retrieval.search(any(), any())).thenReturn(response(hit(1, "资料")));
-        when(client.plan(any(), any(), any(), any(), any())).thenReturn(searchPlan("  计划  额度 ", "计划额度"));
+        when(client.plan(any(), any(), any(), any(), any())).thenReturn(searchPlan("  资料 计划  额度 ", "资料计划额度"));
         collect();
         assertThat(trace.snapshot().retrievalRun().stopReason()).isEqualTo(REPEATED_QUERY);
         verify(retrieval).search(any(), any());
@@ -153,7 +217,8 @@ class KnowledgeEvidenceCollectorTest {
     void preservesUnknownUsage() {
         when(retrieval.search(any(), any())).thenReturn(response(hit(1, "资料")));
         when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
-                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), null, null, null));
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
+                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "资料", "资料计划额度")), List.of()), null, null, null));
         assertThat(collect().planningUsage().totalTokens()).isNull();
     }
 
@@ -191,7 +256,7 @@ class KnowledgeEvidenceCollectorTest {
 
     /** 通过固定库和地区执行一次真实编排，外部依赖由桩控制。 */
     private KnowledgeEvidenceCollector.Collected collect() {
-        return collector.collect(7L, model, "计划额度", "SH", trace);
+        return collector.collect(7L, model, "资料计划额度", "SH", trace);
     }
 
     /** 构造具有有效身份和范围的检索片段。 */

@@ -3,6 +3,7 @@ package com.anying.helpdesk.knowledge.answer.trace;
 import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityPolicy;
 import com.anying.helpdesk.knowledge.answer.KnowledgeRetrievalPlan;
 import com.anying.helpdesk.knowledge.answer.KnowledgeRetrievalRun;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerContext;
 
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerDraft;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerSelection;
@@ -56,6 +57,12 @@ public final class KnowledgeAnswerTrace {
     private long stageStartedNanos;
     private KnowledgeApplicabilityPolicy.Assessment applicability;
     private KnowledgeRetrievalRun retrievalRun;
+    private KnowledgeAnswerContext answerContext;
+
+    /** 保存实际搜索结束后的未完成任务和条件分类，不把规划当作引用事实。 */
+    public synchronized void answerContext(KnowledgeAnswerContext value) {
+        if (status == Status.RUNNING) answerContext = value;
+    }
 
     /** 冻结本次检索调度预算，防止运行中配置变化改变诊断口径。 */
     public synchronized void retrievalStarted(boolean enabled, long budgetMs) {
@@ -233,10 +240,10 @@ public final class KnowledgeAnswerTrace {
 
     /** 导出不可变列表快照，供持久化与确定性测试使用。 */
     public synchronized KnowledgeAnswerRunSnapshot snapshot() {
-        return new KnowledgeAnswerRunSnapshot(3, runId, messageId, conversationId, question, scope,
+        return new KnowledgeAnswerRunSnapshot(4, runId, messageId, conversationId, question, scope,
                 modelConfigId, modelName, status, errorCode, revision, writeFailures,
                 startedAt, LocalDateTime.now(clock), finishedAt, retrieval, retrievalTruncated,
-                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability, retrievalRun);
+                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability, retrievalRun, answerContext);
     }
 
     /** 在调用前持久化运行中阶段，进程中断时仍可定位最后进入的位置。 */

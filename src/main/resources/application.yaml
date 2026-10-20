@@ -35,6 +35,7 @@ app:
   knowledge:
     multihop:
       enabled: ${KNOWLEDGE_MULTIHOP_ENABLED:true}
+      rule-checks-enabled: ${KNOWLEDGE_MULTIHOP_RULE_CHECKS_ENABLED:false}
       scheduling-budget-seconds: ${KNOWLEDGE_MULTIHOP_SCHEDULING_BUDGET_SECONDS:90}
     sources:
       enabled: ${KNOWLEDGE_SOURCES_ENABLED:true}

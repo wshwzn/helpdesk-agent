@@ -50,13 +50,21 @@ class TrustedKnowledgeAnswerServiceTest {
     private final Clock clock = Clock.fixed(Instant.parse("2026-10-18T00:00:00Z"), ZoneId.of("Asia/Shanghai"));
     private final ResolvedChatModel model = new ResolvedChatModel(1L, "test", true, mock(ChatModel.class));
     private final TrustedKnowledgeAnswerService service = new TrustedKnowledgeAnswerService(
-            bases, new KnowledgeEvidenceCollector(retrieval, client, new KnowledgeMultihopProperties()), eligibility, client, new KnowledgeAnswerGuard(), clock, mock(KnowledgeApplicabilityService.class));
+            bases, new KnowledgeEvidenceCollector(retrieval, client, candidateProperties()), eligibility, client, new KnowledgeAnswerGuard(), clock, mock(KnowledgeApplicabilityService.class));
+
+    /** 本组验证候选链路，默认关闭行为由收集器测试覆盖。 */
+    private KnowledgeMultihopProperties candidateProperties() {
+        var result = new KnowledgeMultihopProperties();
+        result.setRuleChecksEnabled(true);
+        return result;
+    }
 
     /** 默认提供两份当前有效资料，以检查复核是否覆盖未被草案选中的候选。 */
     @BeforeEach
     void setup() {
         when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
-                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 0, 0, 0));
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
+                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "上海", QUESTION)), List.of()), 0, 0, 0));
         when(bases.findDefault()).thenReturn(Optional.of(new KnowledgeBaseResponse(1L, "制度库", null,
                 50, new BigDecimal("0.65"), 5, true, 2, 0, null, null)));
         when(retrieval.search(eq(1L), any())).thenReturn(search(List.of(hit(10L, QUOTE), hit(20L, OTHER_QUOTE))));
@@ -91,7 +99,8 @@ class TrustedKnowledgeAnswerServiceTest {
         when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
                 new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SEARCH, List.of("查同条件通知"), List.of("上海住宿额度通知")), 10, 2, 12),
                 new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(
-                        KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 0, 0, 0));
+                        KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
+                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "上海", QUESTION)), List.of()), 0, 0, 0));
         propose(draft(KnowledgeAnswerDraft.Status.CONFLICT));
         if (withdrawn) {
             when(eligibility.findEligible(any(), any(), any())).thenReturn(Map.of(10L, document(10L)));
@@ -112,6 +121,10 @@ class TrustedKnowledgeAnswerServiceTest {
     @EnumSource(KnowledgeAnswerDraft.Status.class)
     @DisplayName("四种业务状态经过同一核验链路，冲突不会被自动裁决")
     void supportsAllBusinessStates(KnowledgeAnswerDraft.Status status) {
+        if (status == KnowledgeAnswerDraft.Status.NEEDS_CLARIFICATION)
+            when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                    new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.NEEDS_USER_INPUT, List.of(), List.of(),
+                            List.of(), List.of("员工类别")), 0, 0, 0));
         propose(draft(status));
         var result = service.answer(model, QUESTION, "SH");
         assertThat(result.knowledgeAnswer().answer().status()).isEqualTo(status);
@@ -131,7 +144,8 @@ class TrustedKnowledgeAnswerServiceTest {
             var input = json.readTree(prompt.getInstructions().getLast().getText());
             String output = "{\"approved\":true}";
             if (input.has("searchedQueries")) {
-                output = "{\"decision\":\"SUFFICIENT\",\"gaps\":[],\"queries\":[]}";
+                output = "{\"decision\":\"SUFFICIENT\",\"gaps\":[],\"queries\":[],"
+                        + "\"ruleChecks\":[{\"evidenceId\":\"E1\",\"term\":\"上海\",\"query\":\"" + QUESTION + "\"}],\"userConditions\":[]}";
             } else if (!input.has("draft")) {
                 var catalog = json.treeToValue(input.get("evidence"), KnowledgeCitationCatalog.class);
                 output = json.writeValueAsString(selection(draft(KnowledgeAnswerDraft.Status.CONFLICT), catalog));
@@ -140,7 +154,7 @@ class TrustedKnowledgeAnswerServiceTest {
         });
         var adapter = new KnowledgeAnswerModelClient(json);
         var realAdapterService = new TrustedKnowledgeAnswerService(bases,
-                new KnowledgeEvidenceCollector(retrieval, adapter, new KnowledgeMultihopProperties()), eligibility,
+                new KnowledgeEvidenceCollector(retrieval, adapter, candidateProperties()), eligibility,
                 adapter, new KnowledgeAnswerGuard(), clock, mock(KnowledgeApplicabilityService.class));
         var result = realAdapterService.answer(model, QUESTION, "SH");
         assertThat(result.knowledgeAnswer().answer().status()).isEqualTo(KnowledgeAnswerDraft.Status.CONFLICT);
@@ -235,7 +249,7 @@ class TrustedKnowledgeAnswerServiceTest {
     @Test
     @DisplayName("缺失模型用量时汇总仍为未知")
     void unknownUsageStaysUnknown() {
-        when(client.draft(any(), any(), any(), any())).thenAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(
+        when(client.draft(any(), any(), any(), any(), any())).thenAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(
                 selection(draft(KnowledgeAnswerDraft.Status.ANSWERABLE), invocation.getArgument(3)), null, null, null));
         assertThat(service.answer(model, QUESTION, "SH").totalTokens()).isNull();
     }
@@ -244,7 +258,7 @@ class TrustedKnowledgeAnswerServiceTest {
     @Test
     @DisplayName("外部模型故障按阶段分类并丢弃原始异常正文")
     void classifiesExternalModelFailures() {
-        when(client.draft(any(), any(), any(), any())).thenThrow(new IllegalStateException("private provider secret"));
+        when(client.draft(any(), any(), any(), any(), any())).thenThrow(new IllegalStateException("private provider secret"));
         assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
                 .isInstanceOfSatisfying(KnowledgeAnswerFailure.class, failure -> {
                     assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_DRAFT_CALL_FAILED");
@@ -253,7 +267,7 @@ class TrustedKnowledgeAnswerServiceTest {
                 });
         doAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(
                 selection(draft(KnowledgeAnswerDraft.Status.ANSWERABLE), invocation.getArgument(3)), 1, 1, 2))
-                .when(client).draft(any(), any(), any(), any());
+                .when(client).draft(any(), any(), any(), any(), any());
         when(client.review(any(), any(), any(), any(), any())).thenThrow(new IllegalStateException("private review secret"));
         assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
                 .isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
@@ -264,7 +278,7 @@ class TrustedKnowledgeAnswerServiceTest {
     @Test
     @DisplayName("模型协议错误不被笼统重标记为网络调用失败")
     void preservesProtocolFailure() {
-        when(client.draft(any(), any(), any(), any())).thenThrow(new KnowledgeAnswerFailure(
+        when(client.draft(any(), any(), any(), any(), any())).thenThrow(new KnowledgeAnswerFailure(
                 KnowledgeAnswerFailure.Code.KNOWLEDGE_PROTOCOL_INVALID, "invalid protocol"));
         assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
                 .isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
@@ -305,7 +319,7 @@ class TrustedKnowledgeAnswerServiceTest {
     void validParagraphDoesNotBypassSemanticReview(String wrongClaim) {
         String original = "仅适用上海普通员工。\n每晚 600 元，超出部分不予报销。";
         when(retrieval.search(any(), any())).thenReturn(search(List.of(hit(10L, original))));
-        when(client.draft(any(), any(), any(), any())).thenAnswer(invocation -> {
+        when(client.draft(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
             KnowledgeCitationCatalog catalog = invocation.getArgument(3);
             return new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerSelection(catalog.citationSetId(),
                     KnowledgeAnswerDraft.Status.ANSWERABLE, List.of(new KnowledgeAnswerSelection.Claim(wrongClaim,
@@ -325,7 +339,7 @@ class TrustedKnowledgeAnswerServiceTest {
 
     /** 配置草案调用的确定性响应。 */
     private void propose(KnowledgeAnswerDraft draft) {
-        when(client.draft(any(), any(), any(), any()))
+        when(client.draft(any(), any(), any(), any(), any()))
                 .thenAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(selection(draft, invocation.getArgument(3)), 10, 5, 15));
     }
 

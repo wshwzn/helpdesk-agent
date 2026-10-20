@@ -155,8 +155,14 @@ python -X utf8 scripts/evaluate_knowledge_clarification.py --base-url http://loc
 
 ## 受控多跳对照（C2）
 
-新诊断 schemaVersion=3 的 retrievalRun 保存全部搜索、规划和停止原因；retrieval 仍表示首轮。脚本按实际搜索结果并集计算召回覆盖，同时单列首轮覆盖；失败或截断的检索诊断不能按完整召回计分。PLANNING 用量与 DRAFT/REVIEW 一起计入诊断成本。
+诊断自 schemaVersion=3 起 的 retrievalRun 保存全部搜索、规划和停止原因；retrieval 仍表示首轮。脚本按实际搜索结果并集计算召回覆盖，同时单列首轮覆盖；失败或截断的检索诊断不能按完整召回计分。PLANNING 用量与 DRAFT/REVIEW 一起计入诊断成本。
 
 可用 `--knowledge-base-id 20 --skip-probes` 复用已经导入的冻结题库，仍校验资料 SHA、发布状态、有效期、检索参数及模型配置。输出目录必须新建；不能覆盖 C1 或挑选重跑结果。运行开关为 `app.knowledge.multihop.enabled`（默认 true），调度软预算 `scheduling-budget-seconds`（默认 90）。
 
 首次真实对照见 [C2 报告](runs/2026-10-21-受控多跳首次对照.md)：9 通过、1 未通过、2 技术失败；仍有过早停止和复核问题，C 阶段尚未整体验收。
+
+## 规则核查与状态衔接候选（阶段 38）
+
+[完整报告](runs/2026-10-21-规则核查与状态衔接对照.md)：12 题 7 通过、1 未通过、4 技术失败；候选改善缺规则与冲突题，但整体退化，未默认启用。`app.knowledge.multihop.rule-checks-enabled` 默认 false，显式 true 才启用新规划协议与状态约束。版本 4 诊断新增可空 answerContext 和规则锚点；关闭候选时 answerContext=null。
+
+REASONED 固定草案回放共 96 次，第二轮误拒/协议失败退化，未通过事前门槛，默认复核仍为 BASELINE。[端到端全量数据](runs/2026-10-21-规则核查与状态衔接对照数据.json)与[复核全量数据](runs/2026-10-21-可定位复核回放数据.json)保留全部失败；不将总正确数或单个改善题作为采用依据。

@@ -75,13 +75,14 @@ public class TrustedKnowledgeAnswerService {
         var evidence = retrieved.evidence();
         var catalog = retrieved.catalog();
         var selection = trace.stage(DRAFT, () -> {
-            var result = atStage(KNOWLEDGE_DRAFT_CALL_FAILED, () -> modelClient.draft(model, question, scope, catalog));
+            var result = atStage(KNOWLEDGE_DRAFT_CALL_FAILED, () -> modelClient.draft(model, question, scope, catalog, retrieved.context()));
             trace.selected(result);
             return result;
         });
         var draft = trace.stage(VALIDATION, () -> {
             var resolved = guard.resolve(selection.value(), catalog, evidence);
             trace.resolved(resolved);
+            if (retrieved.context() != null) retrieved.context().validate(resolved);
             return resolved;
         });
         var review = trace.stage(REVIEW, () -> {
@@ -162,24 +163,24 @@ public class TrustedKnowledgeAnswerService {
 
     private record Retrieved(Long baseId, String baseName, KnowledgeAnswerReport.Reason reason,
                              List<KnowledgeAnswerReport.Evidence> evidence, KnowledgeCitationCatalog catalog,
-                             KnowledgeAnswerModelClient.TokenUsage planningUsage) { }
+                             KnowledgeAnswerModelClient.TokenUsage planningUsage, KnowledgeAnswerContext context) { }
 
     /** 固定知识库后累计受控检索证据，再一次性建立最终可引用目录。 */
     private Retrieved retrieve(ResolvedChatModel model, String question, String scope, KnowledgeAnswerTrace trace,
                                ApplicabilityPreparation preparation) {
         var base = preparation == null ? atStage(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault)
                 : java.util.Optional.ofNullable(preparation.base());
-        if (base.isEmpty()) return new Retrieved(null, null, KnowledgeAnswerReport.Reason.NOT_CONFIGURED, List.of(), null, null);
+        if (base.isEmpty()) return new Retrieved(null, null, KnowledgeAnswerReport.Reason.NOT_CONFIGURED, List.of(), null, null, null);
         var knowledgeBase = base.get();
         var collected = evidenceCollector.collect(knowledgeBase.id(), model, question, scope, trace);
         var immutableEvidence = collected.evidence();
         if (immutableEvidence.isEmpty())
             return new Retrieved(knowledgeBase.id(), knowledgeBase.name(), KnowledgeAnswerReport.Reason.NO_MATCH,
-                    List.of(), null, collected.planningUsage());
+                    List.of(), null, collected.planningUsage(), collected.context());
         var catalog = KnowledgeCitationCatalog.create(immutableEvidence);
         trace.catalog(catalog);
         return new Retrieved(knowledgeBase.id(), knowledgeBase.name(), KnowledgeAnswerReport.Reason.REVIEWED,
-                immutableEvidence, catalog, collected.planningUsage());
+                immutableEvidence, catalog, collected.planningUsage(), collected.context());
     }
 
     /** 拒绝不一致的复核协议，并把合法否决原因映射成固定枚举码，避免输出自由文本。 */

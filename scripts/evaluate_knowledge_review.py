@@ -39,7 +39,7 @@ def metrics(rows, planned):
 
 def summarize(dataset, rows, repeats, candidate_strategy="CHECKLIST"):
     """核对结果身份、去重并分层计算；两轮都满足事先冻结的条件才进入端到端候选验证。"""
-    if candidate_strategy not in ("CHECKLIST", "CONTEXTUAL"):
+    if candidate_strategy not in ("CHECKLIST", "CONTEXTUAL", "REASONED"):
         raise ValueError("invalid candidate strategy")
     cases = {case["id"]: case for case in dataset["cases"]}
     seen = set()
@@ -66,13 +66,22 @@ def summarize(dataset, rows, repeats, candidate_strategy="CHECKLIST"):
     for i in range(1, repeats + 1):
         baseline = summary["byRepeat"]["BASELINE"][str(i)]
         candidate = summary["byRepeat"][candidate_strategy][str(i)]
-        eligible &= (candidate["falseRejects"] < baseline["falseRejects"]
+        reject_gate = (candidate["falseRejects"] <= baseline["falseRejects"] if candidate_strategy == "REASONED"
+                       else candidate["falseRejects"] < baseline["falseRejects"])
+        eligible &= (reject_gate
                      and candidate["falseAccepts"] <= baseline["falseAccepts"]
                      and candidate["technicalFailures"] <= baseline["technicalFailures"])
         challenge = {strategy: metrics([r for r in rows if r["strategy"] == strategy
                     and r["repeat"] == i and r["split"] == "CHALLENGE"], sum(c["split"] == "CHALLENGE" for c in cases.values())) for strategy in ("BASELINE", candidate_strategy)}
         eligible &= all(challenge[candidate_strategy][key] <= challenge["BASELINE"][key]
                         for key in ("falseRejects", "falseAccepts", "technicalFailures"))
+    if candidate_strategy == "REASONED":
+        summary["gatePurpose"] = "诊断增强：每轮误拒、误放、技术失败及挑战集均不得退化；完整原因必需，不宣称准确率提升"
+        eligible &= all(r.get("errorCode") is None and r["review"].get("reason") is not None
+                        and isinstance(r["review"].get("issues"), list)
+                        and (not r["review"]["approved"] or r["review"]["reason"] == "NONE")
+                        and (r["review"]["approved"] or bool(r["review"]["issues"]))
+                        for r in rows if r["strategy"] == "REASONED")
     summary["candidateEligibleForEndToEnd"] = bool(eligible)
     return summary
 
@@ -83,7 +92,7 @@ def main():
     parser.add_argument("--dataset", type=Path, default=ROOT / "docs/evaluation/knowledge-review-cases.json")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repeats", type=int, default=2, choices=range(1, 6))
-    parser.add_argument("--candidate", choices=("CHECKLIST", "CONTEXTUAL"), default="CHECKLIST")
+    parser.add_argument("--candidate", choices=("CHECKLIST", "CONTEXTUAL", "REASONED"), default="CHECKLIST")
     args = parser.parse_args()
     output = args.output.resolve()
     if not output.is_relative_to(ROOT / "target"):

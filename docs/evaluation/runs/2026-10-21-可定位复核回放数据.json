@@ -1,0 +1,2528 @@
+{
+  "summary": {
+    "candidate": "REASONED",
+    "strategies": {
+      "BASELINE": {
+        "planned": 48,
+        "executed": 48,
+        "positiveAttempts": 24,
+        "negativeAttempts": 24,
+        "falseRejects": 3,
+        "falseAccepts": 5,
+        "falseRejectRate": 0.125,
+        "falseAcceptRate": 0.20833333333333334,
+        "technicalFailures": 0,
+        "positiveTechnicalFailures": 0,
+        "negativeTechnicalFailures": 0,
+        "correctDecisions": 40,
+        "knownTokens": 29776,
+        "callsMissingUsage": 0,
+        "meanDurationMs": 1536.2291666666667,
+        "casesWithRepeatedValidDecisions": 24,
+        "casesWithDecisionFlip": 2
+      },
+      "REASONED": {
+        "planned": 48,
+        "executed": 48,
+        "positiveAttempts": 24,
+        "negativeAttempts": 24,
+        "falseRejects": 2,
+        "falseAccepts": 2,
+        "falseRejectRate": 0.08333333333333333,
+        "falseAcceptRate": 0.08333333333333333,
+        "technicalFailures": 1,
+        "positiveTechnicalFailures": 0,
+        "negativeTechnicalFailures": 1,
+        "correctDecisions": 43,
+        "knownTokens": 43237,
+        "callsMissingUsage": 0,
+        "meanDurationMs": 2022.375,
+        "casesWithRepeatedValidDecisions": 23,
+        "casesWithDecisionFlip": 2
+      }
+    },
+    "byRepeat": {
+      "BASELINE": {
+        "1": {
+          "planned": 24,
+          "executed": 24,
+          "positiveAttempts": 12,
+          "negativeAttempts": 12,
+          "falseRejects": 2,
+          "falseAccepts": 3,
+          "falseRejectRate": 0.16666666666666666,
+          "falseAcceptRate": 0.25,
+          "technicalFailures": 0,
+          "positiveTechnicalFailures": 0,
+          "negativeTechnicalFailures": 0,
+          "correctDecisions": 19,
+          "knownTokens": 14888,
+          "callsMissingUsage": 0,
+          "meanDurationMs": 1378.8333333333333,
+          "casesWithRepeatedValidDecisions": 0,
+          "casesWithDecisionFlip": 0
+        },
+        "2": {
+          "planned": 24,
+          "executed": 24,
+          "positiveAttempts": 12,
+          "negativeAttempts": 12,
+          "falseRejects": 1,
+          "falseAccepts": 2,
+          "falseRejectRate": 0.08333333333333333,
+          "falseAcceptRate": 0.16666666666666666,
+          "technicalFailures": 0,
+          "positiveTechnicalFailures": 0,
+          "negativeTechnicalFailures": 0,
+          "correctDecisions": 21,
+          "knownTokens": 14888,
+          "callsMissingUsage": 0,
+          "meanDurationMs": 1693.625,
+          "casesWithRepeatedValidDecisions": 0,
+          "casesWithDecisionFlip": 0
+        }
+      },
+      "REASONED": {
+        "1": {
+          "planned": 24,
+          "executed": 24,
+          "positiveAttempts": 12,
+          "negativeAttempts": 12,
+          "falseRejects": 0,
+          "falseAccepts": 1,
+          "falseRejectRate": 0.0,
+          "falseAcceptRate": 0.08333333333333333,
+          "technicalFailures": 0,
+          "positiveTechnicalFailures": 0,
+          "negativeTechnicalFailures": 0,
+          "correctDecisions": 23,
+          "knownTokens": 21536,
+          "callsMissingUsage": 0,
+          "meanDurationMs": 1498.875,
+          "casesWithRepeatedValidDecisions": 0,
+          "casesWithDecisionFlip": 0
+        },
+        "2": {
+          "planned": 24,
+          "executed": 24,
+          "positiveAttempts": 12,
+          "negativeAttempts": 12,
+          "falseRejects": 2,
+          "falseAccepts": 1,
+          "falseRejectRate": 0.16666666666666666,
+          "falseAcceptRate": 0.08333333333333333,
+          "technicalFailures": 1,
+          "positiveTechnicalFailures": 0,
+          "negativeTechnicalFailures": 1,
+          "correctDecisions": 20,
+          "knownTokens": 21701,
+          "callsMissingUsage": 0,
+          "meanDurationMs": 2545.875,
+          "casesWithRepeatedValidDecisions": 0,
+          "casesWithDecisionFlip": 0
+        }
+      }
+    },
+    "bySplit": {
+      "BASELINE": {
+        "DEVELOPMENT": {
+          "planned": 32,
+          "executed": 32,
+          "positiveAttempts": 16,
+          "negativeAttempts": 16,
+          "falseRejects": 3,
+          "falseAccepts": 4,
+          "falseRejectRate": 0.1875,
+          "falseAcceptRate": 0.25,
+          "technicalFailures": 0,
+          "positiveTechnicalFailures": 0,
+          "negativeTechnicalFailures": 0,
+          "correctDecisions": 25,
+          "knownTokens": 20818,
+          "callsMissingUsage": 0,
+          "meanDurationMs": 1504.40625,
+          "casesWithRepeatedValidDecisions": 16,
+          "casesWithDecisionFlip": 1
+        },
+        "CHALLENGE": {
+          "planned": 16,
+          "executed": 16,
+          "positiveAttempts": 8,
+          "negativeAttempts": 8,
+          "falseRejects": 0,
+          "falseAccepts": 1,
+          "falseRejectRate": 0.0,
+          "falseAcceptRate": 0.125,
+          "technicalFailures": 0,
+          "positiveTechnicalFailures": 0,
+          "negativeTechnicalFailures": 0,
+          "correctDecisions": 15,
+          "knownTokens": 8958,
+          "callsMissingUsage": 0,
+          "meanDurationMs": 1599.875,
+          "casesWithRepeatedValidDecisions": 8,
+          "casesWithDecisionFlip": 1
+        }
+      },
+      "REASONED": {
+        "DEVELOPMENT": {
+          "planned": 32,
+          "executed": 32,
+          "positiveAttempts": 16,
+          "negativeAttempts": 16,
+          "falseRejects": 2,
+          "falseAccepts": 2,
+          "falseRejectRate": 0.125,
+          "falseAcceptRate": 0.125,
+          "technicalFailures": 0,
+          "positiveTechnicalFailures": 0,
+          "negativeTechnicalFailures": 0,
+          "correctDecisions": 28,
+          "knownTokens": 29787,
+          "callsMissingUsage": 0,
+          "meanDurationMs": 2128.90625,
+          "casesWithRepeatedValidDecisions": 16,
+          "casesWithDecisionFlip": 2
+        },
+        "CHALLENGE": {
+          "planned": 16,
+          "executed": 16,
+          "positiveAttempts": 8,
+          "negativeAttempts": 8,
+          "falseRejects": 0,
+          "falseAccepts": 0,
+          "falseRejectRate": 0.0,
+          "falseAcceptRate": 0.0,
+          "technicalFailures": 1,
+          "positiveTechnicalFailures": 0,
+          "negativeTechnicalFailures": 1,
+          "correctDecisions": 15,
+          "knownTokens": 13450,
+          "callsMissingUsage": 0,
+          "meanDurationMs": 1809.3125,
+          "casesWithRepeatedValidDecisions": 7,
+          "casesWithDecisionFlip": 0
+        }
+      }
+    },
+    "complete": true,
+    "gatePurpose": "诊断增强：每轮误拒、误放、技术失败及挑战集均不得退化；完整原因必需，不宣称准确率提升",
+    "candidateEligibleForEndToEnd": false,
+    "runnerExitCode": 0,
+    "finished": true
+  },
+  "metadata": {
+    "startedAt": "2026-10-20T17:28:33.478959600Z",
+    "modelConfigId": 3,
+    "modelName": "deepseek-v4.1-flash",
+    "datasetSha256": "c734e857ffcaa71bc685411b67ea957e49bd4f287926dbd3056495e45f6f80ce",
+    "repeats": 2,
+    "candidate": "REASONED",
+    "planned": 96,
+    "BASELINEPromptSha256": "208a7020ca464eeb0585488718dc89aadee5d98918a602fb86b6863c7bb356f3",
+    "REASONEDPromptSha256": "0338263dc8e20a2cc90d83e68eaa59e1684b4a54fab90b731690f92ea3945987"
+  },
+  "environment": {
+    "gitCommit": "735f424d182ae5b5ae2c0435349a0a7f1a934aa2",
+    "dirty": true,
+    "sourceSha256": "a7af8fd8e2684901fc211c3e58c046028ae918b4f1c41de2eade7aebb3441e02",
+    "runnerSourceSha256": "9033f0e3ec3e8b1703dc9496f8b1cbeb6145e3a481ca02f25ac44458116fe218",
+    "datasetSha256": "c734e857ffcaa71bc685411b67ea957e49bd4f287926dbd3056495e45f6f80ce"
+  },
+  "finished": {
+    "finishedAt": "2026-10-20T17:31:25.207009300Z"
+  },
+  "calls": [
+    {
+      "id": "R12N",
+      "pairId": "R12",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 2309,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 543,
+        "completionTokens": 5,
+        "totalTokens": 548
+      }
+    },
+    {
+      "id": "R12N",
+      "pairId": "R12",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1787,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "引文为每季度300元，结论却写成900元，金额被误读放大。"
+          },
+          {
+            "path": "status",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "证据已直接给出每人每季度300元限额，草案结论与证据不符，不应以ANSWERABLE放行该错误结论。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 774,
+        "completionTokens": 98,
+        "totalTokens": 872
+      }
+    },
+    {
+      "id": "R02N",
+      "pairId": "R02",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1570,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "草案称每晚900元，但引文明确为每人每晚600元，金额误读且超过原文上限。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 920,
+        "completionTokens": 60,
+        "totalTokens": 980
+      }
+    },
+    {
+      "id": "R02N",
+      "pairId": "R02",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1399,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 689,
+        "completionTokens": 5,
+        "totalTokens": 694
+      }
+    },
+    {
+      "id": "R05N",
+      "pairId": "R05",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1093,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 552,
+        "completionTokens": 5,
+        "totalTokens": 557
+      }
+    },
+    {
+      "id": "R05N",
+      "pairId": "R05",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1310,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "结论将适用对象扩大为所有员工包括实习员工，与引文中“实习员工不适用此补贴”相矛盾，补贴上限仅适用于正式员工。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 783,
+        "completionTokens": 69,
+        "totalTokens": 852
+      }
+    },
+    {
+      "id": "R12P",
+      "pairId": "R12",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1374,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 774,
+        "completionTokens": 14,
+        "totalTokens": 788
+      }
+    },
+    {
+      "id": "R12P",
+      "pairId": "R12",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1405,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 543,
+        "completionTokens": 5,
+        "totalTokens": 548
+      }
+    },
+    {
+      "id": "R11P",
+      "pairId": "R11",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1264,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 527,
+        "completionTokens": 5,
+        "totalTokens": 532
+      }
+    },
+    {
+      "id": "R11P",
+      "pairId": "R11",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1680,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 758,
+        "completionTokens": 14,
+        "totalTokens": 772
+      }
+    },
+    {
+      "id": "R03P",
+      "pairId": "R03",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1361,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 906,
+        "completionTokens": 14,
+        "totalTokens": 920
+      }
+    },
+    {
+      "id": "R03P",
+      "pairId": "R03",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1205,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 675,
+        "completionTokens": 5,
+        "totalTokens": 680
+      }
+    },
+    {
+      "id": "R08P",
+      "pairId": "R08",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1630,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 832,
+        "completionTokens": 5,
+        "totalTokens": 837
+      }
+    },
+    {
+      "id": "R08P",
+      "pairId": "R08",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1291,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 1073,
+        "completionTokens": 14,
+        "totalTokens": 1087
+      }
+    },
+    {
+      "id": "R07P",
+      "pairId": "R07",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1265,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 735,
+        "completionTokens": 14,
+        "totalTokens": 749
+      }
+    },
+    {
+      "id": "R07P",
+      "pairId": "R07",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1253,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 508,
+        "completionTokens": 5,
+        "totalTokens": 513
+      }
+    },
+    {
+      "id": "R08N",
+      "pairId": "R08",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1724,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 773,
+        "completionTokens": 5,
+        "totalTokens": 778
+      }
+    },
+    {
+      "id": "R08N",
+      "pairId": "R08",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1742,
+      "review": {
+        "approved": false,
+        "reason": "MISSED_CONFLICT",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "status",
+            "evidenceIds": [
+              "E1",
+              "E2"
+            ],
+            "detail": "E2在同一适用范围CN_SH下规定上海普通员工住宿上限为每人每晚650元，与E1的600元矛盾，draft的conflicts为空且未展示双方。"
+          },
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "结论仅采纳600元而遗漏650元的相反证据，未按冲突要求并列展示两种标准；且未说明E1的有效期为2026年10月1日起至2027年1月1日前。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 1004,
+        "completionTokens": 135,
+        "totalTokens": 1139
+      }
+    },
+    {
+      "id": "R07N",
+      "pairId": "R07",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1259,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 730,
+        "completionTokens": 14,
+        "totalTokens": 744
+      }
+    },
+    {
+      "id": "R07N",
+      "pairId": "R07",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1748,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 503,
+        "completionTokens": 5,
+        "totalTokens": 508
+      }
+    },
+    {
+      "id": "R01N",
+      "pairId": "R01",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1845,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 620,
+        "completionTokens": 5,
+        "totalTokens": 625
+      }
+    },
+    {
+      "id": "R01N",
+      "pairId": "R01",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1625,
+      "review": {
+        "approved": false,
+        "reason": "INCOMPLETE_ANSWER",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "引文列出三项材料「行程说明、审批记录和有效票据」，claim 仅列前两项，遗漏有据的必要部分「有效票据」。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 851,
+        "completionTokens": 67,
+        "totalTokens": 918
+      }
+    },
+    {
+      "id": "R09N",
+      "pairId": "R09",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1417,
+      "review": {
+        "approved": false,
+        "reason": "WRONG_STATUS",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "conflicts/0/first",
+            "evidenceIds": [
+              "E1",
+              "E2"
+            ],
+            "detail": "A档与B档是不同设备档次的分别规定，并非同一适用条件下同一事项的矛盾，不构成冲突。"
+          },
+          {
+            "path": "status",
+            "evidenceIds": [
+              "E1",
+              "E2"
+            ],
+            "detail": "证据分别明确A档由部门主管、B档由财务负责人审批，状态应为ANSWERABLE而非CONFLICT。"
+          },
+          {
+            "path": "conflicts/0/second",
+            "evidenceIds": [
+              "E2"
+            ],
+            "detail": "将B档审批人列为与A档的冲突一方，错误地把他档规定当作相反证据。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 890,
+        "completionTokens": 147,
+        "totalTokens": 1037
+      }
+    },
+    {
+      "id": "R09N",
+      "pairId": "R09",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1077,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 649,
+        "completionTokens": 5,
+        "totalTokens": 654
+      }
+    },
+    {
+      "id": "R09P",
+      "pairId": "R09",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 807,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 635,
+        "completionTokens": 5,
+        "totalTokens": 640
+      }
+    },
+    {
+      "id": "R09P",
+      "pairId": "R09",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1546,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 870,
+        "completionTokens": 14,
+        "totalTokens": 884
+      }
+    },
+    {
+      "id": "R06N",
+      "pairId": "R06",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1980,
+      "review": {
+        "approved": false,
+        "reason": "WRONG_STATUS",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "status",
+            "evidenceIds": [],
+            "detail": "证据仅覆盖提交报销时限，未涉及飞机延误补贴金额，问题第二部分无依据，却标为 ANSWERABLE。"
+          },
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "引文附加了无关的住宿金额上限句子，超出支撑该结论所需的连续片段。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 859,
+        "completionTokens": 88,
+        "totalTokens": 947
+      }
+    },
+    {
+      "id": "R06N",
+      "pairId": "R06",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1215,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 628,
+        "completionTokens": 5,
+        "totalTokens": 633
+      }
+    },
+    {
+      "id": "R02P",
+      "pairId": "R02",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1387,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 689,
+        "completionTokens": 5,
+        "totalTokens": 694
+      }
+    },
+    {
+      "id": "R02P",
+      "pairId": "R02",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1548,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 920,
+        "completionTokens": 14,
+        "totalTokens": 934
+      }
+    },
+    {
+      "id": "R10N",
+      "pairId": "R10",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1744,
+      "review": {
+        "approved": false,
+        "reason": "WRONG_STATUS",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "status",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "E1已明确列出需提交资产编号和故障描述，并否定购买发票要求，足以回答申领材料问题，草案却定为INSUFFICIENT_EVIDENCE。"
+          },
+          {
+            "path": "status",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "适用范围内存在直接回答问题的完整依据，草案未据此作答，属无故拒答。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 728,
+        "completionTokens": 102,
+        "totalTokens": 830
+      }
+    },
+    {
+      "id": "R10N",
+      "pairId": "R10",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1165,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 501,
+        "completionTokens": 5,
+        "totalTokens": 506
+      }
+    },
+    {
+      "id": "R11N",
+      "pairId": "R11",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1434,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 496,
+        "completionTokens": 5,
+        "totalTokens": 501
+      }
+    },
+    {
+      "id": "R11N",
+      "pairId": "R11",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1455,
+      "review": {
+        "approved": false,
+        "reason": "WRONG_STATUS",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "status",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "证据明确写明所有员工每年2天且不区分地区，问题唯一实质事项已有依据，不应要求澄清地区。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 723,
+        "completionTokens": 55,
+        "totalTokens": 778
+      }
+    },
+    {
+      "id": "R04N",
+      "pairId": "R04",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 2168,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "草案称标准适用于所有地区和其他地区，但引文明确写有“本标准不适用于其他地区”，结论与引文相反。"
+          },
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "结论比原文宽泛：原文限定为上海地区普通员工因公出差，草案却写成所有地区，遗漏地区条件并增加适用范围。"
+          },
+          {
+            "path": "status",
+            "evidenceIds": [],
+            "detail": "问题第二问“是否适用于其他地区”已有证据可否定回答，但草案用错误结论替代，且未指出原文的地区限制。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 919,
+        "completionTokens": 152,
+        "totalTokens": 1071
+      }
+    },
+    {
+      "id": "R04N",
+      "pairId": "R04",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1418,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 688,
+        "completionTokens": 5,
+        "totalTokens": 693
+      }
+    },
+    {
+      "id": "R04P",
+      "pairId": "R04",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1298,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 687,
+        "completionTokens": 5,
+        "totalTokens": 692
+      }
+    },
+    {
+      "id": "R04P",
+      "pairId": "R04",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1135,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 918,
+        "completionTokens": 14,
+        "totalTokens": 932
+      }
+    },
+    {
+      "id": "R01P",
+      "pairId": "R01",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 893,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 854,
+        "completionTokens": 14,
+        "totalTokens": 868
+      }
+    },
+    {
+      "id": "R01P",
+      "pairId": "R01",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1300,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 623,
+        "completionTokens": 5,
+        "totalTokens": 628
+      }
+    },
+    {
+      "id": "R06P",
+      "pairId": "R06",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1493,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 634,
+        "completionTokens": 5,
+        "totalTokens": 639
+      }
+    },
+    {
+      "id": "R06P",
+      "pairId": "R06",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1536,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 865,
+        "completionTokens": 14,
+        "totalTokens": 879
+      }
+    },
+    {
+      "id": "R05P",
+      "pairId": "R05",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1344,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 784,
+        "completionTokens": 14,
+        "totalTokens": 798
+      }
+    },
+    {
+      "id": "R05P",
+      "pairId": "R05",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1286,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 553,
+        "completionTokens": 5,
+        "totalTokens": 558
+      }
+    },
+    {
+      "id": "R03N",
+      "pairId": "R03",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1053,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 675,
+        "completionTokens": 5,
+        "totalTokens": 680
+      }
+    },
+    {
+      "id": "R03N",
+      "pairId": "R03",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1163,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "引文明确“超出上限部分不予报销”，结论“可以报销”与原文相反，属于误读否定表述。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 906,
+        "completionTokens": 61,
+        "totalTokens": 967
+      }
+    },
+    {
+      "id": "R10P",
+      "pairId": "R10",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "REASONED",
+      "durationMs": 1780,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 776,
+        "completionTokens": 14,
+        "totalTokens": 790
+      }
+    },
+    {
+      "id": "R10P",
+      "pairId": "R10",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 1,
+      "strategy": "BASELINE",
+      "durationMs": 1284,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 545,
+        "completionTokens": 5,
+        "totalTokens": 550
+      }
+    },
+    {
+      "id": "R04N",
+      "pairId": "R04",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1852,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "草案把适用范围扩大到“所有地区”，并称“也适用于其他地区”，与引文中“本标准不适用于其他地区”直接相反。"
+          },
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "草案删去了“上海地区”“因公出差”等适用条件，结论比原文更宽泛。"
+          },
+          {
+            "path": "status",
+            "evidenceIds": [],
+            "detail": "证据只覆盖上海（CN_SH）普通员工出差住宿上限，未回答对其他地区是否适用之外的其他实质部分；已将相反规定误报为 ANSWERABLE，应体现不适用并说明其他地区无依据。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 919,
+        "completionTokens": 161,
+        "totalTokens": 1080
+      }
+    },
+    {
+      "id": "R04N",
+      "pairId": "R04",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1853,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 688,
+        "completionTokens": 5,
+        "totalTokens": 693
+      }
+    },
+    {
+      "id": "R10P",
+      "pairId": "R10",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1720,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 545,
+        "completionTokens": 5,
+        "totalTokens": 550
+      }
+    },
+    {
+      "id": "R10P",
+      "pairId": "R10",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1295,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 776,
+        "completionTokens": 14,
+        "totalTokens": 790
+      }
+    },
+    {
+      "id": "R05N",
+      "pairId": "R05",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1250,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "引文明确“实习员工不适用此补贴”，结论却称“所有员工包括实习员工”均适用800元，扩大且违背原文否定条件。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 783,
+        "completionTokens": 69,
+        "totalTokens": 852
+      }
+    },
+    {
+      "id": "R05N",
+      "pairId": "R05",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1312,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 552,
+        "completionTokens": 5,
+        "totalTokens": 557
+      }
+    },
+    {
+      "id": "R11P",
+      "pairId": "R11",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1205,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 527,
+        "completionTokens": 5,
+        "totalTokens": 532
+      }
+    },
+    {
+      "id": "R11P",
+      "pairId": "R11",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1278,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 758,
+        "completionTokens": 14,
+        "totalTokens": 772
+      }
+    },
+    {
+      "id": "R01P",
+      "pairId": "R01",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1340,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 854,
+        "completionTokens": 14,
+        "totalTokens": 868
+      }
+    },
+    {
+      "id": "R01P",
+      "pairId": "R01",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1301,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 623,
+        "completionTokens": 5,
+        "totalTokens": 628
+      }
+    },
+    {
+      "id": "R03N",
+      "pairId": "R03",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1240,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 675,
+        "completionTokens": 5,
+        "totalTokens": 680
+      }
+    },
+    {
+      "id": "R03N",
+      "pairId": "R03",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1399,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "草稿结论称超出上限部分可以报销，但引文明确写“超出上限部分不予报销”，结论与原文相反。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 906,
+        "completionTokens": 63,
+        "totalTokens": 969
+      }
+    },
+    {
+      "id": "R08N",
+      "pairId": "R08",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1749,
+      "review": {
+        "approved": false,
+        "reason": "MISSED_CONFLICT",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "status",
+            "evidenceIds": [
+              "E1",
+              "E2"
+            ],
+            "detail": "E1 与 E2 在相同适用条件 CN_SH 下对上海普通员工住宿报销上限分别规定为每人每晚 600 元和 650 元，属同一事项矛盾，应展示双方而非仅采用 600 元并判定 ANSWERABLE。"
+          },
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E2"
+            ],
+            "detail": "结论仅写 600 元，遗漏 E2 的每人每晚 650 元相反规定，结论不完整。"
+          },
+          {
+            "path": "coverage",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "E1 引文含有效期 2026-10-01 起至 2027-01-01 前，claim 文本未保留该时间条件，结论比原文宽泛。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 1004,
+        "completionTokens": 193,
+        "totalTokens": 1197
+      }
+    },
+    {
+      "id": "R08N",
+      "pairId": "R08",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1439,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 773,
+        "completionTokens": 5,
+        "totalTokens": 778
+      }
+    },
+    {
+      "id": "R08P",
+      "pairId": "R08",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1350,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 832,
+        "completionTokens": 5,
+        "totalTokens": 837
+      }
+    },
+    {
+      "id": "R08P",
+      "pairId": "R08",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 2517,
+      "review": {
+        "approved": false,
+        "reason": "WRONG_STATUS",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "conflicts/0/first",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "E1 明确适用有效期为 2026 年 10 月 1 日起至 2027 年 1 月 1 日前，与 E2 元数据有效期不同，两规定适用时间条件不同，不构成同一适用条件下的矛盾；将其认定为冲突并展示双方属误判。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 1073,
+        "completionTokens": 103,
+        "totalTokens": 1176
+      }
+    },
+    {
+      "id": "R07N",
+      "pairId": "R07",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1319,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 730,
+        "completionTokens": 14,
+        "totalTokens": 744
+      }
+    },
+    {
+      "id": "R07N",
+      "pairId": "R07",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1374,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 503,
+        "completionTokens": 5,
+        "totalTokens": 508
+      }
+    },
+    {
+      "id": "R12N",
+      "pairId": "R12",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1037,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 543,
+        "completionTokens": 5,
+        "totalTokens": 548
+      }
+    },
+    {
+      "id": "R12N",
+      "pairId": "R12",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1758,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "结论写900元，引文为每人每季度300元，金额误读，结论与引文不一致。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 774,
+        "completionTokens": 60,
+        "totalTokens": 834
+      }
+    },
+    {
+      "id": "R07P",
+      "pairId": "R07",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1365,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 735,
+        "completionTokens": 14,
+        "totalTokens": 749
+      }
+    },
+    {
+      "id": "R07P",
+      "pairId": "R07",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1454,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 508,
+        "completionTokens": 5,
+        "totalTokens": 513
+      }
+    },
+    {
+      "id": "R12P",
+      "pairId": "R12",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1526,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 543,
+        "completionTokens": 5,
+        "totalTokens": 548
+      }
+    },
+    {
+      "id": "R12P",
+      "pairId": "R12",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1414,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 774,
+        "completionTokens": 14,
+        "totalTokens": 788
+      }
+    },
+    {
+      "id": "R11N",
+      "pairId": "R11",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 3247,
+      "review": {
+        "approved": false,
+        "reason": "UNNECESSARY_CLARIFICATION",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "clarification",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "E1明确适用于所有员工且不区分工作地区，并直接给出每年2天志愿服务假，无需再询问地区。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 723,
+        "completionTokens": 62,
+        "totalTokens": 785
+      }
+    },
+    {
+      "id": "R11N",
+      "pairId": "R11",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 2051,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 496,
+        "completionTokens": 5,
+        "totalTokens": 501
+      }
+    },
+    {
+      "id": "R02P",
+      "pairId": "R02",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 2244,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 689,
+        "completionTokens": 5,
+        "totalTokens": 694
+      }
+    },
+    {
+      "id": "R02P",
+      "pairId": "R02",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 2776,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 920,
+        "completionTokens": 14,
+        "totalTokens": 934
+      }
+    },
+    {
+      "id": "R01N",
+      "pairId": "R01",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1596,
+      "review": {
+        "approved": false,
+        "reason": "INCOMPLETE_ANSWER",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "引文明确列出三项材料：行程说明、审批记录和有效票据；结论只写了两项，遗漏了“有效票据”。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 851,
+        "completionTokens": 64,
+        "totalTokens": 915
+      }
+    },
+    {
+      "id": "R01N",
+      "pairId": "R01",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1092,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 620,
+        "completionTokens": 5,
+        "totalTokens": 625
+      }
+    },
+    {
+      "id": "R09N",
+      "pairId": "R09",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1339,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 649,
+        "completionTokens": 5,
+        "totalTokens": 654
+      }
+    },
+    {
+      "id": "R09N",
+      "pairId": "R09",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 2146,
+      "review": {
+        "approved": false,
+        "reason": "WRONG_STATUS",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "status",
+            "evidenceIds": [
+              "E1",
+              "E2"
+            ],
+            "detail": "两份证据分别规定A档由部门主管审批、B档由财务负责人审批，属不同事项而非同一事项矛盾，应为ANSWERABLE而非CONFLICT。"
+          },
+          {
+            "path": "conflicts/0/first",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "该条单独看有依据，但被列入冲突是不当的；A档与B档规定并存并不矛盾。"
+          },
+          {
+            "path": "conflicts/0/second",
+            "evidenceIds": [
+              "E2"
+            ],
+            "detail": "该条单独看有依据，但被列为冲突的另一方不成立；B档规定与A档规定并非同一事项的相反证据。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 890,
+        "completionTokens": 161,
+        "totalTokens": 1051
+      }
+    },
+    {
+      "id": "R06N",
+      "pairId": "R06",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1788,
+      "review": {
+        "approved": false,
+        "reason": "INCOMPLETE_ANSWER",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "status",
+            "evidenceIds": [],
+            "detail": "问题包含两个实质部分（提交报销期限、飞机延误补贴金额），仅对第一部分有证据；证据未涉及任何延误补贴，却将整体状态标为 ANSWERABLE，未保留证据不足状态。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 859,
+        "completionTokens": 73,
+        "totalTokens": 932
+      }
+    },
+    {
+      "id": "R06N",
+      "pairId": "R06",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1466,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 628,
+        "completionTokens": 5,
+        "totalTokens": 633
+      }
+    },
+    {
+      "id": "R04P",
+      "pairId": "R04",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1560,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 687,
+        "completionTokens": 5,
+        "totalTokens": 692
+      }
+    },
+    {
+      "id": "R04P",
+      "pairId": "R04",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1440,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 918,
+        "completionTokens": 14,
+        "totalTokens": 932
+      }
+    },
+    {
+      "id": "R09P",
+      "pairId": "R09",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1405,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 870,
+        "completionTokens": 14,
+        "totalTokens": 884
+      }
+    },
+    {
+      "id": "R09P",
+      "pairId": "R09",
+      "split": "CHALLENGE",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 3063,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 635,
+        "completionTokens": 5,
+        "totalTokens": 640
+      }
+    },
+    {
+      "id": "R10N",
+      "pairId": "R10",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 2912,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 501,
+        "completionTokens": 5,
+        "totalTokens": 506
+      }
+    },
+    {
+      "id": "R10N",
+      "pairId": "R10",
+      "split": "CHALLENGE",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 3623,
+      "review": null,
+      "errorCode": "KNOWLEDGE_PROTOCOL_INVALID",
+      "usage": {
+        "promptTokens": 728,
+        "completionTokens": 67,
+        "totalTokens": 795
+      }
+    },
+    {
+      "id": "R06P",
+      "pairId": "R06",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 2394,
+      "review": {
+        "approved": false,
+        "reason": "WRONG_STATUS",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "status",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "提交报销时限已有明确依据（差旅结束后十五个自然日内），问题该部分可答，不应整体裁定为证据不足；应仅对飞机延误补贴金额说明无资料，状态用部分可答而非 INSUFFICIENT_EVIDENCE。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 865,
+        "completionTokens": 84,
+        "totalTokens": 949
+      }
+    },
+    {
+      "id": "R06P",
+      "pairId": "R06",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1605,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 634,
+        "completionTokens": 5,
+        "totalTokens": 639
+      }
+    },
+    {
+      "id": "R05P",
+      "pairId": "R05",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1557,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 553,
+        "completionTokens": 5,
+        "totalTokens": 558
+      }
+    },
+    {
+      "id": "R05P",
+      "pairId": "R05",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 1485,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 784,
+        "completionTokens": 14,
+        "totalTokens": 798
+      }
+    },
+    {
+      "id": "R02N",
+      "pairId": "R02",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 3015,
+      "review": {
+        "approved": false,
+        "reason": "UNSUPPORTED_CLAIM",
+        "checklist": null,
+        "issues": [
+          {
+            "path": "claims/0",
+            "evidenceIds": [
+              "E1"
+            ],
+            "detail": "结论写每人每晚900元，但引文原文为住宿报销上限每人每晚600元，金额被误读且结论与引文矛盾。"
+          }
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 920,
+        "completionTokens": 67,
+        "totalTokens": 987
+      }
+    },
+    {
+      "id": "R02N",
+      "pairId": "R02",
+      "split": "DEVELOPMENT",
+      "expectedApproved": false,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 3177,
+      "review": {
+        "approved": false,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 689,
+        "completionTokens": 5,
+        "totalTokens": 694
+      }
+    },
+    {
+      "id": "R03P",
+      "pairId": "R03",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "BASELINE",
+      "durationMs": 1770,
+      "review": {
+        "approved": true,
+        "reason": null,
+        "checklist": null,
+        "issues": null
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 675,
+        "completionTokens": 5,
+        "totalTokens": 680
+      }
+    },
+    {
+      "id": "R03P",
+      "pairId": "R03",
+      "split": "DEVELOPMENT",
+      "expectedApproved": true,
+      "repeat": 2,
+      "strategy": "REASONED",
+      "durationMs": 17650,
+      "review": {
+        "approved": true,
+        "reason": "NONE",
+        "checklist": null,
+        "issues": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 906,
+        "completionTokens": 14,
+        "totalTokens": 920
+      }
+    }
+  ],
+  "note": "原冻结24题（12对）、两轮、共96次逻辑调用；REASONED未通过事前准入，默认BASELINE不变。未筛选结果或重跑。"
+}

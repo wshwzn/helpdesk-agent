@@ -138,7 +138,7 @@
 | `status` | `VARCHAR(20)` | 否 | 无 | `RUNNING`、`SUCCEEDED`、`FAILED`、`CANCELLED`。成功指最终消息已落库；未结束快照不能视为模型还在运行的实时证明。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 固定失败码，无自由文本。除知识阶段码外可为 `STREAM_CANCELLED`、诊断专用的 `KNOWLEDGE_MESSAGE_SAVE_FAILED`；客户消息仍按原协议记录错误。 |
 | `revision` | `BIGINT` | 否 | 无 | 本次运行内递增的快照修订号，从 1 开始；不是 MyBatis 实体乐观锁。写入失败后下次修订可跳号。 |
-| `snapshot` | `MEDIUMTEXT` | 否 | 无 | `schemaVersion=3` JSON（兼容读取版本 1、2）：身份、问题、范围、回答模型配置 ID/名称、运行状态、阶段耗时、召回参数与结果、证据编号、引用目录 `citationCatalog`、模型选择 `selection`、解析后草案 `draft`、复核结果、回答原因、逐模型阶段用量、诊断写入失败次数。另有可空 `applicability`：配置快照、路由结果、续答消息 ID 和 `routingAttempted`。不得加入凭据、模型客户端对象或厂商原始异常。 |
+| `snapshot` | `MEDIUMTEXT` | 否 | 无 | `schemaVersion=4` JSON（兼容读取版本 1、2、3）：身份、问题、范围、回答模型配置 ID/名称、运行状态、阶段耗时、召回参数与结果、证据编号、引用目录 `citationCatalog`、模型选择 `selection`、解析后草案 `draft`、复核结果、回答原因、逐模型阶段用量、诊断写入失败次数。另有可空 `applicability`：配置快照、路由结果、续答消息 ID 和 `routingAttempted`。不得加入凭据、模型客户端对象或厂商原始异常。 |
 | `started_at` | `TIMESTAMP(6)` | 否 | 无 | 在已接受消息上开始诊断的时间，应用按 Asia/Shanghai 写入。 |
 | `updated_at` | `TIMESTAMP(6)` | 否 | 无 | 此快照生成时间。 |
 | `finished_at` | `TIMESTAMP(6)` | 是 | `NULL` | 终态时间；运行中为空。 |
@@ -152,6 +152,8 @@
 - 阶段可先有 `APPLICABILITY`，然后是 `RETRIEVAL` 与最多两次 `PLANNING` 交替，最终为 `DRAFT`、`VALIDATION`、`REVIEW`、`EVIDENCE_RECHECK`、`MESSAGE_PERSISTENCE`；一次规划可对应两次检索。未配置知识库时没有检索阶段；未执行阶段不补造。每阶段状态为 `RUNNING`、`SUCCEEDED`、`FAILED`、`CANCELLED`，活跃阶段的耗时为空，结束后用单调时钟记录毫秒。
 - 阶段耗时包含进入阶段时保存诊断的开销，不含结束时的快照写入；端到端耗时另由评测脚本记录。
 - `retrieval` 保留首轮实际候选、排序和检索参数，最多 50 个 Chunk、50000 字；超限会标记 `retrievalTruncated`，不影响原问答链路的上下文超限拒绝。合法预算内的 `evidence` 对应本轮 E 编号；草案仅保存已解析的结构化对象，畸形原始响应不保存。
+- 版本 4 新增可空 `answerContext`（规则核查候选默认关闭，关闭或单轮时为 null）：stopReason、knowledgeGaps（内部资料缺口）、userConditions（用户条件）、pendingRuleQueries（尚未执行的规则核查）、searchedAfterAssessment（缺口判断之后是否又执行检索）。这些是检索经历，不是事实依据或客户回答。规划新增 ruleChecks（evidenceId、原文 term、包含 term 的 query）及 userConditions；旧规划缺少新列表仍可读取；默认沿用阶段 37 协议，只有显式启用候选时才强制新列表。已声明任务优先于 SUFFICIENT，实际成功查询后才解除；无用户条件不能生成 NEEDS_CLARIFICATION，尚有规则待查不能生成 ANSWERABLE。
+- 复核可空 `issues` 保存固定问题路径、evidenceIds、300 字以内缺陷描述；REASONED 候选批准时必须 reason=NONE 且 issues=[]，否决必须有非 NONE 原因及 1–5 个有效问题，路径限定 status/coverage/clarification 或实际结论路径。旧策略 issues 为空，不补造历史理由；阶段 38 候选未通过回放准入，默认仍为 BASELINE，不启用 REASONED。错误码新增 KNOWLEDGE_UNJUSTIFIED_CLARIFICATION、KNOWLEDGE_RULE_CHECK_INCOMPLETE，无列或约束变更。
 - 版本 3 新增可空 `retrievalRun`：固定预算、`searches`（轮次、查询、响应、截断标记、新增 E 编号）、`plans`（轮次和结构化缺口/动作/查询）、`stopReason`。最多 3 轮、5 次检索、2 次规划；每次响应最多保存 50 块/50000 字，累计模型证据也受 50 块/50000 字硬上限约束。失败请求保留 query 且 response 为空。停止枚举见 `KnowledgeRetrievalRun.StopReason`；它与最终答案状态独立。旧快照该字段为空，不补造历史检索。
 - `usage` 仅出现在已进入的模型阶段，字段未知时为 NULL。协议失败若厂商已经返回用量仍保留；未调用、无用量、零用量是不同状态。不统计 Embedding，不把阶段用量再与成功消息累计用量相加。
 - 版本 2 的 `citationCatalog` 含每轮独立 UUID、证据身份、段落原文、UTF-16 左闭右开偏移、可引用标记；`selection` 是模型提出的目录编号、结论和片段选择，可包含错误选择。`draft` 仅在引用解析及结构校验成功后填入服务端原文，仍未必通过语义复核。旧版本 1 保留其原有草案语义，新增两字段为空，不改写历史 JSON。

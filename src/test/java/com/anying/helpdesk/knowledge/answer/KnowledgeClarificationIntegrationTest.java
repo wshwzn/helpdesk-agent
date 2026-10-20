@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(properties = "app.knowledge.multihop.rule-checks-enabled=true")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class KnowledgeClarificationIntegrationTest {
@@ -88,8 +88,9 @@ class KnowledgeClarificationIntegrationTest {
                 BigDecimal.ZERO, 5, 1, 1, List.of(new KnowledgeSearchResultResponse(1, document.getId(), 1,
                 "地区制度.md", QUOTE, 0.03, 1, 1.0, 1, 0.9, KnowledgeDocumentMetadata.from(document)))));
         when(model.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
-                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 0, 0, 0));
-        when(model.draft(any(), any(), any(), any())).thenAnswer(invocation -> {
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
+                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "住宿", QUESTION)), List.of()), 0, 0, 0));
+        when(model.draft(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
             KnowledgeCitationCatalog catalog = invocation.getArgument(3);
             return new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerSelection(catalog.citationSetId(),
                     KnowledgeAnswerDraft.Status.ANSWERABLE, List.of(new KnowledgeAnswerSelection.Claim(QUOTE,
@@ -130,7 +131,7 @@ class KnowledgeClarificationIntegrationTest {
         assertThat(second.knowledgeAnswer().continuationOfMessageId()).isEqualTo(first.id());
         assertThat(second.totalTokens()).isEqualTo(40);
         verify(retrieval).search(baseId, new KnowledgeSearchRequest(QUESTION, "CN_SH"));
-        verify(model).draft(any(), eq(QUESTION), eq("CN_SH"), any());
+        verify(model).draft(any(), eq(QUESTION), eq("CN_SH"), any(), any());
         verify(model, times(1)).route(any(), any(), any());
         var run = runs.find(second.knowledgeRunId()).orElseThrow();
         assertThat(run.question()).isEqualTo(QUESTION);
@@ -227,7 +228,7 @@ class KnowledgeClarificationIntegrationTest {
         var latest = conversations.pageMessages(id, 1, 20, CUSTOMER).records().getLast();
         assertThat(latest.knowledgeAnswer().reason()).isEqualTo(KnowledgeAnswerReport.Reason.NO_MATCH);
         assertThat(latest.knowledgeAnswer().continuationOfMessageId()).isEqualTo(first.id());
-        verify(model, never()).draft(any(), any(), any(), any());
+        verify(model, never()).draft(any(), any(), any(), any(), any());
     }
 
     /** 不确定分类不能静默当作通用问题，合法候选也不能绕过已有语义复核。 */

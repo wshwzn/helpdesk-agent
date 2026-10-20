@@ -54,7 +54,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(properties = "app.knowledge.multihop.rule-checks-enabled=true")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class KnowledgeAnswerRunIntegrationTest {
@@ -101,8 +101,9 @@ class KnowledgeAnswerRunIntegrationTest {
                 0.03, 1, 1.0, 1, 0.8, metadata))));
         when(eligibility.findEligible(any(), any(), any())).thenReturn(Map.of(10L, document));
         when(modelClient.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
-                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 0, 0, 0));
-        when(modelClient.draft(any(), any(), any(), any())).thenAnswer(invocation -> {
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
+                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "住宿", "住宿？")), List.of()), 0, 0, 0));
+        when(modelClient.draft(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
             return new KnowledgeAnswerModelClient.ModelResult<>(selection(invocation.getArgument(3), "E1-P1"), 10, 5, 15);
         });
@@ -159,7 +160,7 @@ class KnowledgeAnswerRunIntegrationTest {
             assertThat(stage.durationMs()).isGreaterThanOrEqualTo(0);
         });
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(3);
+        assertThat(snapshot.schemaVersion()).isEqualTo(4);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.stages().get(2).usage().totalTokens()).isEqualTo(15);
         assertThat(snapshot.stages().get(4).usage().totalTokens()).isEqualTo(25);
@@ -192,7 +193,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.FAILED);
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(3);
+        assertThat(snapshot.schemaVersion()).isEqualTo(4);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.review().approved()).isFalse();
         assertThat(snapshot.stages().getLast().errorCode()).isEqualTo(message.getErrorCode());
@@ -209,7 +210,7 @@ class KnowledgeAnswerRunIntegrationTest {
     void invalidCitationIsDiagnosable() throws Exception {
         doAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(
                 selection(invocation.getArgument(3), "E1-P999"), null, null, null))
-                .when(modelClient).draft(any(), any(), any(), any());
+                .when(modelClient).draft(any(), any(), any(), any(), any());
         send().andExpect(status().isBadGateway());
         var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.errorCode()).isEqualTo("KNOWLEDGE_CITATION_INVALID");
@@ -227,7 +228,7 @@ class KnowledgeAnswerRunIntegrationTest {
     void failedModelUsageIsPersisted() throws Exception {
         doThrow(new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PROTOCOL_INVALID,
                 "invalid knowledge answer protocol", new KnowledgeAnswerModelClient.TokenUsage(20, 8, 28)))
-                .when(modelClient).draft(any(), any(), any(), any());
+                .when(modelClient).draft(any(), any(), any(), any(), any());
         send().andExpect(status().isBadGateway());
         var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.draft()).isNull();
@@ -316,7 +317,7 @@ class KnowledgeAnswerRunIntegrationTest {
             }
             returned.countDown();
             return new KnowledgeAnswerModelClient.ModelResult<>(selection(invocation.getArgument(3), "E1-P1"), 10, 5, 15);
-        }).when(modelClient).draft(any(), any(), any(), any());
+        }).when(modelClient).draft(any(), any(), any(), any(), any());
         var subscription = service.streamMessage(conversationId,
                 new SendMessageRequest("住宿？", ChatMode.KNOWLEDGE, "SH"), CUSTOMER).subscribe();
         try {
@@ -375,7 +376,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
         com.fasterxml.jackson.databind.node.ObjectNode legacy = mapper.valueToTree(snapshot);
         legacy.put("schemaVersion", 1);
-        legacy.remove(List.of("citationCatalog", "selection", "retrievalRun", "applicability"));
+        legacy.remove(List.of("citationCatalog", "selection", "retrievalRun", "applicability", "answerContext"));
         jdbc.update("UPDATE knowledge_answer_runs SET snapshot=? WHERE run_id=?",
                 mapper.writeValueAsString(legacy), snapshot.runId());
         var loaded = runs.find(snapshot.runId()).orElseThrow();

@@ -74,6 +74,21 @@ class ReviewEvaluationTest(unittest.TestCase):
         second.update(review=None, errorCode="CALL_FAILED")
         self.assertEqual(0, evaluation.metrics([first, second], 2)["casesWithRepeatedValidDecisions"])
 
+    def test_reasoned_gate_requires_nonregression_and_complete_reasons(self):
+        """诊断候选允许准确性持平，但缺原因或任何挑战集退化都不能启用。"""
+        rows = copy.deepcopy(self.rows)
+        for row in rows:
+            if row["strategy"] == "CHECKLIST":
+                row["strategy"] = "REASONED"
+                row["review"].update(reason="NONE" if row["expectedApproved"] else "WRONG_STATUS",
+                                    issues=[] if row["expectedApproved"] else [{"path": "status"}])
+        self.assertTrue(evaluation.summarize(self.dataset, rows, 2, "REASONED")["candidateEligibleForEndToEnd"])
+        negative = next(r for r in rows if r["strategy"] == "REASONED" and not r["expectedApproved"])
+        negative["review"]["issues"] = []
+        self.assertFalse(evaluation.summarize(self.dataset, rows, 2, "REASONED")["candidateEligibleForEndToEnd"])
+        negative["review"].update(approved=True, reason="NONE")
+        self.assertFalse(evaluation.summarize(self.dataset, rows, 2, "REASONED")["candidateEligibleForEndToEnd"])
+
 
 if __name__ == "__main__":
     unittest.main()

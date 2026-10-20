@@ -2,6 +2,7 @@ package com.anying.helpdesk.knowledge.answer.trace;
 
 import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityPolicy;
 import com.anying.helpdesk.knowledge.answer.KnowledgeRetrievalRun;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerContext;
 
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerDraft;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerSelection;
@@ -23,7 +24,8 @@ public record KnowledgeAnswerRunSnapshot(
         List<KnowledgeAnswerReport.Evidence> evidence, KnowledgeAnswerDraft draft,
         KnowledgeAnswerModelClient.Review review, KnowledgeAnswerReport.Reason answerReason,
         List<StageResult> stages, KnowledgeCitationCatalog citationCatalog, KnowledgeAnswerSelection selection,
-        KnowledgeApplicabilityPolicy.Assessment applicability, KnowledgeRetrievalRun retrievalRun
+        KnowledgeApplicabilityPolicy.Assessment applicability, KnowledgeRetrievalRun retrievalRun,
+        KnowledgeAnswerContext answerContext
 ) {
     public enum Status { RUNNING, SUCCEEDED, FAILED, CANCELLED }
     public enum Stage { APPLICABILITY, RETRIEVAL, PLANNING, DRAFT, VALIDATION, REVIEW, EVIDENCE_RECHECK, MESSAGE_PERSISTENCE }

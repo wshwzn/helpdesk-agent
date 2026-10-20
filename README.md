@@ -224,6 +224,8 @@ V22 支持登记当前 OSS Bucket 中的独立 `external-knowledge/{slug}/` 目�
 
 ### 受控多跳与开发对照
 
+阶段 38 已实现规则核查与回答状态衔接候选，但同题对照退化为 7 通过、1 未通过、4 技术失败，因此默认关闭（`app.knowledge.multihop.rule-checks-enabled=false`）。默认保留阶段 37 的规划/草案流程；REASONED 复核候选也未通过准入，默认仍为 BASELINE。详见 [阶段 38 说明](notes/38-规则核查与回答状态衔接.md) 和 [完整对照](docs/evaluation/runs/2026-10-21-规则核查与状态衔接对照.md)。
+
 KNOWLEDGE 默认启用受控补查：首轮原问题搜索，最多两次规划、每次最多两个补查，累计证据去重，最后继续引用校验、复核与资格检查。C1 的同一套 18 份资料、12 题在首次 C2 对照中由 6 题自动通过提升到 9 题，完整来源链召回由 6/12 提升到 11/12；仍有 1 道漏冲突、2 道复核失败，不能声称已解决全部多跳或冲突问题。详见 [首次对照](docs/evaluation/runs/2026-10-21-受控多跳首次对照.md)、[原单轮基线](docs/evaluation/runs/2026-10-20-多跳单轮基线.md)、[运行方法](docs/demo/multihop/README.md) 和 [阶段 37](notes/37-受控多跳检索.md)。
 
 `app.knowledge.multihop.enabled=false` 可进行单轮对照；默认调度软预算 90 秒、累计证据硬上限 50 块/50000 字符。逐轮查询和停止原因仅在管理员诊断中展示。逻辑模型调用上限不含 SDK 内部 HTTP 重试，规划用量已计入消息及诊断，Embedding 和未返回的重试用量不在已知成本内。

@@ -8,12 +8,10 @@ import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
@@ -47,7 +45,7 @@ public class KnowledgeEvidenceCollector {
     }
 
     public record Collected(List<KnowledgeAnswerReport.Evidence> evidence,
-                            KnowledgeAnswerModelClient.TokenUsage planningUsage) { }
+                            KnowledgeAnswerModelClient.TokenUsage planningUsage, KnowledgeAnswerContext context) { }
     private record Key(Long documentId, int chunkSequence) { }
 
     /** 最多执行首轮和两轮补查，所有停止结果都沿原可信草案及复核链路交付。 */
@@ -58,43 +56,53 @@ public class KnowledgeEvidenceCollector {
         trace.retrievalStarted(enabled, budgetMs);
         var evidence = new LinkedHashMap<Key, KnowledgeAnswerReport.Evidence>();
         var queries = new ArrayList<String>();
+        boolean ruleChecksEnabled = enabled && properties.isRuleChecksEnabled();
+        var assessment = new Assessment(ruleChecksEnabled);
         var seen = new LinkedHashSet<String>();
         var usage = new KnowledgeAnswerModelClient.TokenUsage(0, 0, 0);
         search(baseId, scope, 1, question, trace, evidence);
         queries.add(question);
         seen.add(normalize(question));
-        if (evidence.isEmpty()) return stop(trace, NO_MATCH, evidence, usage);
-        if (!enabled) return stop(trace, SINGLE_PASS, evidence, usage);
+        if (evidence.isEmpty()) return stop(trace, NO_MATCH, evidence, usage, assessment, queries);
+        if (!enabled) return stop(trace, SINGLE_PASS, evidence, usage, assessment, queries);
         for (int round = 2; round <= 3; round++) {
-            if (expired(started, budgetMs)) return stop(trace, TIME_BUDGET, evidence, usage);
+            if (expired(started, budgetMs)) return stop(trace, TIME_BUDGET, evidence, usage, assessment, queries);
             int afterRound = round - 1;
             var planned = trace.stage(PLANNING, () -> {
                 var result = external(KNOWLEDGE_PLANNING_CALL_FAILED,
-                        () -> client.plan(model, question, scope, List.copyOf(evidence.values()), List.copyOf(queries)));
+                        () -> ruleChecksEnabled
+                                ? client.plan(model, question, scope, List.copyOf(evidence.values()), List.copyOf(queries))
+                                : client.planLegacy(model, question, scope, List.copyOf(evidence.values()), List.copyOf(queries)));
                 if (result == null || result.value() == null)
                     throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
                 trace.planned(afterRound, result);
-                result.value().validate();
+                if (ruleChecksEnabled) result.value().validateEvidence(List.copyOf(evidence.values()));
+                else result.value().validateLegacy();
                 return result;
             });
             usage = new KnowledgeAnswerModelClient.TokenUsage(sum(usage.promptTokens(), planned.promptTokens()),
                     sum(usage.completionTokens(), planned.completionTokens()), sum(usage.totalTokens(), planned.totalTokens()));
             var plan = planned.value();
-            if (plan.decision() != KnowledgeRetrievalPlan.Decision.SEARCH)
-                return stop(trace, KnowledgeRetrievalRun.StopReason.valueOf(plan.decision().name()), evidence, usage);
+            assessment.accept(plan, queries.size());
+            var pending = assessment.pending(queries);
+            if (plan.decision() != KnowledgeRetrievalPlan.Decision.SEARCH && pending.isEmpty())
+                return stop(trace, KnowledgeRetrievalRun.StopReason.valueOf(plan.decision().name()), evidence, usage, assessment, queries);
+            var scheduled = new LinkedHashMap<String, String>();
+            pending.forEach(q -> scheduled.putIfAbsent(normalize(q), q));
+            plan.queries().forEach(q -> scheduled.putIfAbsent(normalize(q), q));
             int before = evidence.size();
             int executed = 0;
-            for (String query : plan.queries()) {
+            for (String query : scheduled.values().stream().limit(2).toList()) {
                 if (!seen.add(normalize(query))) continue;
-                if (expired(started, budgetMs)) return stop(trace, TIME_BUDGET, evidence, usage);
+                if (expired(started, budgetMs)) return stop(trace, TIME_BUDGET, evidence, usage, assessment, queries);
                 search(baseId, scope, round, query.strip(), trace, evidence);
                 queries.add(query.strip());
                 executed++;
             }
-            if (executed == 0) return stop(trace, REPEATED_QUERY, evidence, usage);
-            if (evidence.size() == before) return stop(trace, NO_NEW_EVIDENCE, evidence, usage);
+            if (executed == 0) return stop(trace, REPEATED_QUERY, evidence, usage, assessment, queries);
+            if (evidence.size() == before) return stop(trace, NO_NEW_EVIDENCE, evidence, usage, assessment, queries);
         }
-        return stop(trace, ROUND_BUDGET, evidence, usage);
+        return stop(trace, ROUND_BUDGET, evidence, usage, assessment, queries);
     }
 
     /** 每次搜索都绑定同一身份，保存实际召回并按文档与块序号累计完整原文。 */
@@ -149,14 +157,44 @@ public class KnowledgeEvidenceCollector {
 
     /** 结束补查并返回稳定 E 编号，规划输出本身不进入最终证据目录。 */
     private Collected stop(KnowledgeAnswerTrace trace, KnowledgeRetrievalRun.StopReason reason,
-            LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence, KnowledgeAnswerModelClient.TokenUsage usage) {
+            LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence, KnowledgeAnswerModelClient.TokenUsage usage,
+            Assessment assessment, List<String> queries) {
         trace.retrievalStopped(reason);
-        return new Collected(List.copyOf(evidence.values()), usage);
+        var context = assessment.enabled ? new KnowledgeAnswerContext(reason,
+                assessment.plan == null ? List.of() : assessment.plan.gaps(),
+                assessment.plan == null ? List.of() : assessment.plan.userConditions(),
+                assessment.pending(queries), queries.size() > assessment.queryCount) : null;
+        trace.answerContext(context);
+        return new Collected(List.copyOf(evidence.values()), usage, context);
+    }
+
+    /** 请求内保留未完成的核查责任，后续规划不能通过省略字段遗忘旧任务。 */
+    private static class Assessment {
+        private final boolean enabled;
+        private KnowledgeRetrievalPlan plan;
+        private int queryCount;
+        private final LinkedHashMap<String, String> checks = new LinkedHashMap<>();
+
+        /** 明确本次是否启用规划约束，单轮对照不伪造规划条件。 */
+        private Assessment(boolean enabled) { this.enabled = enabled; }
+
+        /** 保存最近一次缺口分类，同时累计所有已经声明且有原文锚点的核查查询。 */
+        private void accept(KnowledgeRetrievalPlan value, int count) {
+            plan = value;
+            queryCount = count;
+            if (enabled) value.ruleChecks().forEach(c -> checks.putIfAbsent(KnowledgeRetrievalPlan.normalize(c.query()), c.query()));
+        }
+
+        /** 只用已经成功返回的真实请求解除核查责任，不采信模型自称已查。 */
+        private List<String> pending(List<String> queries) {
+            var executed = queries.stream().map(KnowledgeRetrievalPlan::normalize).collect(java.util.stream.Collectors.toSet());
+            return checks.entrySet().stream().filter(e -> !executed.contains(e.getKey())).map(java.util.Map.Entry::getValue).toList();
+        }
     }
 
     /** 查询判重兼容大小写、全角和空白差异，原始查询仍保留在诊断中。 */
     private String normalize(String query) {
-        return Normalizer.normalize(query, Normalizer.Form.NFKC).replaceAll("\\s+", "").toLowerCase(Locale.ROOT);
+        return KnowledgeRetrievalPlan.normalize(query);
     }
 
     /** 仅检查是否还能启动新的补查，不伪称硬中断已经发出的请求。 */
