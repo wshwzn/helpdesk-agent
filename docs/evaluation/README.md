@@ -85,6 +85,7 @@ V18 起，新知识助手消息的 `knowledgeRunId` 在成功和失败时都会�
 | 错误码 | 阶段 |
 | --- | --- |
 | KNOWLEDGE_RETRIEVAL_FAILED | 默认库读取、Embedding 或 ES 检索阶段失败 |
+| KNOWLEDGE_PLANNING_CALL_FAILED | 补查规划的模型依赖调用失败；无成功降级 |
 | KNOWLEDGE_DRAFT_CALL_FAILED | 生成草案的模型调用失败 |
 | KNOWLEDGE_REVIEW_CALL_FAILED | 语义复核的模型调用失败 |
 | KNOWLEDGE_PROTOCOL_INVALID | 模型未按结构化 JSON 协议返回 |
@@ -151,3 +152,11 @@ python -X utf8 scripts/evaluate_knowledge_clarification.py --base-url http://loc
 [真实失败复核与练习环境报告](runs/2026-10-19-真实失败复核与练习环境.md)记录 BASELINE/CONTEXTUAL 两轮共 112 次调用。候选总体误杀减少，但第一轮错误放行增加且 CHALLENGE 退化，未采用；[全量复核数据](runs/2026-10-19-真实失败复核数据.json)保留完整输入及全部判断。原 B03 误杀未复现，B09 仍被两种策略否决，不能描述为两条问题都已修复。
 
 [练习环境说明](../demo/trusted-knowledge/练习环境.md)提供可重复使用的资料库初始化脚本。它不执行撤回场景，也不是模型质量评测。[五次练习验证数据](runs/2026-10-19-练习环境验证数据.json)记录通用期限及两个地区的澄清续答，五次均自动通过；运行中的 8080 服务构建未核实，不把这组结果称为候选策略端到端验证。
+
+## 受控多跳对照（C2）
+
+新诊断 schemaVersion=3 的 retrievalRun 保存全部搜索、规划和停止原因；retrieval 仍表示首轮。脚本按实际搜索结果并集计算召回覆盖，同时单列首轮覆盖；失败或截断的检索诊断不能按完整召回计分。PLANNING 用量与 DRAFT/REVIEW 一起计入诊断成本。
+
+可用 `--knowledge-base-id 20 --skip-probes` 复用已经导入的冻结题库，仍校验资料 SHA、发布状态、有效期、检索参数及模型配置。输出目录必须新建；不能覆盖 C1 或挑选重跑结果。运行开关为 `app.knowledge.multihop.enabled`（默认 true），调度软预算 `scheduling-budget-seconds`（默认 90）。
+
+首次真实对照见 [C2 报告](runs/2026-10-21-受控多跳首次对照.md)：9 通过、1 未通过、2 技术失败；仍有过早停止和复核问题，C 阶段尚未整体验收。

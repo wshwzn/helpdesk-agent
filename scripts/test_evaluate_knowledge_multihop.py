@@ -26,6 +26,17 @@ class MultihopEvaluationTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             evaluation.validate_dataset(self.dataset)
 
+    def test_retrieval_settings_use_response_field_names(self):
+        """库响应的参数字段不同于更新请求，须按真实响应验证。"""
+        dataset = copy.deepcopy(self.dataset)
+        dataset["documents"] = []
+        state = {"documents": [], "knowledgeBase": {"retrievalCandidateLimit": 50,
+                 "retrievalResultLimit": 5, "vectorMinSimilarity": 0.65}}
+        evaluation.validate_state(state, dataset)
+        state["knowledgeBase"]["retrievalResultLimit"] = 6
+        with self.assertRaises(ValueError):
+            evaluation.validate_state(state, dataset)
+
     def test_missing_results_remain_in_denominator(self):
         """未执行题不计通过，计划题数始终来自冻结题集。"""
         report = evaluation.summarize(self.dataset, self.rows[:-1])
@@ -69,6 +80,37 @@ class MultihopEvaluationTest(unittest.TestCase):
         missing = copy.deepcopy(result)
         missing["diagnostic"]["retrieval"]["results"] = []
         self.assertEqual("RETRIEVAL_GAP", evaluation.inspect_retrieval(case, missing, state)["failureLayer"])
+
+    def test_multihop_coverage_unions_actual_searches(self):
+        """新版本按全部实际检索统计覆盖，首轮覆盖和失败缺失单列。"""
+        case = self.dataset["cases"][0]
+        state = {"documents": [{"id": 1, "sourceKey": "l2-sh", "businessVersion": "v1", "applicabilityScope": "CN_SH"}]}
+        result = {"outcome": "CHECK_PASSED", "diagnosticState": "CAPTURED", "diagnostic": {
+            "schemaVersion": 3, "retrieval": {"results": []}, "evidence": [{"documentId": 1}],
+            "stages": [{"stage": "RETRIEVAL"}, {"stage": "PLANNING"}, {"stage": "RETRIEVAL"}],
+            "retrievalRun": {"stopReason": "ROUND_BUDGET", "searches": [
+                {"round": 1, "response": {"results": []}},
+                {"round": 2, "response": {"results": [{"documentId": 1}]}}]}}}
+        inspected = evaluation.inspect_retrieval(case, result, state)
+        self.assertTrue(inspected["retrievalCovered"])
+        self.assertFalse(inspected["firstSearchCovered"])
+        self.assertEqual(1, inspected["planningCalls"])
+        self.assertEqual(2, inspected["retrievalRounds"])
+        for mutation in ({"truncated": True}, {"response": None}):
+            missing = copy.deepcopy(result)
+            missing["diagnostic"]["retrievalRun"]["searches"][1].update(mutation)
+            self.assertFalse(evaluation.inspect_retrieval(case, missing, state)["coverageKnown"])
+        result["diagnostic"]["retrievalRun"]["searches"].pop()
+        self.assertFalse(evaluation.inspect_retrieval(case, result, state)["coverageKnown"])
+
+    def test_planning_cost_is_included(self):
+        """新增规划成本必须纳入诊断统计，避免只展示回答和复核用量。"""
+        result = {"outcome": "TECHNICAL_ERROR", "diagnosticState": "CAPTURED", "diagnostic": {
+            "stages": [{"stage": "PLANNING", "usage": {"totalTokens": 12}},
+                       {"stage": "DRAFT", "usage": {"totalTokens": 20}}, {"stage": "REVIEW", "usage": None}]}}
+        metrics = evaluation.base.measures({"planned": 1, "results": [result]})
+        self.assertEqual(32, metrics["diagnosticKnownAnswerTokens"])
+        self.assertEqual(1, metrics["diagnosticModelStagesMissingUsage"])
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""冻结多跳开发题集的单轮基线；检索覆盖、答案检查和技术失败分别记录。"""
+"""使用冻结多跳题集对照单轮与受控补查；检索覆盖、答案检查和技术失败分别记录。"""
 
 import argparse
 from collections import Counter
@@ -42,7 +42,12 @@ def inspect_retrieval(case, result, state):
     """即使回答失败也从真实诊断中检查证据链；未知诊断不视为未召回或完整召回。"""
     diagnostic = result.get("diagnostic") or {}
     retrieval = diagnostic.get("retrieval")
-    if result.get("diagnosticState") != "CAPTURED" or retrieval is None or diagnostic.get("retrievalTruncated"):
+    run = diagnostic.get("retrievalRun")
+    searches = run.get("searches", []) if run else []
+    incomplete = diagnostic.get("schemaVersion", 1) >= 3 and (not searches or
+            len(searches) != sum(stage["stage"] == "RETRIEVAL" for stage in diagnostic.get("stages", [])) or
+            any(row.get("response") is None or row.get("truncated") for row in searches))
+    if result.get("diagnosticState") != "CAPTURED" or retrieval is None or diagnostic.get("retrievalTruncated") or incomplete:
         return {"coverageKnown": False, "retrievalCovered": None, "evidenceCovered": None,
                 "failureLayer": "DIAGNOSTIC_UNAVAILABLE"}
     documents = {d["id"]: d for d in state["documents"]}
@@ -51,7 +56,7 @@ def inspect_retrieval(case, result, state):
         """通过冻结文档身份映射检索结果，不依赖返回的文件名猜测来源。"""
         return sorted({base.source_key(documents[item["documentId"]]) for item in items if item["documentId"] in documents})
 
-    retrieved = sources(retrieval["results"])
+    retrieved = sources([hit for row in searches for hit in row["response"]["results"]] if searches else retrieval["results"])
     evidence = sources(diagnostic.get("evidence") or [])
     required = set(case["requiredSources"])
     covered = required.issubset(retrieved)
@@ -59,6 +64,10 @@ def inspect_retrieval(case, result, state):
     return {"coverageKnown": True, "retrievedSources": retrieved, "evidenceSources": evidence,
             "missingSources": sorted(required - set(retrieved)), "retrievalCovered": covered,
             "evidenceCovered": required.issubset(evidence), "recordedRetrievalStages": actual_rounds,
+            "firstSearchCovered": required.issubset(sources(retrieval["results"])),
+            "retrievalRounds": max((row["round"] for row in searches), default=1),
+            "planningCalls": sum(stage["stage"] == "PLANNING" for stage in diagnostic["stages"]),
+            "stopReason": run.get("stopReason") if run else "LEGACY_SINGLE_PASS",
             "failureLayer": "PASSED_CHECKS" if result["outcome"] == "CHECK_PASSED"
             else "RETRIEVAL_GAP" if not covered else "ANSWER_OR_VERIFICATION"}
 
@@ -90,7 +99,7 @@ def save(output, report, dataset):
     report["multihopMetrics"] = summarize(dataset, report["results"])
     base.save_report(output, report)
     with (output / "report.md").open("a", encoding="utf-8") as handle:
-        handle.write("\n## 单轮证据链覆盖\n\n| 题号 | 覆盖完整 | 缺少来源 | 层次诊断 |\n| --- | --- | --- | --- |\n")
+        handle.write("\n## 累计证据链覆盖\n\n| 题号 | 覆盖完整 | 缺少来源 | 层次诊断 |\n| --- | --- | --- | --- |\n")
         for result in report["results"]:
             handle.write(f"| {result['id']} | {result.get('retrievalCovered')} | {', '.join(result.get('missingSources', []))} | {result.get('failureLayer')} |\n")
         handle.write("\n覆盖完整只表示金标准来源都进入候选，不证明答案正确。金标准引导的搜索探针属于人工指定查询，不属于 Agent 多跳成功。\n")
@@ -125,6 +134,10 @@ def prepare(client, dataset, report, output):
 
 def validate_state(state, dataset):
     """核对实际资料哈希、版本、期限及发布状态，禁止跑错库后仍计成绩。"""
+    fields = {"candidateLimit": "retrievalCandidateLimit", "resultLimit": "retrievalResultLimit",
+              "vectorMinSimilarity": "vectorMinSimilarity"}
+    if any(state["knowledgeBase"][actual] != dataset["retrievalSettings"][expected] for expected, actual in fields.items()):
+        raise ValueError("retrieval settings differ from frozen dataset")
     if len(state["documents"]) != len(dataset["documents"]):
         raise ValueError("fixture count mismatch")
     documents = {base.source_key(d): d for d in state["documents"]}
@@ -181,6 +194,8 @@ def main():
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--runtime-label", required=True)
     parser.add_argument("--runtime-jar", type=Path)
+    parser.add_argument("--knowledge-base-id", type=int, help="复用已导入的冻结题库，仍严格核对文件和元数据")
+    parser.add_argument("--skip-probes", action="store_true", help="不重复执行人工金标准探针")
     args = parser.parse_args()
     if args.output.exists():
         raise RuntimeError("output already exists; preserve the original run")
@@ -205,7 +220,8 @@ def main():
     save(args.output, report, dataset)
     evaluation_id = None
     try:
-        evaluation_id = prepare(client, dataset, report, args.output)
+        evaluation_id = args.knowledge_base_id or prepare(client, dataset, report, args.output)
+        report["evaluationKnowledgeBaseId"] = evaluation_id
         report["restoration"] = "PENDING"
         save(args.output, report, dataset)
         client.call("POST", f"/api/admin/knowledge-bases/{evaluation_id}/default")
@@ -226,7 +242,8 @@ def main():
             print(f"{case['id']} {result['outcome']} coverage={result.get('retrievalCovered')} {result['elapsedSeconds']}s", flush=True)
         if base.snapshot(client) != state:
             raise RuntimeError("evaluation state changed before diagnostic probes")
-        probes(client, dataset, state, report, args.output)
+        if not args.skip_probes:
+            probes(client, dataset, state, report, args.output)
     except BaseException as error:
         report["runError"] = type(error).__name__
         raise

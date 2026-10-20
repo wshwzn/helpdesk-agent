@@ -100,6 +100,8 @@ class KnowledgeAnswerRunIntegrationTest {
                 5, 1, 1, List.of(new KnowledgeSearchResultResponse(1, 10L, 1, "制度.md", QUOTE,
                 0.03, 1, 1.0, 1, 0.8, metadata))));
         when(eligibility.findEligible(any(), any(), any())).thenReturn(Map.of(10L, document));
+        when(modelClient.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 0, 0, 0));
         when(modelClient.draft(any(), any(), any(), any())).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
             return new KnowledgeAnswerModelClient.ModelResult<>(selection(invocation.getArgument(3), "E1-P1"), 10, 5, 15);
@@ -108,6 +110,27 @@ class KnowledgeAnswerRunIntegrationTest {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
             return new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerModelClient.Review(true), 20, 5, 25);
         });
+    }
+
+    /** 实际经过消息和诊断落库，验证新增检索轮次不会只停留在内存或丢失用量。 */
+    @Test @DisplayName("多轮查询和规划用量可从管理员诊断往返读取")
+    void persistsMultihopTraceAndUsage() throws Exception {
+        when(modelClient.plan(any(), any(), any(), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SEARCH,
+                        List.of("检查相关规则"), List.of("上海住宿额度通知")), 6, 3, 9));
+        send().andExpect(status().isOk());
+        var message = assistant();
+        var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
+        assertThat(snapshot.retrievalRun().searches()).hasSize(2);
+        assertThat(snapshot.retrievalRun().searches().getLast().query()).isEqualTo("上海住宿额度通知");
+        assertThat(snapshot.retrievalRun().searches().getLast().response().results()).hasSize(1);
+        assertThat(snapshot.retrievalRun().plans()).hasSize(1);
+        assertThat(snapshot.retrievalRun().stopReason()).isEqualTo(KnowledgeRetrievalRun.StopReason.NO_NEW_EVIDENCE);
+        assertThat(message.getTotalTokens()).isEqualTo(49);
+        assertThat(snapshot.stages()).filteredOn(stage -> stage.stage() == KnowledgeAnswerRunSnapshot.Stage.PLANNING)
+                .singleElement().satisfies(stage -> assertThat(stage.usage().totalTokens()).isEqualTo(9));
+        mvc.perform(get("/api/admin/knowledge-answer-runs/" + snapshot.runId()).header("Authorization", adminAuth))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.retrievalRun.searches[1].round").value(2));
     }
 
     /** 清理本测试会话和独立诊断，不影响其他测试的业务资料。 */
@@ -128,7 +151,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(runId).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.SUCCEEDED);
         assertThat(snapshot.stages()).extracting(KnowledgeAnswerRunSnapshot.StageResult::stage)
-                .containsExactly(KnowledgeAnswerRunSnapshot.Stage.RETRIEVAL, KnowledgeAnswerRunSnapshot.Stage.DRAFT,
+                .containsExactly(KnowledgeAnswerRunSnapshot.Stage.RETRIEVAL, KnowledgeAnswerRunSnapshot.Stage.PLANNING, KnowledgeAnswerRunSnapshot.Stage.DRAFT,
                         KnowledgeAnswerRunSnapshot.Stage.VALIDATION, KnowledgeAnswerRunSnapshot.Stage.REVIEW,
                         KnowledgeAnswerRunSnapshot.Stage.EVIDENCE_RECHECK, KnowledgeAnswerRunSnapshot.Stage.MESSAGE_PERSISTENCE);
         assertThat(snapshot.stages()).allSatisfy(stage -> {
@@ -136,10 +159,10 @@ class KnowledgeAnswerRunIntegrationTest {
             assertThat(stage.durationMs()).isGreaterThanOrEqualTo(0);
         });
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(2);
+        assertThat(snapshot.schemaVersion()).isEqualTo(3);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
-        assertThat(snapshot.stages().get(1).usage().totalTokens()).isEqualTo(15);
-        assertThat(snapshot.stages().get(3).usage().totalTokens()).isEqualTo(25);
+        assertThat(snapshot.stages().get(2).usage().totalTokens()).isEqualTo(15);
+        assertThat(snapshot.stages().get(4).usage().totalTokens()).isEqualTo(25);
         String url = "/api/admin/knowledge-answer-runs/" + runId;
         mvc.perform(get(url)).andExpect(status().isUnauthorized());
         mvc.perform(get(url).header("Authorization", customerAuth)).andExpect(status().isForbidden());
@@ -169,7 +192,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.FAILED);
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(2);
+        assertThat(snapshot.schemaVersion()).isEqualTo(3);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.review().approved()).isFalse();
         assertThat(snapshot.stages().getLast().errorCode()).isEqualTo(message.getErrorCode());
@@ -193,8 +216,8 @@ class KnowledgeAnswerRunIntegrationTest {
         assertThat(snapshot.draft()).isNull();
         assertThat(snapshot.selection().claims().getFirst().references().getFirst().paragraphId()).isEqualTo("E1-P999");
         assertThat(snapshot.citationCatalog().citationSetId()).isEqualTo(snapshot.selection().citationSetId());
-        assertThat(snapshot.stages()).hasSize(3);
-        assertThat(snapshot.stages().get(1).usage().totalTokens()).isNull();
+        assertThat(snapshot.stages()).hasSize(4);
+        assertThat(snapshot.stages().get(2).usage().totalTokens()).isNull();
         verify(modelClient, never()).review(any(), any(), any(), any(), any());
     }
 
@@ -234,7 +257,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.answerReason()).isEqualTo(KnowledgeAnswerReport.Reason.NOT_CONFIGURED);
         assertThat(snapshot.stages()).extracting(KnowledgeAnswerRunSnapshot.StageResult::stage)
-                .containsExactly(KnowledgeAnswerRunSnapshot.Stage.RETRIEVAL, KnowledgeAnswerRunSnapshot.Stage.MESSAGE_PERSISTENCE);
+                .containsExactly(KnowledgeAnswerRunSnapshot.Stage.MESSAGE_PERSISTENCE);
         verifyNoInteractions(modelClient);
     }
 
@@ -247,7 +270,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.SUCCEEDED);
         assertThat(snapshot.diagnosticWriteFailures()).isEqualTo(1);
-        assertThat(snapshot.stages()).hasSize(6);
+        assertThat(snapshot.stages()).hasSize(7);
     }
 
     /** 数据库也守住终态，避免其他线程持有的旧快照覆盖已经完成的记录。 */
@@ -352,13 +375,14 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
         com.fasterxml.jackson.databind.node.ObjectNode legacy = mapper.valueToTree(snapshot);
         legacy.put("schemaVersion", 1);
-        legacy.remove(List.of("citationCatalog", "selection"));
+        legacy.remove(List.of("citationCatalog", "selection", "retrievalRun", "applicability"));
         jdbc.update("UPDATE knowledge_answer_runs SET snapshot=? WHERE run_id=?",
                 mapper.writeValueAsString(legacy), snapshot.runId());
         var loaded = runs.find(snapshot.runId()).orElseThrow();
         assertThat(loaded.schemaVersion()).isEqualTo(1);
         assertThat(loaded.citationCatalog()).isNull();
         assertThat(loaded.selection()).isNull();
+        assertThat(loaded.retrievalRun()).isNull();
         assertThat(loaded.draft()).isEqualTo(snapshot.draft());
         var report = assistant().getKnowledgeAnswer();
         assertThat(mapper.readValue(mapper.writeValueAsString(report), KnowledgeAnswerReport.class)).isEqualTo(report);

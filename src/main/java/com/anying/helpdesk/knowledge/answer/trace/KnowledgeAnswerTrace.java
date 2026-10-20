@@ -1,6 +1,8 @@
 package com.anying.helpdesk.knowledge.answer.trace;
 
 import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityPolicy;
+import com.anying.helpdesk.knowledge.answer.KnowledgeRetrievalPlan;
+import com.anying.helpdesk.knowledge.answer.KnowledgeRetrievalRun;
 
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerDraft;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerSelection;
@@ -53,6 +55,63 @@ public final class KnowledgeAnswerTrace {
     private KnowledgeAnswerReport.Reason answerReason;
     private long stageStartedNanos;
     private KnowledgeApplicabilityPolicy.Assessment applicability;
+    private KnowledgeRetrievalRun retrievalRun;
+
+    /** 冻结本次检索调度预算，防止运行中配置变化改变诊断口径。 */
+    public synchronized void retrievalStarted(boolean enabled, long budgetMs) {
+        if (status != Status.RUNNING) return;
+        retrievalRun = new KnowledgeRetrievalRun(enabled, enabled ? 3 : 1, enabled ? 5 : 1,
+                50, 50000, budgetMs, List.of(), List.of(), null);
+    }
+
+    /** 在外部请求前保存轮次和查询，失败调用也有可定位的输入。 */
+    public synchronized void searchStarted(int round, String query) {
+        if (status != Status.RUNNING) return;
+        var searches = new ArrayList<>(retrievalRun.searches());
+        searches.add(new KnowledgeRetrievalRun.Search(round, query, null, false, List.of()));
+        updateRetrievalRun(searches, retrievalRun.plans(), retrievalRun.stopReason());
+    }
+
+    /** 限量保存每次实际检索结果；旧 retrieval 字段始终代表首轮，不能覆盖成最后一次查询。 */
+    public synchronized void searchFinished(KnowledgeSearchResponse response, List<String> added) {
+        if (status != Status.RUNNING) return;
+        var first = retrieval;
+        boolean firstTruncated = retrievalTruncated;
+        retrievalTruncated = false;
+        retrieved(response);
+        var searches = new ArrayList<>(retrievalRun.searches());
+        var pending = searches.getLast();
+        searches.set(searches.size() - 1, new KnowledgeRetrievalRun.Search(pending.round(), pending.query(),
+                retrieval, retrievalTruncated, List.copyOf(added)));
+        if (first != null) {
+            retrieval = first;
+            retrievalTruncated = firstTruncated;
+        }
+        updateRetrievalRun(searches, retrievalRun.plans(), retrievalRun.stopReason());
+    }
+
+    /** 保存规划结果和用量；规划文字只供诊断，不成为可引用证据。 */
+    public synchronized void planned(int round, KnowledgeAnswerModelClient.ModelResult<KnowledgeRetrievalPlan> result) {
+        if (status != Status.RUNNING) return;
+        var plans = new ArrayList<>(retrievalRun.plans());
+        plans.add(new KnowledgeRetrievalRun.Planning(round, result.value()));
+        updateRetrievalRun(retrievalRun.searches(), plans, null);
+        usage(new KnowledgeAnswerModelClient.TokenUsage(result.promptTokens(), result.completionTokens(), result.totalTokens()));
+    }
+
+    /** 停止原因与最终回答状态分开，预算耗尽不等于技术错误或已经充分。 */
+    public synchronized void retrievalStopped(KnowledgeRetrievalRun.StopReason reason) {
+        if (status == Status.RUNNING && retrievalRun != null)
+            updateRetrievalRun(retrievalRun.searches(), retrievalRun.plans(), reason);
+    }
+
+    /** 用不可变列表替换多轮快照，避免后续修改影响已经送往存储的对象。 */
+    private void updateRetrievalRun(List<KnowledgeRetrievalRun.Search> searches,
+            List<KnowledgeRetrievalRun.Planning> plans, KnowledgeRetrievalRun.StopReason stop) {
+        retrievalRun = new KnowledgeRetrievalRun(retrievalRun.enabled(), retrievalRun.maxRounds(),
+                retrievalRun.maxSearches(), retrievalRun.maxEvidence(), retrievalRun.maxCharacters(),
+                retrievalRun.schedulingBudgetMs(), List.copyOf(searches), List.copyOf(plans), stop);
+    }
 
     /** 保存条件配置、主题路由和续答来源，并将已发生的路由用量计入独立阶段。 */
     public synchronized void applicability(KnowledgeApplicabilityPolicy policy,
@@ -174,10 +233,10 @@ public final class KnowledgeAnswerTrace {
 
     /** 导出不可变列表快照，供持久化与确定性测试使用。 */
     public synchronized KnowledgeAnswerRunSnapshot snapshot() {
-        return new KnowledgeAnswerRunSnapshot(2, runId, messageId, conversationId, question, scope,
+        return new KnowledgeAnswerRunSnapshot(3, runId, messageId, conversationId, question, scope,
                 modelConfigId, modelName, status, errorCode, revision, writeFailures,
                 startedAt, LocalDateTime.now(clock), finishedAt, retrieval, retrievalTruncated,
-                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability);
+                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability, retrievalRun);
     }
 
     /** 在调用前持久化运行中阶段，进程中断时仍可定位最后进入的位置。 */
@@ -217,6 +276,9 @@ public final class KnowledgeAnswerTrace {
     /** 以首次终态为准，避免取消、失败和完成之间互相覆盖。 */
     private void finish(Status value, String code) {
         if (status != Status.RUNNING) return;
+        if (retrievalRun != null && retrievalRun.stopReason() == null)
+            retrievalStopped(value == Status.CANCELLED ? KnowledgeRetrievalRun.StopReason.CANCELLED
+                    : KnowledgeRetrievalRun.StopReason.TECHNICAL_FAILURE);
         closeStage(value == Status.CANCELLED ? StageStatus.CANCELLED
                 : value == Status.SUCCEEDED ? StageStatus.SUCCEEDED : StageStatus.FAILED, code);
         status = value;
@@ -231,6 +293,7 @@ public final class KnowledgeAnswerTrace {
         return switch (stages.getLast().stage()) {
             case APPLICABILITY -> "KNOWLEDGE_APPLICABILITY_CALL_FAILED";
             case RETRIEVAL -> "KNOWLEDGE_RETRIEVAL_FAILED";
+            case PLANNING -> "KNOWLEDGE_PLANNING_CALL_FAILED";
             case DRAFT -> "KNOWLEDGE_DRAFT_CALL_FAILED";
             case VALIDATION -> "KNOWLEDGE_STRUCTURE_INVALID";
             case REVIEW -> "KNOWLEDGE_REVIEW_CALL_FAILED";

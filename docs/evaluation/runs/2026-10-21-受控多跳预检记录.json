@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-10-21T00:43:48.911674+08:00",
+  "finishedAt": "2026-10-21T00:43:50.831499+08:00",
+  "runtimeLabel": "stage37-c2",
+  "runtimeJarSha256": "7bdf13122585d08c75a98a3af9bb1b8ced43f6af8c47a75687cd52c98c4a9d68",
+  "datasetSha256": "cdc8a69f112b412b27c846fa17065d8ca9544a8aac92ead0a8c5eb2ccca6a38a",
+  "fixtureSha256": "eae5697330c80b699be7b953d9fe75d6b6912d2682417bf40f8e3172a1e9f024",
+  "results": [],
+  "restoration": "RESTORED",
+  "runError": "KeyError",
+  "failureExplanation": "预检错误使用 candidateLimit/resultLimit 读取库响应，实际响应名为 retrievalCandidateLimit/retrievalResultLimit；修复前未执行任何问题。"
+}

@@ -87,6 +87,8 @@ class KnowledgeClarificationIntegrationTest {
         when(retrieval.search(eq(baseId), any())).thenReturn(new KnowledgeSearchResponse(baseId, QUESTION, 50,
                 BigDecimal.ZERO, 5, 1, 1, List.of(new KnowledgeSearchResultResponse(1, document.getId(), 1,
                 "地区制度.md", QUOTE, 0.03, 1, 1.0, 1, 0.9, KnowledgeDocumentMetadata.from(document)))));
+        when(model.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 0, 0, 0));
         when(model.draft(any(), any(), any(), any())).thenAnswer(invocation -> {
             KnowledgeCitationCatalog catalog = invocation.getArgument(3);
             return new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerSelection(catalog.citationSetId(),

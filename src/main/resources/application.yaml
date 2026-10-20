@@ -33,6 +33,9 @@ app:
   model-config:
     encryption-key: ${MODEL_CONFIG_ENCRYPTION_KEY}
   knowledge:
+    multihop:
+      enabled: ${KNOWLEDGE_MULTIHOP_ENABLED:true}
+      scheduling-budget-seconds: ${KNOWLEDGE_MULTIHOP_SCHEDULING_BUDGET_SECONDS:90}
     sources:
       enabled: ${KNOWLEDGE_SOURCES_ENABLED:true}
       scan-delay-ms: ${KNOWLEDGE_SOURCE_SCAN_DELAY_MS:60000}

@@ -50,11 +50,13 @@ class TrustedKnowledgeAnswerServiceTest {
     private final Clock clock = Clock.fixed(Instant.parse("2026-10-18T00:00:00Z"), ZoneId.of("Asia/Shanghai"));
     private final ResolvedChatModel model = new ResolvedChatModel(1L, "test", true, mock(ChatModel.class));
     private final TrustedKnowledgeAnswerService service = new TrustedKnowledgeAnswerService(
-            bases, retrieval, eligibility, client, new KnowledgeAnswerGuard(), clock, mock(KnowledgeApplicabilityService.class));
+            bases, new KnowledgeEvidenceCollector(retrieval, client, new KnowledgeMultihopProperties()), eligibility, client, new KnowledgeAnswerGuard(), clock, mock(KnowledgeApplicabilityService.class));
 
     /** 默认提供两份当前有效资料，以检查复核是否覆盖未被草案选中的候选。 */
     @BeforeEach
     void setup() {
+        when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 0, 0, 0));
         when(bases.findDefault()).thenReturn(Optional.of(new KnowledgeBaseResponse(1L, "制度库", null,
                 50, new BigDecimal("0.65"), 5, true, 2, 0, null, null)));
         when(retrieval.search(eq(1L), any())).thenReturn(search(List.of(hit(10L, QUOTE), hit(20L, OTHER_QUOTE))));
@@ -80,6 +82,31 @@ class TrustedKnowledgeAnswerServiceTest {
         verify(client).review(eq(model), eq(QUESTION), eq("SH"), argThat(items -> items.size() == 2), eq(draft));
     }
 
+    /** 后续召回的相反规定进入同一引用和复核链路，最后仍检查所有轮次的资格。 */
+    @ParameterizedTest @ValueSource(booleans = {false, true})
+    @DisplayName("补查冲突资料可被引用且交付前撤回仍阻止输出")
+    void multihopEvidenceUsesFullVerification(boolean withdrawn) {
+        when(retrieval.search(eq(1L), any())).thenReturn(search(List.of(hit(10L, QUOTE))),
+                search(List.of(hit(20L, OTHER_QUOTE))));
+        when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SEARCH, List.of("查同条件通知"), List.of("上海住宿额度通知")), 10, 2, 12),
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(
+                        KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 0, 0, 0));
+        propose(draft(KnowledgeAnswerDraft.Status.CONFLICT));
+        if (withdrawn) {
+            when(eligibility.findEligible(any(), any(), any())).thenReturn(Map.of(10L, document(10L)));
+            assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
+                    .hasMessage("knowledge evidence changed during generation");
+        } else {
+            var result = service.answer(model, QUESTION, "SH");
+            assertThat(result.content()).contains("600", "650", "[E1]", "[E2]");
+            assertThat(result.knowledgeAnswer().citations()).hasSize(2);
+            assertThat(result.totalTokens()).isEqualTo(52);
+        }
+        verify(bases).findDefault();
+        verify(client).review(eq(model), eq(QUESTION), eq("SH"), argThat(items -> items.size() == 2), any());
+    }
+
     /** 四种状态均允许保留有据部分，冲突状态必须展示两个真实来源。 */
     @ParameterizedTest
     @EnumSource(KnowledgeAnswerDraft.Status.class)
@@ -103,18 +130,22 @@ class TrustedKnowledgeAnswerServiceTest {
             Prompt prompt = invocation.getArgument(0);
             var input = json.readTree(prompt.getInstructions().getLast().getText());
             String output = "{\"approved\":true}";
-            if (!input.has("draft")) {
+            if (input.has("searchedQueries")) {
+                output = "{\"decision\":\"SUFFICIENT\",\"gaps\":[],\"queries\":[]}";
+            } else if (!input.has("draft")) {
                 var catalog = json.treeToValue(input.get("evidence"), KnowledgeCitationCatalog.class);
                 output = json.writeValueAsString(selection(draft(KnowledgeAnswerDraft.Status.CONFLICT), catalog));
             }
             return new ChatResponse(List.of(new Generation(new AssistantMessage(output))));
         });
-        var realAdapterService = new TrustedKnowledgeAnswerService(bases, retrieval, eligibility,
-                new KnowledgeAnswerModelClient(json), new KnowledgeAnswerGuard(), clock, mock(KnowledgeApplicabilityService.class));
+        var adapter = new KnowledgeAnswerModelClient(json);
+        var realAdapterService = new TrustedKnowledgeAnswerService(bases,
+                new KnowledgeEvidenceCollector(retrieval, adapter, new KnowledgeMultihopProperties()), eligibility,
+                adapter, new KnowledgeAnswerGuard(), clock, mock(KnowledgeApplicabilityService.class));
         var result = realAdapterService.answer(model, QUESTION, "SH");
         assertThat(result.knowledgeAnswer().answer().status()).isEqualTo(KnowledgeAnswerDraft.Status.CONFLICT);
         assertThat(result.content()).contains("600", "650", "[E1]", "[E2]");
-        verify(model.chatModel(), times(2)).call(any(Prompt.class));
+        verify(model.chatModel(), times(3)).call(any(Prompt.class));
     }
 
     /** 伪造的证据编号不得进入复核或最终输出。 */
