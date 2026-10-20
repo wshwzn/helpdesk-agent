@@ -270,7 +270,8 @@ class AdminKnowledgeBaseControllerIntegrationTest {
                 null,
                 com.anying.helpdesk.knowledge.domain.KnowledgePublicationStatus.DRAFT,
                 now,
-                now
+                now,
+                null, null, null, null
         ));
 
         mockMvc.perform(post("/api/admin/knowledge-bases/3/documents/7/index")

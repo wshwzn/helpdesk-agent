@@ -17,6 +17,11 @@ import com.anying.helpdesk.knowledge.dto.KnowledgeRetrievalSettingsResponse;
 import com.anying.helpdesk.knowledge.dto.UpdateKnowledgeRetrievalSettingsRequest;
 import com.anying.helpdesk.knowledge.dto.UpdateKnowledgeDocumentMetadataRequest;
 import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentVersionRequest;
+import com.anying.helpdesk.knowledge.dto.UploadKnowledgeRevisionRequest;
+import com.anying.helpdesk.knowledge.dto.ApproveKnowledgeRevisionRequest;
+import com.anying.helpdesk.knowledge.dto.KnowledgeRevisionUploadResponse;
+import com.anying.helpdesk.knowledge.dto.KnowledgeRevisionApprovalResponse;
+import com.anying.helpdesk.knowledge.service.KnowledgeDocumentRevisionService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentPublicationService;
 import com.anying.helpdesk.knowledge.service.KnowledgeBaseService;
 import com.anying.helpdesk.knowledge.service.KnowledgeDocumentContent;
@@ -61,6 +66,7 @@ import java.util.List;
 @Tag(name = "知识库管理", description = "ADMIN 管理知识库与原始文档")
 @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
 public class AdminKnowledgeBaseController {
+    private final KnowledgeDocumentRevisionService revisionService;
 
     private final KnowledgeBaseService knowledgeBaseService;
     private final KnowledgeDocumentService knowledgeDocumentService;
@@ -175,6 +181,28 @@ public class AdminKnowledgeBaseController {
                 currentUserProvider.userId()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(response));
+    }
+
+    /** 针对已有版本上传独立候选并自动索引，相同内容和元数据重复提交返回已有结果。 */
+    @PostMapping(path = "/{knowledgeBaseId}/documents/{documentId}/revisions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "上传文档新版", description = "file 为文件，metadata 为 JSON；新候选返回 202，无变化或已有候选返回 200")
+    public ResponseEntity<ApiResponse<KnowledgeRevisionUploadResponse>> uploadRevision(
+            @PathVariable @Min(1) Long knowledgeBaseId, @PathVariable @Min(1) Long documentId,
+            @RequestPart("file") MultipartFile file,
+            @Valid @RequestPart("metadata") UploadKnowledgeRevisionRequest request) {
+        KnowledgeRevisionUploadResponse response = revisionService.upload(knowledgeBaseId, documentId, file,
+                request, currentUserProvider.userId());
+        return ResponseEntity.status("CREATED".equals(response.outcome()) ? HttpStatus.ACCEPTED : HttpStatus.OK)
+                .body(ApiResponse.ok(response));
+    }
+
+    /** 审核候选后原子安排双方时间边界，已到生效时间的新版立即接替旧版。 */
+    @PostMapping("/{knowledgeBaseId}/documents/{documentId}/approve-replacement")
+    @Operation(summary = "审核新版并接替旧版", description = "documentId 是候选新版，需同时提交候选及旧版当前乐观锁版本")
+    public ApiResponse<KnowledgeRevisionApprovalResponse> approveReplacement(
+            @PathVariable @Min(1) Long knowledgeBaseId, @PathVariable @Min(1) Long documentId,
+            @Valid @RequestBody ApproveKnowledgeRevisionRequest request) {
+        return ApiResponse.ok(publicationService.approveRevision(knowledgeBaseId, documentId, request));
     }
 
     /**

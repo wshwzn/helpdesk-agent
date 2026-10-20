@@ -27,7 +27,11 @@ public record KnowledgeDocumentResponse(
         @Schema(description = "失效时间，Asia/Shanghai，不含边界") LocalDateTime validUntil,
         @Schema(description = "业务发布状态") KnowledgePublicationStatus publicationStatus,
         @Schema(description = "创建时间") LocalDateTime createdAt,
-        @Schema(description = "更新时间") LocalDateTime updatedAt
+        @Schema(description = "更新时间") LocalDateTime updatedAt,
+        @Schema(description = "本候选明确接替的文档；普通上传为空") Long predecessorDocumentId,
+        @Schema(description = "已审核的接替文档；尚未交接也会有值") Long successorDocumentId,
+        @Schema(description = "审核确定的实际启用时间，含边界") LocalDateTime activatedAt,
+        @Schema(description = "被新版接替的时间，不含边界") LocalDateTime supersededAt
 ) {
 
     /**
@@ -53,7 +57,11 @@ public record KnowledgeDocumentResponse(
                 document.getValidUntil(),
                 document.getPublicationStatus(),
                 document.getCreatedAt(),
-                document.getUpdatedAt()
+                document.getUpdatedAt(),
+                document.getPredecessorDocumentId(),
+                document.getSuccessorDocumentId(),
+                document.getActivatedAt(),
+                document.getSupersededAt()
         );
     }
 }

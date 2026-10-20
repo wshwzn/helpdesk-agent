@@ -39,6 +39,8 @@ public class KnowledgeDocumentEligibilityService {
                 .isNotNull(KnowledgeDocument::getBusinessVersion)
                 .le(KnowledgeDocument::getValidFrom, at)
                 .and(query -> query.isNull(KnowledgeDocument::getValidUntil).or().gt(KnowledgeDocument::getValidUntil, at))
+                .and(query -> query.isNull(KnowledgeDocument::getActivatedAt).or().le(KnowledgeDocument::getActivatedAt, at))
+                .and(query -> query.isNull(KnowledgeDocument::getSupersededAt).or().gt(KnowledgeDocument::getSupersededAt, at))
                 .in(KnowledgeDocument::getApplicabilityScope, List.of("ALL", scope))
                 .orderByAsc(KnowledgeDocument::getId)
                 .last("LIMIT " + (MAX_ELIGIBLE_DOCUMENTS + 1)));

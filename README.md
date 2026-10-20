@@ -4,7 +4,7 @@
 
 新消息默认走 KNOWLEDGE 可信问答。显式 AGENT 暂作旧客户端兼容，只提供知识检索工具，不具备完整核验保证。客服工单已退出问答工具列表，历史模块与接口保留；增量更新、多跳检索和最终入口统一仍按[后续路线](docs/企业知识问答后续路线.md)推进。
 
-当前员工账号继续使用 CUSTOMER 角色代码，管理员使用 ADMIN；本轮没有角色或数据库迁移。
+当前员工账号继续使用 CUSTOMER 角色代码，管理员使用 ADMIN；角色沿用既有设计。
 
 ## 环境要求
 
@@ -172,6 +172,47 @@ POST /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/withdra
 `sourceKey` 是跨业务版本保持稳定的来源标识；同库的来源、业务版本、范围组合唯一。范围使用大写代码，`ALL` 表示通用，**不表示员工访问权限**。`businessVersion` 只是标签，不用它自动选最新版。元数据只可修改草稿，保存后需要重新索引；清空 `validUntil` 会移除原截止时间。
 
 索引异步完成至 `READY` 后，发布和撤回均提交 `{"version": 当前乐观锁版本}`。缺少元数据、处理未完成、错误状态或旧版本请求返回 409；非法日期区间返回 400。已发布记录不可直接修改或重建索引，修订须上传新业务版本。撤回后不再参与新的检索，也不能重新发布。
+
+### 上传新版与审核交接
+
+更新已有资料时使用明确的新版入口，来源和适用范围继承旧版，原文件保持独立：
+
+```http
+POST /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{旧版ID}/revisions
+Content-Type: multipart/form-data
+```
+
+请求包含 `file` 文件及 `metadata` JSON 部分（该部分 Content-Type 为 `application/json`）：
+
+```json
+{
+  "predecessorVersion": 5,
+  "businessVersion": "2026.3",
+  "validFrom": "2026-11-01T00:00:00",
+  "validUntil": null
+}
+```
+
+新建候选返回 202，`data.outcome=CREATED`，`data.document` 包含新文档 ID、PROCESSING 状态和 predecessorDocumentId。文件上传成功后自动提交索引；通过现有文档详情及 index-task 接口查询进度。原始文件哈希、解析扩展名、业务版本和有效期均相同时，返回 200 / UNCHANGED（旧文档）或 EXISTING（已有相同候选），不重复创建对象或任务。同业务版本但内容或日期不同返回 409，需要使用新版本标签。
+
+仅文件相同但业务元数据变化仍创建候选并完整索引，当前不复用分块向量。无变化及已有候选是只读返回，可以重发此前成功请求；新建候选必须提供旧版当前 predecessorVersion。新版元数据随上传固定，需改动时另建候选；处理失败可显式重试索引，上传失败则检查或删除失败候选后重新上传。
+
+候选 READY 后，读取双方最新乐观锁版本并审核：
+
+```http
+POST /api/admin/knowledge-bases/{knowledgeBaseId}/documents/{候选ID}/approve-replacement
+Content-Type: application/json
+
+{"version": 4, "predecessorVersion": 5}
+```
+
+返回双方文档和 `effectiveAt`。实际交接时刻取审核时刻与新版 validFrom 的较晚值：旧版在此时刻退出、新版从此时刻参与检索，未来生效无需定时改状态。旧版本身的有效期必须覆盖到交接时刻，新版截止必须晚于交接；不自动延长旧制度。并发审核只有一个候选成功；候选禁止调用普通 publish 绕过审核。
+
+文档详情新增 predecessorDocumentId、successorDocumentId、activatedAt、supersededAt。旧版仍可显示 PUBLISHED，但过了 supersededAt 已不可检索；原 validUntil 和原文件保留，证据元数据采用实际有效区间。新版构建失败或尚未审核时，不改变旧版的问答资格。
+
+使用原 withdraw 接口撤回尚未生效的新版，会同时取消旧版的退出边界；已生效后撤回新版不会自动恢复旧制度。存在未来接替安排时，先撤回新版才能撤回旧版。已审核或被候选引用的版本保留用于追溯，禁止物理删除；未审核且停止处理的候选允许删除。
+
+V21 不推断历史版本关系。**所有问答实例应升级到理解交接边界的代码后，再启用替换功能。** 设计与限制见 [`notes/34-文档新版与审核交接.md`](notes/34-文档新版与审核交接.md)。普通上传和独立发布仍兼容，本功能只保证明确关联的版本交接，不自动裁决全库同源冲突。
 
 检索请求可以增加 `"applicabilityScope": "CN_SH"`，同时查询该范围与 `ALL`；省略范围只查通用资料。MySQL 先产生可用文档 ID，BM25 和 KNN 都在召回前过滤；返回后再复核撤回和到期情况。单次准入超过 10000 份文档会明确失败，需要拆分知识库。新旧有效期重叠时保留双方，正文冲突检测尚待后续实现。
 

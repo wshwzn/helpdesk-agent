@@ -8,7 +8,7 @@
 - 时间字段使用 `TIMESTAMP(6)`，保留微秒精度。
 - Java 枚举以字符串名称入库，禁止直接修改已使用的枚举名称。
 - `updated_at` 由应用服务在更新数据时写入，没有配置数据库 `ON UPDATE`。
-- 业务表主要使用逻辑关联；V20 的索引任务对所属文档建立级联删除外键。应用层仍必须校验数据归属与引用对象。
+- 业务表主要使用逻辑关联；V20 的索引任务对所属文档建立级联删除外键，V21 的版本链建立限制删除的自引用外键。应用层仍必须校验数据归属与引用对象。
 - `version` 是 MyBatis-Plus 乐观锁版本号，每次成功更新后递增。
 
 ## `users` 用户表
@@ -262,7 +262,7 @@ V19 增加适用条件配置，更新不需要重建 ES 索引：
 
 ## `knowledge_documents` 知识库文档表
 
-保存原始文档的对象存储位置、完整性信息和处理状态，由 Flyway V9 创建，V16 增加业务版本、适用范围和发布元数据，V20 增加有效索引批次。文件正文存放在本地开发目录或阿里云 OSS；检索分块和向量存放在 Elasticsearch，不在 MySQL 重复保存。
+保存原始文档的对象存储位置、完整性信息和处理状态，由 Flyway V9 创建，V16 增加业务版本、适用范围和发布元数据，V20 增加有效索引批次，V21 增加明确版本链和审核交接边界。文件正文存放在本地开发目录或阿里云 OSS；检索分块和向量存放在 Elasticsearch，不在 MySQL 重复保存。
 
 | 字段 | 类型 | 可空 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -286,6 +286,10 @@ V19 增加适用条件配置，更新不需要重建 ES 索引：
 | `chunk_count` | `INT` | 否 | `0` | Elasticsearch 中当前有效分块数量。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 失败时的脱敏错误码，例如 `STORAGE_UPLOAD_FAILED`。 |
 | `active_index_build_id` | `VARCHAR(36)` | 是 | `NULL` | V20：最近成功提交的 ES 执行批次 UUID。空表示升级前无批次字段的历史片段；与业务版本及乐观锁版本不同，无新增索引或唯一约束。 |
+| `predecessor_document_id` | `BIGINT` | 是 | `NULL` | V21：本候选明确接替的文档 ID，自引用外键；普通上传和历史资料为空。上传时确定且不可修改，一份旧版可有多个未审核候选。 |
+| `successor_document_id` | `BIGINT` | 是 | `NULL` | V21：已审核的接替文档 ID，自引用外键且唯一；未来交接也提前记录。撤回尚未生效的接替文档时清空。 |
+| `activated_at` | `DATETIME(6)` | 是 | `NULL` | V21：候选经审核后的实际启用边界，含边界；取审核时刻与声明 valid_from 的较晚值。普通发布、未审核候选和历史资料为空。撤回后保留审计值。 |
+| `superseded_at` | `DATETIME(6)` | 是 | `NULL` | V21：旧版被接替的时间，不含边界，与 successor_document_id 成对设置或清空。原 valid_until 不变。 |
 | `created_by` | `BIGINT` | 否 | 无 | 上传管理员的 `users.id`，逻辑关联。 |
 | `version` | `INT` | 否 | `0` | 文档状态推进使用的乐观锁版本号。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 元数据创建时间。 |
@@ -300,17 +304,25 @@ V19 增加适用条件配置，更新不需要重建 ES 索引：
 - V16 普通索引：`idx_knowledge_document_eligibility (knowledge_base_id, publication_status, status, applicability_scope, valid_from)`，支持检索准入查询；截止时间作为剩余条件校验。
 - 普通索引：`idx_knowledge_documents_base_status_id (knowledge_base_id, status, id)`，支持按知识库和处理状态读取文档。
 - 普通索引：`idx_knowledge_documents_base_sha256 (knowledge_base_id, sha256)`，支持后续识别同一知识库中的重复内容；当前不禁止重复上传。
+- V21 普通索引：`idx_knowledge_document_predecessor (predecessor_document_id)`，用于版本关系查询及删除保护；唯一约束 `uk_knowledge_document_successor (successor_document_id)` 保证同一接替文档不会被多份旧版引用，允许多行 NULL。
+- V21 外键：`fk_knowledge_document_predecessor`、`fk_knowledge_document_successor` 均引用本表 `id`，使用默认限制删除行为，无级联修改或删除。来源、范围、知识库一致及双向关系配对由应用保证。
 - 上传时先写入 `UPLOADING`，对象保存成功后改为 `PENDING`；提交索引后文档状态与任务同事务写入，`PROCESSING` 包括排队、执行和退避重试。成功写入 ES 并激活批次后改为 `READY`；确定性解析错误或重试耗尽改为 `FAILED`。
-- `PROCESSING` 状态禁止修改元数据和删除；重复调用原索引接口返回活动任务对应的文档，不重复入队。文档行锁、乐观锁及执行令牌分别保护提交、编辑及后台完成。
+- `PROCESSING` 状态禁止修改元数据和删除，`UPLOADING` 同样禁止删除；重复调用原索引接口返回活动任务对应的文档，不重复入队。文档行锁、乐观锁及执行令牌分别保护提交、编辑及后台完成。
 - 被当前 RAG 评测用例选为期望文档时禁止删除；应先修改或删除对应评测用例。
 - 新文档和 V16 迁移后的历史文档均为草稿。历史 `READY` 不自动等于已审核；必须配置业务元数据、重新索引并发布后才能参与检索。
-- 元数据仅允许在非上传中、非索引中的草稿上编辑。保存元数据后处理状态回到 `PENDING`，清空错误与分块统计；业务截止时间可以显式清空。
+- 普通文档元数据仅允许在非上传中、非索引中的草稿上编辑。保存元数据后处理状态回到 `PENDING`，清空错误与分块统计；业务截止时间可以显式清空。V21 新版候选元数据随上传固定，禁止通过 metadata / submit 改写，需创建另一候选。
 - 发布要求 `DRAFT + READY` 且来源、业务版本、生效时间已配置；未来生效的资料可以先发布，但不会提前召回。只有已发布资料可以撤回，撤回为终态；修订时上传新版本。
 - 发布、撤回和元数据编辑要求提交当前乐观锁 `version`，过期或并发更新返回 409。唯一性冲突同样返回 409。
 - 已发布及撤回文档不允许重新索引或修改业务元数据；已发布文档必须先撤回才能删除。草稿索引使用独立执行批次，只有成功提交的批次指针可进入检索，不覆盖已有批次。
-- 检索准入同时要求 `PUBLISHED + READY`、`valid_from <= 当前时间 < valid_until`（空截止除外），以及范围为 `ALL` 或请求明确给出的范围。省略范围只允许 `ALL`。不同业务版本同时有效时全部保留，不按标签排序裁决。
+- 检索准入同时要求 `PUBLISHED + READY`、`valid_from <= 当前时间 < valid_until`（空截止除外）、`activated_at <= 当前时间 < superseded_at`（各空边界忽略），以及范围为 `ALL` 或请求明确给出的范围。省略范围只允许 `ALL`。未建立明确接替关系的不同业务版本同时有效时仍全部保留，不按标签排序裁决。
 - MySQL 为准入权威；ES Chunk 中保存业务元数据快照和 `indexBuildId`，不复制可变发布状态。两路召回前均传入文档及有效批次白名单；历史空批次仅匹配无 `indexBuildId` 的片段。返回后再次查询 MySQL 复核。单次准入文档超过 10000 时明确失败，不截断或退化为无过滤检索。
 - V20 升级将原 `PROCESSING` 状态设为 `FAILED`，错误码 `INDEX_TASK_MISSING`，分块数清零且乐观锁递增，供管理员重新提交。上线前须停止旧版实例，不能与旧版无批次隔离的工作者混跑。
+- V21 旧数据四个新增字段全为空，不自动推断历史版本关系、不重新索引、不改变发布状态。旧程序不理解交接边界，上线时所有问答实例必须升级后再启用替换功能。
+- 新版上传继承旧版的来源和范围，正文 SHA-256、解析扩展名、业务版本及有效期完全相同才返回 UNCHANGED；已存在的同父候选完全相同返回 EXISTING，否则同业务版本冲突。新候选创建要求旧版当前有效、无已审核接替者且旧版乐观锁匹配。无变化/已有候选是只读返回，允许重发先前成功请求时旧版锁版本已变化。
+- 审核按旧版→候选顺序加行锁，同时校验双方乐观锁。候选必须 DRAFT + READY，不能走普通 publish。应用同事务设置旧版 successor/superseded 和候选 activated/PUBLISHED；交接时间取审核时刻与候选 valid_from 较晚者，精度微秒。旧版必须覆盖到交接时刻（自身 valid_until 等于交接时刻允许），候选截止必须晚于交接。
+- 时间统一按 Asia/Shanghai 业务时钟解释，未来交接由准入 SQL 的半开区间完成，不依赖定时修改发布状态。检索证据元数据返回声明有效期与交接边界的交集；ES 原有元数据快照不改写，权威数据取 MySQL。
+- 撤回待生效接替文档会同事务清空旧版 successor/superseded，撤回后不再激活；已生效后撤回不会恢复旧制度。存在待生效接替者时禁止先撤回旧版。候选 activated 非空、文档存在已审核接替者或仍被候选引用时禁止物理删除，保留原始文件和历史链；未审核且停止处理的候选可以删除。
+- 同库同源同范围、无自引用/循环、successor 与 superseded 成对及 activated 对应审核记录等规则由应用事务保证；新增迁移不包含依赖自增主键的 CHECK，不声称数据库能拦截任意手工 SQL 制造的循环。
 
 ## `knowledge_index_tasks` 文档索引任务表
 
@@ -477,6 +489,8 @@ agent_pending_actions.ticket_id >── tickets.id
 users.id ──< knowledge_bases.created_by
 knowledge_bases.id ──< knowledge_documents.knowledge_base_id
 knowledge_documents.id ── knowledge_index_tasks.document_id（级联删除外键）
+knowledge_documents.id ──< knowledge_documents.predecessor_document_id（限制删除自引用外键）
+knowledge_documents.id ── knowledge_documents.successor_document_id（唯一、限制删除自引用外键）
 users.id ──< knowledge_documents.created_by
 knowledge_bases.id ──< rag_evaluation_cases.knowledge_base_id
 rag_evaluation_cases.id ──< rag_evaluation_case_documents.case_id
@@ -485,7 +499,7 @@ knowledge_bases.id ──< rag_evaluation_runs.knowledge_base_id
 rag_evaluation_runs.id ──< rag_evaluation_run_results.run_id
 ```
 
-这些关系目前均为逻辑关联，没有外键约束和级联删除行为。
+除图中明确标出的 V20/V21 外键外，其余关系为应用维护的逻辑关联；不要将文档版本链当作可级联删除的数据。
 
 ## `flyway_schema_history` 迁移历史表
 
@@ -515,5 +529,6 @@ rag_evaluation_runs.id ──< rag_evaluation_run_results.run_id
 | V18 | `V18__add_knowledge_answer_runs.sql` | 运行 UUID 关联及管理员诊断表。 |
 | V19 | `V19__add_knowledge_clarification_policy.sql` | 在 knowledge_bases 增加适用条件 JSON 与独立修订号；旧库默认关闭。 |
 | V20 | `V20__create_knowledge_index_tasks.sql` | 增加文档有效索引批次与持久任务表、调度索引、检查约束及级联外键；显式标记旧内存任务失败。 |
+| V21 | `V21__add_knowledge_document_revisions.sql` | 增加前后版本关联、审核启用/被替代时间、前驱索引、后继唯一约束及两个限制删除自引用外键；历史资料默认不关联。 |
 
 诊断阶段补充：需要判断适用条件时先执行 `APPLICABILITY`；只有 `applicability.routingAttempted=true` 才实际调用路由模型并计入模型用量。配置未启用/续答不调用路由；DRAFT、REVIEW 仍分别记账，Embedding 用量不在此统计内。

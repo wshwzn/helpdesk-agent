@@ -19,7 +19,15 @@ public record KnowledgeDocumentMetadata(
      * 从权威文档记录提取不含存储位置的业务元数据。
      */
     public static KnowledgeDocumentMetadata from(KnowledgeDocument document) {
+        LocalDateTime from = document.getValidFrom();
+        if (document.getActivatedAt() != null && (from == null || document.getActivatedAt().isAfter(from))) {
+            from = document.getActivatedAt();
+        }
+        LocalDateTime until = document.getValidUntil();
+        if (document.getSupersededAt() != null && (until == null || document.getSupersededAt().isBefore(until))) {
+            until = document.getSupersededAt();
+        }
         return new KnowledgeDocumentMetadata(document.getSourceKey(), document.getBusinessVersion(),
-                document.getApplicabilityScope(), document.getValidFrom(), document.getValidUntil());
+                document.getApplicabilityScope(), from, until);
     }
 }

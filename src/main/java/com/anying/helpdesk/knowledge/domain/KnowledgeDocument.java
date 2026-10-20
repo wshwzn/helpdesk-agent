@@ -35,6 +35,10 @@ public class KnowledgeDocument {
     private Integer chunkCount;
     private String errorCode;
     private String activeIndexBuildId;
+    private Long predecessorDocumentId;
+    private Long successorDocumentId;
+    private LocalDateTime activatedAt;
+    private LocalDateTime supersededAt;
     private Long createdBy;
     @Version
     private Integer version;
