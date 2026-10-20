@@ -168,3 +168,9 @@ python -X utf8 scripts/evaluate_knowledge_clarification.py --base-url http://loc
 REASONED 固定草案回放共 96 次，第二轮误拒/协议失败退化，未通过事前门槛，默认复核仍为 BASELINE。[端到端全量数据](runs/2026-10-21-规则核查与状态衔接对照数据.json)与[复核全量数据](runs/2026-10-21-可定位复核回放数据.json)保留全部失败；不将总正确数或单个改善题作为采用依据。
 
 阶段 39 仅修正候选查询队列和规划失败分类，详见 [实现说明](../../notes/39-检索队列与规划失败分类.md)。没有新增真实模型分数；规则候选仍关闭。后续新诊断可区分五类 KNOWLEDGE_PLAN_*_INVALID，旧记录不补造细分原因。
+
+## 独立规划协议回放（阶段 40）
+
+[独立题集](knowledge-planning-cases.json)为 8 个虚构设备制度场景，覆盖直接题、缺映射、完整链、并列缺口、缺规则、冲突、实际用户条件。运行 `python -X utf8 scripts/evaluate_knowledge_planning.py --output target/planning-replay-new --repeats 2`，显式调用生产规划客户端；不检索、不生成答案、不修改知识库。
+
+[首次报告](runs/2026-10-21-独立规划协议回放.md)和[全量数据](runs/2026-10-21-独立规划协议回放数据.json)：16/16 协议通过，15/16 满足事前动作标签，0 技术失败。P01 第一次的额外核查不是回答错误；保留偏窄标签与未通过门槛，不事后改分。候选未启用，未进入完整问答评测。

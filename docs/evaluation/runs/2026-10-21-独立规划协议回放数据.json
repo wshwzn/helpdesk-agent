@@ -1,0 +1,835 @@
+{
+  "dataset": {
+    "schemaVersion": 1,
+    "labelSource": "DEVELOPER_ASSISTANT_PROVISIONAL",
+    "description": "独立虚构设备制度场景，仅评估规划协议与粗粒度动作；不代表召回或最终问答质量。",
+    "adoptionCriteria": [
+      "8题各两遍完整执行，全部规划协议合法且无调用失败",
+      "每次决策在事前允许集合内；仅用户条件场景允许非空userConditions",
+      "全部有效规划逐条阅读，确认核查对象与问题相关且并列问题未遗漏，再决定是否进入端到端验证",
+      "不自动启用候选，不重跑选优，保留完整失败及未知用量"
+    ],
+    "cases": [
+      {
+        "id": "P01",
+        "category": "direct_fact",
+        "question": "设备等级 D4 的开发机内存是多少？",
+        "scope": "ALL",
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 9001,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度1.md",
+            "content": "设备等级 D4 的标准开发机内存为 32 GB。",
+            "metadata": {
+              "sourceKey": "planning-fixture-1",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "searchedQueries": [
+          "设备等级 D4 的开发机内存是多少？"
+        ],
+        "expectedDecisions": [
+          "SUFFICIENT"
+        ]
+      },
+      {
+        "id": "P02",
+        "category": "direct_process",
+        "question": "离职后需要在几天内归还开发机？",
+        "scope": "ALL",
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 9001,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度1.md",
+            "content": "离职开发机归还流程：离职员工应在离职后三个工作日内归还开发机。",
+            "metadata": {
+              "sourceKey": "planning-fixture-1",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "searchedQueries": [
+          "离职后需要在几天内归还开发机？"
+        ],
+        "expectedDecisions": [
+          "SUFFICIENT"
+        ]
+      },
+      {
+        "id": "P03",
+        "category": "missing_mapping",
+        "question": "苍鹭研发计划成员的开发机内存是多少？",
+        "scope": "ALL",
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 9001,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度1.md",
+            "content": "苍鹭研发计划成员采用设备编码 K6，具体设备等级查询 K6 映射表。",
+            "metadata": {
+              "sourceKey": "planning-fixture-1",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "searchedQueries": [
+          "苍鹭研发计划成员的开发机内存是多少？"
+        ],
+        "expectedDecisions": [
+          "SEARCH"
+        ]
+      },
+      {
+        "id": "P04",
+        "category": "resolved_mapping",
+        "question": "苍鹭研发计划成员的开发机内存是多少？",
+        "scope": "ALL",
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 9001,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度1.md",
+            "content": "苍鹭研发计划成员采用设备编码 K6，具体设备等级查询 K6 映射表。",
+            "metadata": {
+              "sourceKey": "planning-fixture-1",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 9002,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度2.md",
+            "content": "设备编码 K6 对应设备等级 D4。",
+            "metadata": {
+              "sourceKey": "planning-fixture-2",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E3",
+            "documentId": 9003,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度3.md",
+            "content": "设备等级 D4 的标准开发机内存为 32 GB。",
+            "metadata": {
+              "sourceKey": "planning-fixture-3",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "searchedQueries": [
+          "苍鹭研发计划成员的开发机内存是多少？",
+          "设备编码 K6 映射表"
+        ],
+        "expectedDecisions": [
+          "SUFFICIENT",
+          "SEARCH"
+        ]
+      },
+      {
+        "id": "P05",
+        "category": "parallel_gap",
+        "question": "苍鹭研发计划成员的开发机内存是多少，离职后多久需要归还？",
+        "scope": "ALL",
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 9001,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度1.md",
+            "content": "苍鹭研发计划成员采用设备编码 K6，具体设备等级查询 K6 映射表。",
+            "metadata": {
+              "sourceKey": "planning-fixture-1",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 9002,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度2.md",
+            "content": "设备编码 K6 对应设备等级 D4。",
+            "metadata": {
+              "sourceKey": "planning-fixture-2",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E3",
+            "documentId": 9003,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度3.md",
+            "content": "设备等级 D4 的标准开发机内存为 32 GB。",
+            "metadata": {
+              "sourceKey": "planning-fixture-3",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "searchedQueries": [
+          "苍鹭研发计划成员的开发机内存是多少，离职后多久需要归还？"
+        ],
+        "expectedDecisions": [
+          "SEARCH"
+        ]
+      },
+      {
+        "id": "P06",
+        "category": "missing_rule",
+        "question": "白桦计划成员开发机配多少内存？",
+        "scope": "ALL",
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 9001,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度1.md",
+            "content": "白桦计划成员使用设备标准 R9，内存配置应查询 R9 配置表。本文件没有配置数值。",
+            "metadata": {
+              "sourceKey": "planning-fixture-1",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "searchedQueries": [
+          "白桦计划成员开发机配多少内存？",
+          "R9 配置表 内存",
+          "设备标准 R9 配置规格"
+        ],
+        "expectedDecisions": [
+          "SEARCH",
+          "EXHAUSTED"
+        ]
+      },
+      {
+        "id": "P07",
+        "category": "conflict",
+        "question": "设备等级 D4 的开发机内存是多少？",
+        "scope": "ALL",
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 9001,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度1.md",
+            "content": "设备等级 D4 的标准开发机内存为 32 GB。",
+            "metadata": {
+              "sourceKey": "planning-fixture-1",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 9002,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度2.md",
+            "content": "设备等级 D4 的开发机内存为 64 GB。本通知没有声明与其他 D4 配置表的优先级或替代关系。",
+            "metadata": {
+              "sourceKey": "planning-fixture-2",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "searchedQueries": [
+          "设备等级 D4 的开发机内存是多少？"
+        ],
+        "expectedDecisions": [
+          "SUFFICIENT",
+          "SEARCH"
+        ]
+      },
+      {
+        "id": "P08",
+        "category": "user_condition",
+        "question": "我要申请开发机，应配多少内存？",
+        "scope": "ALL",
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 9001,
+            "chunkSequence": 1,
+            "sourceName": "虚构设备制度1.md",
+            "content": "开发机申请制度：申请人属于硬件实验室时配 64 GB 内存，属于软件实验室时配 32 GB 内存。申请人应明确自己所属的实验室类型；本制度不提供个人所属实验室名单。",
+            "metadata": {
+              "sourceKey": "planning-fixture-1",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2020-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "searchedQueries": [
+          "我要申请开发机，应配多少内存？"
+        ],
+        "expectedDecisions": [
+          "NEEDS_USER_INPUT"
+        ]
+      }
+    ]
+  },
+  "environment": {
+    "gitCommit": "1b0ee9c575b03e79e9203afd3e11a48ba2836459",
+    "dirty": true,
+    "sourceSha256": "b95622bd910ae0d2991dac22162275504a00fdc6d5974d50cf7abf6ccdea366d",
+    "runnerSourceSha256": "4fc9af2e8b61d60dc5ed150062a81a32cb061eb3742da83403740d742b994697",
+    "datasetSha256": "b43bb38023f871ec2aea66aa95974137c6abeff6c842276e3f7dd2948f5a00b1"
+  },
+  "metadata": {
+    "modelConfigId": 3,
+    "modelName": "deepseek-v4.1-flash",
+    "startedAt": "2026-10-20T18:23:27.446336200Z",
+    "datasetSha256": "b43bb38023f871ec2aea66aa95974137c6abeff6c842276e3f7dd2948f5a00b1",
+    "planned": 16,
+    "repeats": 2
+  },
+  "summary": {
+    "planned": 16,
+    "complete": true,
+    "metrics": {
+      "executed": 16,
+      "protocolPassed": 16,
+      "scenarioPassed": 15,
+      "errors": {},
+      "knownTokens": 16106,
+      "callsMissingUsage": 0,
+      "meanDurationMs": 2089.1875
+    },
+    "byRepeat": {
+      "1": {
+        "executed": 8,
+        "protocolPassed": 8,
+        "scenarioPassed": 7,
+        "errors": {},
+        "knownTokens": 8168,
+        "callsMissingUsage": 0,
+        "meanDurationMs": 2001.875
+      },
+      "2": {
+        "executed": 8,
+        "protocolPassed": 8,
+        "scenarioPassed": 8,
+        "errors": {},
+        "knownTokens": 7938,
+        "callsMissingUsage": 0,
+        "meanDurationMs": 2176.5
+      }
+    },
+    "automaticGatePassed": false,
+    "requiresSemanticReview": true,
+    "runnerExitCode": 0,
+    "finished": true
+  },
+  "finished": {
+    "finishedAt": "2026-10-20T18:24:01.083317500Z"
+  },
+  "calls": [
+    {
+      "id": "P03",
+      "repeat": 1,
+      "durationMs": 2083,
+      "plan": {
+        "decision": "SEARCH",
+        "gaps": [
+          "尚缺 K6 对应的设备等级及该等级的开发机内存配置",
+          "尚缺苍鹭研发计划成员开发机内存的具体标准及例外/冲突规定"
+        ],
+        "queries": [
+          "K6 映射表 设备等级",
+          "开发机内存 配置标准 设备等级"
+        ],
+        "ruleChecks": [
+          {
+            "evidenceId": "E1",
+            "term": "K6",
+            "query": "K6 映射表 设备等级"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 852,
+        "completionTokens": 102,
+        "totalTokens": 954
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P01",
+      "repeat": 1,
+      "durationMs": 1841,
+      "plan": {
+        "decision": "SEARCH",
+        "gaps": [
+          "尚缺 D4 开发机内存规则在适用范围内的其他制度或配置表，无法检查是否存在冲突或例外"
+        ],
+        "queries": [
+          "D4 开发机内存 配置表",
+          "D4 开发机内存 标准"
+        ],
+        "ruleChecks": [
+          {
+            "evidenceId": "E1",
+            "term": "设备等级 D4",
+            "query": "设备等级 D4 开发机内存"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 845,
+        "completionTokens": 95,
+        "totalTokens": 940
+      },
+      "scenarioChecksPassed": false
+    },
+    {
+      "id": "P06",
+      "repeat": 1,
+      "durationMs": 2059,
+      "plan": {
+        "decision": "SEARCH",
+        "gaps": [
+          "缺少 R9 配置表中的内存配置数值"
+        ],
+        "queries": [
+          "R9 配置表 配置参数 内存",
+          "R9 设备配置表 内存配置"
+        ],
+        "ruleChecks": [
+          {
+            "evidenceId": "E1",
+            "term": "R9 配置表",
+            "query": "R9 配置表 内存 配置"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 873,
+        "completionTokens": 84,
+        "totalTokens": 957
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P02",
+      "repeat": 1,
+      "durationMs": 1989,
+      "plan": {
+        "decision": "SUFFICIENT",
+        "gaps": [],
+        "queries": [],
+        "ruleChecks": [
+          {
+            "evidenceId": "E1",
+            "term": "三个工作日内",
+            "query": "离职后开发机归还期限 三个工作日内 是否存在例外规定"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 847,
+        "completionTokens": 58,
+        "totalTokens": 905
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P07",
+      "repeat": 1,
+      "durationMs": 2524,
+      "plan": {
+        "decision": "SEARCH",
+        "gaps": [
+          "E1 与 E2 对“设备等级 D4 的开发机内存”给出 32 GB 和 64 GB 两种冲突取值，且 E2 未声明优先级或替代关系；需补充能判定适用版本或效力优先的内部资料。"
+        ],
+        "queries": [
+          "设备等级 D4 开发机内存 32 GB 64 GB 优先级 版本效力",
+          "设备等级 D4 开发机内存 配置表 适用版本 替代关系"
+        ],
+        "ruleChecks": [
+          {
+            "evidenceId": "E1",
+            "term": "设备等级 D4 的标准开发机内存为 32 GB",
+            "query": "设备等级 D4 的标准开发机内存为 32 GB 优先级 适用"
+          },
+          {
+            "evidenceId": "E2",
+            "term": "设备等级 D4 的开发机内存为 64 GB",
+            "query": "设备等级 D4 的开发机内存为 64 GB 替代关系 适用版本"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 948,
+        "completionTokens": 205,
+        "totalTokens": 1153
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P08",
+      "repeat": 1,
+      "durationMs": 1834,
+      "plan": {
+        "decision": "NEEDS_USER_INPUT",
+        "gaps": [],
+        "queries": [],
+        "ruleChecks": [
+          {
+            "evidenceId": "E1",
+            "term": "硬件实验室",
+            "query": "开发机申请 硬件实验室 64 GB 内存 规定"
+          },
+          {
+            "evidenceId": "E1",
+            "term": "软件实验室",
+            "query": "开发机申请 软件实验室 32 GB 内存 规定"
+          }
+        ],
+        "userConditions": [
+          "申请人所属实验室类型（硬件实验室或软件实验室）"
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 877,
+        "completionTokens": 97,
+        "totalTokens": 974
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P04",
+      "repeat": 1,
+      "durationMs": 1699,
+      "plan": {
+        "decision": "SEARCH",
+        "gaps": [
+          "缺少设备等级 D4 对应开发机内存规则的冲突或例外情况核查"
+        ],
+        "queries": [
+          "设备等级 D4 标准开发机内存 例外"
+        ],
+        "ruleChecks": [
+          {
+            "evidenceId": "E3",
+            "term": "设备等级 D4",
+            "query": "设备等级 D4 标准开发机内存 例外"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 1035,
+        "completionTokens": 83,
+        "totalTokens": 1118
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P05",
+      "repeat": 1,
+      "durationMs": 1986,
+      "plan": {
+        "decision": "SEARCH",
+        "gaps": [
+          "证据已确认设备等级 D4 对应开发机内存为 32 GB，但尚缺苍鹭研发计划成员离职后设备归还期限的内部规定",
+          "尚缺设备等级 D4 的离职归还期限规则及是否存在例外的内部资料"
+        ],
+        "queries": [
+          "设备等级 D4 离职后开发机归还期限",
+          "离职后开发机归还期限规定"
+        ],
+        "ruleChecks": [
+          {
+            "evidenceId": "E3",
+            "term": "设备等级 D4",
+            "query": "设备等级 D4 标准开发机内存 离职归还期限"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 1039,
+        "completionTokens": 128,
+        "totalTokens": 1167
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P03",
+      "repeat": 2,
+      "durationMs": 1389,
+      "plan": {
+        "decision": "SEARCH",
+        "gaps": [
+          "尚缺 K6 对应的设备等级、开发机配置及内存标准"
+        ],
+        "queries": [
+          "K6 映射表 设备等级 开发机",
+          "K6 设备等级 内存 配置"
+        ],
+        "ruleChecks": [],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 852,
+        "completionTokens": 65,
+        "totalTokens": 917
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P07",
+      "repeat": 2,
+      "durationMs": 1610,
+      "plan": {
+        "decision": "SUFFICIENT",
+        "gaps": [],
+        "queries": [],
+        "ruleChecks": [
+          {
+            "evidenceId": "E1",
+            "term": "设备等级 D4 的标准开发机内存",
+            "query": "设备等级 D4 的标准开发机内存"
+          },
+          {
+            "evidenceId": "E2",
+            "term": "设备等级 D4 的开发机内存",
+            "query": "设备等级 D4 的开发机内存 优先级 替代关系"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 948,
+        "completionTokens": 93,
+        "totalTokens": 1041
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P02",
+      "repeat": 2,
+      "durationMs": 1675,
+      "plan": {
+        "decision": "SUFFICIENT",
+        "gaps": [],
+        "queries": [],
+        "ruleChecks": [
+          {
+            "evidenceId": "E1",
+            "term": "三个工作日内",
+            "query": "离职开发机归还三个工作日内 规定"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 847,
+        "completionTokens": 53,
+        "totalTokens": 900
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P04",
+      "repeat": 2,
+      "durationMs": 2018,
+      "plan": {
+        "decision": "SUFFICIENT",
+        "gaps": [],
+        "queries": [],
+        "ruleChecks": [
+          {
+            "evidenceId": "E2",
+            "term": "设备等级 D4",
+            "query": "设备等级 D4 标准开发机内存配置"
+          },
+          {
+            "evidenceId": "E1",
+            "term": "设备编码 K6",
+            "query": "设备编码 K6 对应设备等级"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 1035,
+        "completionTokens": 80,
+        "totalTokens": 1115
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P08",
+      "repeat": 2,
+      "durationMs": 4263,
+      "plan": {
+        "decision": "NEEDS_USER_INPUT",
+        "gaps": [
+          "缺少申请人所属实验室类型的信息，制度不提供个人实验室名单，无法确定适用 64 GB 还是 32 GB"
+        ],
+        "queries": [],
+        "ruleChecks": [],
+        "userConditions": [
+          "申请人所属的实验室类型（硬件实验室或软件实验室）"
+        ]
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 877,
+        "completionTokens": 69,
+        "totalTokens": 946
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P06",
+      "repeat": 2,
+      "durationMs": 2106,
+      "plan": {
+        "decision": "SEARCH",
+        "gaps": [
+          "尚缺R9配置表中的内存配置数值，需核查“R9 配置表”原文是否载明白桦计划成员开发机的内存规格及其例外或冲突规定"
+        ],
+        "queries": [
+          "R9 配置表 内存 配置标准",
+          "白桦计划 开发机 内存 配置"
+        ],
+        "ruleChecks": [],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 873,
+        "completionTokens": 85,
+        "totalTokens": 958
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P01",
+      "repeat": 2,
+      "durationMs": 2090,
+      "plan": {
+        "decision": "SUFFICIENT",
+        "gaps": [],
+        "queries": [],
+        "ruleChecks": [
+          {
+            "evidenceId": "E1",
+            "term": "设备等级 D4",
+            "query": "设备等级 D4 的开发机内存"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 845,
+        "completionTokens": 53,
+        "totalTokens": 898
+      },
+      "scenarioChecksPassed": true
+    },
+    {
+      "id": "P05",
+      "repeat": 2,
+      "durationMs": 2261,
+      "plan": {
+        "decision": "SEARCH",
+        "gaps": [
+          "已有证据链只覆盖苍鹭研发计划→K6→D4→32 GB开发机内存，尚缺离职后设备归还期限的内部规定"
+        ],
+        "queries": [
+          "设备等级 D4 离职后归还期限"
+        ],
+        "ruleChecks": [
+          {
+            "evidenceId": "E3",
+            "term": "32 GB",
+            "query": "设备等级 D4 标准开发机内存 32 GB 离职归还期限规定"
+          },
+          {
+            "evidenceId": "E2",
+            "term": "D4",
+            "query": "设备等级 D4 离职后归还期限"
+          }
+        ],
+        "userConditions": []
+      },
+      "errorCode": null,
+      "usage": {
+        "promptTokens": 1039,
+        "completionTokens": 124,
+        "totalTokens": 1163
+      },
+      "scenarioChecksPassed": true
+    }
+  ],
+  "adoption": {
+    "enabled": false,
+    "endToEndExecuted": false,
+    "reason": "事前自动门槛未满足；直接题的额外核查并非协议或事实错误，不能据此夸大产品退化。独立规划回放不能证明完整问答改善。"
+  }
+}
