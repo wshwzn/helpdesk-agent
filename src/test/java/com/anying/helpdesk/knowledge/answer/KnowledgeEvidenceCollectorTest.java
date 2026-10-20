@@ -208,8 +208,63 @@ class KnowledgeEvidenceCollectorTest {
         when(retrieval.search(any(), any())).thenReturn(response(hit(1, "资料")));
         when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
                 new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SEARCH, List.of(), List.of()), 10, 2, 12));
-        assertThatThrownBy(this::collect).hasMessage("invalid retrieval plan");
+        assertThatThrownBy(this::collect).hasMessage("invalid retrieval plan action");
         assertThat(trace.snapshot().stages().getLast().usage().totalTokens()).isEqualTo(12);
+        assertThat(trace.snapshot().errorCode()).isEqualTo("KNOWLEDGE_PLAN_ACTION_INVALID");
+    }
+
+    /** 复现并列问题的查询被核查挤占，两个缺口应先执行，旧核查随后继续且不丢失。 */
+    @Test @DisplayName("统一队列先执行映射和期限查询再执行核查且总搜索不超过五次")
+    void ruleChecksDoNotDisplaceParallelQuestions() {
+        var first = hit(1, "规则 Q8 与 Q9");
+        var mapping = hit(2, "Q8 对应住宿等级");
+        var deadline = hit(3, "十五个自然日");
+        when(retrieval.search(any(), any())).thenReturn(response(first), response(first, mapping),
+                response(first, mapping, deadline), response(first, mapping, deadline));
+        var checks = List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "Q8", "Q8 额度核查"),
+                new KnowledgeRetrievalPlan.RuleCheck("E1", "Q9", "Q9 额度核查"));
+        when(client.plan(any(), any(), any(), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SEARCH,
+                        List.of("缺映射", "缺期限"), List.of("映射查询", "报销期限"), checks, List.of()), 1, 1, 2),
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT,
+                        List.of(), List.of(), List.of(checks.getFirst()), List.of()), 1, 1, 2));
+        var result = collect();
+        assertThat(trace.snapshot().retrievalRun().searches()).extracting(KnowledgeRetrievalRun.Search::query)
+                .containsExactly("资料计划额度", "映射查询", "报销期限", "Q8 额度核查", "Q9 额度核查");
+        assertThat(result.context().pendingRuleQueries()).isEmpty();
+        verify(retrieval, times(5)).search(any(), any());
+    }
+
+    /** 当前批次无新增不能吞掉队列里尚未执行的核查，也不能由下一规划省略它。 */
+    @Test @DisplayName("无新增证据时保留队列任务到下一轮并受原预算限制")
+    void noNewEvidenceDoesNotDiscardQueuedTasks() {
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "规则 Q8")));
+        when(client.plan(any(), any(), any(), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SEARCH,
+                        List.of("缺金额"), List.of("映射查询", "报销期限"),
+                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "Q8", "Q8 额度核查")), List.of()), 1, 1, 2),
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.EXHAUSTED,
+                        List.of("缺金额"), List.of(), List.of(), List.of()), 1, 1, 2));
+        collect();
+        assertThat(trace.snapshot().retrievalRun().searches()).extracting(KnowledgeRetrievalRun.Search::query)
+                .containsExactly("资料计划额度", "映射查询", "报销期限", "Q8 额度核查");
+        assertThat(trace.snapshot().retrievalRun().stopReason()).isEqualTo(NO_NEW_EVIDENCE);
+        verify(client, times(2)).plan(any(), any(), any(), any(), any());
+    }
+
+    /** 已执行查询必须在取本轮名额之前去除，否则核查仍会被重复项阻塞。 */
+    @Test @DisplayName("已查和格式重复查询不占用两个实际搜索名额")
+    void deduplicatesBeforeTakingSlots() {
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "规则 Q8")));
+        when(client.plan(any(), any(), any(), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SEARCH,
+                        List.of("缺期限"), List.of(" 资料计划额度 ", "报销期限"),
+                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "Q8", "Q8 核查")), List.of()), 1, 1, 2));
+        collect();
+        assertThat(trace.snapshot().retrievalRun().searches()).extracting(KnowledgeRetrievalRun.Search::query)
+                .containsExactly("资料计划额度", "报销期限", "Q8 核查");
+        assertThat(trace.snapshot().retrievalRun().searches()).extracting(KnowledgeRetrievalRun.Search::round)
+                .containsExactly(1, 2, 2);
     }
 
     /** 未配置用量的规划调用不能在客户总用量中被当作零消耗。 */

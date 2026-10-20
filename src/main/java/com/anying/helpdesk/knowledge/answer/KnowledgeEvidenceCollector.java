@@ -74,7 +74,7 @@ public class KnowledgeEvidenceCollector {
                                 ? client.plan(model, question, scope, List.copyOf(evidence.values()), List.copyOf(queries))
                                 : client.planLegacy(model, question, scope, List.copyOf(evidence.values()), List.copyOf(queries)));
                 if (result == null || result.value() == null)
-                    throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
+                    throw new KnowledgeAnswerFailure(ruleChecksEnabled ? KNOWLEDGE_PLAN_PAYLOAD_INVALID : KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
                 trace.planned(afterRound, result);
                 if (ruleChecksEnabled) result.value().validateEvidence(List.copyOf(evidence.values()));
                 else result.value().validateLegacy();
@@ -87,12 +87,11 @@ public class KnowledgeEvidenceCollector {
             var pending = assessment.pending(queries);
             if (plan.decision() != KnowledgeRetrievalPlan.Decision.SEARCH && pending.isEmpty())
                 return stop(trace, KnowledgeRetrievalRun.StopReason.valueOf(plan.decision().name()), evidence, usage, assessment, queries);
-            var scheduled = new LinkedHashMap<String, String>();
-            pending.forEach(q -> scheduled.putIfAbsent(normalize(q), q));
-            plan.queries().forEach(q -> scheduled.putIfAbsent(normalize(q), q));
+            var scheduled = ruleChecksEnabled ? assessment.scheduled(queries) : plan.queries();
             int before = evidence.size();
             int executed = 0;
-            for (String query : scheduled.values().stream().limit(2).toList()) {
+            for (String query : scheduled) {
+                if (executed == 2) break;
                 if (!seen.add(normalize(query))) continue;
                 if (expired(started, budgetMs)) return stop(trace, TIME_BUDGET, evidence, usage, assessment, queries);
                 search(baseId, scope, round, query.strip(), trace, evidence);
@@ -100,7 +99,8 @@ public class KnowledgeEvidenceCollector {
                 executed++;
             }
             if (executed == 0) return stop(trace, REPEATED_QUERY, evidence, usage, assessment, queries);
-            if (evidence.size() == before) return stop(trace, NO_NEW_EVIDENCE, evidence, usage, assessment, queries);
+            if (evidence.size() == before && (!ruleChecksEnabled || assessment.scheduled(queries).isEmpty()))
+                return stop(trace, NO_NEW_EVIDENCE, evidence, usage, assessment, queries);
         }
         return stop(trace, ROUND_BUDGET, evidence, usage, assessment, queries);
     }
@@ -174,6 +174,7 @@ public class KnowledgeEvidenceCollector {
         private KnowledgeRetrievalPlan plan;
         private int queryCount;
         private final LinkedHashMap<String, String> checks = new LinkedHashMap<>();
+        private final LinkedHashMap<String, String> tasks = new LinkedHashMap<>();
 
         /** 明确本次是否启用规划约束，单轮对照不伪造规划条件。 */
         private Assessment(boolean enabled) { this.enabled = enabled; }
@@ -182,7 +183,24 @@ public class KnowledgeEvidenceCollector {
         private void accept(KnowledgeRetrievalPlan value, int count) {
             plan = value;
             queryCount = count;
-            if (enabled) value.ruleChecks().forEach(c -> checks.putIfAbsent(KnowledgeRetrievalPlan.normalize(c.query()), c.query()));
+            if (enabled) {
+                value.queries().forEach(this::enqueue);
+                value.ruleChecks().forEach(c -> {
+                    enqueue(c.query());
+                    checks.putIfAbsent(KnowledgeRetrievalPlan.normalize(c.query()), c.query());
+                });
+            }
+        }
+
+        /** 所有查询进入同一请求内队列，缺口查询按规划顺序入队，规则核查不再插队。 */
+        private void enqueue(String query) {
+            tasks.putIfAbsent(KnowledgeRetrievalPlan.normalize(query), query);
+        }
+
+        /** 跨轮保留尚未执行的任务，先过滤已查项，再由调用方限制本轮实际执行次数。 */
+        private List<String> scheduled(List<String> queries) {
+            var executed = queries.stream().map(KnowledgeRetrievalPlan::normalize).collect(java.util.stream.Collectors.toSet());
+            return tasks.entrySet().stream().filter(e -> !executed.contains(e.getKey())).map(java.util.Map.Entry::getValue).toList();
         }
 
         /** 只用已经成功返回的真实请求解除核查责任，不采信模型自称已查。 */

@@ -81,7 +81,34 @@ class KnowledgeAnswerModelClientTest {
         respond(output);
         assertThatThrownBy(() -> client.plan(model, "计划额度", "SH", List.of(), List.of("计划额度")))
                 .isInstanceOfSatisfying(KnowledgeAnswerFailure.class, error ->
-                        assertThat(error.errorCode()).isEqualTo("KNOWLEDGE_PROTOCOL_INVALID"));
+                        assertThat(error.errorCode()).startsWith("KNOWLEDGE_PLAN_"));
+    }
+
+    /** 固定坏输入穿过真实解析和校验，诊断分类与已知用量均不能在包装异常时丢失。 */
+    @ParameterizedTest @org.junit.jupiter.params.provider.MethodSource("invalidPlanCases")
+    @DisplayName("规划失败区分载荷字段动作查询与锚点并保留用量")
+    void classifiedPlanFailureKeepsUsage(String output, String code) {
+        when(chatModel.call(any(Prompt.class))).thenReturn(new ChatResponse(
+                List.of(new Generation(new AssistantMessage(output))),
+                ChatResponseMetadata.builder().usage(new DefaultUsage(20, 8, 28)).build()));
+        var evidence = List.of(new KnowledgeAnswerReport.Evidence("E1", 1L, 0, "规则", "Q8 额度", null));
+        assertThatThrownBy(() -> client.plan(model, "问题", "SH", evidence, List.of("问题")))
+                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class, failure -> {
+                    assertThat(failure.errorCode()).isEqualTo(code);
+                    assertThat(failure.usage().totalTokens()).isEqualTo(28);
+                    assertThat(failure.getMessage()).doesNotContain(output);
+                    assertThat(failure.getCause()).isNull();
+                });
+    }
+
+    /** 用独立固定输入逐一命中协议分支，不以重试真实模型来挑选失败案例。 */
+    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> invalidPlanCases() {
+        return java.util.stream.Stream.of(
+                org.junit.jupiter.params.provider.Arguments.of("private malformed output", "KNOWLEDGE_PLAN_PAYLOAD_INVALID"),
+                org.junit.jupiter.params.provider.Arguments.of("{\"decision\": \"SUFFICIENT\", \"gaps\": [], \"queries\": [], \"ruleChecks\": [{\"evidenceId\": \"E1\", \"term\": \"Q8\", \"query\": \"Q8 额度\"}], \"userConditions\": null}", "KNOWLEDGE_PLAN_FIELDS_INVALID"),
+                org.junit.jupiter.params.provider.Arguments.of("{\"decision\": \"SUFFICIENT\", \"gaps\": [], \"queries\": [], \"ruleChecks\": [], \"userConditions\": []}", "KNOWLEDGE_PLAN_ACTION_INVALID"),
+                org.junit.jupiter.params.provider.Arguments.of("{\"decision\": \"SUFFICIENT\", \"gaps\": [], \"queries\": [], \"ruleChecks\": [{\"evidenceId\": \"E1\", \"term\": \"Q8\", \"query\": \"Q9 额度\"}], \"userConditions\": []}", "KNOWLEDGE_PLAN_RULE_QUERY_INVALID"),
+                org.junit.jupiter.params.provider.Arguments.of("{\"decision\": \"SUFFICIENT\", \"gaps\": [], \"queries\": [], \"ruleChecks\": [{\"evidenceId\": \"E9\", \"term\": \"Q8\", \"query\": \"Q8 额度\"}], \"userConditions\": []}", "KNOWLEDGE_PLAN_RULE_ANCHOR_INVALID"));
     }
 
     /** 搜索词是数据，规划上下文保留之前查询以约束重复和内部关系追问。 */

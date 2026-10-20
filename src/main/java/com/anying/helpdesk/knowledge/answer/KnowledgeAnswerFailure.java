@@ -8,6 +8,11 @@ public class KnowledgeAnswerFailure extends IllegalStateException {
         KNOWLEDGE_APPLICABILITY_CHANGED,
         KNOWLEDGE_RETRIEVAL_FAILED,
         KNOWLEDGE_PLANNING_CALL_FAILED,
+        KNOWLEDGE_PLAN_PAYLOAD_INVALID,
+        KNOWLEDGE_PLAN_FIELDS_INVALID,
+        KNOWLEDGE_PLAN_ACTION_INVALID,
+        KNOWLEDGE_PLAN_RULE_QUERY_INVALID,
+        KNOWLEDGE_PLAN_RULE_ANCHOR_INVALID,
         KNOWLEDGE_UNJUSTIFIED_CLARIFICATION,
         KNOWLEDGE_RULE_CHECK_INCOMPLETE,
         KNOWLEDGE_DRAFT_CALL_FAILED,
@@ -40,6 +45,11 @@ public class KnowledgeAnswerFailure extends IllegalStateException {
         super(message);
         this.code = code;
         this.usage = usage;
+    }
+
+    /** 补充已知用量时保留原固定错误分类，不把字段错误重新压成通用错误。 */
+    public KnowledgeAnswerFailure withUsage(KnowledgeAnswerModelClient.TokenUsage value) {
+        return new KnowledgeAnswerFailure(code, getMessage(), value);
     }
 
     /** 提供失败调用中已知的用量，未知时返回空值。 */

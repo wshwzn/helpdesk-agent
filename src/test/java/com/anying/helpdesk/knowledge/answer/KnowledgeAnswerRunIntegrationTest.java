@@ -236,6 +236,24 @@ class KnowledgeAnswerRunIntegrationTest {
         assertThat(snapshot.stages().getLast().usage().totalTokens()).isEqualTo(28);
     }
 
+    /** 新分类经消息及诊断落库仍保留阶段和用量，客户端保持既有失败响应。 */
+    @Test @DisplayName("规划锚点失败分类可从管理员诊断读取且不会执行草案")
+    void classifiedPlanningFailureIsPersisted() throws Exception {
+        doThrow(new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PLAN_RULE_ANCHOR_INVALID,
+                "rule check has no evidence anchor", new KnowledgeAnswerModelClient.TokenUsage(20, 8, 28)))
+                .when(modelClient).plan(any(), any(), any(), any(), any());
+        send().andExpect(status().isBadGateway()).andExpect(jsonPath("$.code").value("CHAT_GENERATION_FAILED"));
+        var snapshot = runs.find(assistant().getKnowledgeRunId()).orElseThrow();
+        assertThat(snapshot.errorCode()).isEqualTo("KNOWLEDGE_PLAN_RULE_ANCHOR_INVALID");
+        assertThat(assistant().getErrorCode()).isEqualTo(snapshot.errorCode());
+        assertThat(snapshot.stages().getLast().stage()).isEqualTo(KnowledgeAnswerRunSnapshot.Stage.PLANNING);
+        assertThat(snapshot.stages().getLast().errorCode()).isEqualTo(snapshot.errorCode());
+        assertThat(snapshot.stages().getLast().usage().totalTokens()).isEqualTo(28);
+        mvc.perform(get("/api/admin/knowledge-answer-runs/" + snapshot.runId()).header("Authorization", adminAuth))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.errorCode").value(snapshot.errorCode()));
+        verify(modelClient, never()).draft(any(), any(), any(), any(), any());
+    }
+
     /** 即使诊断表完全不可写，也不影响正常回答或覆盖原有的精确失败码。 */
     @Test
     @DisplayName("诊断存储故障同时与业务成功和业务失败隔离")

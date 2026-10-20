@@ -166,3 +166,5 @@ python -X utf8 scripts/evaluate_knowledge_clarification.py --base-url http://loc
 [完整报告](runs/2026-10-21-规则核查与状态衔接对照.md)：12 题 7 通过、1 未通过、4 技术失败；候选改善缺规则与冲突题，但整体退化，未默认启用。`app.knowledge.multihop.rule-checks-enabled` 默认 false，显式 true 才启用新规划协议与状态约束。版本 4 诊断新增可空 answerContext 和规则锚点；关闭候选时 answerContext=null。
 
 REASONED 固定草案回放共 96 次，第二轮误拒/协议失败退化，未通过事前门槛，默认复核仍为 BASELINE。[端到端全量数据](runs/2026-10-21-规则核查与状态衔接对照数据.json)与[复核全量数据](runs/2026-10-21-可定位复核回放数据.json)保留全部失败；不将总正确数或单个改善题作为采用依据。
+
+阶段 39 仅修正候选查询队列和规划失败分类，详见 [实现说明](../../notes/39-检索队列与规划失败分类.md)。没有新增真实模型分数；规则候选仍关闭。后续新诊断可区分五类 KNOWLEDGE_PLAN_*_INVALID，旧记录不补造细分原因。

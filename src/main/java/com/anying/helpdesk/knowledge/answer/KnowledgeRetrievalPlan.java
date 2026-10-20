@@ -13,27 +13,33 @@ public record KnowledgeRetrievalPlan(Decision decision, List<String> gaps, List<
         this(decision, gaps, queries, List.of(), List.of());
     }
 
-    /** 严格限制规划规模及动作组合，错误协议不能被当作证据充分。 */
+    /** 分开标识字段、动作和查询绑定错误，不保存模型原始输出。 */
     public void validate() {
         if (decision == null || gaps == null || queries == null || ruleChecks == null || userConditions == null
                 || gaps.size() > 8 || queries.size() > 2 || ruleChecks.size() > 2 || userConditions.size() > 5
-                || gaps.stream().anyMatch(s -> s == null || s.isBlank() || s.length() > 300)
-                || queries.stream().anyMatch(s -> s == null || s.isBlank() || s.length() > 300
-                    || s.codePoints().anyMatch(Character::isISOControl))
-                || userConditions.stream().anyMatch(s -> s == null || s.isBlank() || s.length() > 300)
+                || gaps.stream().anyMatch(s -> invalidText(s, 300, false))
+                || queries.stream().anyMatch(s -> invalidText(s, 300, true))
+                || userConditions.stream().anyMatch(s -> invalidText(s, 300, false))
                 || ruleChecks.stream().anyMatch(c -> c == null || c.evidenceId() == null
-                    || c.term() == null || c.term().isBlank() || c.term().length() > 100
-                    || c.query() == null || c.query().isBlank() || c.query().length() > 300
-                    || c.query().codePoints().anyMatch(Character::isISOControl)
-                    || !normalize(c.query()).contains(normalize(c.term())))
-                || (decision == Decision.SEARCH && (queries.isEmpty() || gaps.isEmpty()))
+                    || invalidText(c.term(), 100, false) || invalidText(c.query(), 300, true)))
+            throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PLAN_FIELDS_INVALID,
+                    "invalid retrieval plan fields");
+        if ((decision == Decision.SEARCH && (queries.isEmpty() || gaps.isEmpty()))
                 || (decision != Decision.SEARCH && !queries.isEmpty())
                 || (decision == Decision.SUFFICIENT && (!gaps.isEmpty() || !userConditions.isEmpty() || ruleChecks.isEmpty()))
                 || (decision == Decision.NEEDS_USER_INPUT && userConditions.isEmpty())
-                || (decision == Decision.EXHAUSTED && gaps.isEmpty())) {
-            throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PROTOCOL_INVALID,
-                    "invalid retrieval plan");
-        }
+                || (decision == Decision.EXHAUSTED && gaps.isEmpty()))
+            throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PLAN_ACTION_INVALID,
+                    "invalid retrieval plan action");
+        if (ruleChecks.stream().anyMatch(c -> !normalize(c.query()).contains(normalize(c.term()))))
+            throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PLAN_RULE_QUERY_INVALID,
+                    "rule query does not contain its term");
+    }
+
+    /** 对各字段沿用原长度和控制字符限制，不因诊断细分放宽契约。 */
+    private boolean invalidText(String value, int limit, boolean singleLine) {
+        return value == null || value.isBlank() || value.length() > limit
+                || (singleLine && value.codePoints().anyMatch(Character::isISOControl));
     }
 
     /** 保留阶段 37 的规划边界，未启用实验协议时不要求新增字段。 */
@@ -56,7 +62,7 @@ public record KnowledgeRetrievalPlan(Decision decision, List<String> gaps, List<
         validate();
         for (var check : ruleChecks) {
             if (evidence.stream().noneMatch(e -> e.id().equals(check.evidenceId()) && e.content().contains(check.term())))
-                throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PROTOCOL_INVALID,
+                throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PLAN_RULE_ANCHOR_INVALID,
                         "rule check has no evidence anchor");
         }
     }
