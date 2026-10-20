@@ -39,7 +39,7 @@ class KnowledgePlanningReplayTest {
         var model = new ResolvedChatModel(1L, "test", true, chat);
         var client = new KnowledgeAnswerModelClient(json);
         when(chat.call(any(Prompt.class))).thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage(
-                "{\"decision\":\"SUFFICIENT\",\"gaps\":[],\"queries\":[],\"ruleChecks\":[{\"evidenceId\":\"E1\",\"term\":\"D4\",\"query\":\"D4 内存\"}],\"userConditions\":[]}")))));
+                "{\"decision\":\"SUFFICIENT\",\"gaps\":[],\"tasks\":[],\"userConditions\":[]}")))));
         var row = KnowledgePlanningEvaluationCli.execute(client, model, dataset().cases().getFirst(), 1);
         assertThat(row.scenarioChecksPassed()).isTrue();
         var prompt = ArgumentCaptor.forClass(Prompt.class);

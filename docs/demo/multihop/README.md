@@ -64,8 +64,10 @@ python scripts/evaluate_knowledge_multihop.py --output target/multihop-baseline-
 
 已有冻结资料库时可传 `--knowledge-base-id <库ID> --skip-probes`，省去重复导入和人工探针。运行前确认后端已启用多跳并填真实制品标签；题集与 18 份原文保持冻结。诊断 retrieval 是首轮，retrievalRun.searches 是全部实际搜索，evidence 是累计去重证据，规划模型生成的缺口不能当作事实依据。
 
-## 阶段 38 实验开关
+## 当前候选开关与停止迭代决定
 
-规则核查与回答状态衔接候选须显式配置 `app.knowledge.multihop.rule-checks-enabled=true`（或环境变量 `KNOWLEDGE_MULTIHOP_RULE_CHECKS_ENABLED=true`）。默认 false，沿用阶段 37 规划与草案流程。候选仍受同一三轮/五次搜索预算约束；可空 answerContext 不是制度事实，不应作为答案证据。
+阶段 41 单列表候选显式配置为 `app.knowledge.multihop.task-planning-enabled=true`（环境变量 `KNOWLEDGE_TASK_PLANNING_ENABLED=true`），默认 false。旧 `rule-checks-enabled` / `KNOWLEDGE_MULTIHOP_RULE_CHECKS_ENABLED` 已移除，不能继续照旧命令启用。
 
-[首次候选对照](../../evaluation/runs/2026-10-21-规则核查与状态衔接对照.md)为 7 通过、1 未通过、4 技术失败，未准入。实验时需记录实际开关和制品标签；不要把默认关闭的新制品误认为已跑过同一候选对照。REASONED 复核候选也未采用，复现本次问答实验应保留 BASELINE。
+[本次对照](../../evaluation/runs/2026-10-21-单列表规划候选取舍.md)为 10 通过、1 未通过、1 技术失败；冲突题仍错误确定回答，未准入，已结束本项候选迭代。日常运行继续使用阶段 37 默认规划与 BASELINE 复核，下一阶段统一问答入口。
+
+候选使用一份 tasks 列表，仍受三轮/五次搜索预算约束；可空 answerContext 只记录检索经历，不能作为答案证据。显式复现时必须记录真实开关和制品标签；不能把关闭候选的默认运行误记为候选成绩。历史阶段 38–40 报告仅反映各自当时的实现。

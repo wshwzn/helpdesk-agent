@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties = "app.knowledge.multihop.rule-checks-enabled=true")
+@SpringBootTest(properties = "app.knowledge.multihop.task-planning-enabled=true")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class KnowledgeClarificationIntegrationTest {
@@ -89,7 +89,7 @@ class KnowledgeClarificationIntegrationTest {
                 "地区制度.md", QUOTE, 0.03, 1, 1.0, 1, 0.9, KnowledgeDocumentMetadata.from(document)))));
         when(model.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
                 new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
-                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "住宿", QUESTION)), List.of()), 0, 0, 0));
+                        List.of(), List.of()), 0, 0, 0));
         when(model.draft(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
             KnowledgeCitationCatalog catalog = invocation.getArgument(3);
             return new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerSelection(catalog.citationSetId(),

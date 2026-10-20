@@ -6,6 +6,29 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 class KnowledgeAnswerContextTest {
+    /** 旧诊断字段只作读取别名，新记录不再输出核查专用名称。 */
+    @Test @DisplayName("旧待核查字段仍可读取且新快照只输出通用待查字段")
+    void readsOldPendingField() throws Exception {
+        var json = com.fasterxml.jackson.databind.json.JsonMapper.builder().build();
+        var value = json.readValue("{\"stopReason\":\"TIME_BUDGET\",\"knowledgeGaps\":[],\"userConditions\":[],"
+                + "\"pendingRuleQueries\":[\"规则查询\"],\"searchedAfterAssessment\":false}", KnowledgeAnswerContext.class);
+        assertThat(value.pendingQueries()).containsExactly("规则查询");
+        assertThat(json.writeValueAsString(value)).contains("pendingQueries").doesNotContain("pendingRuleQueries");
+    }
+
+    /** 历史规划只读取展示，不把已经停用的双列表当作新模型协议执行。 */
+    @Test @DisplayName("阶段38真实诊断保留原规则核查字段并兼容读取上下文")
+    void readsArchivedRuleChecks() throws Exception {
+        var json = com.fasterxml.jackson.databind.json.JsonMapper.builder()
+                .addModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule()).build();
+        var archive = json.readTree(java.nio.file.Path.of("docs/evaluation/runs/2026-10-21-规则核查与状态衔接对照数据.json").toFile());
+        var node = java.util.stream.StreamSupport.stream(archive.get("results").spliterator(), false)
+                .filter(row -> row.get("id").asText().equals("N01")).findFirst().orElseThrow().get("diagnostic");
+        var old = json.treeToValue(node, com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerRunSnapshot.class);
+        assertThat(old.schemaVersion()).isEqualTo(4);
+        assertThat(old.retrievalRun().plans().getFirst().plan().ruleChecks()).isNotEmpty();
+        assertThat(old.answerContext().pendingQueries()).isEmpty();
+    }
     /** 已知制度表缺失不能转换成对员工类别或内部映射的追问。 */
     @Test @DisplayName("内部资料缺失不授权向用户追问")
     void knowledgeGapDoesNotAuthorizeClarification() {

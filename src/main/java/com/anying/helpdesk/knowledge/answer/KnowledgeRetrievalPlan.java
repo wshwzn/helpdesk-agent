@@ -13,27 +13,32 @@ public record KnowledgeRetrievalPlan(Decision decision, List<String> gaps, List<
         this(decision, gaps, queries, List.of(), List.of());
     }
 
-    /** 分开标识字段、动作和查询绑定错误，不保存模型原始输出。 */
+    /** 新模型只生成一份任务列表；转换后复用既有诊断 queries 字段，旧核查字段仅供历史读取。 */
+    public record TaskPlan(Decision decision, List<String> gaps, List<String> tasks, List<String> userConditions) {
+        /** 将单列表协议转为内部统一计划，不接受第二份规则核查任务。 */
+        public KnowledgeRetrievalPlan toPlan() {
+            var result = new KnowledgeRetrievalPlan(decision, gaps, tasks, List.of(), userConditions);
+            result.validate();
+            return result;
+        }
+    }
+
+    /** 单列表只在 SEARCH 时非空，停止决策不能隐含另一批待查任务。 */
     public void validate() {
         if (decision == null || gaps == null || queries == null || ruleChecks == null || userConditions == null
-                || gaps.size() > 8 || queries.size() > 2 || ruleChecks.size() > 2 || userConditions.size() > 5
+                || gaps.size() > 8 || queries.size() > 2 || !ruleChecks.isEmpty() || userConditions.size() > 5
                 || gaps.stream().anyMatch(s -> invalidText(s, 300, false))
                 || queries.stream().anyMatch(s -> invalidText(s, 300, true))
-                || userConditions.stream().anyMatch(s -> invalidText(s, 300, false))
-                || ruleChecks.stream().anyMatch(c -> c == null || c.evidenceId() == null
-                    || invalidText(c.term(), 100, false) || invalidText(c.query(), 300, true)))
+                || userConditions.stream().anyMatch(s -> invalidText(s, 300, false)))
             throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PLAN_FIELDS_INVALID,
                     "invalid retrieval plan fields");
         if ((decision == Decision.SEARCH && (queries.isEmpty() || gaps.isEmpty()))
                 || (decision != Decision.SEARCH && !queries.isEmpty())
-                || (decision == Decision.SUFFICIENT && (!gaps.isEmpty() || !userConditions.isEmpty() || ruleChecks.isEmpty()))
+                || (decision == Decision.SUFFICIENT && (!gaps.isEmpty() || !userConditions.isEmpty()))
                 || (decision == Decision.NEEDS_USER_INPUT && userConditions.isEmpty())
                 || (decision == Decision.EXHAUSTED && gaps.isEmpty()))
             throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PLAN_ACTION_INVALID,
                     "invalid retrieval plan action");
-        if (ruleChecks.stream().anyMatch(c -> !normalize(c.query()).contains(normalize(c.term()))))
-            throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PLAN_RULE_QUERY_INVALID,
-                    "rule query does not contain its term");
     }
 
     /** 对各字段沿用原长度和控制字符限制，不因诊断细分放宽契约。 */
@@ -57,17 +62,7 @@ public record KnowledgeRetrievalPlan(Decision decision, List<String> gaps, List<
         }
     }
 
-    /** 规则词必须真实出现于本轮原文，不能凭空声明已识别的规则或跨轮引用。 */
-    public void validateEvidence(List<KnowledgeAnswerReport.Evidence> evidence) {
-        validate();
-        for (var check : ruleChecks) {
-            if (evidence.stream().noneMatch(e -> e.id().equals(check.evidenceId()) && e.content().contains(check.term())))
-                throw new KnowledgeAnswerFailure(KnowledgeAnswerFailure.Code.KNOWLEDGE_PLAN_RULE_ANCHOR_INVALID,
-                        "rule check has no evidence anchor");
-        }
-    }
-
-    /** 统一查询和规则词的格式比较，原文锚点本身仍要求逐字匹配。 */
+    /** 统一查询格式用于判重，查询本身不作为可引用事实。 */
     public static String normalize(String text) {
         return java.text.Normalizer.normalize(text, java.text.Normalizer.Form.NFKC)
                 .replaceAll("\\s+", "").toLowerCase(java.util.Locale.ROOT);

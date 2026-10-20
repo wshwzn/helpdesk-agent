@@ -163,7 +163,7 @@ python -X utf8 scripts/evaluate_knowledge_clarification.py --base-url http://loc
 
 ## 规则核查与状态衔接候选（阶段 38）
 
-[完整报告](runs/2026-10-21-规则核查与状态衔接对照.md)：12 题 7 通过、1 未通过、4 技术失败；候选改善缺规则与冲突题，但整体退化，未默认启用。`app.knowledge.multihop.rule-checks-enabled` 默认 false，显式 true 才启用新规划协议与状态约束。版本 4 诊断新增可空 answerContext 和规则锚点；关闭候选时 answerContext=null。
+[完整报告](runs/2026-10-21-规则核查与状态衔接对照.md)：12 题 7 通过、1 未通过、4 技术失败；候选改善缺规则与冲突题，但整体退化，未默认启用。当时使用 `app.knowledge.multihop.rule-checks-enabled`，该旧开关已在阶段 41 移除。版本 4 诊断新增可空 answerContext 和规则锚点；关闭候选时 answerContext=null。
 
 REASONED 固定草案回放共 96 次，第二轮误拒/协议失败退化，未通过事前门槛，默认复核仍为 BASELINE。[端到端全量数据](runs/2026-10-21-规则核查与状态衔接对照数据.json)与[复核全量数据](runs/2026-10-21-可定位复核回放数据.json)保留全部失败；不将总正确数或单个改善题作为采用依据。
 
@@ -174,3 +174,9 @@ REASONED 固定草案回放共 96 次，第二轮误拒/协议失败退化，未
 [独立题集](knowledge-planning-cases.json)为 8 个虚构设备制度场景，覆盖直接题、缺映射、完整链、并列缺口、缺规则、冲突、实际用户条件。运行 `python -X utf8 scripts/evaluate_knowledge_planning.py --output target/planning-replay-new --repeats 2`，显式调用生产规划客户端；不检索、不生成答案、不修改知识库。
 
 [首次报告](runs/2026-10-21-独立规划协议回放.md)和[全量数据](runs/2026-10-21-独立规划协议回放数据.json)：16/16 协议通过，15/16 满足事前动作标签，0 技术失败。P01 第一次的额外核查不是回答错误；保留偏窄标签与未通过门槛，不事后改分。候选未启用，未进入完整问答评测。
+
+## 单列表规划候选取舍（阶段 41）
+
+[完整报告](runs/2026-10-21-单列表规划候选取舍.md)：同一冻结 12 题只跑一次，10 通过、1 未通过、1 技术失败，完整召回 11/12。原先通过的九题未退化，N01 改善；但 N02 仍错误确定回答，不满足事前采用门槛。已知 Token 62,538，比阶段 37 增长 6.89%。候选保持关闭，结束本项迭代，下一步进入 D 统一入口。
+
+新候选只输出 decision/gaps/tasks/userConditions，显式开关为 `app.knowledge.multihop.task-planning-enabled=true`（环境变量 `KNOWLEDGE_TASK_PLANNING_ENABLED=true`），默认 false；复核仍 BASELINE。新快照版本 5，answerContext 使用 pendingQueries，旧 pendingRuleQueries 可读取；诊断 queries 保存转换后的任务，ruleChecks 为空。阶段 40 的独立回放工具现在调用新的候选协议，重新运行不等于复现旧版协议，旧数据保持原样。

@@ -55,7 +55,7 @@ class TrustedKnowledgeAnswerServiceTest {
     /** 本组验证候选链路，默认关闭行为由收集器测试覆盖。 */
     private KnowledgeMultihopProperties candidateProperties() {
         var result = new KnowledgeMultihopProperties();
-        result.setRuleChecksEnabled(true);
+        result.setTaskPlanningEnabled(true);
         return result;
     }
 
@@ -64,7 +64,7 @@ class TrustedKnowledgeAnswerServiceTest {
     void setup() {
         when(client.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
                 new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
-                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "上海", QUESTION)), List.of()), 0, 0, 0));
+                        List.of(), List.of()), 0, 0, 0));
         when(bases.findDefault()).thenReturn(Optional.of(new KnowledgeBaseResponse(1L, "制度库", null,
                 50, new BigDecimal("0.65"), 5, true, 2, 0, null, null)));
         when(retrieval.search(eq(1L), any())).thenReturn(search(List.of(hit(10L, QUOTE), hit(20L, OTHER_QUOTE))));
@@ -100,7 +100,7 @@ class TrustedKnowledgeAnswerServiceTest {
                 new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SEARCH, List.of("查同条件通知"), List.of("上海住宿额度通知")), 10, 2, 12),
                 new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeRetrievalPlan(
                         KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
-                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "上海", QUESTION)), List.of()), 0, 0, 0));
+                        List.of(), List.of()), 0, 0, 0));
         propose(draft(KnowledgeAnswerDraft.Status.CONFLICT));
         if (withdrawn) {
             when(eligibility.findEligible(any(), any(), any())).thenReturn(Map.of(10L, document(10L)));
@@ -144,8 +144,7 @@ class TrustedKnowledgeAnswerServiceTest {
             var input = json.readTree(prompt.getInstructions().getLast().getText());
             String output = "{\"approved\":true}";
             if (input.has("searchedQueries")) {
-                output = "{\"decision\":\"SUFFICIENT\",\"gaps\":[],\"queries\":[],"
-                        + "\"ruleChecks\":[{\"evidenceId\":\"E1\",\"term\":\"上海\",\"query\":\"" + QUESTION + "\"}],\"userConditions\":[]}";
+                output = "{\"decision\":\"SUFFICIENT\",\"gaps\":[],\"tasks\":[],\"userConditions\":[]}";
             } else if (!input.has("draft")) {
                 var catalog = json.treeToValue(input.get("evidence"), KnowledgeCitationCatalog.class);
                 output = json.writeValueAsString(selection(draft(KnowledgeAnswerDraft.Status.CONFLICT), catalog));

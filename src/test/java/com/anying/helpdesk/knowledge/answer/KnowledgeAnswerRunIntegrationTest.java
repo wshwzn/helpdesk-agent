@@ -54,7 +54,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties = "app.knowledge.multihop.rule-checks-enabled=true")
+@SpringBootTest(properties = "app.knowledge.multihop.task-planning-enabled=true")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class KnowledgeAnswerRunIntegrationTest {
@@ -102,7 +102,7 @@ class KnowledgeAnswerRunIntegrationTest {
         when(eligibility.findEligible(any(), any(), any())).thenReturn(Map.of(10L, document));
         when(modelClient.plan(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
                 new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of(),
-                        List.of(new KnowledgeRetrievalPlan.RuleCheck("E1", "住宿", "住宿？")), List.of()), 0, 0, 0));
+                        List.of(), List.of()), 0, 0, 0));
         when(modelClient.draft(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
             return new KnowledgeAnswerModelClient.ModelResult<>(selection(invocation.getArgument(3), "E1-P1"), 10, 5, 15);
@@ -160,7 +160,7 @@ class KnowledgeAnswerRunIntegrationTest {
             assertThat(stage.durationMs()).isGreaterThanOrEqualTo(0);
         });
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(4);
+        assertThat(snapshot.schemaVersion()).isEqualTo(5);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.stages().get(2).usage().totalTokens()).isEqualTo(15);
         assertThat(snapshot.stages().get(4).usage().totalTokens()).isEqualTo(25);
@@ -193,7 +193,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.FAILED);
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(4);
+        assertThat(snapshot.schemaVersion()).isEqualTo(5);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.review().approved()).isFalse();
         assertThat(snapshot.stages().getLast().errorCode()).isEqualTo(message.getErrorCode());

@@ -240,7 +240,7 @@ public final class KnowledgeAnswerTrace {
 
     /** 导出不可变列表快照，供持久化与确定性测试使用。 */
     public synchronized KnowledgeAnswerRunSnapshot snapshot() {
-        return new KnowledgeAnswerRunSnapshot(4, runId, messageId, conversationId, question, scope,
+        return new KnowledgeAnswerRunSnapshot(5, runId, messageId, conversationId, question, scope,
                 modelConfigId, modelName, status, errorCode, revision, writeFailures,
                 startedAt, LocalDateTime.now(clock), finishedAt, retrieval, retrievalTruncated,
                 evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability, retrievalRun, answerContext);

@@ -56,8 +56,8 @@ public class KnowledgeEvidenceCollector {
         trace.retrievalStarted(enabled, budgetMs);
         var evidence = new LinkedHashMap<Key, KnowledgeAnswerReport.Evidence>();
         var queries = new ArrayList<String>();
-        boolean ruleChecksEnabled = enabled && properties.isRuleChecksEnabled();
-        var assessment = new Assessment(ruleChecksEnabled);
+        boolean taskPlanningEnabled = enabled && properties.isTaskPlanningEnabled();
+        var assessment = new Assessment(taskPlanningEnabled);
         var seen = new LinkedHashSet<String>();
         var usage = new KnowledgeAnswerModelClient.TokenUsage(0, 0, 0);
         search(baseId, scope, 1, question, trace, evidence);
@@ -70,13 +70,13 @@ public class KnowledgeEvidenceCollector {
             int afterRound = round - 1;
             var planned = trace.stage(PLANNING, () -> {
                 var result = external(KNOWLEDGE_PLANNING_CALL_FAILED,
-                        () -> ruleChecksEnabled
+                        () -> taskPlanningEnabled
                                 ? client.plan(model, question, scope, List.copyOf(evidence.values()), List.copyOf(queries))
                                 : client.planLegacy(model, question, scope, List.copyOf(evidence.values()), List.copyOf(queries)));
                 if (result == null || result.value() == null)
-                    throw new KnowledgeAnswerFailure(ruleChecksEnabled ? KNOWLEDGE_PLAN_PAYLOAD_INVALID : KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
+                    throw new KnowledgeAnswerFailure(taskPlanningEnabled ? KNOWLEDGE_PLAN_PAYLOAD_INVALID : KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
                 trace.planned(afterRound, result);
-                if (ruleChecksEnabled) result.value().validateEvidence(List.copyOf(evidence.values()));
+                if (taskPlanningEnabled) result.value().validate();
                 else result.value().validateLegacy();
                 return result;
             });
@@ -84,10 +84,9 @@ public class KnowledgeEvidenceCollector {
                     sum(usage.completionTokens(), planned.completionTokens()), sum(usage.totalTokens(), planned.totalTokens()));
             var plan = planned.value();
             assessment.accept(plan, queries.size());
-            var pending = assessment.pending(queries);
-            if (plan.decision() != KnowledgeRetrievalPlan.Decision.SEARCH && pending.isEmpty())
+            if (plan.decision() != KnowledgeRetrievalPlan.Decision.SEARCH)
                 return stop(trace, KnowledgeRetrievalRun.StopReason.valueOf(plan.decision().name()), evidence, usage, assessment, queries);
-            var scheduled = ruleChecksEnabled ? assessment.scheduled(queries) : plan.queries();
+            var scheduled = plan.queries();
             int before = evidence.size();
             int executed = 0;
             for (String query : scheduled) {
@@ -99,7 +98,7 @@ public class KnowledgeEvidenceCollector {
                 executed++;
             }
             if (executed == 0) return stop(trace, REPEATED_QUERY, evidence, usage, assessment, queries);
-            if (evidence.size() == before && (!ruleChecksEnabled || assessment.scheduled(queries).isEmpty()))
+            if (evidence.size() == before)
                 return stop(trace, NO_NEW_EVIDENCE, evidence, usage, assessment, queries);
         }
         return stop(trace, ROUND_BUDGET, evidence, usage, assessment, queries);
@@ -168,45 +167,26 @@ public class KnowledgeEvidenceCollector {
         return new Collected(List.copyOf(evidence.values()), usage, context);
     }
 
-    /** 请求内保留未完成的核查责任，后续规划不能通过省略字段遗忘旧任务。 */
+    /** 请求内只保存最近一次单列表计划，用实际执行记录标明预算中断的待查任务。 */
     private static class Assessment {
         private final boolean enabled;
         private KnowledgeRetrievalPlan plan;
         private int queryCount;
-        private final LinkedHashMap<String, String> checks = new LinkedHashMap<>();
-        private final LinkedHashMap<String, String> tasks = new LinkedHashMap<>();
 
-        /** 明确本次是否启用规划约束，单轮对照不伪造规划条件。 */
+        /** 默认链路不注入候选的用户条件和任务约束。 */
         private Assessment(boolean enabled) { this.enabled = enabled; }
 
-        /** 保存最近一次缺口分类，同时累计所有已经声明且有原文锚点的核查查询。 */
+        /** 每批最多两项且在下一规划前执行，只有预算中断时留下未执行任务。 */
         private void accept(KnowledgeRetrievalPlan value, int count) {
             plan = value;
             queryCount = count;
-            if (enabled) {
-                value.queries().forEach(this::enqueue);
-                value.ruleChecks().forEach(c -> {
-                    enqueue(c.query());
-                    checks.putIfAbsent(KnowledgeRetrievalPlan.normalize(c.query()), c.query());
-                });
-            }
         }
 
-        /** 所有查询进入同一请求内队列，缺口查询按规划顺序入队，规则核查不再插队。 */
-        private void enqueue(String query) {
-            tasks.putIfAbsent(KnowledgeRetrievalPlan.normalize(query), query);
-        }
-
-        /** 跨轮保留尚未执行的任务，先过滤已查项，再由调用方限制本轮实际执行次数。 */
-        private List<String> scheduled(List<String> queries) {
-            var executed = queries.stream().map(KnowledgeRetrievalPlan::normalize).collect(java.util.stream.Collectors.toSet());
-            return tasks.entrySet().stream().filter(e -> !executed.contains(e.getKey())).map(java.util.Map.Entry::getValue).toList();
-        }
-
-        /** 只用已经成功返回的真实请求解除核查责任，不采信模型自称已查。 */
+        /** 查询成功返回才视为执行，重复查询沿用此前实际记录，不新增核查账本。 */
         private List<String> pending(List<String> queries) {
+            if (!enabled || plan == null) return List.of();
             var executed = queries.stream().map(KnowledgeRetrievalPlan::normalize).collect(java.util.stream.Collectors.toSet());
-            return checks.entrySet().stream().filter(e -> !executed.contains(e.getKey())).map(java.util.Map.Entry::getValue).toList();
+            return plan.queries().stream().filter(q -> !executed.contains(KnowledgeRetrievalPlan.normalize(q))).distinct().toList();
         }
     }
 
