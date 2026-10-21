@@ -36,19 +36,17 @@ class KnowledgeApplicabilityServiceTest {
         assertThat(service.requiredOptions(policy, new KnowledgeApplicabilityPolicy.Route(List.of(), false))).isEmpty();
     }
 
-    /** 多问题共享一个显式范围时只能选择所有需范围主题的交集。 */
-    @Test
-    @DisplayName("多主题取范围交集，互不相容时拒绝猜测")
-    void intersectsRequiredScopes() {
-        var policy = new KnowledgeApplicabilityPolicy(1L, List.of(topic("a", List.of(sh, bj)),
-                topic("b", List.of(sh)), topic("generic", List.of())));
-        assertThat(service.requiredOptions(policy, new KnowledgeApplicabilityPolicy.Route(List.of("a", "b", "generic"), false)))
-                .containsExactly(sh);
-        var incompatible = new KnowledgeApplicabilityPolicy(1L, List.of(topic("a", List.of(sh)), topic("b", List.of(bj))));
-        assertThatThrownBy(() -> service.requiredOptions(incompatible,
-                new KnowledgeApplicabilityPolicy.Route(List.of("a", "b"), false)))
-                .isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
-                        error -> assertThat(error.errorCode()).isEqualTo("KNOWLEDGE_APPLICABILITY_UNCERTAIN"));
+    /** 多主题的地区并集用于比较，不能因不相交而删除用户的另一地区。 */
+    @Test @DisplayName("多主题保留范围并集，明确名称可单选或多选")
+    void unionsRequiredScopes() {
+        var policy = new KnowledgeApplicabilityPolicy(1L, List.of(topic("a", List.of(sh)), topic("b", List.of(bj))));
+        var options = service.requiredOptions(policy, new KnowledgeApplicabilityPolicy.Route(List.of("a", "b"), false));
+        assertThat(options).containsExactly(sh, bj);
+        assertThat(service.namedScopes("上海标准", options)).containsExactly("CN_SH");
+        assertThat(service.namedScopes("比较上海和北京", options)).containsExactly("CN_SH", "CN_BJ");
+        assertThat(service.namedScopes("不是上海，是北京", options)).isEmpty();
+        assertThat(service.namedScopes("比较上海和未配置地区", options)).isEmpty();
+        assertThat(service.namedScopes("请问标准", options)).isEmpty();
     }
 
     /** 检查真实协议调用的数据边界，地区选项和制度事实不会进入分类模型。 */

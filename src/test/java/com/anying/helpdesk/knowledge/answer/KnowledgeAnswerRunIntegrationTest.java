@@ -160,7 +160,7 @@ class KnowledgeAnswerRunIntegrationTest {
             assertThat(stage.durationMs()).isGreaterThanOrEqualTo(0);
         });
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(5);
+        assertThat(snapshot.schemaVersion()).isEqualTo(6);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.stages().get(2).usage().totalTokens()).isEqualTo(15);
         assertThat(snapshot.stages().get(4).usage().totalTokens()).isEqualTo(25);
@@ -193,7 +193,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.FAILED);
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(5);
+        assertThat(snapshot.schemaVersion()).isEqualTo(6);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.review().approved()).isFalse();
         assertThat(snapshot.stages().getLast().errorCode()).isEqualTo(message.getErrorCode());

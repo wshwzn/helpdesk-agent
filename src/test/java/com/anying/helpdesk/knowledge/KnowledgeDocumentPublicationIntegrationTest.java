@@ -99,6 +99,21 @@ class KnowledgeDocumentPublicationIntegrationTest {
         assertThat(eligibility.findEligible(original, "UNKNOWN", SWITCH_AT).keySet()).containsExactly(general.id());
     }
 
+    /** 联合范围只允许请求的地区和通用资料，仍过滤草稿、未来、撤回以及其他知识库。 */
+    @Test @DisplayName("多范围准入并集仍遵守发布有效期和地区边界")
+    void unionScopesKeepEligibilityBoundaries() {
+        var all = publish(ready("general", "v1", "ALL", SWITCH_AT, null));
+        var sh = publish(ready("travel", "v1", "CN_SH", SWITCH_AT, null));
+        var bj = publish(ready("travel", "v1", "CN_BJ", SWITCH_AT, null));
+        publish(ready("travel", "v1", "CN_GZ", SWITCH_AT, null));
+        publish(ready("future", "v1", "CN_SH", SWITCH_AT.plusDays(1), null));
+        ready("draft", "v1", "CN_BJ", SWITCH_AT, null);
+        var withdrawn = publish(ready("withdrawn", "v1", "CN_BJ", SWITCH_AT, null));
+        publication.withdraw(baseId, withdrawn.id(), withdrawn.version());
+        assertThat(eligibility.findEligibleScopes(baseId, java.util.List.of("CN_SH", "CN_BJ"), SWITCH_AT).keySet())
+                .containsExactly(all.id(), sh.id(), bj.id());
+    }
+
     /**
      * 验证撤回和索引失败都能让残留 ES 片段失去准入资格。
      */

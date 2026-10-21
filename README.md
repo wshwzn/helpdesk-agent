@@ -483,7 +483,7 @@ Content-Type: application/json
 }
 ```
 
-- 知识问题最多 2000 字，每次提交完整问题；此模式不带历史事实、不执行工单工具。使用默认知识库，范围只能由调用方指定；省略时只查 `ALL`，不自动把“上海”映射成 `CN_SH`。AGENT 请求携带范围会返回 400，防止调用方误以为范围已应用。
+- 知识问题最多 2000 字，每次提交完整问题；此模式不带历史事实、不执行工单工具。使用默认知识库，范围可由调用方传单值 `applicabilityScope` 或最多三项 `applicabilityScopes`；省略时按已配置主题中的完整地区名称识别，无法明确识别时返回澄清，未配置主题则仍只查 `ALL`。AGENT 请求携带范围会返回 400，防止调用方误以为范围已应用。
 - `assistantMessage.knowledgeAnswer.answer.status` 返回 `ANSWERABLE`（充分依据）、`NEEDS_CLARIFICATION`（需补条件）、`INSUFFICIENT_EVIDENCE`（依据不足）或 `CONFLICT`（疑似冲突）。不足时允许保留有依据部分；冲突时展示双方，不按版本号或上传时间选边。
 - 草案模型只返回本轮 `citationSetId` 与 `evidenceId + paragraphId`。后端按空行建立片段目录、验证所属证据并逐字提取完整原文；跨轮目录、未知片段、跨证据片段均拒绝，不放宽引用校验。过长段落保留上下文但不可引用。
 - 报告含 `claims[].references[]` 的 `evidenceId` 和逐字 `quote`，通过 `evidence[]` 对应真实 `documentId`、`chunkSequence`、原文与业务版本。正文中的 `[E1]` 由服务端生成。兼容字段 `citations` 只包含实际使用的证据；报告还保留未被引用的本轮候选，便于审计遗漏。
@@ -626,3 +626,11 @@ Spring Security 根据 JWT 中的角色限制访问：`CUSTOMER` 可以操作自
 
 
 V19 增加可配置的适用条件澄清：管理员通过 `/api/admin/knowledge-bases/{id}/clarification-policy` 配置业务主题及范围选项。缺范围时先识别主题，再由服务端返回结构化澄清；客户传 `clarificationMessageId` 和显式范围后，服务端从原消息恢复问题、绑定原知识库并重新检索及核验。通用流程无需一律问地区，旧知识库默认关闭此功能。规则、接口和限制见 `notes/30-适用条件澄清与续答.md`；演示见 `docs/demo/trusted-knowledge/README.md`，实测见 `docs/evaluation/runs/2026-10-19-澄清续答验证.md`。本轮接口/脚本交付，尚未增加前端选择卡片。
+
+### 多范围比较与调用预算
+
+阶段42支持 `{"content":"比较上海和北京的住宿上限","applicabilityScopes":["CN_SH","CN_BJ"]}`。旧单范围字段仍可用；新旧字段不得冲突，范围不可为空、重复、超过三项或与ALL混选。消息响应和报告增加 applicabilityScopes，多范围时旧标量为null。
+
+先联合过滤所选地区与ALL通用资料，一次向量化、一次混合检索；缺少专属地区片段时仅对该地区有限补查，再根据整题缺口规划。各地区共享三轮、五次逻辑搜索、两次规划及证据预算；整题只生成、复核一次，不把不同地区金额差异当成同条件冲突。通用资料是否真正适用仍需语义核验，任一部分缺资料可返回不足及有据部分。
+
+配置主题的完整名称在问题中明确出现时无需重复追问；复杂否定或不能明确识别时继续澄清。续答可通过 applicabilityScopes 多选原卡片提供的地区，仍携带 clarificationMessageId。前端多选控件不在本仓库；请求契约、验证和限制见 [阶段42记录](notes/42-多范围联合检索与澄清.md) 与 [验证资料](docs/demo/multi-scope/README.md)。V23增加消息范围JSON列表，历史消息继续兼容。

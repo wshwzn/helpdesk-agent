@@ -17,6 +17,6 @@ public record PreparedChatExchange(
                                 ConversationModelHistory history, String knowledgeRunId) {
         this(userMessage, assistantMessageId, history, knowledgeRunId,
                 new KnowledgeAnswerInput(userMessage.getContent(),
-                        userMessage.getApplicabilityScope(), null, null, null));
+                        userMessage.getApplicabilityScope(), null, null, null, userMessage.getApplicabilityScopes()));
     }
 }

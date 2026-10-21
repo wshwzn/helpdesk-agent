@@ -104,6 +104,90 @@ public class KnowledgeEvidenceCollector {
         return stop(trace, ROUND_BUDGET, evidence, usage, assessment, queries);
     }
 
+    /** 多范围先联合初检，未召回地区各补查至多一次，再用整题剩余预算补事实关系。 */
+    public Collected collectScopes(Long baseId, ResolvedChatModel model, String question, List<String> scopes,
+                                   KnowledgeAnswerTrace trace) {
+        KnowledgeScopes.checked(scopes);
+        long started = ticker.getAsLong();
+        long budgetMs = properties.getSchedulingBudgetSeconds() * 1000L;
+        boolean enabled = properties.isEnabled();
+        trace.scopes(scopes);
+        trace.retrievalStarted(enabled, budgetMs);
+        var evidence = new LinkedHashMap<Key, KnowledgeAnswerReport.Evidence>();
+        var queries = new ArrayList<String>();
+        var attempted = new LinkedHashSet<String>();
+        var seen = new LinkedHashSet<String>();
+        var usage = new KnowledgeAnswerModelClient.TokenUsage(0, 0, 0);
+        var assessment = new Assessment(false);
+        searchScopes(baseId, scopes, 1, question, trace, evidence);
+        queries.add(question);
+        seen.add(scopes + ":" + normalize(question));
+        if (evidence.isEmpty()) return stop(trace, NO_MATCH, evidence, usage, assessment, queries);
+        if (!enabled) return stop(trace, SINGLE_PASS, evidence, usage, assessment, queries);
+        for (int round = 2; round <= 3; round++) {
+            if (expired(started, budgetMs)) return stop(trace, TIME_BUDGET, evidence, usage, assessment, queries);
+            var missing = scopes.stream().filter(scope -> !attempted.contains(scope)
+                    && evidence.values().stream().noneMatch(e -> scope.equals(e.metadata().applicabilityScope())))
+                    .limit(2).toList();
+            var tasks = new ArrayList<ScopeSearch>();
+            if (!missing.isEmpty()) {
+                for (var scope : missing) tasks.add(new ScopeSearch(question, List.of(scope)));
+            } else {
+                int afterRound = round - 1;
+                var planned = trace.stage(PLANNING, () -> {
+                    var result = external(KNOWLEDGE_PLANNING_CALL_FAILED, () -> client.planLegacy(model, question,
+                            KnowledgeScopes.describe(scopes), List.copyOf(evidence.values()), List.copyOf(queries)));
+                    if (result == null || result.value() == null)
+                        throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
+                    trace.planned(afterRound, result);
+                    result.value().validateLegacy();
+                    return result;
+                });
+                usage = new KnowledgeAnswerModelClient.TokenUsage(sum(usage.promptTokens(), planned.promptTokens()),
+                        sum(usage.completionTokens(), planned.completionTokens()), sum(usage.totalTokens(), planned.totalTokens()));
+                if (planned.value().decision() != KnowledgeRetrievalPlan.Decision.SEARCH)
+                    return stop(trace, KnowledgeRetrievalRun.StopReason.valueOf(planned.value().decision().name()),
+                            evidence, usage, assessment, queries);
+                for (var query : planned.value().queries()) tasks.add(new ScopeSearch(query, scopes));
+            }
+            int before = evidence.size();
+            int executed = 0;
+            for (var task : tasks) {
+                if (!seen.add(task.scopes() + ":" + normalize(task.query()))) continue;
+                if (expired(started, budgetMs)) return stop(trace, TIME_BUDGET, evidence, usage, assessment, queries);
+                searchScopes(baseId, task.scopes(), round, task.query(), trace, evidence);
+                queries.add(task.query());
+                if (task.scopes().size() == 1) attempted.add(task.scopes().getFirst());
+                executed++;
+            }
+            if (executed == 0) return stop(trace, REPEATED_QUERY, evidence, usage, assessment, queries);
+            // 地区覆盖补查用掉一轮后仍允许处理其余地区或事实缺口，不因一侧没资料吞掉其他任务。
+            if (missing.isEmpty() && evidence.size() == before)
+                return stop(trace, NO_NEW_EVIDENCE, evidence, usage, assessment, queries);
+        }
+        return stop(trace, ROUND_BUDGET, evidence, usage, assessment, queries);
+    }
+
+    private record ScopeSearch(String query, List<String> scopes) { }
+
+    /** 联合查询仍只调用一次混合检索，实际过滤集合写入逐次诊断。 */
+    private void searchScopes(Long baseId, List<String> scopes, int round, String query, KnowledgeAnswerTrace trace,
+            LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence) {
+        trace.searchStarted(round, query, scopes);
+        trace.stage(RETRIEVAL, () -> {
+            var response = external(KNOWLEDGE_RETRIEVAL_FAILED,
+                    () -> retrieval.search(baseId, new KnowledgeSearchRequest(query, null, scopes)));
+            List<String> added = List.of();
+            try {
+                added = mergeScopes(baseId, scopes, response, evidence, trace);
+                trace.evidence(List.copyOf(evidence.values()));
+                return response;
+            } finally {
+                if (response != null && response.results() != null) trace.searchFinished(response, added);
+            }
+        });
+    }
+
     /** 每次搜索都绑定同一身份，保存实际召回并按文档与块序号累计完整原文。 */
     private void search(Long baseId, String scope, int round, String query, KnowledgeAnswerTrace trace,
                         LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence) {
@@ -125,13 +209,19 @@ public class KnowledgeEvidenceCollector {
     /** 整批校验再合并，不能静默截掉超预算的后续证据或用变化原文替换已有来源。 */
     private List<String> merge(Long baseId, String scope, KnowledgeSearchResponse response,
             LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence, KnowledgeAnswerTrace trace) {
+        return mergeScopes(baseId, List.of(scope), response, evidence, trace);
+    }
+
+    /** 每个候选都核对本次实际过滤集合，保持稳定编号及累计证据预算。 */
+    private List<String> mergeScopes(Long baseId, List<String> scopes, KnowledgeSearchResponse response,
+            LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence, KnowledgeAnswerTrace trace) {
         if (response == null || response.results() == null || !Objects.equals(baseId, response.knowledgeBaseId()))
             throw new KnowledgeAnswerFailure(KNOWLEDGE_EVIDENCE_CHECK_FAILED, "invalid retrieval identity");
         var merged = new LinkedHashMap<>(evidence);
         var added = new ArrayList<String>();
         for (var hit : response.results()) {
             if (hit.documentId() == null || hit.metadata() == null || hit.content() == null || hit.content().isBlank()
-                    || !(scope.equals(hit.metadata().applicabilityScope()) || "ALL".equals(hit.metadata().applicabilityScope())))
+                    || !(scopes.contains(hit.metadata().applicabilityScope()) || "ALL".equals(hit.metadata().applicabilityScope())))
                 throw new KnowledgeAnswerFailure(KNOWLEDGE_EVIDENCE_CHECK_FAILED, "incomplete or out-of-scope evidence");
             var key = new Key(hit.documentId(), hit.chunkSequence());
             var previous = merged.get(key);

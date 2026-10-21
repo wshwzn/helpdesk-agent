@@ -25,7 +25,7 @@ public record KnowledgeAnswerRunSnapshot(
         KnowledgeAnswerModelClient.Review review, KnowledgeAnswerReport.Reason answerReason,
         List<StageResult> stages, KnowledgeCitationCatalog citationCatalog, KnowledgeAnswerSelection selection,
         KnowledgeApplicabilityPolicy.Assessment applicability, KnowledgeRetrievalRun retrievalRun,
-        KnowledgeAnswerContext answerContext
+        KnowledgeAnswerContext answerContext, List<String> applicabilityScopes
 ) {
     public enum Status { RUNNING, SUCCEEDED, FAILED, CANCELLED }
     public enum Stage { APPLICABILITY, RETRIEVAL, PLANNING, DRAFT, VALIDATION, REVIEW, EVIDENCE_RECHECK, MESSAGE_PERSISTENCE }

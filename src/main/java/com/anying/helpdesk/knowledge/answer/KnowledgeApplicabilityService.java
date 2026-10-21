@@ -66,7 +66,7 @@ public class KnowledgeApplicabilityService {
         }
     }
 
-    /** 校验模型只能选择配置中的主题；多主题取共同范围，不自行扩大适用面。 */
+    /** 校验模型只能选择配置中的主题；多主题保留可选范围并集，支持分地区的比较问题。 */
     public List<KnowledgeApplicabilityPolicy.ScopeOption> requiredOptions(
             KnowledgeApplicabilityPolicy policy, KnowledgeApplicabilityPolicy.Route route) {
         if (route == null || route.uncertain() == null || route.topicIds() == null
@@ -79,11 +79,22 @@ public class KnowledgeApplicabilityService {
         for (var topic : policy.topics()) {
             if (!route.topicIds().contains(topic.id()) || topic.scopeOptions().isEmpty()) continue;
             if (options == null) options = new ArrayList<>(topic.scopeOptions());
-            else options.retainAll(topic.scopeOptions());
+            else for (var option : topic.scopeOptions()) if (!options.contains(option)) options.add(option);
         }
         if (options != null && options.isEmpty())
             throw new KnowledgeAnswerFailure(KNOWLEDGE_APPLICABILITY_UNCERTAIN, "incompatible applicability topics");
         return options == null ? List.of() : List.copyOf(options);
+    }
+
+    /** 只识别配置名称在原问题中的明确出现，不让模型生成未经配置的地区代码。 */
+    public List<String> namedScopes(String question, List<KnowledgeApplicabilityPolicy.ScopeOption> options) {
+        if (java.util.regex.Pattern.compile("不是|不要|不含|除了|除外|而非|不包括").matcher(question).find())
+            return List.of();
+        var named = options.stream().filter(option -> question.contains(option.label()))
+                .map(KnowledgeApplicabilityPolicy.ScopeOption::value).distinct().toList();
+        // 过多范围保留澄清，让用户缩小范围，禁止静默截断前三项。
+        boolean comparison = java.util.regex.Pattern.compile("比较|对比|相比|差异|区别").matcher(question).find();
+        return named.size() <= KnowledgeScopes.MAX_SCOPES && (!comparison || named.size() >= 2) ? named : List.of();
     }
 
     /** 生成前后均检查修订，配置变更不会悄悄套用到旧澄清卡片。 */

@@ -28,9 +28,14 @@ public class KnowledgeDocumentEligibilityService {
      */
     @Transactional(readOnly = true)
     public Map<Long, KnowledgeDocument> findEligible(Long knowledgeBaseId, String scope, LocalDateTime at) {
-        if (scope == null || !scope.matches("[A-Z][A-Z0-9_-]{0,39}")) {
-            throw new InvalidKnowledgeDocumentException("invalid applicability scope");
-        }
+        return findEligibleScopes(knowledgeBaseId, List.of(scope), at);
+    }
+
+    /** 一次准入查询联合多个地区与通用资料，总文档数仍使用原上限。 */
+    @Transactional(readOnly = true)
+    public Map<Long, KnowledgeDocument> findEligibleScopes(Long knowledgeBaseId, List<String> scopes, LocalDateTime at) {
+        var allowed = new java.util.LinkedHashSet<>(com.anying.helpdesk.knowledge.answer.KnowledgeScopes.checked(scopes));
+        allowed.add("ALL");
         List<KnowledgeDocument> documents = documentMapper.selectList(new LambdaQueryWrapper<KnowledgeDocument>()
                 .eq(KnowledgeDocument::getKnowledgeBaseId, knowledgeBaseId)
                 .eq(KnowledgeDocument::getPublicationStatus, KnowledgePublicationStatus.PUBLISHED)
@@ -41,7 +46,7 @@ public class KnowledgeDocumentEligibilityService {
                 .and(query -> query.isNull(KnowledgeDocument::getValidUntil).or().gt(KnowledgeDocument::getValidUntil, at))
                 .and(query -> query.isNull(KnowledgeDocument::getActivatedAt).or().le(KnowledgeDocument::getActivatedAt, at))
                 .and(query -> query.isNull(KnowledgeDocument::getSupersededAt).or().gt(KnowledgeDocument::getSupersededAt, at))
-                .in(KnowledgeDocument::getApplicabilityScope, List.of("ALL", scope))
+                .in(KnowledgeDocument::getApplicabilityScope, allowed)
                 .orderByAsc(KnowledgeDocument::getId)
                 .last("LIMIT " + (MAX_ELIGIBLE_DOCUMENTS + 1)));
         if (documents.size() > MAX_ELIGIBLE_DOCUMENTS) {

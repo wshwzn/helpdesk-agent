@@ -101,8 +101,9 @@
 | `total_tokens` | `INT` | 是 | `NULL` | 厂商返回的总 Token 数。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 生成失败时保存的内部脱敏错误码，例如模型失败 `MODEL_CALL_FAILED`、进程中断超时恢复 `GENERATION_INTERRUPTED`。 |
 | `mode` | `VARCHAR(20)` | 否 | `AGENT` | 本条消息的模式：`AGENT` 旧兼容工具对话、`KNOWLEDGE` 强制证据核验；历史记录及数据库默认值仍为 AGENT，应用新请求默认显式写入 KNOWLEDGE。 |
-| `applicability_scope` | `VARCHAR(40)` | 是 | `NULL` | 本轮请求显式选择的业务范围快照。KNOWLEDGE 未指定时为 `ALL`，AGENT 为空；非权限字段。 |
-| `knowledge_answer` | `MEDIUMTEXT` | 是 | `NULL` | 核验报告 JSON；仅成功完成的 KNOWLEDGE 助手消息写入。包含 `schemaVersion=1`（普通结果）或 `2`（结构化澄清/续答）、原因、知识库身份快照、范围、核验时间、结构化回答及本轮证据快照。 |
+| `applicability_scope` | `VARCHAR(40)` | 是 | `NULL` | 兼容的单范围快照；多范围及AGENT为空。用户未指定时为ALL；助手完成时可保存从配置名称解析的单范围。非权限字段。 |
+| `applicability_scopes` | `LONGTEXT` | 是 | `NULL` | V23新增范围代码JSON数组，最多三项；不可重复，不可ALL混选。用户行保存请求范围，助手成功行保存实际解析范围。多范围时旧 applicability_scope 为空；历史NULL列表回退旧标量。AGENT为空。 |
+| `knowledge_answer` | `MEDIUMTEXT` | 是 | `NULL` | 核验报告 JSON；仅成功完成的 KNOWLEDGE 助手消息写入。新回答版本3保存范围列表，结构化澄清仍为版本2；兼容历史版本1普通结果和版本2续答。包含原因、知识库身份快照、范围、核验时间、结构化回答及本轮证据快照。 |
 | `knowledge_run_id` | `VARCHAR(36)` | 是 | `NULL` | V18 新增，服务端为新 KNOWLEDGE 助手消息分配的 UUID，逻辑关联 `knowledge_answer_runs.run_id`。客户消息、AGENT 消息及升级前历史消息为空；成功或失败后均保留。 |
 | `version` | `INT` | 否 | `0` | 乐观锁版本号，防止生成完成与失败状态互相覆盖。 |
 | `created_at` | `TIMESTAMP(6)` | 否 | 当前时间 | 消息创建时间。 |
@@ -152,7 +153,7 @@
 - 阶段可先有 `APPLICABILITY`，然后是 `RETRIEVAL` 与最多两次 `PLANNING` 交替，最终为 `DRAFT`、`VALIDATION`、`REVIEW`、`EVIDENCE_RECHECK`、`MESSAGE_PERSISTENCE`；一次规划可对应两次检索。未配置知识库时没有检索阶段；未执行阶段不补造。每阶段状态为 `RUNNING`、`SUCCEEDED`、`FAILED`、`CANCELLED`，活跃阶段的耗时为空，结束后用单调时钟记录毫秒。
 - 阶段耗时包含进入阶段时保存诊断的开销，不含结束时的快照写入；端到端耗时另由评测脚本记录。
 - `retrieval` 保留首轮实际候选、排序和检索参数，最多 50 个 Chunk、50000 字；超限会标记 `retrievalTruncated`，不影响原问答链路的上下文超限拒绝。合法预算内的 `evidence` 对应本轮 E 编号；草案仅保存已解析的结构化对象，畸形原始响应不保存。
-- 当前新快照写版本 5。可空 `answerContext` 保存 stopReason、knowledgeGaps（内部资料缺口）、userConditions（用户条件）、pendingQueries（计划中尚未执行的搜索）、searchedAfterAssessment（缺口判断后是否又检索）。关闭任务规划候选或单轮时为 null。这些是检索经历，不是事实证据。单列表模型协议为 decision/gaps/tasks/userConditions；转换后诊断仍用 queries 保存任务，ruleChecks=[]。每批最多两项且在下次规划前执行，不维护跨轮核查账本；停止决策任务必须为空，预算中断留下的待执行任务阻止 ANSWERABLE，无用户条件不能生成 NEEDS_CLARIFICATION。
+- 当前新快照写版本 6，增加有效 applicabilityScopes；每次 retrievalRun.searches 保存实际 scopes（旧记录为NULL，不补造）。多范围共用三轮/五次搜索和整题生成复核，资格过滤仍包含ALL通用资料。版本5的上下文契约保持：可空 `answerContext` 保存 stopReason、knowledgeGaps（内部资料缺口）、userConditions（用户条件）、pendingQueries（计划中尚未执行的搜索）、searchedAfterAssessment（缺口判断后是否又检索）。关闭任务规划候选或单轮时为 null。这些是检索经历，不是事实证据。单列表模型协议为 decision/gaps/tasks/userConditions；转换后诊断仍用 queries 保存任务，ruleChecks=[]。每批最多两项且在下次规划前执行，不维护跨轮核查账本；停止决策任务必须为空，预算中断留下的待执行任务阻止 ANSWERABLE，无用户条件不能生成 NEEDS_CLARIFICATION。
 - 历史版本 4 的 `pendingRuleQueries` 兼容为读取别名，ruleChecks（evidenceId、term、query）仍可反序列化展示；不重写历史快照。阶段 38–40 的锚点、双列表与强制核查队列已移除，不再执行。候选开关改为 `app.knowledge.multihop.task-planning-enabled`（默认 false），旧 `rule-checks-enabled` 不再启用候选。
 - 复核可空 `issues` 保存固定问题路径、evidenceIds、300 字以内缺陷描述；REASONED 候选批准时必须 reason=NONE 且 issues=[]，否决必须有非 NONE 原因及 1–5 个有效问题，路径限定 status/coverage/clarification 或实际结论路径。旧策略 issues 为空，不补造历史理由；阶段 38 候选未通过回放准入，默认仍为 BASELINE，不启用 REASONED。错误码新增 KNOWLEDGE_UNJUSTIFIED_CLARIFICATION、KNOWLEDGE_RULE_CHECK_INCOMPLETE，无列或约束变更。 阶段 39 对候选规划新增固定分类 KNOWLEDGE_PLAN_PAYLOAD_INVALID（载荷解析）、KNOWLEDGE_PLAN_FIELDS_INVALID（字段）、KNOWLEDGE_PLAN_ACTION_INVALID（动作组合）、KNOWLEDGE_PLAN_RULE_QUERY_INVALID（查询与规则词）、KNOWLEDGE_PLAN_RULE_ANCHOR_INVALID（原文锚点），写入既有 errorCode 与 stages.errorCode，失败用量仍保留；不增加 JSON 字段或保存原始坏输出。
 - 版本 3 新增可空 `retrievalRun`：固定预算、`searches`（轮次、查询、响应、截断标记、新增 E 编号）、`plans`（轮次和结构化缺口/动作/查询）、`stopReason`。最多 3 轮、5 次检索、2 次规划；每次响应最多保存 50 块/50000 字，累计模型证据也受 50 块/50000 字硬上限约束。失败请求保留 query 且 response 为空。停止枚举见 `KnowledgeRetrievalRun.StopReason`；它与最终答案状态独立。旧快照该字段为空，不补造历史检索。
@@ -538,6 +539,7 @@ V22 另有 `knowledge_bases → knowledge_sources → knowledge_source_items` �
 | V20 | `V20__create_knowledge_index_tasks.sql` | 增加文档有效索引批次与持久任务表、调度索引、检查约束及级联外键；显式标记旧内存任务失败。 |
 | V21 | `V21__add_knowledge_document_revisions.sql` | 增加前后版本关联、审核启用/被替代时间、前驱索引、后继唯一约束及两个限制删除自引用外键；历史资料默认不关联。 |
 | V22 | `V22__add_knowledge_oss_sources.sql` | 新增 OSS 来源、对象映射、扫描租约和结果，以及文档 source_item_id 追溯关联；普通历史资料不纳入同步。 |
+| V23 | `V23__add_message_applicability_scopes.sql` | 新增可空消息范围JSON列表；历史行回退单范围字段，不新增索引或约束。 |
 
 ## `knowledge_sources` OSS 来源表（V22）
 
@@ -585,3 +587,5 @@ V22 另有 `knowledge_bases → knowledge_sources → knowledge_source_items` �
 约束：主键 id；`uk_knowledge_source_item (source_id, key_hash)`；`fk_knowledge_source_item_source` 引用 knowledge_sources.id ON DELETE CASCADE；`fk_knowledge_source_item_document` 引用 knowledge_documents.id 默认限制删除；`ck_knowledge_source_item_status` 限定上述状态。映射、文档及知识库归属一致、同对象来源标识/范围不变由应用保证。导入提交锁定来源并核对租约，再锁知识库以串行化不同来源对业务身份的认领；快照上传在事务外，候选、任务和 last_document_id / accepted_fingerprint 在同一事务提交。
 
 诊断阶段补充：需要判断适用条件时先执行 `APPLICABILITY`；只有 `applicability.routingAttempted=true` 才实际调用路由模型并计入模型用量。配置未启用/续答不调用路由；DRAFT、REVIEW 仍分别记账，Embedding 用量不在此统计内。
+
+阶段42范围契约补充：请求可以使用 applicabilityScopes（1–3项）或旧 applicabilityScope，二者同时出现必须表达同一单范围；应用拒绝空/重复/非法代码/ALL混选。消息列表JSON由应用校验，数据库不对文本内部添加检查约束。新回答报告版本3增加 applicabilityScopes，旧版本从标量恢复；多范围标量为NULL。未指定范围时按配置名称识别，助手完成时允许从请求ALL变为实际范围，但显式范围集合不得改变。多选续答仍绑定最后一条澄清消息、原库、配置修订及原选项。

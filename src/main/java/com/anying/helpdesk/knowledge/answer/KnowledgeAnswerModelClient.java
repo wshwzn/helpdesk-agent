@@ -177,7 +177,7 @@ public class KnowledgeAnswerModelClient {
                 EXHAUSTED 表示已尝试相关规则仍缺资料或关系循环，gaps 写缺失事实，queries=[]。
                 不要因资料缺失拒绝保留其他已有据部分。缺口最多 8 项，每项最多 300 字；
                 查询最多 2 项，每项最多 300 字，不含换行。只输出 JSON，不输出答案、思考过程或额外字段。
-                """, Map.of("question", question, "applicabilityScope", scope,
+                """ + (scope.startsWith("[") ? "逐一检查范围列表中的每个地区，某地区有片段不代表该地区的目标事实完整。跨地区金额不同不是冲突。" : ""), Map.of("question", question, "applicabilityScope", scope,
                 "evidence", evidence, "searchedQueries", searchedQueries), KnowledgeRetrievalPlan.class);
         try {
             if (result.value() == null) throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
@@ -226,7 +226,7 @@ public class KnowledgeAnswerModelClient {
     /** 只提供本轮证据生成草案，不注册工单工具，也不引入旧轮事实。 */
     public ModelResult<KnowledgeAnswerSelection> draft(ResolvedChatModel model, String question, String scope,
                                                   KnowledgeCitationCatalog evidence) {
-        return call(model, DRAFT_PROMPT, Map.of("question", question, "applicabilityScope", scope,
+        return call(model, scopedPrompt(DRAFT_PROMPT, scope), Map.of("question", question, "applicabilityScope", scope,
                 "evidence", evidence), KnowledgeAnswerSelection.class);
     }
 
@@ -234,7 +234,7 @@ public class KnowledgeAnswerModelClient {
     public ModelResult<KnowledgeAnswerSelection> draft(ResolvedChatModel model, String question, String scope,
             KnowledgeCitationCatalog evidence, KnowledgeAnswerContext context) {
         if (context == null) return draft(model, question, scope, evidence);
-        return call(model, DRAFT_PROMPT + """
+        return call(model, scopedPrompt(DRAFT_PROMPT, scope) + """
                 retrievalContext 是服务端记录的检索经历，knowledgeGaps 来自规划模型，不是制度事实或引用依据。
                 searchedAfterAssessment=true 表示缺口判断之后又有检索，必须用最终 evidence 重新检查哪些缺口已补齐。
                 不得把缺内部制度、编码映射或金额表转成向用户追问。只有 userConditions 非空时才允许 NEEDS_CLARIFICATION，
@@ -257,7 +257,7 @@ public class KnowledgeAnswerModelClient {
                                      List<KnowledgeAnswerReport.Evidence> evidence, KnowledgeAnswerDraft draft,
                                      ReviewStrategy strategy) {
         if (strategy == ReviewStrategy.REASONED) {
-            var result = call(model, REASONED_REVIEW_PROMPT, Map.of("question", question, "applicabilityScope", scope,
+            var result = call(model, scopedPrompt(REASONED_REVIEW_PROMPT, scope), Map.of("question", question, "applicabilityScope", scope,
                     "evidence", evidence, "draft", draft, "claimPaths", KnowledgeReviewChecklist.claimPaths(draft)), Review.class);
             try {
                 validateReasonedReview(result.value(), evidence, draft);
@@ -268,7 +268,7 @@ public class KnowledgeAnswerModelClient {
             }
         }
         if (strategy == ReviewStrategy.BASELINE || strategy == ReviewStrategy.CONTEXTUAL) {
-            var result = call(model, reviewPrompt(strategy), Map.of("question", question, "applicabilityScope", scope,
+            var result = call(model, scopedPrompt(reviewPrompt(strategy), scope), Map.of("question", question, "applicabilityScope", scope,
                     "evidence", evidence, "draft", draft), Review.class);
             var review = result.value();
             if (review == null || review.approved() == null || review.checklist() != null || review.issues() != null
@@ -279,7 +279,7 @@ public class KnowledgeAnswerModelClient {
             }
             return result;
         }
-        var result = call(model, CHECKLIST_PROMPT, Map.of("question", question, "applicabilityScope", scope,
+        var result = call(model, scopedPrompt(CHECKLIST_PROMPT, scope), Map.of("question", question, "applicabilityScope", scope,
                 "evidence", evidence, "draft", draft, "claimPaths", KnowledgeReviewChecklist.claimPaths(draft)),
                 KnowledgeReviewChecklist.class);
         try {
@@ -289,6 +289,20 @@ public class KnowledgeAnswerModelClient {
             throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, failure.getMessage(),
                     new TokenUsage(result.promptTokens(), result.completionTokens(), result.totalTokens()));
         }
+    }
+
+    /** 多范围共用一次草案和复核，逐项核对覆盖，禁止将地区差异当作同条件冲突。 */
+    private String scopedPrompt(String prompt, String scope) {
+        if (!scope.startsWith("[")) return prompt;
+        return prompt + """
+                本次 applicabilityScope 是明确选择的多个范围列表，必须覆盖每个范围并分别标明地区。
+                各地区金额不同是正常差异，不是冲突；只有同一适用条件的相反规定才算冲突。
+                ALL 资料仅在原文确实适用于该地区时提供依据，不能用一个地区的规则补另一个地区。
+                找到某地区的任意片段不代表该地区问题已有答案；必须核对每个地区每项实质问题。
+                任一地区或问题缺依据时用 INSUFFICIENT_EVIDENCE，保留其余有依据部分，不能声称比较完整。
+                若所有请求范围都由通用制度明确覆盖，可以完整回答，不强求每个范围都有专属文件。
+                已明确的地区不要再次追问；资料缺失不能让用户提供制度金额。
+                """;
     }
 
     /** 为评测记录提示摘要，避免只凭策略名称认定两次运行使用相同规则。 */

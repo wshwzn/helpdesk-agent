@@ -55,8 +55,7 @@ public class KnowledgeRetrievalService {
             KnowledgeRetrievalSettingsResponse settings
     ) {
         String query = request.query().trim();
-        Map<Long, KnowledgeDocument> eligible = new LinkedHashMap<>(eligibilityService.findEligible(
-                knowledgeBaseId, request.applicabilityScope(), LocalDateTime.now(knowledgeClock)));
+        Map<Long, KnowledgeDocument> eligible = new LinkedHashMap<>(eligible(knowledgeBaseId, request));
         if (eligible.isEmpty()) {
             return new KnowledgeSearchResponse(knowledgeBaseId, query, settings.candidateLimit(),
                     settings.vectorMinSimilarity(), settings.resultLimit(), 0, 0, List.of());
@@ -77,8 +76,7 @@ public class KnowledgeRetrievalService {
                         document.getId(), document.getActiveIndexBuildId())).toList()
         );
         // 网络调用期间可能发生撤回或到期；只允许初次准入且复核仍有效的文档进入最终证据。
-        Map<Long, KnowledgeDocument> current = eligibilityService.findEligible(
-                knowledgeBaseId, request.applicabilityScope(), LocalDateTime.now(knowledgeClock));
+        Map<Long, KnowledgeDocument> current = eligible(knowledgeBaseId, request);
         eligible.keySet().retainAll(current.keySet());
         KnowledgeChunkSearchResults verified = new KnowledgeChunkSearchResults(
                 candidates.bm25Hits().stream().filter(hit -> eligible.containsKey(hit.documentId())).toList(),
@@ -94,6 +92,13 @@ public class KnowledgeRetrievalService {
                 verified.vectorHits().size(),
                 results
         );
+    }
+
+    /** 多范围只扩大一次候选准入集合，不重复生成查询向量或执行各地区完整检索。 */
+    private Map<Long, KnowledgeDocument> eligible(Long baseId, KnowledgeSearchRequest request) {
+        return request.applicabilityScopes().size() == 1
+                ? eligibilityService.findEligible(baseId, request.applicabilityScope(), LocalDateTime.now(knowledgeClock))
+                : eligibilityService.findEligibleScopes(baseId, request.applicabilityScopes(), LocalDateTime.now(knowledgeClock));
     }
 
     /**

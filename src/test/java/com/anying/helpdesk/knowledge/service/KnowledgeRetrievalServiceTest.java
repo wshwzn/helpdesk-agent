@@ -151,6 +151,32 @@ class KnowledgeRetrievalServiceTest {
         assertThat(response.bm25CandidateCount()).isZero();
     }
 
+    /** 联合范围复用一次向量化与混合检索，并继续在网络调用后复查撤回资格。 */
+    @Test @DisplayName("多范围联合查询只向量化一次且剔除中途撤回文档")
+    void unionScopesEmbedOnceAndRecheck() {
+        var service = new KnowledgeRetrievalService(knowledgeBaseService, embeddingModelProvider, chunkStore, eligibilityService, clock);
+        var sh = document(3L); sh.setApplicabilityScope("CN_SH");
+        var bj = document(9L); bj.setApplicabilityScope("CN_BJ");
+        var eligible = new java.util.LinkedHashMap<Long, KnowledgeDocument>(); eligible.put(3L, sh); eligible.put(9L, bj);
+        when(eligibilityService.findEligibleScopes(eq(3L), eq(List.of("CN_SH", "CN_BJ")), any()))
+                .thenReturn(eligible, Map.of(3L, sh));
+        float[] vector = {1F, 0F};
+        when(embeddingModelProvider.get()).thenReturn(new ResolvedEmbeddingModel(8L, "embedding-model", 2, embeddingModel));
+        when(embeddingModel.embed("比较额度")).thenReturn(vector);
+        var shHit = hit("3-1", 1, "上海额度", 10);
+        var bjHit = new KnowledgeChunkSearchHit("9-1", 9L, 1, "北京.md", "北京额度", 9);
+        when(chunkStore.search(3L, 8L, "embedding-model", "比较额度", vector, 50, 100, 0,
+                List.of(new com.anying.helpdesk.knowledge.index.KnowledgeIndexSelection(3L, null),
+                        new com.anying.helpdesk.knowledge.index.KnowledgeIndexSelection(9L, null))))
+                .thenReturn(new KnowledgeChunkSearchResults(List.of(shHit, bjHit), List.of(shHit, bjHit)));
+        var result = service.search(3L, new KnowledgeSearchRequest("比较额度", null, List.of("CN_SH", "CN_BJ")),
+                new KnowledgeRetrievalSettingsResponse(3L, 50, BigDecimal.ZERO, 5, 0));
+        assertThat(result.results()).extracting(r -> r.documentId()).containsExactly(3L);
+        verify(embeddingModel).embed("比较额度");
+        org.mockito.Mockito.verify(eligibilityService, org.mockito.Mockito.times(2))
+                .findEligibleScopes(eq(3L), eq(List.of("CN_SH", "CN_BJ")), any());
+    }
+
     /**
      * 构造用于验证引用版本的权威元数据快照。
      */

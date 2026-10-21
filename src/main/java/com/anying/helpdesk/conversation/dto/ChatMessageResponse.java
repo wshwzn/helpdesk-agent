@@ -27,6 +27,7 @@ public record ChatMessageResponse(
         List<KnowledgeCitationResponse> citations,
         @Schema(description = "本条消息的对话模式；AGENT 为旧兼容模式，其检索引用不等于已完成可信核验") ChatMode mode,
         @Schema(description = "知识问答显式选择的适用范围") String applicabilityScope,
+        @Schema(description = "有效范围列表；历史消息从单范围字段恢复") List<String> applicabilityScopes,
         @Schema(description = "知识问答核验报告；普通对话、生成中或失败时为空") KnowledgeAnswerReport knowledgeAnswer,
         @Schema(description = "知识助手消息的运行编号；仅管理员可查询诊断，旧消息为空") String knowledgeRunId,
         @Schema(description = "创建时间") LocalDateTime createdAt,
@@ -66,6 +67,8 @@ public record ChatMessageResponse(
                 message.getKnowledgeAnswer() == null ? citations : message.getKnowledgeAnswer().citations(),
                 message.getMode(),
                 message.getApplicabilityScope(),
+                message.getApplicabilityScopes() != null ? message.getApplicabilityScopes()
+                        : message.getApplicabilityScope() == null ? List.of() : List.of(message.getApplicabilityScope()),
                 message.getKnowledgeAnswer(),
                 message.getKnowledgeRunId(),
                 message.getCreatedAt(),

@@ -13,17 +13,25 @@ public record SendMessageRequest(
         @Schema(description = "员工提问内容", example = "差旅结束后多久内提交报销？")
         @NotBlank @Size(max = 10000) String content,
         @Schema(description = "默认 KNOWLEDGE，强制检索和核验，问题最多 2000 字；显式 AGENT 仅为旧客户端兼容，不具备完整核验保证", defaultValue = "KNOWLEDGE") ChatMode mode,
-        @Schema(description = "KNOWLEDGE 的适用范围代码，默认 ALL；不从自然语言猜测", example = "CN_SH")
+        @Schema(description = "旧单范围字段；省略范围时按已配置名称识别或澄清", example = "CN_SH")
         @Pattern(regexp = "[A-Z][A-Z0-9_-]{0,39}") String applicabilityScope,
         @Schema(description = "续答的澄清助手消息 ID；必须显式选择其提供的范围")
-        @jakarta.validation.constraints.Positive Long clarificationMessageId
+        @jakarta.validation.constraints.Positive Long clarificationMessageId,
+        @Schema(description = "适用范围列表，最多3项；不可与不同的单范围字段并用，不可混选ALL")
+        java.util.List<String> applicabilityScopes
 ) {
-    /** 新请求默认进入可信问答，显式旧模式保持兼容；知识问答省略范围时仅查通用资料。 */
+    /** 新请求默认进入可信问答，显式旧模式保持兼容；省略范围交给可信服务按配置识别或澄清。 */
     public SendMessageRequest {
         mode = mode == null ? ChatMode.KNOWLEDGE : mode;
-        if (mode == ChatMode.KNOWLEDGE && applicabilityScope == null) {
-            applicabilityScope = "ALL";
+        if (mode == ChatMode.KNOWLEDGE) {
+            applicabilityScopes = com.anying.helpdesk.knowledge.answer.KnowledgeScopes.resolve(applicabilityScope, applicabilityScopes);
+            applicabilityScope = com.anying.helpdesk.knowledge.answer.KnowledgeScopes.single(applicabilityScopes);
         }
+    }
+
+    /** 保留旧客户端及单范围续答的构造入口。 */
+    public SendMessageRequest(String content, ChatMode mode, String scope, Long clarificationId) {
+        this(content, mode, scope, clarificationId, null);
     }
 
     /** 兼容未使用澄清续答的知识问答请求。 */
@@ -42,7 +50,7 @@ public record SendMessageRequest(
     public boolean isKnowledgeInputValid() {
         return mode == ChatMode.KNOWLEDGE
                 ? (content == null || content.length() <= 2000)
-                    && (clarificationMessageId == null || (applicabilityScope != null && !"ALL".equals(applicabilityScope)))
-                : applicabilityScope == null && clarificationMessageId == null;
+                    && (clarificationMessageId == null || (applicabilityScopes != null && !applicabilityScopes.contains("ALL")))
+                : applicabilityScope == null && applicabilityScopes == null && clarificationMessageId == null;
     }
 }

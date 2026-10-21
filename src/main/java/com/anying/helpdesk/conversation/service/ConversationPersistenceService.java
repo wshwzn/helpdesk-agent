@@ -206,6 +206,7 @@ public class ConversationPersistenceService {
         userMessage.setContent(request.content().trim());
         userMessage.setMode(request.mode());
         userMessage.setApplicabilityScope(request.applicabilityScope());
+        userMessage.setApplicabilityScopes(request.applicabilityScopes());
         userMessage.setStatus(ChatMessageStatus.COMPLETED);
         userMessage.setCreatedAt(now);
         userMessage.setUpdatedAt(now);
@@ -216,6 +217,7 @@ public class ConversationPersistenceService {
         assistantMessage.setRole(ChatMessageRole.ASSISTANT);
         assistantMessage.setMode(request.mode());
         assistantMessage.setApplicabilityScope(request.applicabilityScope());
+        assistantMessage.setApplicabilityScopes(request.applicabilityScopes());
         if (request.mode() == ChatMode.KNOWLEDGE) {
             assistantMessage.setKnowledgeRunId(java.util.UUID.randomUUID().toString());
         }
@@ -246,7 +248,7 @@ public class ConversationPersistenceService {
             Long conversationId, SendMessageRequest request) {
         if (request.clarificationMessageId() == null)
             return new KnowledgeAnswerInput(
-                    request.content().trim(), request.applicabilityScope(), null, null, null);
+                    request.content().trim(), request.applicabilityScope(), null, null, null, request.applicabilityScopes());
         var latest = chatMessageMapper.selectList(new LambdaQueryWrapper<ChatMessage>()
                 .eq(ChatMessage::getConversationId, conversationId).orderByDesc(ChatMessage::getId).last("LIMIT 1"));
         var source = latest.isEmpty() ? null : latest.getFirst();
@@ -258,13 +260,21 @@ public class ConversationPersistenceService {
             throw new KnowledgeClarificationException(true, "clarification is no longer available; ask the original question again");
         var report = source.getKnowledgeAnswer();
         var clarification = report.clarification();
-        if (request.mode() != ChatMode.KNOWLEDGE || clarification.scopeOptions().stream()
-                .noneMatch(option -> option.value().equals(request.applicabilityScope())))
+        if (request.mode() != ChatMode.KNOWLEDGE || !clarification.scopeOptions().stream().map(option -> option.value()).toList()
+                .containsAll(request.applicabilityScopes()))
             throw new KnowledgeClarificationException(false, "select a scope offered by the clarification");
         if (applicabilityService.get(report.knowledgeBaseId()).revision() != clarification.policyRevision())
             throw new KnowledgeClarificationException(true, "applicability policy has changed; ask the original question again");
         return new KnowledgeAnswerInput(clarification.originalQuestion(),
-                request.applicabilityScope(), report.knowledgeBaseId(), source.getId(), clarification.policyRevision());
+                request.applicabilityScope(), report.knowledgeBaseId(), source.getId(), clarification.policyRevision(), request.applicabilityScopes());
+    }
+
+    /** 显式范围必须一致；未指定范围的请求允许可信服务按配置名称解析实际范围。 */
+    private boolean scopeMatches(ChatMessage message, KnowledgeAnswerReport report) {
+        var requested = message.getApplicabilityScopes() != null ? message.getApplicabilityScopes()
+                : java.util.List.of(message.getApplicabilityScope());
+        return requested.equals(java.util.List.of("ALL"))
+                || new java.util.HashSet<>(requested).equals(new java.util.HashSet<>(report.applicabilityScopes()));
     }
 
     /** 原子保存最终正文、Token 用量和核验报告，拒绝覆盖已结束的生成任务。 */
@@ -272,8 +282,7 @@ public class ConversationPersistenceService {
     public ChatMessage completeAssistant(Long assistantMessageId, ChatCompletionResult result) {
         ChatMessage message = requirePendingAssistant(assistantMessageId);
         if ((message.getMode() == ChatMode.KNOWLEDGE) != (result.knowledgeAnswer() != null)
-                || (result.knowledgeAnswer() != null && !java.util.Objects.equals(
-                message.getApplicabilityScope(), result.knowledgeAnswer().applicabilityScope()))) {
+                || (result.knowledgeAnswer() != null && !scopeMatches(message, result.knowledgeAnswer()))) {
             throw new IllegalStateException("knowledge answer does not match message mode or scope");
         }
         LocalDateTime now = LocalDateTime.now();
@@ -283,6 +292,10 @@ public class ConversationPersistenceService {
         message.setCompletionTokens(result.completionTokens());
         message.setTotalTokens(result.totalTokens());
         message.setKnowledgeAnswer(result.knowledgeAnswer());
+        if (result.knowledgeAnswer() != null) {
+            message.setApplicabilityScope(result.knowledgeAnswer().applicabilityScope());
+            message.setApplicabilityScopes(result.knowledgeAnswer().applicabilityScopes());
+        }
         message.setUpdatedAt(now);
         if (chatMessageMapper.updateById(message) == 0) {
             throw new ConcurrentConversationUpdateException(message.getConversationId());

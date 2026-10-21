@@ -12,6 +12,19 @@ import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*
 @Component
 public class KnowledgeAnswerGuard {
 
+    /** 不同地区的独立金额不是制度冲突；ALL 与具体范围仍可能构成同条件冲突。 */
+    public void validateScopeConflicts(KnowledgeAnswerDraft draft, List<KnowledgeAnswerReport.Evidence> evidence) {
+        var byId = evidence.stream().collect(Collectors.toMap(KnowledgeAnswerReport.Evidence::id, item -> item));
+        for (var conflict : draft.conflicts()) {
+            var first = conflict.first().references().stream().map(r -> byId.get(r.evidenceId()).metadata().applicabilityScope())
+                    .collect(Collectors.toSet());
+            var second = conflict.second().references().stream().map(r -> byId.get(r.evidenceId()).metadata().applicabilityScope())
+                    .collect(Collectors.toSet());
+            require(first.contains("ALL") || second.contains("ALL") || first.stream().anyMatch(second::contains),
+                    "different scopes alone do not establish a conflict");
+        }
+    }
+
     /** 将模型片段选择解析为服务端原文，并继续执行原有状态和逐字引用校验。 */
     public KnowledgeAnswerDraft resolve(KnowledgeAnswerSelection selection, KnowledgeCitationCatalog catalog,
                                         List<KnowledgeAnswerReport.Evidence> evidence) {

@@ -262,7 +262,7 @@ public class ConversationServiceImpl implements ConversationService {
     private ChatCompletionResult answerKnowledge(ResolvedChatModel model, PreparedChatExchange prepared,
                                                 KnowledgeAnswerTrace trace) {
         var input = prepared.knowledgeInput();
-        return input.continuationOfMessageId() == null
+        return input.continuationOfMessageId() == null && input.scopes().size() == 1
                 ? trustedKnowledgeAnswerService.answer(model, input.question(), input.scope(), trace)
                 : trustedKnowledgeAnswerService.answer(model, input, trace);
     }

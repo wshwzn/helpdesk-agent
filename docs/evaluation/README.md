@@ -180,3 +180,7 @@ REASONED 固定草案回放共 96 次，第二轮误拒/协议失败退化，未
 [完整报告](runs/2026-10-21-单列表规划候选取舍.md)：同一冻结 12 题只跑一次，10 通过、1 未通过、1 技术失败，完整召回 11/12。原先通过的九题未退化，N01 改善；但 N02 仍错误确定回答，不满足事前采用门槛。已知 Token 62,538，比阶段 37 增长 6.89%。候选保持关闭，结束本项迭代，下一步进入 D 统一入口。
 
 新候选只输出 decision/gaps/tasks/userConditions，显式开关为 `app.knowledge.multihop.task-planning-enabled=true`（环境变量 `KNOWLEDGE_TASK_PLANNING_ENABLED=true`），默认 false；复核仍 BASELINE。新快照版本 5，answerContext 使用 pendingQueries，旧 pendingRuleQueries 可读取；诊断 queries 保存转换后的任务，ruleChecks 为空。阶段 40 的独立回放工具现在调用新的候选协议，重新运行不等于复现旧版协议，旧数据保持原样。
+
+## 多范围联合检索（阶段42）
+
+[完整报告](runs/2026-10-21-多范围联合检索验证.md)保留首次会话入口缺陷及修复后六题：五题通过，一题部分可答草案被复核拒绝。全程使用新默认“dp官方”，未切回旧模型；修复后29,037已知Token包含失败和澄清初问，未计Embedding。最多三范围共用检索和生成预算，正常比较题一次搜索；不能将两轮成功项拼成六题全通过，或与旧模型得分直接比较。

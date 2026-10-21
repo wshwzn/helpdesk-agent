@@ -1,0 +1,3786 @@
+{
+  "startedAt": "2026-10-21T13:25:22.695683+08:00",
+  "planned": 6,
+  "results": [
+    {
+      "id": "S01",
+      "question": "普通员工在上海出差每晚住宿报销上限是多少？",
+      "scopes": [
+        "CN_SH"
+      ],
+      "expectedStatus": "ANSWERABLE",
+      "conversationId": 240,
+      "message": {
+        "id": 802,
+        "conversationId": 240,
+        "role": "ASSISTANT",
+        "content": "根据本轮检索资料：\n\n普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。 [E1]",
+        "status": "COMPLETED",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "promptTokens": 2382,
+        "completionTokens": 507,
+        "totalTokens": 2889,
+        "errorCode": null,
+        "citations": [
+          {
+            "knowledgeBaseName": "多范围评测-8a8a10dd",
+            "sourceName": "01-上海住宿.md",
+            "chunkSequence": 1,
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "documentId": 250,
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": "CN_SH",
+        "applicabilityScopes": [
+          "CN_SH"
+        ],
+        "knowledgeAnswer": {
+          "schemaVersion": 3,
+          "reason": "REVIEWED",
+          "knowledgeBaseId": 21,
+          "knowledgeBaseName": "多范围评测-8a8a10dd",
+          "applicabilityScope": "CN_SH",
+          "checkedAt": "2026-10-21T13:25:43.9298421",
+          "answer": {
+            "status": "ANSWERABLE",
+            "claims": [
+              {
+                "text": "普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "id": "E2",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "clarification": null,
+          "continuationOfMessageId": null,
+          "applicabilityScopes": [
+            "CN_SH"
+          ]
+        },
+        "knowledgeRunId": "166a951d-0b87-4168-909d-c27edbe9bbbd",
+        "createdAt": "2026-10-21T13:25:38.651747",
+        "updatedAt": "2026-10-21T13:25:43.9540228"
+      },
+      "problems": [],
+      "outcome": "CHECK_PASSED",
+      "elapsedSeconds": 5.505,
+      "diagnostic": {
+        "schemaVersion": 6,
+        "runId": "166a951d-0b87-4168-909d-c27edbe9bbbd",
+        "assistantMessageId": 802,
+        "conversationId": 240,
+        "question": "普通员工在上海出差每晚住宿报销上限是多少？",
+        "applicabilityScope": "CN_SH",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 16,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-21T13:25:38.6832515",
+        "updatedAt": "2026-10-21T13:25:43.9804003",
+        "finishedAt": "2026-10-21T13:25:43.9788962",
+        "retrieval": {
+          "knowledgeBaseId": 21,
+          "query": "普通员工在上海出差每晚住宿报销上限是多少？",
+          "candidateLimit": 50,
+          "vectorMinSimilarity": 0.0,
+          "resultLimit": 5,
+          "bm25CandidateCount": 2,
+          "vectorCandidateCount": 2,
+          "results": [
+            {
+              "rank": 1,
+              "documentId": 250,
+              "chunkSequence": 1,
+              "originalName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "rrfScore": 0.03278688524590164,
+              "bm25Rank": 1,
+              "bm25Score": 38.33765,
+              "vectorRank": 1,
+              "vectorScore": 0.975936,
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "rank": 2,
+              "documentId": 252,
+              "chunkSequence": 1,
+              "originalName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "rrfScore": 0.03225806451612903,
+              "bm25Rank": 2,
+              "bm25Score": 22.87059,
+              "vectorRank": 2,
+              "vectorScore": 0.8200685,
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ]
+        },
+        "retrievalTruncated": false,
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 250,
+            "chunkSequence": 1,
+            "sourceName": "01-上海住宿.md",
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 252,
+            "chunkSequence": 1,
+            "sourceName": "03-通用报销期限.md",
+            "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+            "metadata": {
+              "sourceKey": "scope-all",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "draft": {
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "review": {
+          "approved": true,
+          "reason": null,
+          "checklist": null,
+          "issues": null
+        },
+        "answerReason": "REVIEWED",
+        "stages": [
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:38.7474187",
+            "durationMs": 534,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "PLANNING",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:39.2955099",
+            "durationMs": 1223,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 726,
+              "completionTokens": 100,
+              "totalTokens": 826
+            }
+          },
+          {
+            "stage": "DRAFT",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:40.5315065",
+            "durationMs": 1726,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 960,
+              "completionTokens": 180,
+              "totalTokens": 1140
+            }
+          },
+          {
+            "stage": "VALIDATION",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:42.2666216",
+            "durationMs": 7,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "REVIEW",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:42.2846969",
+            "durationMs": 1635,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 696,
+              "completionTokens": 227,
+              "totalTokens": 923
+            }
+          },
+          {
+            "stage": "EVIDENCE_RECHECK",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:43.9258378",
+            "durationMs": 11,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:43.945655",
+            "durationMs": 29,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": {
+          "citationSetId": "3ecfa877-1986-4e1f-a247-7c0e8b947c5a",
+          "sources": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E1-P1",
+                  "startOffset": 0,
+                  "endOffset": 55,
+                  "text": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E2",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E2-P1",
+                  "startOffset": 0,
+                  "endOffset": 49,
+                  "text": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                  "selectable": true
+                }
+              ]
+            }
+          ]
+        },
+        "selection": {
+          "citationSetId": "3ecfa877-1986-4e1f-a247-7c0e8b947c5a",
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P1"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "applicability": null,
+        "retrievalRun": {
+          "enabled": true,
+          "maxRounds": 3,
+          "maxSearches": 5,
+          "maxEvidence": 50,
+          "maxCharacters": 50000,
+          "schedulingBudgetMs": 90000,
+          "searches": [
+            {
+              "round": 1,
+              "query": "普通员工在上海出差每晚住宿报销上限是多少？",
+              "response": {
+                "knowledgeBaseId": 21,
+                "query": "普通员工在上海出差每晚住宿报销上限是多少？",
+                "candidateLimit": 50,
+                "vectorMinSimilarity": 0.0,
+                "resultLimit": 5,
+                "bm25CandidateCount": 2,
+                "vectorCandidateCount": 2,
+                "results": [
+                  {
+                    "rank": 1,
+                    "documentId": 250,
+                    "chunkSequence": 1,
+                    "originalName": "01-上海住宿.md",
+                    "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                    "rrfScore": 0.03278688524590164,
+                    "bm25Rank": 1,
+                    "bm25Score": 38.33765,
+                    "vectorRank": 1,
+                    "vectorScore": 0.975936,
+                    "metadata": {
+                      "sourceKey": "scope-cn_sh",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "CN_SH",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "documentId": 252,
+                    "chunkSequence": 1,
+                    "originalName": "03-通用报销期限.md",
+                    "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                    "rrfScore": 0.03225806451612903,
+                    "bm25Rank": 2,
+                    "bm25Score": 22.87059,
+                    "vectorRank": 2,
+                    "vectorScore": 0.8200685,
+                    "metadata": {
+                      "sourceKey": "scope-all",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "ALL",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  }
+                ]
+              },
+              "truncated": false,
+              "addedEvidenceIds": [
+                "E1",
+                "E2"
+              ],
+              "scopes": [
+                "CN_SH"
+              ]
+            }
+          ],
+          "plans": [
+            {
+              "afterRound": 1,
+              "plan": {
+                "decision": "SUFFICIENT",
+                "gaps": [],
+                "queries": [],
+                "ruleChecks": [],
+                "userConditions": []
+              }
+            }
+          ],
+          "stopReason": "SUFFICIENT"
+        },
+        "answerContext": null,
+        "applicabilityScopes": [
+          "CN_SH"
+        ]
+      },
+      "searches": 1,
+      "modelStages": {
+        "PLANNING": 1,
+        "DRAFT": 1,
+        "REVIEW": 1
+      },
+      "missingUsage": 0,
+      "knownTokens": 2889
+    },
+    {
+      "id": "S02",
+      "question": "比较上海和北京普通员工每晚住宿报销上限。",
+      "scopes": [
+        "CN_SH",
+        "CN_BJ"
+      ],
+      "expectedStatus": "ANSWERABLE",
+      "conversationId": 241,
+      "message": {
+        "id": 804,
+        "conversationId": 241,
+        "role": "ASSISTANT",
+        "content": "根据本轮检索资料：\n\n上海：普通员工在上海出差，每晚住宿报销上限为640元，超过上限的部分不予报销；该标准只适用于上海。 [E1]\n\n北京：普通员工在北京出差，每晚住宿报销上限为480元，超过上限的部分不予报销；该标准只适用于北京。 [E2]\n\n比较两地普通员工每晚住宿报销上限，上海为640元，北京为480元，上海比北京高160元。 [E1] [E2]",
+        "status": "COMPLETED",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "promptTokens": 3411,
+        "completionTokens": 808,
+        "totalTokens": 4219,
+        "errorCode": null,
+        "citations": [
+          {
+            "knowledgeBaseName": "多范围评测-8a8a10dd",
+            "sourceName": "01-上海住宿.md",
+            "chunkSequence": 1,
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "documentId": 250,
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "knowledgeBaseName": "多范围评测-8a8a10dd",
+            "sourceName": "02-北京住宿.md",
+            "chunkSequence": 1,
+            "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+            "documentId": 251,
+            "metadata": {
+              "sourceKey": "scope-cn_bj",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_BJ",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": null,
+        "applicabilityScopes": [
+          "CN_SH",
+          "CN_BJ"
+        ],
+        "knowledgeAnswer": {
+          "schemaVersion": 3,
+          "reason": "REVIEWED",
+          "knowledgeBaseId": 21,
+          "knowledgeBaseName": "多范围评测-8a8a10dd",
+          "applicabilityScope": null,
+          "checkedAt": "2026-10-21T13:25:50.9374037",
+          "answer": {
+            "status": "ANSWERABLE",
+            "claims": [
+              {
+                "text": "上海：普通员工在上海出差，每晚住宿报销上限为640元，超过上限的部分不予报销；该标准只适用于上海。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                  }
+                ]
+              },
+              {
+                "text": "北京：普通员工在北京出差，每晚住宿报销上限为480元，超过上限的部分不予报销；该标准只适用于北京。",
+                "references": [
+                  {
+                    "evidenceId": "E2",
+                    "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                  }
+                ]
+              },
+              {
+                "text": "比较两地普通员工每晚住宿报销上限，上海为640元，北京为480元，上海比北京高160元。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                  },
+                  {
+                    "evidenceId": "E2",
+                    "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "id": "E2",
+              "documentId": 251,
+              "chunkSequence": 1,
+              "sourceName": "02-北京住宿.md",
+              "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+              "metadata": {
+                "sourceKey": "scope-cn_bj",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "id": "E3",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "clarification": null,
+          "continuationOfMessageId": null,
+          "applicabilityScopes": [
+            "CN_SH",
+            "CN_BJ"
+          ]
+        },
+        "knowledgeRunId": "40c3c2e7-b0d9-416a-b757-52ecfb016e30",
+        "createdAt": "2026-10-21T13:25:44.249572",
+        "updatedAt": "2026-10-21T13:25:50.9586504"
+      },
+      "problems": [],
+      "outcome": "CHECK_PASSED",
+      "elapsedSeconds": 6.778,
+      "diagnostic": {
+        "schemaVersion": 6,
+        "runId": "40c3c2e7-b0d9-416a-b757-52ecfb016e30",
+        "assistantMessageId": 804,
+        "conversationId": 241,
+        "question": "比较上海和北京普通员工每晚住宿报销上限。",
+        "applicabilityScope": null,
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 18,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-21T13:25:44.261025",
+        "updatedAt": "2026-10-21T13:25:50.9703938",
+        "finishedAt": "2026-10-21T13:25:50.9703938",
+        "retrieval": {
+          "knowledgeBaseId": 21,
+          "query": "比较上海和北京普通员工每晚住宿报销上限。",
+          "candidateLimit": 50,
+          "vectorMinSimilarity": 0.0,
+          "resultLimit": 5,
+          "bm25CandidateCount": 3,
+          "vectorCandidateCount": 3,
+          "results": [
+            {
+              "rank": 1,
+              "documentId": 250,
+              "chunkSequence": 1,
+              "originalName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "rrfScore": 0.03252247488101534,
+              "bm25Rank": 2,
+              "bm25Score": 33.339237,
+              "vectorRank": 1,
+              "vectorScore": 0.9446422,
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "rank": 2,
+              "documentId": 251,
+              "chunkSequence": 1,
+              "originalName": "02-北京住宿.md",
+              "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+              "rrfScore": 0.03252247488101534,
+              "bm25Rank": 1,
+              "bm25Score": 43.96037,
+              "vectorRank": 2,
+              "vectorScore": 0.9365417,
+              "metadata": {
+                "sourceKey": "scope-cn_bj",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "rank": 3,
+              "documentId": 252,
+              "chunkSequence": 1,
+              "originalName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "rrfScore": 0.031746031746031744,
+              "bm25Rank": 3,
+              "bm25Score": 17.850693,
+              "vectorRank": 3,
+              "vectorScore": 0.78782344,
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ]
+        },
+        "retrievalTruncated": false,
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 250,
+            "chunkSequence": 1,
+            "sourceName": "01-上海住宿.md",
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 251,
+            "chunkSequence": 1,
+            "sourceName": "02-北京住宿.md",
+            "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+            "metadata": {
+              "sourceKey": "scope-cn_bj",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_BJ",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E3",
+            "documentId": 252,
+            "chunkSequence": 1,
+            "sourceName": "03-通用报销期限.md",
+            "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+            "metadata": {
+              "sourceKey": "scope-all",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "draft": {
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "上海：普通员工在上海出差，每晚住宿报销上限为640元，超过上限的部分不予报销；该标准只适用于上海。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                }
+              ]
+            },
+            {
+              "text": "北京：普通员工在北京出差，每晚住宿报销上限为480元，超过上限的部分不予报销；该标准只适用于北京。",
+              "references": [
+                {
+                  "evidenceId": "E2",
+                  "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                }
+              ]
+            },
+            {
+              "text": "比较两地普通员工每晚住宿报销上限，上海为640元，北京为480元，上海比北京高160元。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                },
+                {
+                  "evidenceId": "E2",
+                  "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "review": {
+          "approved": true,
+          "reason": null,
+          "checklist": null,
+          "issues": null
+        },
+        "answerReason": "REVIEWED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:44.2680572",
+            "durationMs": 992,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 160,
+              "completionTokens": 60,
+              "totalTokens": 220
+            }
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:45.2700307",
+            "durationMs": 295,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "PLANNING",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:45.5741954",
+            "durationMs": 1060,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 864,
+              "completionTokens": 74,
+              "totalTokens": 938
+            }
+          },
+          {
+            "stage": "DRAFT",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:46.6597136",
+            "durationMs": 2447,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 1241,
+              "completionTokens": 441,
+              "totalTokens": 1682
+            }
+          },
+          {
+            "stage": "VALIDATION",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:49.1133195",
+            "durationMs": 5,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "REVIEW",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:49.1233807",
+            "durationMs": 1780,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 1146,
+              "completionTokens": 233,
+              "totalTokens": 1379
+            }
+          },
+          {
+            "stage": "EVIDENCE_RECHECK",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:50.9336409",
+            "durationMs": 8,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:50.949737",
+            "durationMs": 15,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": {
+          "citationSetId": "03eee36f-7c16-4c46-b713-4291b0069733",
+          "sources": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E1-P1",
+                  "startOffset": 0,
+                  "endOffset": 55,
+                  "text": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E2",
+              "documentId": 251,
+              "chunkSequence": 1,
+              "sourceName": "02-北京住宿.md",
+              "metadata": {
+                "sourceKey": "scope-cn_bj",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E2-P1",
+                  "startOffset": 0,
+                  "endOffset": 55,
+                  "text": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E3",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E3-P1",
+                  "startOffset": 0,
+                  "endOffset": 49,
+                  "text": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                  "selectable": true
+                }
+              ]
+            }
+          ]
+        },
+        "selection": {
+          "citationSetId": "03eee36f-7c16-4c46-b713-4291b0069733",
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "上海：普通员工在上海出差，每晚住宿报销上限为640元，超过上限的部分不予报销；该标准只适用于上海。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P1"
+                }
+              ]
+            },
+            {
+              "text": "北京：普通员工在北京出差，每晚住宿报销上限为480元，超过上限的部分不予报销；该标准只适用于北京。",
+              "references": [
+                {
+                  "evidenceId": "E2",
+                  "paragraphId": "E2-P1"
+                }
+              ]
+            },
+            {
+              "text": "比较两地普通员工每晚住宿报销上限，上海为640元，北京为480元，上海比北京高160元。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P1"
+                },
+                {
+                  "evidenceId": "E2",
+                  "paragraphId": "E2-P1"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "lodging",
+                "description": "员工出差住宿报销金额和地区比较",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  },
+                  {
+                    "value": "CN_GZ",
+                    "label": "广州"
+                  }
+                ]
+              }
+            ]
+          },
+          "route": {
+            "topicIds": [
+              "lodging"
+            ],
+            "uncertain": false
+          },
+          "continuationOfMessageId": null,
+          "routingAttempted": true
+        },
+        "retrievalRun": {
+          "enabled": true,
+          "maxRounds": 3,
+          "maxSearches": 5,
+          "maxEvidence": 50,
+          "maxCharacters": 50000,
+          "schedulingBudgetMs": 90000,
+          "searches": [
+            {
+              "round": 1,
+              "query": "比较上海和北京普通员工每晚住宿报销上限。",
+              "response": {
+                "knowledgeBaseId": 21,
+                "query": "比较上海和北京普通员工每晚住宿报销上限。",
+                "candidateLimit": 50,
+                "vectorMinSimilarity": 0.0,
+                "resultLimit": 5,
+                "bm25CandidateCount": 3,
+                "vectorCandidateCount": 3,
+                "results": [
+                  {
+                    "rank": 1,
+                    "documentId": 250,
+                    "chunkSequence": 1,
+                    "originalName": "01-上海住宿.md",
+                    "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                    "rrfScore": 0.03252247488101534,
+                    "bm25Rank": 2,
+                    "bm25Score": 33.339237,
+                    "vectorRank": 1,
+                    "vectorScore": 0.9446422,
+                    "metadata": {
+                      "sourceKey": "scope-cn_sh",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "CN_SH",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "documentId": 251,
+                    "chunkSequence": 1,
+                    "originalName": "02-北京住宿.md",
+                    "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+                    "rrfScore": 0.03252247488101534,
+                    "bm25Rank": 1,
+                    "bm25Score": 43.96037,
+                    "vectorRank": 2,
+                    "vectorScore": 0.9365417,
+                    "metadata": {
+                      "sourceKey": "scope-cn_bj",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "CN_BJ",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "documentId": 252,
+                    "chunkSequence": 1,
+                    "originalName": "03-通用报销期限.md",
+                    "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                    "rrfScore": 0.031746031746031744,
+                    "bm25Rank": 3,
+                    "bm25Score": 17.850693,
+                    "vectorRank": 3,
+                    "vectorScore": 0.78782344,
+                    "metadata": {
+                      "sourceKey": "scope-all",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "ALL",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  }
+                ]
+              },
+              "truncated": false,
+              "addedEvidenceIds": [
+                "E1",
+                "E2",
+                "E3"
+              ],
+              "scopes": [
+                "CN_SH",
+                "CN_BJ"
+              ]
+            }
+          ],
+          "plans": [
+            {
+              "afterRound": 1,
+              "plan": {
+                "decision": "SUFFICIENT",
+                "gaps": [],
+                "queries": [],
+                "ruleChecks": [],
+                "userConditions": []
+              }
+            }
+          ],
+          "stopReason": "SUFFICIENT"
+        },
+        "answerContext": null,
+        "applicabilityScopes": [
+          "CN_SH",
+          "CN_BJ"
+        ]
+      },
+      "searches": 1,
+      "modelStages": {
+        "APPLICABILITY": 1,
+        "PLANNING": 1,
+        "DRAFT": 1,
+        "REVIEW": 1
+      },
+      "missingUsage": 0,
+      "knownTokens": 4219
+    },
+    {
+      "id": "S03",
+      "question": "比较上海和北京普通员工每晚住宿报销上限。",
+      "scopes": [
+        "CN_SH",
+        "CN_BJ"
+      ],
+      "expectedStatus": "ANSWERABLE",
+      "conversationId": 242,
+      "message": {
+        "id": 806,
+        "conversationId": 242,
+        "role": "ASSISTANT",
+        "content": "根据本轮检索资料：\n\n上海：普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销，该标准只适用于上海。 [E1]\n\n北京：普通员工在北京出差，每晚住宿报销上限为480元；超过上限的部分不予报销，该标准只适用于北京。 [E2]\n\n按上述标准，上海普通员工每晚住宿报销上限比北京高160元。 [E1] [E2]",
+        "status": "COMPLETED",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "promptTokens": 3401,
+        "completionTokens": 865,
+        "totalTokens": 4266,
+        "errorCode": null,
+        "citations": [
+          {
+            "knowledgeBaseName": "多范围评测-8a8a10dd",
+            "sourceName": "01-上海住宿.md",
+            "chunkSequence": 1,
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "documentId": 250,
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "knowledgeBaseName": "多范围评测-8a8a10dd",
+            "sourceName": "02-北京住宿.md",
+            "chunkSequence": 1,
+            "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+            "documentId": 251,
+            "metadata": {
+              "sourceKey": "scope-cn_bj",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_BJ",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": null,
+        "applicabilityScopes": [
+          "CN_SH",
+          "CN_BJ"
+        ],
+        "knowledgeAnswer": {
+          "schemaVersion": 3,
+          "reason": "REVIEWED",
+          "knowledgeBaseId": 21,
+          "knowledgeBaseName": "多范围评测-8a8a10dd",
+          "applicabilityScope": null,
+          "checkedAt": "2026-10-21T13:25:58.315814",
+          "answer": {
+            "status": "ANSWERABLE",
+            "claims": [
+              {
+                "text": "上海：普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销，该标准只适用于上海。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                  }
+                ]
+              },
+              {
+                "text": "北京：普通员工在北京出差，每晚住宿报销上限为480元；超过上限的部分不予报销，该标准只适用于北京。",
+                "references": [
+                  {
+                    "evidenceId": "E2",
+                    "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                  }
+                ]
+              },
+              {
+                "text": "按上述标准，上海普通员工每晚住宿报销上限比北京高160元。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                  },
+                  {
+                    "evidenceId": "E2",
+                    "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "id": "E2",
+              "documentId": 251,
+              "chunkSequence": 1,
+              "sourceName": "02-北京住宿.md",
+              "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+              "metadata": {
+                "sourceKey": "scope-cn_bj",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "id": "E3",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "clarification": null,
+          "continuationOfMessageId": null,
+          "applicabilityScopes": [
+            "CN_SH",
+            "CN_BJ"
+          ]
+        },
+        "knowledgeRunId": "3873a2f1-30fe-43bd-948e-6b3127b52374",
+        "createdAt": "2026-10-21T13:25:51.112038",
+        "updatedAt": "2026-10-21T13:25:58.3311433"
+      },
+      "problems": [],
+      "outcome": "CHECK_PASSED",
+      "elapsedSeconds": 7.292,
+      "diagnostic": {
+        "schemaVersion": 6,
+        "runId": "3873a2f1-30fe-43bd-948e-6b3127b52374",
+        "assistantMessageId": 806,
+        "conversationId": 242,
+        "question": "比较上海和北京普通员工每晚住宿报销上限。",
+        "applicabilityScope": "ALL",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 18,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-21T13:25:51.1259297",
+        "updatedAt": "2026-10-21T13:25:58.3402654",
+        "finishedAt": "2026-10-21T13:25:58.3402654",
+        "retrieval": {
+          "knowledgeBaseId": 21,
+          "query": "比较上海和北京普通员工每晚住宿报销上限。",
+          "candidateLimit": 50,
+          "vectorMinSimilarity": 0.0,
+          "resultLimit": 5,
+          "bm25CandidateCount": 3,
+          "vectorCandidateCount": 3,
+          "results": [
+            {
+              "rank": 1,
+              "documentId": 250,
+              "chunkSequence": 1,
+              "originalName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "rrfScore": 0.03252247488101534,
+              "bm25Rank": 2,
+              "bm25Score": 33.339237,
+              "vectorRank": 1,
+              "vectorScore": 0.944651,
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "rank": 2,
+              "documentId": 251,
+              "chunkSequence": 1,
+              "originalName": "02-北京住宿.md",
+              "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+              "rrfScore": 0.03252247488101534,
+              "bm25Rank": 1,
+              "bm25Score": 43.96037,
+              "vectorRank": 2,
+              "vectorScore": 0.93653023,
+              "metadata": {
+                "sourceKey": "scope-cn_bj",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "rank": 3,
+              "documentId": 252,
+              "chunkSequence": 1,
+              "originalName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "rrfScore": 0.031746031746031744,
+              "bm25Rank": 3,
+              "bm25Score": 17.850693,
+              "vectorRank": 3,
+              "vectorScore": 0.78783005,
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ]
+        },
+        "retrievalTruncated": false,
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 250,
+            "chunkSequence": 1,
+            "sourceName": "01-上海住宿.md",
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 251,
+            "chunkSequence": 1,
+            "sourceName": "02-北京住宿.md",
+            "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+            "metadata": {
+              "sourceKey": "scope-cn_bj",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_BJ",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E3",
+            "documentId": 252,
+            "chunkSequence": 1,
+            "sourceName": "03-通用报销期限.md",
+            "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+            "metadata": {
+              "sourceKey": "scope-all",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "draft": {
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "上海：普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销，该标准只适用于上海。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                }
+              ]
+            },
+            {
+              "text": "北京：普通员工在北京出差，每晚住宿报销上限为480元；超过上限的部分不予报销，该标准只适用于北京。",
+              "references": [
+                {
+                  "evidenceId": "E2",
+                  "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                }
+              ]
+            },
+            {
+              "text": "按上述标准，上海普通员工每晚住宿报销上限比北京高160元。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                },
+                {
+                  "evidenceId": "E2",
+                  "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "review": {
+          "approved": true,
+          "reason": null,
+          "checklist": null,
+          "issues": null
+        },
+        "answerReason": "REVIEWED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:51.1336493",
+            "durationMs": 980,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 160,
+              "completionTokens": 63,
+              "totalTokens": 223
+            }
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:52.1229575",
+            "durationMs": 471,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "PLANNING",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:52.6028429",
+            "durationMs": 1323,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 864,
+              "completionTokens": 104,
+              "totalTokens": 968
+            }
+          },
+          {
+            "stage": "DRAFT",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:53.9324409",
+            "durationMs": 2336,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 1240,
+              "completionTokens": 423,
+              "totalTokens": 1663
+            }
+          },
+          {
+            "stage": "VALIDATION",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:56.2760914",
+            "durationMs": 7,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "REVIEW",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:56.2887232",
+            "durationMs": 2006,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 1137,
+              "completionTokens": 275,
+              "totalTokens": 1412
+            }
+          },
+          {
+            "stage": "EVIDENCE_RECHECK",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:58.3097234",
+            "durationMs": 9,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:58.3244034",
+            "durationMs": 12,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": {
+          "citationSetId": "6e280eeb-fbc4-4912-a508-3e304808af48",
+          "sources": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E1-P1",
+                  "startOffset": 0,
+                  "endOffset": 55,
+                  "text": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E2",
+              "documentId": 251,
+              "chunkSequence": 1,
+              "sourceName": "02-北京住宿.md",
+              "metadata": {
+                "sourceKey": "scope-cn_bj",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E2-P1",
+                  "startOffset": 0,
+                  "endOffset": 55,
+                  "text": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E3",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E3-P1",
+                  "startOffset": 0,
+                  "endOffset": 49,
+                  "text": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                  "selectable": true
+                }
+              ]
+            }
+          ]
+        },
+        "selection": {
+          "citationSetId": "6e280eeb-fbc4-4912-a508-3e304808af48",
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "上海：普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销，该标准只适用于上海。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P1"
+                }
+              ]
+            },
+            {
+              "text": "北京：普通员工在北京出差，每晚住宿报销上限为480元；超过上限的部分不予报销，该标准只适用于北京。",
+              "references": [
+                {
+                  "evidenceId": "E2",
+                  "paragraphId": "E2-P1"
+                }
+              ]
+            },
+            {
+              "text": "按上述标准，上海普通员工每晚住宿报销上限比北京高160元。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P1"
+                },
+                {
+                  "evidenceId": "E2",
+                  "paragraphId": "E2-P1"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "lodging",
+                "description": "员工出差住宿报销金额和地区比较",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  },
+                  {
+                    "value": "CN_GZ",
+                    "label": "广州"
+                  }
+                ]
+              }
+            ]
+          },
+          "route": {
+            "topicIds": [
+              "lodging"
+            ],
+            "uncertain": false
+          },
+          "continuationOfMessageId": null,
+          "routingAttempted": true
+        },
+        "retrievalRun": {
+          "enabled": true,
+          "maxRounds": 3,
+          "maxSearches": 5,
+          "maxEvidence": 50,
+          "maxCharacters": 50000,
+          "schedulingBudgetMs": 90000,
+          "searches": [
+            {
+              "round": 1,
+              "query": "比较上海和北京普通员工每晚住宿报销上限。",
+              "response": {
+                "knowledgeBaseId": 21,
+                "query": "比较上海和北京普通员工每晚住宿报销上限。",
+                "candidateLimit": 50,
+                "vectorMinSimilarity": 0.0,
+                "resultLimit": 5,
+                "bm25CandidateCount": 3,
+                "vectorCandidateCount": 3,
+                "results": [
+                  {
+                    "rank": 1,
+                    "documentId": 250,
+                    "chunkSequence": 1,
+                    "originalName": "01-上海住宿.md",
+                    "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                    "rrfScore": 0.03252247488101534,
+                    "bm25Rank": 2,
+                    "bm25Score": 33.339237,
+                    "vectorRank": 1,
+                    "vectorScore": 0.944651,
+                    "metadata": {
+                      "sourceKey": "scope-cn_sh",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "CN_SH",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "documentId": 251,
+                    "chunkSequence": 1,
+                    "originalName": "02-北京住宿.md",
+                    "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+                    "rrfScore": 0.03252247488101534,
+                    "bm25Rank": 1,
+                    "bm25Score": 43.96037,
+                    "vectorRank": 2,
+                    "vectorScore": 0.93653023,
+                    "metadata": {
+                      "sourceKey": "scope-cn_bj",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "CN_BJ",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "documentId": 252,
+                    "chunkSequence": 1,
+                    "originalName": "03-通用报销期限.md",
+                    "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                    "rrfScore": 0.031746031746031744,
+                    "bm25Rank": 3,
+                    "bm25Score": 17.850693,
+                    "vectorRank": 3,
+                    "vectorScore": 0.78783005,
+                    "metadata": {
+                      "sourceKey": "scope-all",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "ALL",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  }
+                ]
+              },
+              "truncated": false,
+              "addedEvidenceIds": [
+                "E1",
+                "E2",
+                "E3"
+              ],
+              "scopes": [
+                "CN_SH",
+                "CN_BJ"
+              ]
+            }
+          ],
+          "plans": [
+            {
+              "afterRound": 1,
+              "plan": {
+                "decision": "SUFFICIENT",
+                "gaps": [],
+                "queries": [],
+                "ruleChecks": [],
+                "userConditions": []
+              }
+            }
+          ],
+          "stopReason": "SUFFICIENT"
+        },
+        "answerContext": null,
+        "applicabilityScopes": [
+          "CN_SH",
+          "CN_BJ"
+        ]
+      },
+      "searches": 1,
+      "modelStages": {
+        "APPLICABILITY": 1,
+        "PLANNING": 1,
+        "DRAFT": 1,
+        "REVIEW": 1
+      },
+      "missingUsage": 0,
+      "knownTokens": 4266
+    },
+    {
+      "id": "S04",
+      "question": "比较上海和广州普通员工每晚住宿报销上限。",
+      "scopes": [
+        "CN_SH",
+        "CN_GZ"
+      ],
+      "expectedStatus": "INSUFFICIENT_EVIDENCE",
+      "conversationId": 243,
+      "message": {
+        "id": 808,
+        "conversationId": 243,
+        "role": "ASSISTANT",
+        "content": "现有证据不足以完整回答问题。\n\n上海普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。该标准只适用于上海。 [E1]",
+        "status": "COMPLETED",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "promptTokens": 2906,
+        "completionTokens": 1902,
+        "totalTokens": 4808,
+        "errorCode": null,
+        "citations": [
+          {
+            "knowledgeBaseName": "多范围评测-8a8a10dd",
+            "sourceName": "01-上海住宿.md",
+            "chunkSequence": 1,
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "documentId": 250,
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": null,
+        "applicabilityScopes": [
+          "CN_SH",
+          "CN_GZ"
+        ],
+        "knowledgeAnswer": {
+          "schemaVersion": 3,
+          "reason": "REVIEWED",
+          "knowledgeBaseId": 21,
+          "knowledgeBaseName": "多范围评测-8a8a10dd",
+          "applicabilityScope": null,
+          "checkedAt": "2026-10-21T13:26:11.1455581",
+          "answer": {
+            "status": "INSUFFICIENT_EVIDENCE",
+            "claims": [
+              {
+                "text": "上海普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。该标准只适用于上海。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "id": "E2",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "clarification": null,
+          "continuationOfMessageId": null,
+          "applicabilityScopes": [
+            "CN_SH",
+            "CN_GZ"
+          ]
+        },
+        "knowledgeRunId": "2cd10d0a-b456-4e1b-bc14-54d47c38f467",
+        "createdAt": "2026-10-21T13:25:58.483799",
+        "updatedAt": "2026-10-21T13:26:11.163704"
+      },
+      "problems": [],
+      "outcome": "CHECK_PASSED",
+      "elapsedSeconds": 12.737,
+      "diagnostic": {
+        "schemaVersion": 6,
+        "runId": "2cd10d0a-b456-4e1b-bc14-54d47c38f467",
+        "assistantMessageId": 808,
+        "conversationId": 243,
+        "question": "比较上海和广州普通员工每晚住宿报销上限。",
+        "applicabilityScope": null,
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 22,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-21T13:25:58.4924534",
+        "updatedAt": "2026-10-21T13:26:11.1741198",
+        "finishedAt": "2026-10-21T13:26:11.1741198",
+        "retrieval": {
+          "knowledgeBaseId": 21,
+          "query": "比较上海和广州普通员工每晚住宿报销上限。",
+          "candidateLimit": 50,
+          "vectorMinSimilarity": 0.0,
+          "resultLimit": 5,
+          "bm25CandidateCount": 2,
+          "vectorCandidateCount": 2,
+          "results": [
+            {
+              "rank": 1,
+              "documentId": 250,
+              "chunkSequence": 1,
+              "originalName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "rrfScore": 0.03278688524590164,
+              "bm25Rank": 1,
+              "bm25Score": 33.339237,
+              "vectorRank": 1,
+              "vectorScore": 0.93612546,
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "rank": 2,
+              "documentId": 252,
+              "chunkSequence": 1,
+              "originalName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "rrfScore": 0.03225806451612903,
+              "bm25Rank": 2,
+              "bm25Score": 17.850693,
+              "vectorRank": 2,
+              "vectorScore": 0.79017377,
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ]
+        },
+        "retrievalTruncated": false,
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 250,
+            "chunkSequence": 1,
+            "sourceName": "01-上海住宿.md",
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 252,
+            "chunkSequence": 1,
+            "sourceName": "03-通用报销期限.md",
+            "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+            "metadata": {
+              "sourceKey": "scope-all",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "draft": {
+          "status": "INSUFFICIENT_EVIDENCE",
+          "claims": [
+            {
+              "text": "上海普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。该标准只适用于上海。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "review": {
+          "approved": true,
+          "reason": null,
+          "checklist": null,
+          "issues": null
+        },
+        "answerReason": "REVIEWED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:58.4977261",
+            "durationMs": 938,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 160,
+              "completionTokens": 84,
+              "totalTokens": 244
+            }
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:59.4412812",
+            "durationMs": 250,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:59.7028613",
+            "durationMs": 213,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "PLANNING",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:25:59.9269699",
+            "durationMs": 1897,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 771,
+              "completionTokens": 204,
+              "totalTokens": 975
+            }
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:01.8283512",
+            "durationMs": 240,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "DRAFT",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:02.0757482",
+            "durationMs": 2052,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 1113,
+              "completionTokens": 370,
+              "totalTokens": 1483
+            }
+          },
+          {
+            "stage": "VALIDATION",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:04.1326726",
+            "durationMs": 3,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "REVIEW",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:04.1394762",
+            "durationMs": 6990,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 862,
+              "completionTokens": 1244,
+              "totalTokens": 2106
+            }
+          },
+          {
+            "stage": "EVIDENCE_RECHECK",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:11.1420433",
+            "durationMs": 8,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:11.1567622",
+            "durationMs": 12,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": {
+          "citationSetId": "52e6f1b4-81b0-4ec8-b676-4a460fa068d0",
+          "sources": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E1-P1",
+                  "startOffset": 0,
+                  "endOffset": 55,
+                  "text": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E2",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E2-P1",
+                  "startOffset": 0,
+                  "endOffset": 49,
+                  "text": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                  "selectable": true
+                }
+              ]
+            }
+          ]
+        },
+        "selection": {
+          "citationSetId": "52e6f1b4-81b0-4ec8-b676-4a460fa068d0",
+          "status": "INSUFFICIENT_EVIDENCE",
+          "claims": [
+            {
+              "text": "上海普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。该标准只适用于上海。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P1"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "lodging",
+                "description": "员工出差住宿报销金额和地区比较",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  },
+                  {
+                    "value": "CN_GZ",
+                    "label": "广州"
+                  }
+                ]
+              }
+            ]
+          },
+          "route": {
+            "topicIds": [
+              "lodging"
+            ],
+            "uncertain": false
+          },
+          "continuationOfMessageId": null,
+          "routingAttempted": true
+        },
+        "retrievalRun": {
+          "enabled": true,
+          "maxRounds": 3,
+          "maxSearches": 5,
+          "maxEvidence": 50,
+          "maxCharacters": 50000,
+          "schedulingBudgetMs": 90000,
+          "searches": [
+            {
+              "round": 1,
+              "query": "比较上海和广州普通员工每晚住宿报销上限。",
+              "response": {
+                "knowledgeBaseId": 21,
+                "query": "比较上海和广州普通员工每晚住宿报销上限。",
+                "candidateLimit": 50,
+                "vectorMinSimilarity": 0.0,
+                "resultLimit": 5,
+                "bm25CandidateCount": 2,
+                "vectorCandidateCount": 2,
+                "results": [
+                  {
+                    "rank": 1,
+                    "documentId": 250,
+                    "chunkSequence": 1,
+                    "originalName": "01-上海住宿.md",
+                    "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                    "rrfScore": 0.03278688524590164,
+                    "bm25Rank": 1,
+                    "bm25Score": 33.339237,
+                    "vectorRank": 1,
+                    "vectorScore": 0.93612546,
+                    "metadata": {
+                      "sourceKey": "scope-cn_sh",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "CN_SH",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "documentId": 252,
+                    "chunkSequence": 1,
+                    "originalName": "03-通用报销期限.md",
+                    "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                    "rrfScore": 0.03225806451612903,
+                    "bm25Rank": 2,
+                    "bm25Score": 17.850693,
+                    "vectorRank": 2,
+                    "vectorScore": 0.79017377,
+                    "metadata": {
+                      "sourceKey": "scope-all",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "ALL",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  }
+                ]
+              },
+              "truncated": false,
+              "addedEvidenceIds": [
+                "E1",
+                "E2"
+              ],
+              "scopes": [
+                "CN_SH",
+                "CN_GZ"
+              ]
+            },
+            {
+              "round": 2,
+              "query": "比较上海和广州普通员工每晚住宿报销上限。",
+              "response": {
+                "knowledgeBaseId": 21,
+                "query": "比较上海和广州普通员工每晚住宿报销上限。",
+                "candidateLimit": 50,
+                "vectorMinSimilarity": 0.0,
+                "resultLimit": 5,
+                "bm25CandidateCount": 1,
+                "vectorCandidateCount": 1,
+                "results": [
+                  {
+                    "rank": 1,
+                    "documentId": 252,
+                    "chunkSequence": 1,
+                    "originalName": "03-通用报销期限.md",
+                    "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                    "rrfScore": 0.03278688524590164,
+                    "bm25Rank": 1,
+                    "bm25Score": 17.850693,
+                    "vectorRank": 1,
+                    "vectorScore": 0.79017377,
+                    "metadata": {
+                      "sourceKey": "scope-all",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "ALL",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  }
+                ]
+              },
+              "truncated": false,
+              "addedEvidenceIds": [],
+              "scopes": [
+                "CN_GZ"
+              ]
+            },
+            {
+              "round": 3,
+              "query": "广州住宿标准 普通员工 每晚住宿报销上限",
+              "response": {
+                "knowledgeBaseId": 21,
+                "query": "广州住宿标准 普通员工 每晚住宿报销上限",
+                "candidateLimit": 50,
+                "vectorMinSimilarity": 0.0,
+                "resultLimit": 5,
+                "bm25CandidateCount": 2,
+                "vectorCandidateCount": 2,
+                "results": [
+                  {
+                    "rank": 1,
+                    "documentId": 250,
+                    "chunkSequence": 1,
+                    "originalName": "01-上海住宿.md",
+                    "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                    "rrfScore": 0.03278688524590164,
+                    "bm25Rank": 1,
+                    "bm25Score": 38.009403,
+                    "vectorRank": 1,
+                    "vectorScore": 0.89350724,
+                    "metadata": {
+                      "sourceKey": "scope-cn_sh",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "CN_SH",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "documentId": 252,
+                    "chunkSequence": 1,
+                    "originalName": "03-通用报销期限.md",
+                    "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                    "rrfScore": 0.03225806451612903,
+                    "bm25Rank": 2,
+                    "bm25Score": 23.511198,
+                    "vectorRank": 2,
+                    "vectorScore": 0.79072696,
+                    "metadata": {
+                      "sourceKey": "scope-all",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "ALL",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  }
+                ]
+              },
+              "truncated": false,
+              "addedEvidenceIds": [],
+              "scopes": [
+                "CN_SH",
+                "CN_GZ"
+              ]
+            }
+          ],
+          "plans": [
+            {
+              "afterRound": 2,
+              "plan": {
+                "decision": "SEARCH",
+                "gaps": [
+                  "缺少广州普通员工每晚住宿报销上限的具体金额；上海普通员工上限已有640元的依据。"
+                ],
+                "queries": [
+                  "广州住宿标准 普通员工 每晚住宿报销上限"
+                ],
+                "ruleChecks": [],
+                "userConditions": []
+              }
+            }
+          ],
+          "stopReason": "NO_NEW_EVIDENCE"
+        },
+        "answerContext": null,
+        "applicabilityScopes": [
+          "CN_SH",
+          "CN_GZ"
+        ]
+      },
+      "searches": 3,
+      "modelStages": {
+        "APPLICABILITY": 1,
+        "PLANNING": 1,
+        "DRAFT": 1,
+        "REVIEW": 1
+      },
+      "missingUsage": 0,
+      "knownTokens": 4808
+    },
+    {
+      "id": "S05",
+      "question": "比较两个地区普通员工每晚住宿报销上限。",
+      "scopes": [
+        "CN_SH",
+        "CN_BJ"
+      ],
+      "expectedStatus": "ANSWERABLE",
+      "conversationId": 244,
+      "clarification": {
+        "id": 810,
+        "conversationId": 244,
+        "role": "ASSISTANT",
+        "content": "请补充本次问题适用的地区或范围（比较时最多选择3项）：上海、北京、广州。",
+        "status": "COMPLETED",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "promptTokens": 159,
+        "completionTokens": 80,
+        "totalTokens": 239,
+        "errorCode": null,
+        "citations": [],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": "ALL",
+        "applicabilityScopes": [
+          "ALL"
+        ],
+        "knowledgeAnswer": {
+          "schemaVersion": 2,
+          "reason": "APPLICABILITY_REQUIRED",
+          "knowledgeBaseId": 21,
+          "knowledgeBaseName": "多范围评测-8a8a10dd",
+          "applicabilityScope": "ALL",
+          "checkedAt": "2026-10-21T13:26:12.5862882",
+          "answer": {
+            "status": "NEEDS_CLARIFICATION",
+            "claims": [],
+            "missingConditions": [
+              "请明确本次问题适用的地区或范围？"
+            ],
+            "conflicts": []
+          },
+          "evidence": [],
+          "clarification": {
+            "originalQuestion": "比较两个地区普通员工每晚住宿报销上限。",
+            "policyRevision": 1,
+            "topicIds": [
+              "lodging"
+            ],
+            "scopeOptions": [
+              {
+                "value": "CN_SH",
+                "label": "上海"
+              },
+              {
+                "value": "CN_BJ",
+                "label": "北京"
+              },
+              {
+                "value": "CN_GZ",
+                "label": "广州"
+              }
+            ]
+          },
+          "continuationOfMessageId": null,
+          "applicabilityScopes": [
+            "ALL"
+          ]
+        },
+        "knowledgeRunId": "ee054507-f173-4c5c-940d-77c4c5c538a1",
+        "createdAt": "2026-10-21T13:26:11.350072",
+        "updatedAt": "2026-10-21T13:26:12.590297"
+      },
+      "message": {
+        "id": 812,
+        "conversationId": 244,
+        "role": "ASSISTANT",
+        "content": "根据本轮检索资料：\n\n在上海适用范围内，普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。 [E1]\n\n在北京适用范围内，普通员工在北京出差，每晚住宿报销上限为480元；超过上限的部分不予报销。 [E2]\n\n比较普通员工每晚住宿报销上限，上海为640元，北京为480元，上海比北京高160元。 [E1] [E2]",
+        "status": "COMPLETED",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "promptTokens": 3240,
+        "completionTokens": 1302,
+        "totalTokens": 4542,
+        "errorCode": null,
+        "citations": [
+          {
+            "knowledgeBaseName": "多范围评测-8a8a10dd",
+            "sourceName": "01-上海住宿.md",
+            "chunkSequence": 1,
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "documentId": 250,
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "knowledgeBaseName": "多范围评测-8a8a10dd",
+            "sourceName": "02-北京住宿.md",
+            "chunkSequence": 1,
+            "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+            "documentId": 251,
+            "metadata": {
+              "sourceKey": "scope-cn_bj",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_BJ",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": null,
+        "applicabilityScopes": [
+          "CN_SH",
+          "CN_BJ"
+        ],
+        "knowledgeAnswer": {
+          "schemaVersion": 3,
+          "reason": "REVIEWED",
+          "knowledgeBaseId": 21,
+          "knowledgeBaseName": "多范围评测-8a8a10dd",
+          "applicabilityScope": null,
+          "checkedAt": "2026-10-21T13:26:21.7569039",
+          "answer": {
+            "status": "ANSWERABLE",
+            "claims": [
+              {
+                "text": "在上海适用范围内，普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                  }
+                ]
+              },
+              {
+                "text": "在北京适用范围内，普通员工在北京出差，每晚住宿报销上限为480元；超过上限的部分不予报销。",
+                "references": [
+                  {
+                    "evidenceId": "E2",
+                    "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                  }
+                ]
+              },
+              {
+                "text": "比较普通员工每晚住宿报销上限，上海为640元，北京为480元，上海比北京高160元。",
+                "references": [
+                  {
+                    "evidenceId": "E1",
+                    "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                  },
+                  {
+                    "evidenceId": "E2",
+                    "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                  }
+                ]
+              }
+            ],
+            "missingConditions": [],
+            "conflicts": []
+          },
+          "evidence": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "id": "E2",
+              "documentId": 251,
+              "chunkSequence": 1,
+              "sourceName": "02-北京住宿.md",
+              "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+              "metadata": {
+                "sourceKey": "scope-cn_bj",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "id": "E3",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ],
+          "clarification": null,
+          "continuationOfMessageId": 810,
+          "applicabilityScopes": [
+            "CN_SH",
+            "CN_BJ"
+          ]
+        },
+        "knowledgeRunId": "f21f0833-e61a-4623-986d-45c22c95aa83",
+        "createdAt": "2026-10-21T13:26:12.69118",
+        "updatedAt": "2026-10-21T13:26:21.767502"
+      },
+      "problems": [],
+      "outcome": "CHECK_PASSED",
+      "elapsedSeconds": 10.473,
+      "diagnostic": {
+        "schemaVersion": 6,
+        "runId": "f21f0833-e61a-4623-986d-45c22c95aa83",
+        "assistantMessageId": 812,
+        "conversationId": 244,
+        "question": "比较两个地区普通员工每晚住宿报销上限。",
+        "applicabilityScope": null,
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 18,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-21T13:26:12.7065998",
+        "updatedAt": "2026-10-21T13:26:21.7765534",
+        "finishedAt": "2026-10-21T13:26:21.7765534",
+        "retrieval": {
+          "knowledgeBaseId": 21,
+          "query": "比较两个地区普通员工每晚住宿报销上限。",
+          "candidateLimit": 50,
+          "vectorMinSimilarity": 0.0,
+          "resultLimit": 5,
+          "bm25CandidateCount": 3,
+          "vectorCandidateCount": 3,
+          "results": [
+            {
+              "rank": 1,
+              "documentId": 250,
+              "chunkSequence": 1,
+              "originalName": "01-上海住宿.md",
+              "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+              "rrfScore": 0.03252247488101534,
+              "bm25Rank": 1,
+              "bm25Score": 27.992605,
+              "vectorRank": 2,
+              "vectorScore": 0.89888996,
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "rank": 2,
+              "documentId": 251,
+              "chunkSequence": 1,
+              "originalName": "02-北京住宿.md",
+              "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+              "rrfScore": 0.03252247488101534,
+              "bm25Rank": 2,
+              "bm25Score": 27.852106,
+              "vectorRank": 1,
+              "vectorScore": 0.9038331,
+              "metadata": {
+                "sourceKey": "scope-cn_bj",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            },
+            {
+              "rank": 3,
+              "documentId": 252,
+              "chunkSequence": 1,
+              "originalName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "rrfScore": 0.031746031746031744,
+              "bm25Rank": 3,
+              "bm25Score": 22.560524,
+              "vectorRank": 3,
+              "vectorScore": 0.8161013,
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ]
+        },
+        "retrievalTruncated": false,
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 250,
+            "chunkSequence": 1,
+            "sourceName": "01-上海住宿.md",
+            "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+            "metadata": {
+              "sourceKey": "scope-cn_sh",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_SH",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E2",
+            "documentId": 251,
+            "chunkSequence": 1,
+            "sourceName": "02-北京住宿.md",
+            "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+            "metadata": {
+              "sourceKey": "scope-cn_bj",
+              "businessVersion": "v1",
+              "applicabilityScope": "CN_BJ",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          },
+          {
+            "id": "E3",
+            "documentId": 252,
+            "chunkSequence": 1,
+            "sourceName": "03-通用报销期限.md",
+            "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+            "metadata": {
+              "sourceKey": "scope-all",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "draft": {
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "在上海适用范围内，普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                }
+              ]
+            },
+            {
+              "text": "在北京适用范围内，普通员工在北京出差，每晚住宿报销上限为480元；超过上限的部分不予报销。",
+              "references": [
+                {
+                  "evidenceId": "E2",
+                  "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                }
+              ]
+            },
+            {
+              "text": "比较普通员工每晚住宿报销上限，上海为640元，北京为480元，上海比北京高160元。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。"
+                },
+                {
+                  "evidenceId": "E2",
+                  "quote": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "review": {
+          "approved": true,
+          "reason": null,
+          "checklist": null,
+          "issues": null
+        },
+        "answerReason": "REVIEWED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:12.7126115",
+            "durationMs": 7,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:12.7244537",
+            "durationMs": 371,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "PLANNING",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:13.104925",
+            "durationMs": 1112,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 862,
+              "completionTokens": 104,
+              "totalTokens": 966
+            }
+          },
+          {
+            "stage": "DRAFT",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:14.22961",
+            "durationMs": 4442,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 1242,
+              "completionTokens": 776,
+              "totalTokens": 2018
+            }
+          },
+          {
+            "stage": "VALIDATION",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:18.6772529",
+            "durationMs": 3,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "REVIEW",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:18.6843747",
+            "durationMs": 3057,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 1136,
+              "completionTokens": 422,
+              "totalTokens": 1558
+            }
+          },
+          {
+            "stage": "EVIDENCE_RECHECK",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:21.7532217",
+            "durationMs": 6,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:21.763134",
+            "durationMs": 8,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": {
+          "citationSetId": "b3b86918-f684-4dc4-8ace-5f98f6949f90",
+          "sources": [
+            {
+              "id": "E1",
+              "documentId": 250,
+              "chunkSequence": 1,
+              "sourceName": "01-上海住宿.md",
+              "metadata": {
+                "sourceKey": "scope-cn_sh",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_SH",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E1-P1",
+                  "startOffset": 0,
+                  "endOffset": 55,
+                  "text": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E2",
+              "documentId": 251,
+              "chunkSequence": 1,
+              "sourceName": "02-北京住宿.md",
+              "metadata": {
+                "sourceKey": "scope-cn_bj",
+                "businessVersion": "v1",
+                "applicabilityScope": "CN_BJ",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E2-P1",
+                  "startOffset": 0,
+                  "endOffset": 55,
+                  "text": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+                  "selectable": true
+                }
+              ]
+            },
+            {
+              "id": "E3",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E3-P1",
+                  "startOffset": 0,
+                  "endOffset": 49,
+                  "text": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                  "selectable": true
+                }
+              ]
+            }
+          ]
+        },
+        "selection": {
+          "citationSetId": "b3b86918-f684-4dc4-8ace-5f98f6949f90",
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "在上海适用范围内，普通员工在上海出差，每晚住宿报销上限为640元；超过上限的部分不予报销。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P1"
+                }
+              ]
+            },
+            {
+              "text": "在北京适用范围内，普通员工在北京出差，每晚住宿报销上限为480元；超过上限的部分不予报销。",
+              "references": [
+                {
+                  "evidenceId": "E2",
+                  "paragraphId": "E2-P1"
+                }
+              ]
+            },
+            {
+              "text": "比较普通员工每晚住宿报销上限，上海为640元，北京为480元，上海比北京高160元。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P1"
+                },
+                {
+                  "evidenceId": "E2",
+                  "paragraphId": "E2-P1"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "lodging",
+                "description": "员工出差住宿报销金额和地区比较",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  },
+                  {
+                    "value": "CN_GZ",
+                    "label": "广州"
+                  }
+                ]
+              }
+            ]
+          },
+          "route": null,
+          "continuationOfMessageId": 810,
+          "routingAttempted": false
+        },
+        "retrievalRun": {
+          "enabled": true,
+          "maxRounds": 3,
+          "maxSearches": 5,
+          "maxEvidence": 50,
+          "maxCharacters": 50000,
+          "schedulingBudgetMs": 90000,
+          "searches": [
+            {
+              "round": 1,
+              "query": "比较两个地区普通员工每晚住宿报销上限。",
+              "response": {
+                "knowledgeBaseId": 21,
+                "query": "比较两个地区普通员工每晚住宿报销上限。",
+                "candidateLimit": 50,
+                "vectorMinSimilarity": 0.0,
+                "resultLimit": 5,
+                "bm25CandidateCount": 3,
+                "vectorCandidateCount": 3,
+                "results": [
+                  {
+                    "rank": 1,
+                    "documentId": 250,
+                    "chunkSequence": 1,
+                    "originalName": "01-上海住宿.md",
+                    "content": "# 上海住宿标准\n普通员工在上海出差，每晚住宿报销上限为640元。超过上限的部分不予报销。本标准只适用于上海。",
+                    "rrfScore": 0.03252247488101534,
+                    "bm25Rank": 1,
+                    "bm25Score": 27.992605,
+                    "vectorRank": 2,
+                    "vectorScore": 0.89888996,
+                    "metadata": {
+                      "sourceKey": "scope-cn_sh",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "CN_SH",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  },
+                  {
+                    "rank": 2,
+                    "documentId": 251,
+                    "chunkSequence": 1,
+                    "originalName": "02-北京住宿.md",
+                    "content": "# 北京住宿标准\n普通员工在北京出差，每晚住宿报销上限为480元。超过上限的部分不予报销。本标准只适用于北京。",
+                    "rrfScore": 0.03252247488101534,
+                    "bm25Rank": 2,
+                    "bm25Score": 27.852106,
+                    "vectorRank": 1,
+                    "vectorScore": 0.9038331,
+                    "metadata": {
+                      "sourceKey": "scope-cn_bj",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "CN_BJ",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  },
+                  {
+                    "rank": 3,
+                    "documentId": 252,
+                    "chunkSequence": 1,
+                    "originalName": "03-通用报销期限.md",
+                    "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                    "rrfScore": 0.031746031746031744,
+                    "bm25Rank": 3,
+                    "bm25Score": 22.560524,
+                    "vectorRank": 3,
+                    "vectorScore": 0.8161013,
+                    "metadata": {
+                      "sourceKey": "scope-all",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "ALL",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  }
+                ]
+              },
+              "truncated": false,
+              "addedEvidenceIds": [
+                "E1",
+                "E2",
+                "E3"
+              ],
+              "scopes": [
+                "CN_SH",
+                "CN_BJ"
+              ]
+            }
+          ],
+          "plans": [
+            {
+              "afterRound": 1,
+              "plan": {
+                "decision": "SUFFICIENT",
+                "gaps": [],
+                "queries": [],
+                "ruleChecks": [],
+                "userConditions": []
+              }
+            }
+          ],
+          "stopReason": "SUFFICIENT"
+        },
+        "answerContext": null,
+        "applicabilityScopes": [
+          "CN_SH",
+          "CN_BJ"
+        ]
+      },
+      "searches": 1,
+      "modelStages": {
+        "PLANNING": 1,
+        "DRAFT": 1,
+        "REVIEW": 1
+      },
+      "missingUsage": 0,
+      "knownTokens": 4542,
+      "clarificationDiagnostic": {
+        "schemaVersion": 6,
+        "runId": "ee054507-f173-4c5c-940d-77c4c5c538a1",
+        "assistantMessageId": 810,
+        "conversationId": 244,
+        "question": "比较两个地区普通员工每晚住宿报销上限。",
+        "applicabilityScope": "ALL",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "status": "SUCCEEDED",
+        "errorCode": null,
+        "revision": 6,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-21T13:26:11.3638937",
+        "updatedAt": "2026-10-21T13:26:12.595819",
+        "finishedAt": "2026-10-21T13:26:12.595819",
+        "retrieval": null,
+        "retrievalTruncated": false,
+        "evidence": [],
+        "draft": {
+          "status": "NEEDS_CLARIFICATION",
+          "claims": [],
+          "missingConditions": [
+            "请明确本次问题适用的地区或范围？"
+          ],
+          "conflicts": []
+        },
+        "review": null,
+        "answerReason": "APPLICABILITY_REQUIRED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:11.3729107",
+            "durationMs": 1208,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 159,
+              "completionTokens": 80,
+              "totalTokens": 239
+            }
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:12.5872994",
+            "durationMs": 7,
+            "errorCode": null,
+            "usage": null
+          }
+        ],
+        "citationCatalog": null,
+        "selection": null,
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "lodging",
+                "description": "员工出差住宿报销金额和地区比较",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  },
+                  {
+                    "value": "CN_GZ",
+                    "label": "广州"
+                  }
+                ]
+              }
+            ]
+          },
+          "route": {
+            "topicIds": [
+              "lodging"
+            ],
+            "uncertain": false
+          },
+          "continuationOfMessageId": null,
+          "routingAttempted": true
+        },
+        "retrievalRun": null,
+        "answerContext": null,
+        "applicabilityScopes": [
+          "ALL"
+        ]
+      }
+    },
+    {
+      "id": "S06",
+      "question": "上海和北京的员工分别应在出差结束后多久内提交报销？",
+      "scopes": [
+        "CN_SH",
+        "CN_BJ"
+      ],
+      "expectedStatus": "ANSWERABLE",
+      "conversationId": 245,
+      "outcome": "TECHNICAL_ERROR",
+      "httpStatus": 502,
+      "errorCode": "CHAT_GENERATION_FAILED",
+      "failedMessage": {
+        "id": 814,
+        "conversationId": 245,
+        "role": "ASSISTANT",
+        "content": null,
+        "status": "FAILED",
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "promptTokens": null,
+        "completionTokens": null,
+        "totalTokens": null,
+        "errorCode": "KNOWLEDGE_ANSWER_FAILED",
+        "citations": [],
+        "mode": "KNOWLEDGE",
+        "applicabilityScope": null,
+        "applicabilityScopes": [
+          "CN_SH",
+          "CN_BJ"
+        ],
+        "knowledgeAnswer": null,
+        "knowledgeRunId": "4c11adc2-2832-4c1c-8ad4-a6a67856c838",
+        "createdAt": "2026-10-21T13:26:21.914264",
+        "updatedAt": "2026-10-21T13:26:30.635709"
+      },
+      "elapsedSeconds": 8.786,
+      "diagnostic": {
+        "schemaVersion": 6,
+        "runId": "4c11adc2-2832-4c1c-8ad4-a6a67856c838",
+        "assistantMessageId": 814,
+        "conversationId": 245,
+        "question": "上海和北京的员工分别应在出差结束后多久内提交报销？",
+        "applicabilityScope": null,
+        "modelConfigId": 9,
+        "modelName": "deepseek-flash",
+        "status": "FAILED",
+        "errorCode": "KNOWLEDGE_MESSAGE_SAVE_FAILED",
+        "revision": 17,
+        "diagnosticWriteFailures": 0,
+        "startedAt": "2026-10-21T13:26:21.9211275",
+        "updatedAt": "2026-10-21T13:26:30.6304816",
+        "finishedAt": "2026-10-21T13:26:30.6304816",
+        "retrieval": {
+          "knowledgeBaseId": 21,
+          "query": "上海和北京的员工分别应在出差结束后多久内提交报销？",
+          "candidateLimit": 50,
+          "vectorMinSimilarity": 0.0,
+          "resultLimit": 5,
+          "bm25CandidateCount": 1,
+          "vectorCandidateCount": 1,
+          "results": [
+            {
+              "rank": 1,
+              "documentId": 252,
+              "chunkSequence": 1,
+              "originalName": "03-通用报销期限.md",
+              "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+              "rrfScore": 0.03278688524590164,
+              "bm25Rank": 1,
+              "bm25Score": 28.068935,
+              "vectorRank": 1,
+              "vectorScore": 0.906424,
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              }
+            }
+          ]
+        },
+        "retrievalTruncated": false,
+        "evidence": [
+          {
+            "id": "E1",
+            "documentId": 252,
+            "chunkSequence": 1,
+            "sourceName": "03-通用报销期限.md",
+            "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+            "metadata": {
+              "sourceKey": "scope-all",
+              "businessVersion": "v1",
+              "applicabilityScope": "ALL",
+              "validFrom": "2026-01-01T00:00:00",
+              "validUntil": null
+            }
+          }
+        ],
+        "draft": {
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "上海和北京的员工均应在出差结束后十二个自然日内提交报销申请。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "quote": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "review": {
+          "approved": true,
+          "reason": null,
+          "checklist": null,
+          "issues": null
+        },
+        "answerReason": "REVIEWED",
+        "stages": [
+          {
+            "stage": "APPLICABILITY",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:21.9261496",
+            "durationMs": 1422,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 162,
+              "completionTokens": 156,
+              "totalTokens": 318
+            }
+          },
+          {
+            "stage": "RETRIEVAL",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:23.355373",
+            "durationMs": 182,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "PLANNING",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:23.5483549",
+            "durationMs": 2739,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 628,
+              "completionTokens": 415,
+              "totalTokens": 1043
+            }
+          },
+          {
+            "stage": "DRAFT",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:26.2948911",
+            "durationMs": 1832,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 832,
+              "completionTokens": 260,
+              "totalTokens": 1092
+            }
+          },
+          {
+            "stage": "VALIDATION",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:28.1310371",
+            "durationMs": 3,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "REVIEW",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:28.1392894",
+            "durationMs": 2463,
+            "errorCode": null,
+            "usage": {
+              "promptTokens": 590,
+              "completionTokens": 335,
+              "totalTokens": 925
+            }
+          },
+          {
+            "stage": "EVIDENCE_RECHECK",
+            "status": "SUCCEEDED",
+            "startedAt": "2026-10-21T13:26:30.6155751",
+            "durationMs": 5,
+            "errorCode": null,
+            "usage": null
+          },
+          {
+            "stage": "MESSAGE_PERSISTENCE",
+            "status": "FAILED",
+            "startedAt": "2026-10-21T13:26:30.62552",
+            "durationMs": 5,
+            "errorCode": "KNOWLEDGE_MESSAGE_SAVE_FAILED",
+            "usage": null
+          }
+        ],
+        "citationCatalog": {
+          "citationSetId": "2d8fc74a-6787-4d8f-84ad-27823fc4ddf2",
+          "sources": [
+            {
+              "id": "E1",
+              "documentId": 252,
+              "chunkSequence": 1,
+              "sourceName": "03-通用报销期限.md",
+              "metadata": {
+                "sourceKey": "scope-all",
+                "businessVersion": "v1",
+                "applicabilityScope": "ALL",
+                "validFrom": "2026-01-01T00:00:00",
+                "validUntil": null
+              },
+              "paragraphs": [
+                {
+                  "id": "E1-P1",
+                  "startOffset": 0,
+                  "endOffset": 49,
+                  "text": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                  "selectable": true
+                }
+              ]
+            }
+          ]
+        },
+        "selection": {
+          "citationSetId": "2d8fc74a-6787-4d8f-84ad-27823fc4ddf2",
+          "status": "ANSWERABLE",
+          "claims": [
+            {
+              "text": "上海和北京的员工均应在出差结束后十二个自然日内提交报销申请。",
+              "references": [
+                {
+                  "evidenceId": "E1",
+                  "paragraphId": "E1-P1"
+                }
+              ]
+            }
+          ],
+          "missingConditions": [],
+          "conflicts": []
+        },
+        "applicability": {
+          "policy": {
+            "revision": 1,
+            "topics": [
+              {
+                "id": "lodging",
+                "description": "员工出差住宿报销金额和地区比较",
+                "scopeOptions": [
+                  {
+                    "value": "CN_SH",
+                    "label": "上海"
+                  },
+                  {
+                    "value": "CN_BJ",
+                    "label": "北京"
+                  },
+                  {
+                    "value": "CN_GZ",
+                    "label": "广州"
+                  }
+                ]
+              }
+            ]
+          },
+          "route": {
+            "topicIds": [],
+            "uncertain": false
+          },
+          "continuationOfMessageId": null,
+          "routingAttempted": true
+        },
+        "retrievalRun": {
+          "enabled": true,
+          "maxRounds": 3,
+          "maxSearches": 5,
+          "maxEvidence": 50,
+          "maxCharacters": 50000,
+          "schedulingBudgetMs": 90000,
+          "searches": [
+            {
+              "round": 1,
+              "query": "上海和北京的员工分别应在出差结束后多久内提交报销？",
+              "response": {
+                "knowledgeBaseId": 21,
+                "query": "上海和北京的员工分别应在出差结束后多久内提交报销？",
+                "candidateLimit": 50,
+                "vectorMinSimilarity": 0.0,
+                "resultLimit": 5,
+                "bm25CandidateCount": 1,
+                "vectorCandidateCount": 1,
+                "results": [
+                  {
+                    "rank": 1,
+                    "documentId": 252,
+                    "chunkSequence": 1,
+                    "originalName": "03-通用报销期限.md",
+                    "content": "# 通用报销期限\n所有地区的员工均应在出差结束后十二个自然日内提交报销申请。本文件不规定住宿金额。",
+                    "rrfScore": 0.03278688524590164,
+                    "bm25Rank": 1,
+                    "bm25Score": 28.068935,
+                    "vectorRank": 1,
+                    "vectorScore": 0.906424,
+                    "metadata": {
+                      "sourceKey": "scope-all",
+                      "businessVersion": "v1",
+                      "applicabilityScope": "ALL",
+                      "validFrom": "2026-01-01T00:00:00",
+                      "validUntil": null
+                    }
+                  }
+                ]
+              },
+              "truncated": false,
+              "addedEvidenceIds": [
+                "E1"
+              ],
+              "scopes": [
+                "ALL"
+              ]
+            }
+          ],
+          "plans": [
+            {
+              "afterRound": 1,
+              "plan": {
+                "decision": "SUFFICIENT",
+                "gaps": [],
+                "queries": [],
+                "ruleChecks": [],
+                "userConditions": []
+              }
+            }
+          ],
+          "stopReason": "SUFFICIENT"
+        },
+        "answerContext": null,
+        "applicabilityScopes": [
+          "ALL"
+        ]
+      },
+      "searches": 1,
+      "modelStages": {
+        "APPLICABILITY": 1,
+        "PLANNING": 1,
+        "DRAFT": 1,
+        "REVIEW": 1
+      },
+      "missingUsage": 0,
+      "knownTokens": 3378
+    }
+  ],
+  "originalKnowledgeBaseId": 18,
+  "restoration": "RESTORED",
+  "textModel": {
+    "id": 9,
+    "name": "dp官方",
+    "modelName": "deepseek-flash",
+    "updatedAt": "2026-10-21T13:03:38.585331"
+  },
+  "gitCommit": "15e40d83b6e75e4df4bf6d6efdf09c08b6321597",
+  "runtimeJarSha256": "2e0176b2afde15c325727908bfdb63d9af157b6a65556cf24ac3a4389c5050db",
+  "sourceSha256": "d6da4822926fb2eef06043b20d9f6763dca24d460f9743282a44152ee2a5ec1c",
+  "fixtureSha256": "66e8717d5be5880bb6edb591810db37a12b4f717118f8599be213b9a0fa8636c",
+  "models": [
+    {
+      "id": 9,
+      "modelType": "CHAT",
+      "modelName": "deepseek-flash",
+      "enabled": true,
+      "embeddingDimensions": null,
+      "updatedAt": "2026-10-21T13:03:38.585331"
+    },
+    {
+      "id": 8,
+      "modelType": "EMBEDDING",
+      "modelName": "qwen3.7-text-embedding",
+      "enabled": true,
+      "embeddingDimensions": 1024,
+      "updatedAt": "2026-09-29T02:39:29.153776"
+    }
+  ],
+  "evaluationKnowledgeBaseId": 21,
+  "evaluationSnapshot": {
+    "knowledgeBase": {
+      "id": 21,
+      "name": "多范围评测-8a8a10dd",
+      "description": "阶段42隔离验证",
+      "retrievalCandidateLimit": 50,
+      "vectorMinSimilarity": 0.0,
+      "retrievalResultLimit": 5,
+      "isDefault": true,
+      "documentCount": 3,
+      "version": 2,
+      "createdAt": "2026-10-21T13:25:22.947578",
+      "updatedAt": "2026-10-21T13:25:38.274472"
+    },
+    "documents": [
+      {
+        "id": 252,
+        "knowledgeBaseId": 21,
+        "originalName": "03-通用报销期限.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 144,
+        "sha256": "72a891c0be2f4e316fa008b130d09fc66b27fcab16d635069a8148923f55dd10",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "scope-all",
+        "businessVersion": "v1",
+        "applicabilityScope": "ALL",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-21T13:25:33.791514",
+        "updatedAt": "2026-10-21T13:25:38.139618",
+        "predecessorDocumentId": null,
+        "successorDocumentId": null,
+        "activatedAt": null,
+        "supersededAt": null,
+        "sourceItemId": null
+      },
+      {
+        "id": 251,
+        "knowledgeBaseId": 21,
+        "originalName": "02-北京住宿.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 156,
+        "sha256": "fc2dd96a7566c993e512b79a9fd62e928ca0ad717ba0d007d1307991a4d03285",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "scope-cn_bj",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_BJ",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-21T13:25:31.491287",
+        "updatedAt": "2026-10-21T13:25:33.763087",
+        "predecessorDocumentId": null,
+        "successorDocumentId": null,
+        "activatedAt": null,
+        "supersededAt": null,
+        "sourceItemId": null
+      },
+      {
+        "id": 250,
+        "knowledgeBaseId": 21,
+        "originalName": "01-上海住宿.md",
+        "contentType": "text/markdown",
+        "fileExtension": "md",
+        "sizeBytes": 156,
+        "sha256": "97c3aa6f0a33f50a34738433e559b2c683424ef83e2c4e223af30f7a5dc0fccd",
+        "status": "READY",
+        "chunkCount": 1,
+        "errorCode": null,
+        "version": 5,
+        "sourceKey": "scope-cn_sh",
+        "businessVersion": "v1",
+        "applicabilityScope": "CN_SH",
+        "validFrom": "2026-01-01T00:00:00",
+        "validUntil": null,
+        "publicationStatus": "PUBLISHED",
+        "createdAt": "2026-10-21T13:25:23.074028",
+        "updatedAt": "2026-10-21T13:25:31.439728",
+        "predecessorDocumentId": null,
+        "successorDocumentId": null,
+        "activatedAt": null,
+        "supersededAt": null,
+        "sourceItemId": null
+      }
+    ],
+    "models": [
+      {
+        "id": 9,
+        "modelType": "CHAT",
+        "modelName": "deepseek-flash",
+        "enabled": true,
+        "embeddingDimensions": null,
+        "updatedAt": "2026-10-21T13:03:38.585331"
+      },
+      {
+        "id": 8,
+        "modelType": "EMBEDDING",
+        "modelName": "qwen3.7-text-embedding",
+        "enabled": true,
+        "embeddingDimensions": 1024,
+        "updatedAt": "2026-09-29T02:39:29.153776"
+      }
+    ]
+  },
+  "finishedAt": "2026-10-21T13:26:30.867913+08:00"
+}

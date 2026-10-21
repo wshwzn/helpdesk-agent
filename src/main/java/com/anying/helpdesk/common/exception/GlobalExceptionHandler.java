@@ -50,6 +50,12 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /** 请求反序列化阶段的范围错误返回400，不向日志或响应泄露原始请求正文。 */
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnreadableRequest() {
+        return ResponseEntity.badRequest().body(ApiResponse.error("VALIDATION_ERROR", "invalid request body or scope selection", null));
+    }
+
     /** 参数错误返回 400，旧澄清消息或并发配置变化返回 409。 */
     @ExceptionHandler(KnowledgeClarificationException.class)
     public ResponseEntity<ApiResponse<Void>> handleClarification(

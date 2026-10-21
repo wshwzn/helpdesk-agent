@@ -35,6 +35,7 @@ public final class KnowledgeAnswerTrace {
     private final Long conversationId;
     private final String question;
     private final String scope;
+    private List<String> scopes;
     private final Long modelConfigId;
     private final String modelName;
     private final Clock clock;
@@ -59,6 +60,11 @@ public final class KnowledgeAnswerTrace {
     private KnowledgeRetrievalRun retrievalRun;
     private KnowledgeAnswerContext answerContext;
 
+    /** 保存服务端解析的有效范围，未解析前不冒充已经选定。 */
+    public synchronized void scopes(List<String> values) {
+        if (status == Status.RUNNING) scopes = List.copyOf(values);
+    }
+
     /** 保存实际搜索结束后的未完成任务和条件分类，不把规划当作引用事实。 */
     public synchronized void answerContext(KnowledgeAnswerContext value) {
         if (status == Status.RUNNING) answerContext = value;
@@ -73,9 +79,14 @@ public final class KnowledgeAnswerTrace {
 
     /** 在外部请求前保存轮次和查询，失败调用也有可定位的输入。 */
     public synchronized void searchStarted(int round, String query) {
+        searchStarted(round, query, scopes);
+    }
+
+    /** 每个补查记录实际过滤范围，联合查询不伪装为逐地区多次调用。 */
+    public synchronized void searchStarted(int round, String query, List<String> searchScopes) {
         if (status != Status.RUNNING) return;
         var searches = new ArrayList<>(retrievalRun.searches());
-        searches.add(new KnowledgeRetrievalRun.Search(round, query, null, false, List.of()));
+        searches.add(new KnowledgeRetrievalRun.Search(round, query, null, false, List.of(), List.copyOf(searchScopes)));
         updateRetrievalRun(searches, retrievalRun.plans(), retrievalRun.stopReason());
     }
 
@@ -89,7 +100,7 @@ public final class KnowledgeAnswerTrace {
         var searches = new ArrayList<>(retrievalRun.searches());
         var pending = searches.getLast();
         searches.set(searches.size() - 1, new KnowledgeRetrievalRun.Search(pending.round(), pending.query(),
-                retrieval, retrievalTruncated, List.copyOf(added)));
+                retrieval, retrievalTruncated, List.copyOf(added), pending.scopes()));
         if (first != null) {
             retrieval = first;
             retrievalTruncated = firstTruncated;
@@ -140,6 +151,7 @@ public final class KnowledgeAnswerTrace {
         this.conversationId = conversationId;
         this.question = question;
         this.scope = scope;
+        this.scopes = scope == null ? List.of() : List.of(scope);
         this.modelConfigId = model.configId();
         this.modelName = model.modelName();
         this.clock = clock;
@@ -240,10 +252,10 @@ public final class KnowledgeAnswerTrace {
 
     /** 导出不可变列表快照，供持久化与确定性测试使用。 */
     public synchronized KnowledgeAnswerRunSnapshot snapshot() {
-        return new KnowledgeAnswerRunSnapshot(5, runId, messageId, conversationId, question, scope,
+        return new KnowledgeAnswerRunSnapshot(6, runId, messageId, conversationId, question, scope,
                 modelConfigId, modelName, status, errorCode, revision, writeFailures,
                 startedAt, LocalDateTime.now(clock), finishedAt, retrieval, retrievalTruncated,
-                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability, retrievalRun, answerContext);
+                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability, retrievalRun, answerContext, scopes);
     }
 
     /** 在调用前持久化运行中阶段，进程中断时仍可定位最后进入的位置。 */

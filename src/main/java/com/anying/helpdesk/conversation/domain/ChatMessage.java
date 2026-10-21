@@ -30,7 +30,10 @@ public class ChatMessage {
     private Integer totalTokens;
     private String errorCode;
     private ChatMode mode;
+    @TableField(updateStrategy = com.baomidou.mybatisplus.annotation.FieldStrategy.ALWAYS)
     private String applicabilityScope;
+    @TableField(typeHandler = com.anying.helpdesk.conversation.mapper.KnowledgeScopesTypeHandler.class)
+    private java.util.List<String> applicabilityScopes;
     private String knowledgeRunId;
     @TableField(typeHandler = KnowledgeAnswerReportTypeHandler.class)
     private KnowledgeAnswerReport knowledgeAnswer;

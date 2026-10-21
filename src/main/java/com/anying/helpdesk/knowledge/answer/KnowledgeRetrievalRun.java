@@ -13,6 +13,11 @@ public record KnowledgeRetrievalRun(boolean enabled, int maxRounds, int maxSearc
         EVIDENCE_BUDGET, TECHNICAL_FAILURE, CANCELLED
     }
     public record Search(int round, String query, KnowledgeSearchResponse response,
-                         boolean truncated, List<String> addedEvidenceIds) { }
+                         boolean truncated, List<String> addedEvidenceIds, List<String> scopes) {
+        /** 兼容历史单范围诊断构造，旧记录未记范围时不补造。 */
+        public Search(int round, String query, KnowledgeSearchResponse response, boolean truncated, List<String> added) {
+            this(round, query, response, truncated, added, null);
+        }
+    }
     public record Planning(int afterRound, KnowledgeRetrievalPlan plan) { }
 }

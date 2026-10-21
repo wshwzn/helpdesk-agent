@@ -19,8 +19,19 @@ public record KnowledgeAnswerReport(
         KnowledgeAnswerDraft answer,
         List<Evidence> evidence,
         Clarification clarification,
-        Long continuationOfMessageId
+        Long continuationOfMessageId, List<String> applicabilityScopes
 ) {
+    /** 旧报告读取时从标量恢复范围，新报告不得丢失多范围信息。 */
+    public KnowledgeAnswerReport {
+        applicabilityScopes = KnowledgeScopes.resolve(applicabilityScope, applicabilityScopes);
+        applicabilityScope = KnowledgeScopes.single(applicabilityScopes);
+    }
+    /** 兼容旧报告及单范围续答的构造入口。 */
+    public KnowledgeAnswerReport(int version, Reason reason, Long baseId, String baseName, String scope,
+            LocalDateTime checkedAt, KnowledgeAnswerDraft answer, List<Evidence> evidence,
+            Clarification clarification, Long continuationId) {
+        this(version, reason, baseId, baseName, scope, checkedAt, answer, evidence, clarification, continuationId, null);
+    }
     public enum Reason { REVIEWED, NO_MATCH, NOT_CONFIGURED, APPLICABILITY_REQUIRED }
 
     public record Clarification(String originalQuestion, long policyRevision, List<String> topicIds,

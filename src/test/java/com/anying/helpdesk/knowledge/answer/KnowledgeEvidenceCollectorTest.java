@@ -248,6 +248,74 @@ class KnowledgeEvidenceCollectorTest {
         assertThatThrownBy(this::collect).hasMessage("invalid retrieval identity");
     }
 
+    /** 首轮双方均有资料且规划充分时，只发生一次联合检索。 */
+    @Test @DisplayName("多范围证据齐全时不逐地区重复检索")
+    void jointSearchAvoidsPerScopeCalls() {
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "SH", "上海额度"), hit(2, "BJ", "北京额度")));
+        when(client.planLegacy(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 1, 1, 2));
+        var result = collector.collectScopes(7L, model, "比较额度", List.of("SH", "BJ"), trace);
+        assertThat(result.evidence()).hasSize(2);
+        verify(retrieval).search(7L, new KnowledgeSearchRequest("比较额度", null, List.of("SH", "BJ")));
+        assertThat(trace.snapshot().retrievalRun().searches()).hasSize(1);
+        assertThat(trace.snapshot().retrievalRun().searches().getFirst().scopes()).containsExactly("SH", "BJ");
+    }
+
+    /** 一侧没有召回时只补查该侧，通用资料去重且保持原来的证据编号。 */
+    @Test @DisplayName("北京被挤出初检时只补北京且通用资料不重复累计")
+    void supplementsOnlyMissingScope() {
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "SH", "上海"), hit(3, "ALL", "通用")),
+                response(hit(2, "BJ", "北京"), hit(3, "ALL", "通用")));
+        when(client.planLegacy(any(), any(), any(), any(), any())).thenReturn(new KnowledgeAnswerModelClient.ModelResult<>(
+                new KnowledgeRetrievalPlan(KnowledgeRetrievalPlan.Decision.SUFFICIENT, List.of(), List.of()), 1, 1, 2));
+        var result = collector.collectScopes(7L, model, "比较额度", List.of("SH", "BJ"), trace);
+        assertThat(result.evidence()).extracting(KnowledgeAnswerReport.Evidence::id).containsExactly("E1", "E2", "E3");
+        verify(retrieval).search(7L, new KnowledgeSearchRequest("比较额度", "BJ"));
+        assertThat(trace.snapshot().retrievalRun().searches()).hasSize(2);
+    }
+
+    /** 三个地区共享原五次搜索预算，缺范围补查与关系查询不能各自领取一份预算。 */
+    @Test @DisplayName("多范围补查与关系检索共享五次搜索上限")
+    void scopesShareSearchBudget() {
+        var counter = new java.util.concurrent.atomic.AtomicLong(10);
+        when(retrieval.search(any(), any())).thenAnswer(invocation -> {
+            KnowledgeSearchRequest req = invocation.getArgument(1);
+            return response(hit(counter.incrementAndGet(), req.applicabilityScopes().getFirst(), "资料"));
+        });
+        when(client.planLegacy(any(), any(), any(), any(), any())).thenReturn(searchPlan("映射", "期限"));
+        collector.collectScopes(7L, model, "比较额度", List.of("SH", "BJ", "GZ"), trace);
+        assertThat(trace.snapshot().retrievalRun().searches()).hasSize(5);
+        assertThat(trace.snapshot().retrievalRun().stopReason()).isEqualTo(ROUND_BUDGET);
+        verify(client, times(1)).planLegacy(any(), any(), any(), any(), any());
+    }
+
+    /** 多范围不会放宽每次实际过滤，定向查北京时上海命中仍属错误响应。 */
+    @Test @DisplayName("定向补查不能接收其他地区证据")
+    void scopedSupplementRejectsForeignEvidence() {
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "SH", "上海")));
+        assertThatThrownBy(() -> collector.collectScopes(7L, model, "比较", List.of("SH", "BJ"), trace))
+                .hasMessage("incomplete or out-of-scope evidence");
+    }
+
+    /** 联合检索完成后取消，不再发起地区补查或规划调用。 */
+    @Test @DisplayName("多范围取消后不会继续补查")
+    void multiScopeCancellationStopsWork() {
+        when(retrieval.search(any(), any())).thenAnswer(invocation -> {
+            trace.cancelled();
+            return response(hit(1, "SH", "上海"));
+        });
+        assertThatThrownBy(() -> collector.collectScopes(7L, model, "比较", List.of("SH", "BJ"), trace))
+                .isInstanceOf(java.util.concurrent.CancellationException.class);
+        verify(retrieval).search(any(), any());
+        verifyNoInteractions(client);
+    }
+
+    /** 构造不同地区的检索结果用于验证过滤边界。 */
+    private KnowledgeSearchResultResponse hit(long id, String scope, String text) {
+        return new KnowledgeSearchResultResponse(1, id, 0, "资料.md", text, 0.1, 1, 1.0, 1, 0.9,
+                new KnowledgeDocumentMetadata("source-" + id, "v1", scope, null, null));
+    }
+
     /** 通过固定库和地区执行一次真实编排，外部依赖由桩控制。 */
     private KnowledgeEvidenceCollector.Collected collect() {
         return collector.collect(7L, model, "资料计划额度", "SH", trace);

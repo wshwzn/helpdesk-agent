@@ -46,14 +46,22 @@ public class TrustedKnowledgeAnswerService {
     /** 用恢复的原问题和用户明确选择的范围重新执行完整检索及核验。 */
     public ChatCompletionResult answer(ResolvedChatModel model, KnowledgeAnswerInput input, KnowledgeAnswerTrace trace) {
         String question = input.question();
-        String scope = input.scope();
+        String requestedScope = input.scope();
         if (question == null || question.isBlank() || question.length() > 2000
-                || scope == null || !scope.matches("[A-Z][A-Z0-9_-]{0,39}")) {
+                || input.scopes().isEmpty()) {
             throw new IllegalArgumentException("invalid knowledge question");
         }
-        var preparation = "ALL".equals(scope) || input.continuationOfMessageId() != null
+        var preparation = "ALL".equals(requestedScope) || input.continuationOfMessageId() != null
                 ? trace.stage(APPLICABILITY, () -> prepareApplicability(model, input, trace)) : null;
+        var selectedScopes = input.scopes();
         if (preparation != null && !preparation.options().isEmpty()) {
+            var named = applicabilityService.namedScopes(question, preparation.options());
+            if (!named.isEmpty()) selectedScopes = named;
+        }
+        final var scopes = selectedScopes;
+        final String scope = KnowledgeScopes.describe(scopes);
+        trace.scopes(scopes);
+        if (preparation != null && !preparation.options().isEmpty() && scopes.equals(List.of("ALL"))) {
             applicabilityService.requireRevision(preparation.base().id(), preparation.policy().revision());
             var clarification = new KnowledgeAnswerReport.Clarification(question, preparation.policy().revision(),
                     preparation.route().value().topicIds(), preparation.options());
@@ -66,11 +74,11 @@ public class TrustedKnowledgeAnswerService {
             trace.resolved(draft);
             return withRoutingUsage(new ChatCompletionResult(render(report), 0, 0, 0, report), preparation);
         }
-        var retrieved = retrieve(model, question, scope, trace, preparation);
+        var retrieved = retrieve(model, question, scopes, trace, preparation);
         if (retrieved.reason() != KnowledgeAnswerReport.Reason.REVIEWED) {
             trace.answerReason(retrieved.reason());
             checkPolicy(preparation);
-            return withRoutingUsage(withContinuation(empty(retrieved.reason(), retrieved.baseId(), retrieved.baseName(), scope), input), preparation);
+            return withRoutingUsage(withScopes(withContinuation(empty(retrieved.reason(), retrieved.baseId(), retrieved.baseName(), KnowledgeScopes.single(scopes)), input), scopes), preparation);
         }
         var evidence = retrieved.evidence();
         var catalog = retrieved.catalog();
@@ -83,6 +91,7 @@ public class TrustedKnowledgeAnswerService {
             var resolved = guard.resolve(selection.value(), catalog, evidence);
             trace.resolved(resolved);
             if (retrieved.context() != null) retrieved.context().validate(resolved);
+            if (scopes.size() > 1) guard.validateScopeConflicts(resolved, evidence);
             return resolved;
         });
         var review = trace.stage(REVIEW, () -> {
@@ -95,7 +104,8 @@ public class TrustedKnowledgeAnswerService {
         LocalDateTime checkedAt = trace.stage(EVIDENCE_RECHECK, () -> {
             LocalDateTime now = LocalDateTime.now(knowledgeClock);
             var current = atStage(KNOWLEDGE_EVIDENCE_CHECK_FAILED,
-                    () -> eligibilityService.findEligible(retrieved.baseId(), scope, now));
+                    () -> scopes.size() == 1 ? eligibilityService.findEligible(retrieved.baseId(), scope, now)
+                            : eligibilityService.findEligibleScopes(retrieved.baseId(), scopes, now));
             for (var item : evidence) {
                 var document = current.get(item.documentId());
                 if (document == null || !Objects.equals(item.metadata(), KnowledgeDocumentMetadata.from(document))) {
@@ -105,8 +115,8 @@ public class TrustedKnowledgeAnswerService {
             return now;
         });
         checkPolicy(preparation);
-        var report = new KnowledgeAnswerReport(1, KnowledgeAnswerReport.Reason.REVIEWED,
-                retrieved.baseId(), retrieved.baseName(), scope, checkedAt, draft, evidence);
+        var report = new KnowledgeAnswerReport(3, KnowledgeAnswerReport.Reason.REVIEWED,
+                retrieved.baseId(), retrieved.baseName(), KnowledgeScopes.single(scopes), checkedAt, draft, evidence, null, null, scopes);
         trace.answerReason(report.reason());
         return withRoutingUsage(withContinuation(new ChatCompletionResult(render(report),
                 sum(sum(selection.promptTokens(), review.promptTokens()), retrieved.planningUsage().promptTokens()),
@@ -156,8 +166,17 @@ public class TrustedKnowledgeAnswerService {
     private ChatCompletionResult withContinuation(ChatCompletionResult result, KnowledgeAnswerInput input) {
         if (input.continuationOfMessageId() == null) return result;
         var old = result.knowledgeAnswer();
-        var report = new KnowledgeAnswerReport(2, old.reason(), old.knowledgeBaseId(), old.knowledgeBaseName(),
-                old.applicabilityScope(), old.checkedAt(), old.answer(), old.evidence(), null, input.continuationOfMessageId());
+        var report = new KnowledgeAnswerReport(3, old.reason(), old.knowledgeBaseId(), old.knowledgeBaseName(),
+                old.applicabilityScope(), old.checkedAt(), old.answer(), old.evidence(), null, input.continuationOfMessageId(), old.applicabilityScopes());
+        return new ChatCompletionResult(result.content(), result.promptTokens(), result.completionTokens(), result.totalTokens(), report);
+    }
+
+    /** 无命中也保存完整范围，不把跨地区请求退化成通用查询。 */
+    private ChatCompletionResult withScopes(ChatCompletionResult result, List<String> scopes) {
+        var old = result.knowledgeAnswer();
+        var report = new KnowledgeAnswerReport(3, old.reason(), old.knowledgeBaseId(), old.knowledgeBaseName(),
+                KnowledgeScopes.single(scopes), old.checkedAt(), old.answer(), old.evidence(), old.clarification(),
+                old.continuationOfMessageId(), scopes);
         return new ChatCompletionResult(result.content(), result.promptTokens(), result.completionTokens(), result.totalTokens(), report);
     }
 
@@ -166,13 +185,15 @@ public class TrustedKnowledgeAnswerService {
                              KnowledgeAnswerModelClient.TokenUsage planningUsage, KnowledgeAnswerContext context) { }
 
     /** 固定知识库后累计受控检索证据，再一次性建立最终可引用目录。 */
-    private Retrieved retrieve(ResolvedChatModel model, String question, String scope, KnowledgeAnswerTrace trace,
+    private Retrieved retrieve(ResolvedChatModel model, String question, List<String> scopes, KnowledgeAnswerTrace trace,
                                ApplicabilityPreparation preparation) {
         var base = preparation == null ? atStage(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault)
                 : java.util.Optional.ofNullable(preparation.base());
         if (base.isEmpty()) return new Retrieved(null, null, KnowledgeAnswerReport.Reason.NOT_CONFIGURED, List.of(), null, null, null);
         var knowledgeBase = base.get();
-        var collected = evidenceCollector.collect(knowledgeBase.id(), model, question, scope, trace);
+        var collected = scopes.size() == 1
+                ? evidenceCollector.collect(knowledgeBase.id(), model, question, scopes.getFirst(), trace)
+                : evidenceCollector.collectScopes(knowledgeBase.id(), model, question, scopes, trace);
         var immutableEvidence = collected.evidence();
         if (immutableEvidence.isEmpty())
             return new Retrieved(knowledgeBase.id(), knowledgeBase.name(), KnowledgeAnswerReport.Reason.NO_MATCH,
@@ -234,7 +255,7 @@ public class TrustedKnowledgeAnswerService {
             return "在当前适用范围和生效时间内未检索到可用依据。请补充适用范围或联系知识维护者。";
         }
         if (report.reason() == KnowledgeAnswerReport.Reason.APPLICABILITY_REQUIRED) {
-            return "请补充本次问题适用的地区或范围：" + report.clarification().scopeOptions().stream()
+            return "请补充本次问题适用的地区或范围（比较时最多选择3项）：" + report.clarification().scopeOptions().stream()
                     .map(KnowledgeApplicabilityPolicy.ScopeOption::label).collect(Collectors.joining("、")) + "。";
         }
         var answer = report.answer();
