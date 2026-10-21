@@ -334,12 +334,12 @@ class KnowledgeClarificationIntegrationTest {
 
     /** 显式多选必须原样穿过同步与流式会话入口，不能靠正文中的地区名弥补参数丢失。 */
     @org.junit.jupiter.params.ParameterizedTest
-    @org.junit.jupiter.params.provider.ValueSource(booleans = {false, true})
+    @org.junit.jupiter.params.provider.CsvSource({"false, KNOWLEDGE", "true, KNOWLEDGE", "false, AGENT", "true, AGENT"})
     @DisplayName("同步和流式均保留显式多范围且不重复路由")
-    void explicitScopesSurviveConversationEntry(boolean streaming) {
+    void explicitScopesSurviveConversationEntry(boolean streaming, ChatMode mode) {
         multiScopeFixtures();
         Long id = conversation();
-        var request = new SendMessageRequest("请比较所选地区的住宿标准", ChatMode.KNOWLEDGE,
+        var request = new SendMessageRequest("请比较所选地区的住宿标准", mode,
                 null, null, List.of("CN_SH", "CN_BJ"));
         if (streaming) conversations.streamMessage(id, request, CUSTOMER).collectList().block(java.time.Duration.ofSeconds(10));
         else conversations.sendMessage(id, request, CUSTOMER);
@@ -353,12 +353,14 @@ class KnowledgeClarificationIntegrationTest {
     }
 
     /** 原先未选范围的比较问题可以通过同一澄清卡片选择多个地区，恢复原问题继续处理。 */
-    @Test @DisplayName("澄清续答允许多选且绑定原问题原知识库")
-    void multiSelectContinuation() {
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(ChatMode.class)
+    @DisplayName("两种模式值澄清续答允许多选且绑定原问题原知识库")
+    void multiSelectContinuation(ChatMode mode) {
         Long id = conversation();
         var first = ask(id);
         multiScopeFixtures();
-        var answer = conversations.sendMessage(id, new SendMessageRequest("比较两个地区", ChatMode.KNOWLEDGE,
+        var answer = conversations.sendMessage(id, new SendMessageRequest("比较两个地区", mode,
                 null, first.id(), List.of("CN_SH", "CN_BJ")), CUSTOMER).assistantMessage();
         assertThat(answer.knowledgeAnswer().continuationOfMessageId()).isEqualTo(first.id());
         assertThat(answer.applicabilityScopes()).containsExactly("CN_SH", "CN_BJ");

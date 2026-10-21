@@ -100,7 +100,7 @@
 | `completion_tokens` | `INT` | 是 | `NULL` | 厂商返回的输出 Token 数。 |
 | `total_tokens` | `INT` | 是 | `NULL` | 厂商返回的总 Token 数。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 生成失败时保存的内部脱敏错误码，例如模型失败 `MODEL_CALL_FAILED`、进程中断超时恢复 `GENERATION_INTERRUPTED`。 |
-| `mode` | `VARCHAR(20)` | 否 | `AGENT` | 本条消息的模式：`AGENT` 旧兼容工具对话、`KNOWLEDGE` 强制证据核验；历史记录及数据库默认值仍为 AGENT，应用新请求默认显式写入 KNOWLEDGE。 |
+| `mode` | `VARCHAR(20)` | 否 | `AGENT` | 实际执行模式：`AGENT`仅为历史工具对话，`KNOWLEDGE`为可信链路。数据库默认仍为AGENT；所有新应用请求（包括输入AGENT别名）均显式写KNOWLEDGE，历史行不重标。 |
 | `applicability_scope` | `VARCHAR(40)` | 是 | `NULL` | 兼容的单范围快照；多范围及AGENT为空。用户未指定时为ALL；助手完成时可保存从配置名称解析的单范围。非权限字段。 |
 | `applicability_scopes` | `LONGTEXT` | 是 | `NULL` | V23新增范围代码JSON数组，最多三项；不可重复，不可ALL混选。用户行保存请求范围，助手成功行保存实际解析范围。多范围时旧 applicability_scope 为空；历史NULL列表回退旧标量。AGENT为空。 |
 | `knowledge_answer` | `MEDIUMTEXT` | 是 | `NULL` | 核验报告 JSON；仅成功完成的 KNOWLEDGE 助手消息写入。新回答版本3保存范围列表，结构化澄清仍为版本2；兼容历史版本1普通结果和版本2续答。包含原因、知识库身份快照、范围、核验时间、结构化回答及本轮证据快照。 |
@@ -589,3 +589,5 @@ V22 另有 `knowledge_bases → knowledge_sources → knowledge_source_items` �
 诊断阶段补充：需要判断适用条件时先执行 `APPLICABILITY`；只有 `applicability.routingAttempted=true` 才实际调用路由模型并计入模型用量。配置未启用/续答不调用路由；DRAFT、REVIEW 仍分别记账，Embedding 用量不在此统计内。
 
 阶段42范围契约补充：请求可以使用 applicabilityScopes（1–3项）或旧 applicabilityScope，二者同时出现必须表达同一单范围；应用拒绝空/重复/非法代码/ALL混选。消息列表JSON由应用校验，数据库不对文本内部添加检查约束。新回答报告版本3增加 applicabilityScopes，旧版本从标量恢复；多范围标量为NULL。未指定范围时按配置名称识别，助手完成时允许从请求ALL变为实际范围，但显式范围集合不得改变。多选续答仍绑定最后一条澄清消息、原库、配置修订及原选项。
+
+阶段43不新增DDL：AGENT仅为请求别名，应用规范为KNOWLEDGE后写入；所有新助手消息都分配knowledge_run_id并受报告一致性检查。旧AGENT行保留原模式、空报告及工具引用，不补造核验记录。

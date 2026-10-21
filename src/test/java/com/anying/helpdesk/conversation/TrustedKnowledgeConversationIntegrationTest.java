@@ -103,10 +103,11 @@ class TrustedKnowledgeConversationIntegrationTest {
     }
 
     /** 验证真实数据库 JSON 往返和历史引用来源，不只检查即刻内存响应。 */
-    @Test
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(ChatMode.class)
     @DisplayName("同步知识问答保存模式、范围、引文及业务版本并能回读")
-    void persistsReportAndHistory() throws Exception {
-        send("{\"content\":\"上海住宿额度？\",\"mode\":\"KNOWLEDGE\",\"applicabilityScope\":\"SH\"}")
+    void persistsReportAndHistory(ChatMode mode) throws Exception {
+        send("{\"content\":\"上海住宿额度？\",\"mode\":\"%s\",\"applicabilityScope\":\"SH\"}".formatted(mode))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.assistantMessage.mode").value("KNOWLEDGE"))
                 .andExpect(jsonPath("$.data.assistantMessage.knowledgeAnswer.answer.status").value("ANSWERABLE"))
@@ -118,6 +119,10 @@ class TrustedKnowledgeConversationIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records[1].knowledgeAnswer.evidence[0].metadata.businessVersion").value("v2"))
                 .andExpect(jsonPath("$.data.records[1].citations[0].content").value("上海住宿上限每晚600元。"));
+        assertThat(saved.getPromptTokens()).isEqualTo(30);
+        assertThat(saved.getCompletionTokens()).isEqualTo(10);
+        assertThat(saved.getTotalTokens()).isEqualTo(40);
+        assertThat(jdbc.queryForObject("SELECT status FROM knowledge_answer_runs WHERE run_id=?", String.class, saved.getKnowledgeRunId())).isEqualTo("SUCCEEDED");
         verifyNoInteractions(agentClient);
     }
 
@@ -139,9 +144,10 @@ class TrustedKnowledgeConversationIntegrationTest {
     }
 
     /** 即使调用新模式也不能读取或继续其他客户的对话。 */
-    @Test
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(ChatMode.class)
     @DisplayName("知识模式不能绕过会话归属校验")
-    void enforcesOwnershipBeforeModelCalls() throws Exception {
+    void enforcesOwnershipBeforeModelCalls(ChatMode mode) throws Exception {
         User other = new User();
         other.setId(CUSTOMER + 1);
         other.setUsername("other_knowledge_customer");
@@ -149,36 +155,40 @@ class TrustedKnowledgeConversationIntegrationTest {
         mvc.perform(post("/api/conversations/{id}/messages", conversationId)
                         .header("Authorization", "Bearer " + jwt.issue(other).value())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"content\":\"问题\",\"mode\":\"KNOWLEDGE\"}"))
+                        .content("{\"content\":\"问题\",\"mode\":\"%s\"}".formatted(mode)))
                 .andExpect(status().isNotFound());
         verifyNoInteractions(provider, knowledge, agentClient);
     }
 
     /** 客户端参数问题必须在写入用户消息前返回。 */
     @Test
-    @DisplayName("非法范围、知识问题超长和普通模式误传范围均返回400")
+    @DisplayName("所有入口拒绝非法范围超长问题和无效续答")
     void validatesBeforeSaving() throws Exception {
         send(mapper.writeValueAsString(new SendMessageRequest("问".repeat(2001), ChatMode.KNOWLEDGE, "SH")))
                 .andExpect(status().isBadRequest());
         send("{\"content\":\"问题\",\"mode\":\"KNOWLEDGE\",\"applicabilityScope\":\"sh\"}")
                 .andExpect(status().isBadRequest());
-        send("{\"content\":\"问题\",\"mode\":\"AGENT\",\"applicabilityScope\":\"SH\"}")
+        send("{\"content\":\"问题\",\"mode\":\"AGENT\",\"applicabilityScopes\":[\"ALL\",\"SH\"]}")
                 .andExpect(status().isBadRequest());
         send(mapper.writeValueAsString(new SendMessageRequest("问".repeat(2001))))
                 .andExpect(status().isBadRequest());
         send("{\"content\":\"问题\",\"clarificationMessageId\":1}")
                 .andExpect(status().isBadRequest());
+        send(mapper.writeValueAsString(java.util.Map.of("content", "问".repeat(2001), "mode", "AGENT")))
+                .andExpect(status().isBadRequest());
+        send("{\"content\":\"问题\",\"mode\":\"UNKNOWN\"}").andExpect(status().isBadRequest());
         assertThat(messages.selectCount(new LambdaQueryWrapper<ChatMessage>()
                 .eq(ChatMessage::getConversationId, conversationId))).isZero();
         verifyNoInteractions(knowledge);
     }
 
     /** 模型核验异常必须落入失败状态，不能生成一条看似完成的拒答。 */
-    @Test
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(ChatMode.class)
     @DisplayName("知识核验失败时无正文无报告且异常细节不会外泄")
-    void failsClosed() throws Exception {
+    void failsClosed(ChatMode mode) throws Exception {
         when(knowledge.answer(any(), any(), any(), any())).thenThrow(new IllegalStateException("private draft secret"));
-        var response = send("{\"content\":\"问题\"}")
+        var response = send("{\"content\":\"问题\",\"mode\":\"%s\"}".formatted(mode))
                 .andExpect(status().isBadGateway()).andReturn().getResponse().getContentAsString();
         assertThat(response).doesNotContain("private draft secret");
         assertThat(assistant().getStatus()).isEqualTo(ChatMessageStatus.FAILED);
@@ -190,30 +200,32 @@ class TrustedKnowledgeConversationIntegrationTest {
     }
 
     /** 同步和流式两条入口持久化同一个分类码，客户端错误正文仍脱敏。 */
-    @Test
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(ChatMode.class)
     @DisplayName("知识失败阶段能从历史消息追溯且不会暴露内部说明")
-    void persistsSafeFailureStageInBothModes() throws Exception {
+    void persistsSafeFailureStageInBothModes(ChatMode mode) throws Exception {
         when(knowledge.answer(any(), any(), any(), any())).thenThrow(new KnowledgeAnswerFailure(
                 KnowledgeAnswerFailure.Code.KNOWLEDGE_CITATION_INVALID, "private unverified draft"));
-        String response = send("{\"content\":\"问题\",\"mode\":\"KNOWLEDGE\"}")
+        String response = send("{\"content\":\"问题\",\"mode\":\"%s\"}".formatted(mode))
                 .andExpect(status().isBadGateway()).andReturn().getResponse().getContentAsString();
         assertThat(response).doesNotContain("private unverified draft");
         assertThat(assistant().getErrorCode()).isEqualTo("KNOWLEDGE_CITATION_INVALID");
         var events = service.streamMessage(conversationId,
-                new SendMessageRequest("问题", ChatMode.KNOWLEDGE, "ALL"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
+                new SendMessageRequest("问题", mode, "ALL"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
         assertThat(events).extracting(event -> event.type()).containsExactly("start", "error");
         assertThat(assistant().getErrorCode()).isEqualTo("KNOWLEDGE_CITATION_INVALID");
         assertThat(assistant().getKnowledgeAnswer()).isNull();
     }
 
     /** SSE 只展示经过知识服务核验的最终正文，不要求模型厂商支持流式。 */
-    @Test
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(ChatMode.class)
     @DisplayName("知识 SSE 成功时按 start、delta、done 返回并保存报告")
-    void streamsOnlyFinalAnswer() throws Exception {
+    void streamsOnlyFinalAnswer(ChatMode mode) throws Exception {
         var pending = mvc.perform(post("/api/conversations/{id}/messages/stream", conversationId)
                         .header("Authorization", authorization).contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.TEXT_EVENT_STREAM)
-                        .content("{\"content\":\"上海住宿额度？\",\"applicabilityScope\":\"SH\"}"))
+                        .content("{\"content\":\"上海住宿额度？\",\"applicabilityScope\":\"SH\",\"mode\":\"%s\"}".formatted(mode)))
                 .andExpect(request().asyncStarted()).andReturn();
         var response = mvc.perform(asyncDispatch(pending)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
@@ -227,23 +239,25 @@ class TrustedKnowledgeConversationIntegrationTest {
     }
 
     /** 复核失败时 SSE 不允许先发草案再报错。 */
-    @Test
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(ChatMode.class)
     @DisplayName("知识 SSE 核验失败时只发 start 和 error")
-    void failedStreamNeverEmitsDelta() throws Exception {
+    void failedStreamNeverEmitsDelta(ChatMode mode) throws Exception {
         when(knowledge.answer(any(), any(), any(), any())).thenThrow(new IllegalStateException("unverified draft"));
         var events = service.streamMessage(conversationId,
-                new SendMessageRequest("问题"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
+                new SendMessageRequest("问题", mode, "ALL"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
         assertThat(events).extracting(event -> event.type()).containsExactly("start", "error");
         assertThat(assistant().getContent()).isNull();
         verifyNoInteractions(agentClient);
     }
 
-    /** 缺省、显式空值和显式知识模式均使用同一可信路径，历史回读保持核验报告。 */
+    /** 缺省、显式空值、知识模式与旧AGENT别名均使用同一可信路径，历史回读保持核验报告。 */
     @ParameterizedTest
     @ValueSource(strings = {"{\"content\":\"报销期限？\"}",
             "{\"content\":\"报销期限？\",\"mode\":null}",
-            "{\"content\":\"报销期限？\",\"mode\":\"KNOWLEDGE\"}"})
-    @DisplayName("默认与显式知识请求均持久化核验报告且不触发旧模型")
+            "{\"content\":\"报销期限？\",\"mode\":\"KNOWLEDGE\"}",
+            "{\"content\":\"报销期限？\",\"mode\":\"AGENT\"}"})
+    @DisplayName("四种请求形态均持久化核验报告且不触发旧模型")
     void defaultsToTrustedKnowledge(String body) throws Exception {
         send(body).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.userMessage.mode").value("KNOWLEDGE"))
@@ -263,15 +277,11 @@ class TrustedKnowledgeConversationIntegrationTest {
 
     /** 旧模式历史保持原标记；同一会话的新缺省请求改用知识链路，不给旧回答补造核验。 */
     @Test
-    @DisplayName("显式AGENT可兼容且切换默认知识模式后两类历史仍可回读")
+    @DisplayName("升级前AGENT历史不补造核验且新消息统一可信")
     void preservesLegacyHistoryWithoutUpgradingItsTrust() throws Exception {
-        when(agentClient.complete(any(), any(), any())).thenReturn(new ChatCompletionResult("旧模式回答", 2, 1, 3));
-        send("{\"content\":\"旧问题\",\"mode\":\"AGENT\"}")
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.assistantMessage.mode").value("AGENT"))
-                .andExpect(jsonPath("$.data.assistantMessage.knowledgeAnswer").doesNotExist());
+        jdbc.update("INSERT INTO chat_messages (conversation_id, role, content, status, mode) VALUES (?, 'USER', '旧问题', 'COMPLETED', 'AGENT')", conversationId);
+        jdbc.update("INSERT INTO chat_messages (conversation_id, role, content, status, mode) VALUES (?, 'ASSISTANT', '旧模式回答', 'COMPLETED', 'AGENT')", conversationId);
         assertThat(assistant().getKnowledgeRunId()).isNull();
-        verifyNoInteractions(knowledge);
         send("{\"content\":\"新问题\"}").andExpect(status().isOk());
         mvc.perform(get("/api/conversations/{id}/messages", conversationId).header("Authorization", authorization))
                 .andExpect(status().isOk())
@@ -280,13 +290,14 @@ class TrustedKnowledgeConversationIntegrationTest {
                 .andExpect(jsonPath("$.data.records[1].knowledgeAnswer").doesNotExist())
                 .andExpect(jsonPath("$.data.records[3].mode").value("KNOWLEDGE"))
                 .andExpect(jsonPath("$.data.records[3].knowledgeAnswer").exists());
-        verify(agentClient, times(1)).complete(any(), any(), any());
+        verifyNoInteractions(agentClient);
     }
 
     /** 模拟忽略线程中断的迟到模型响应，检查取消后不落库为完成。 */
-    @Test
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(ChatMode.class)
     @DisplayName("核验期间取消连接后迟到结果不能覆盖失败状态")
-    void cancelledStreamCannotPersistLateResult() throws Exception {
+    void cancelledStreamCannotPersistLateResult(ChatMode mode) throws Exception {
         CountDownLatch entered = new CountDownLatch(1);
         CountDownLatch finished = new CountDownLatch(1);
         CompletableFuture<Void> release = new CompletableFuture<>();
@@ -297,7 +308,7 @@ class TrustedKnowledgeConversationIntegrationTest {
             return completion();
         });
         var subscription = service.streamMessage(conversationId,
-                new SendMessageRequest("问题", ChatMode.KNOWLEDGE, "SH"), CUSTOMER).subscribe();
+                new SendMessageRequest("问题", mode, "SH"), CUSTOMER).subscribe();
         try {
             assertThat(entered.await(5, TimeUnit.SECONDS)).isTrue();
             subscription.dispose();
@@ -311,7 +322,10 @@ class TrustedKnowledgeConversationIntegrationTest {
         await().during(Duration.ofMillis(200)).atMost(Duration.ofSeconds(3)).untilAsserted(() -> {
             assertThat(assistant().getErrorCode()).isEqualTo("STREAM_CANCELLED");
             assertThat(assistant().getKnowledgeAnswer()).isNull();
+            assertThat(jdbc.queryForObject("SELECT status FROM knowledge_answer_runs WHERE run_id=?", String.class,
+                    assistant().getKnowledgeRunId())).isEqualTo("CANCELLED");
         });
+        verifyNoInteractions(agentClient);
     }
 
     /** 发送当前对话的同步请求。 */

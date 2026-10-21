@@ -1,4 +1,4 @@
 package com.anying.helpdesk.conversation.domain;
 
-/** KNOWLEDGE 为新请求默认模式；AGENT 仅保留旧客户端与历史记录兼容，不能视为完整核验。 */
+/** 新请求统一规范为 KNOWLEDGE；AGENT 只作为输入别名和历史记录标记，旧记录不补造核验。 */
 public enum ChatMode { AGENT, KNOWLEDGE }

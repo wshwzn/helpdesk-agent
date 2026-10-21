@@ -11,8 +11,8 @@ import jakarta.validation.constraints.Size;
 @Schema(description = "发送消息请求")
 public record SendMessageRequest(
         @Schema(description = "员工提问内容", example = "差旅结束后多久内提交报销？")
-        @NotBlank @Size(max = 10000) String content,
-        @Schema(description = "默认 KNOWLEDGE，强制检索和核验，问题最多 2000 字；显式 AGENT 仅为旧客户端兼容，不具备完整核验保证", defaultValue = "KNOWLEDGE") ChatMode mode,
+        @NotBlank @Size(max = 2000) String content,
+        @Schema(description = "统一可信问答；AGENT 仅为旧请求别名，与省略/null/KNOWLEDGE 一样规范为 KNOWLEDGE", defaultValue = "KNOWLEDGE") ChatMode mode,
         @Schema(description = "旧单范围字段；省略范围时按已配置名称识别或澄清", example = "CN_SH")
         @Pattern(regexp = "[A-Z][A-Z0-9_-]{0,39}") String applicabilityScope,
         @Schema(description = "续答的澄清助手消息 ID；必须显式选择其提供的范围")
@@ -20,13 +20,11 @@ public record SendMessageRequest(
         @Schema(description = "适用范围列表，最多3项；不可与不同的单范围字段并用，不可混选ALL")
         java.util.List<String> applicabilityScopes
 ) {
-    /** 新请求默认进入可信问答，显式旧模式保持兼容；省略范围交给可信服务按配置识别或澄清。 */
+    /** 所有请求统一为可信问答；AGENT 仅兼容旧客户端的字段值，不再选择另一条生成链路。 */
     public SendMessageRequest {
-        mode = mode == null ? ChatMode.KNOWLEDGE : mode;
-        if (mode == ChatMode.KNOWLEDGE) {
-            applicabilityScopes = com.anying.helpdesk.knowledge.answer.KnowledgeScopes.resolve(applicabilityScope, applicabilityScopes);
-            applicabilityScope = com.anying.helpdesk.knowledge.answer.KnowledgeScopes.single(applicabilityScopes);
-        }
+        mode = ChatMode.KNOWLEDGE;
+        applicabilityScopes = com.anying.helpdesk.knowledge.answer.KnowledgeScopes.resolve(applicabilityScope, applicabilityScopes);
+        applicabilityScope = com.anying.helpdesk.knowledge.answer.KnowledgeScopes.single(applicabilityScopes);
     }
 
     /** 保留旧客户端及单范围续答的构造入口。 */
@@ -44,13 +42,10 @@ public record SendMessageRequest(
         this(content, null, null);
     }
 
-    /** 校验知识检索的问题长度，并避免在普通模式静默忽略范围参数。 */
+    /** 澄清续答必须明确选择地区，不能用缺省通用范围绕过原选项检查。 */
     @JsonIgnore
-    @AssertTrue(message = "KNOWLEDGE content must be at most 2000 characters; scope is only supported in KNOWLEDGE mode")
+    @AssertTrue(message = "clarification requires an explicit non-ALL scope selection")
     public boolean isKnowledgeInputValid() {
-        return mode == ChatMode.KNOWLEDGE
-                ? (content == null || content.length() <= 2000)
-                    && (clarificationMessageId == null || (applicabilityScopes != null && !applicabilityScopes.contains("ALL")))
-                : applicabilityScope == null && applicabilityScopes == null && clarificationMessageId == null;
+        return clarificationMessageId == null || !applicabilityScopes.contains("ALL");
     }
 }

@@ -25,7 +25,7 @@ public record ChatMessageResponse(
         @Schema(description = "失败错误码；成功时为空") String errorCode,
         @Schema(description = "AI 回答引用的知识库片段；未检索知识库时为空数组")
         List<KnowledgeCitationResponse> citations,
-        @Schema(description = "本条消息的对话模式；AGENT 为旧兼容模式，其检索引用不等于已完成可信核验") ChatMode mode,
+        @Schema(description = "实际执行模式；新消息均为 KNOWLEDGE，历史 AGENT 不代表已核验") ChatMode mode,
         @Schema(description = "知识问答显式选择的适用范围") String applicabilityScope,
         @Schema(description = "有效范围列表；历史消息从单范围字段恢复") List<String> applicabilityScopes,
         @Schema(description = "知识问答核验报告；普通对话、生成中或失败时为空") KnowledgeAnswerReport knowledgeAnswer,

@@ -8,10 +8,7 @@ import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerInput;
 
 import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityService;
 
-import com.anying.helpdesk.agent.domain.AgentToolCall;
-import com.anying.helpdesk.agent.service.AgentToolCallService;
 import com.anying.helpdesk.common.response.PageResponse;
-import com.anying.helpdesk.conversation.config.ChatProperties;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.conversation.domain.ChatMessageRole;
 import com.anying.helpdesk.conversation.domain.ChatMessageStatus;
@@ -30,7 +27,6 @@ import com.anying.helpdesk.conversation.mapper.ConversationMapper;
 import com.anying.helpdesk.conversation.model.ChatCompletionResult;
 import com.anying.helpdesk.conversation.dto.SendMessageRequest;
 import com.anying.helpdesk.conversation.domain.ChatMode;
-import com.anying.helpdesk.conversation.model.ConversationModelHistory;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -40,8 +36,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -51,8 +45,6 @@ public class ConversationPersistenceService {
 
     private final ConversationMapper conversationMapper;
     private final ChatMessageMapper chatMessageMapper;
-    private final ChatProperties chatProperties;
-    private final AgentToolCallService toolCallService;
     private final KnowledgeCitationService knowledgeCitationService;
     private final StaleChatGenerationRecoveryService staleGenerationRecoveryService;
     private final KnowledgeApplicabilityService applicabilityService;
@@ -218,9 +210,7 @@ public class ConversationPersistenceService {
         assistantMessage.setMode(request.mode());
         assistantMessage.setApplicabilityScope(request.applicabilityScope());
         assistantMessage.setApplicabilityScopes(request.applicabilityScopes());
-        if (request.mode() == ChatMode.KNOWLEDGE) {
-            assistantMessage.setKnowledgeRunId(java.util.UUID.randomUUID().toString());
-        }
+        assistantMessage.setKnowledgeRunId(java.util.UUID.randomUUID().toString());
         assistantMessage.setStatus(ChatMessageStatus.PENDING);
         assistantMessage.setModelConfigId(model.configId());
         assistantMessage.setModelName(model.modelName());
@@ -234,13 +224,8 @@ public class ConversationPersistenceService {
             throw new ConcurrentConversationUpdateException(conversationId);
         }
 
-        List<ChatMessage> history = loadRecentCompletedHistory(conversationId);
-        return new PreparedChatExchange(
-                userMessage,
-                assistantMessage.getId(),
-                new ConversationModelHistory(history, loadRecentToolCalls(history)),
-                assistantMessage.getKnowledgeRunId(), knowledgeInput
-        );
+        return new PreparedChatExchange(userMessage, assistantMessage.getId(),
+                assistantMessage.getKnowledgeRunId(), knowledgeInput);
     }
 
     /** 只允许续答当前对话最后一条结构化澄清，原问题和知识库均由服务端恢复。 */
@@ -315,36 +300,6 @@ public class ConversationPersistenceService {
             throw new ConcurrentConversationUpdateException(message.getConversationId());
         }
         touchConversation(message.getConversationId(), now);
-    }
-
-    private List<ChatMessage> loadRecentCompletedHistory(Long conversationId) {
-        Page<ChatMessage> result = chatMessageMapper.selectPage(
-                new Page<>(1, chatProperties.historyLimit(), false),
-                new LambdaQueryWrapper<ChatMessage>()
-                        .eq(ChatMessage::getConversationId, conversationId)
-                        .eq(ChatMessage::getStatus, ChatMessageStatus.COMPLETED)
-                        .in(ChatMessage::getRole, ChatMessageRole.USER, ChatMessageRole.ASSISTANT)
-                        .orderByDesc(ChatMessage::getId)
-        );
-        List<ChatMessage> history = new ArrayList<>(result.getRecords());
-        Collections.reverse(history);
-        return List.copyOf(history);
-    }
-
-    /**
-     * 仅加载紧邻当前客户消息的上一条 AI 回复所关联的成功工具调用。
-     */
-    private List<AgentToolCall> loadRecentToolCalls(List<ChatMessage> history) {
-        if (history.size() < 2) {
-            return List.of();
-        }
-        ChatMessage currentMessage = history.getLast();
-        ChatMessage previousMessage = history.get(history.size() - 2);
-        if (currentMessage.getRole() != ChatMessageRole.USER
-                || previousMessage.getRole() != ChatMessageRole.ASSISTANT) {
-            return List.of();
-        }
-        return toolCallService.listSuccessfulByAssistantMessageId(previousMessage.getId());
     }
 
     private Conversation requireOwnedConversation(Long id, Long customerId) {

@@ -20,9 +20,11 @@ import com.anying.helpdesk.conversation.domain.ChatMessageStatus;
 import com.anying.helpdesk.conversation.mapper.ChatMessageMapper;
 import com.anying.helpdesk.conversation.mapper.ConversationMapper;
 import com.anying.helpdesk.conversation.model.ChatCompletionResult;
-import com.anying.helpdesk.conversation.model.ChatStreamChunk;
-import com.anying.helpdesk.conversation.model.ConversationModelHistory;
 import com.anying.helpdesk.conversation.model.ConversationModelClient;
+import com.anying.helpdesk.knowledge.answer.TrustedKnowledgeAnswerService;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerReport;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerDraft;
+import com.anying.helpdesk.knowledge.dto.KnowledgeDocumentMetadata;
 import com.anying.helpdesk.conversation.service.ConversationPersistenceService;
 import com.anying.helpdesk.conversation.service.PreparedChatExchange;
 import com.anying.helpdesk.conversation.service.StaleChatGenerationRecoveryService;
@@ -49,7 +51,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import reactor.core.publisher.Flux;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -71,7 +72,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** 显式旧模式的会话兼容回归；工单动作由测试桩模拟，实际模型注册边界另有专项测试。 */
+/** 旧AGENT请求归一后的会话回归，历史工具引用和中断清理仍保留验证。 */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -118,6 +119,9 @@ class ConversationControllerIntegrationTest {
     @MockitoBean
     private ConversationModelClient modelClient;
 
+    @MockitoBean
+    private TrustedKnowledgeAnswerService knowledge;
+
     @AfterEach
     void cleanUp() {
         pendingActionMapper.delete(null);
@@ -128,170 +132,63 @@ class ConversationControllerIntegrationTest {
                 .likeRight(User::getUsername, "conversation_"));
     }
 
-    @Test
+    /** 新问答只携带本轮问题，调用发生在事务外，历史仍可阅读。 */
+    @Test @DisplayName("旧别名进入可信服务且历史不作为新事实回放")
     void customerChatsWithHistoryOutsideDatabaseTransaction() throws Exception {
         String token = registerCustomer("conversation_customer_one");
-        long conversationId = createConversation(token, "登录问题");
-        ResolvedChatModel resolvedModel = new ResolvedChatModel(
-                99L,
-                "test-chat-model",
-                true,
-                mock(ChatModel.class)
-        );
-        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.complete(
-                any(ResolvedChatModel.class),
-                any(ConversationModelHistory.class),
-                any()
-        )).thenAnswer(invocation -> {
+        long conversationId = createConversation(token, "制度问题");
+        when(defaultChatModelProvider.get()).thenReturn(new ResolvedChatModel(99L, "test-chat-model", true, mock(ChatModel.class)));
+        when(knowledge.answer(any(), any(), any(), any())).thenAnswer(invocation -> {
             assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
-            ConversationModelHistory modelHistory = invocation.getArgument(1);
-            List<ChatMessage> history = modelHistory.messages();
-            String lastUserMessage = history.getLast().getContent();
-            return new ChatCompletionResult("AI: " + lastUserMessage, 12, 6, 18);
+            return trustedCompletion("AI: " + invocation.getArgument(1), 12, 6, 18);
         });
-
-        sendMessage(token, conversationId, "我无法登录")
+        sendMessage(token, conversationId, "报销期限")
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.userMessage.role").value("USER"))
-                .andExpect(jsonPath("$.data.userMessage.status").value("COMPLETED"))
-                .andExpect(jsonPath("$.data.assistantMessage.role").value("ASSISTANT"))
-                .andExpect(jsonPath("$.data.assistantMessage.status").value("COMPLETED"))
-                .andExpect(jsonPath("$.data.assistantMessage.content").value("AI: 我无法登录"))
+                .andExpect(jsonPath("$.data.userMessage.mode").value("KNOWLEDGE"))
+                .andExpect(jsonPath("$.data.assistantMessage.knowledgeAnswer").exists())
+                .andExpect(jsonPath("$.data.assistantMessage.content").value("AI: 报销期限"))
                 .andExpect(jsonPath("$.data.assistantMessage.modelConfigId").value(99))
-                .andExpect(jsonPath("$.data.assistantMessage.modelName").value("test-chat-model"))
                 .andExpect(jsonPath("$.data.assistantMessage.totalTokens").value(18))
                 .andExpect(jsonPath("$.data.pendingActions").isEmpty());
-
-        User customer = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, "conversation_customer_one"));
-        ChatMessage firstAssistantMessage = chatMessageMapper.selectList(
-                        new LambdaQueryWrapper<ChatMessage>()
-                                .eq(ChatMessage::getConversationId, conversationId)
-                                .eq(ChatMessage::getRole, ChatMessageRole.ASSISTANT)
-                                .orderByDesc(ChatMessage::getId)
-                )
-                .getFirst();
-        AgentToolCall toolCall = agentToolCallService.start(
-                new AgentExecutionContext(customer.getId(), conversationId, firstAssistantMessage.getId()),
-                "listCustomerTickets",
-                "{\"status\":\"PENDING\"}"
-        );
-        agentToolCallService.completeSuccess(toolCall.getId(), "{\"tickets\":[]}");
-
-        sendMessage(token, conversationId, "还是提示密码错误")
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.assistantMessage.content").value("AI: 还是提示密码错误"));
-
-        mockMvc.perform(get("/api/conversations/{id}/messages", conversationId)
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.total").value(4))
-                .andExpect(jsonPath("$.data.records[0].role").value("USER"))
-                .andExpect(jsonPath("$.data.records[3].role").value("ASSISTANT"));
-
-        ArgumentCaptor<ConversationModelHistory> historyCaptor = ArgumentCaptor.forClass(
-                ConversationModelHistory.class
-        );
-        ArgumentCaptor<AgentExecutionContext> contextCaptor = ArgumentCaptor.forClass(AgentExecutionContext.class);
-        verify(modelClient, org.mockito.Mockito.times(2)).complete(
-                any(),
-                historyCaptor.capture(),
-                contextCaptor.capture()
-        );
-        ConversationModelHistory secondModelHistory = historyCaptor.getAllValues().get(1);
-        List<ChatMessage> secondHistory = secondModelHistory.messages();
-        assertThat(secondHistory)
-                .extracting(ChatMessage::getRole)
-                .containsExactly(ChatMessageRole.USER, ChatMessageRole.ASSISTANT, ChatMessageRole.USER);
-        assertThat(secondHistory)
-                .extracting(ChatMessage::getContent)
-                .containsExactly("我无法登录", "AI: 我无法登录", "还是提示密码错误");
-        assertThat(secondModelHistory.recentToolCalls())
-                .singleElement()
-                .satisfies(record -> {
-                    assertThat(record.getAssistantMessageId()).isEqualTo(firstAssistantMessage.getId());
-                    assertThat(record.getToolName()).isEqualTo("listCustomerTickets");
-                    assertThat(record.getResultJson()).isEqualTo("{\"tickets\":[]}");
-                });
-        assertThat(contextCaptor.getAllValues())
-                .allSatisfy(context -> assertThat(context.conversationId()).isEqualTo(conversationId))
-                .extracting(AgentExecutionContext::customerId)
-                .containsOnly(contextCaptor.getValue().customerId());
-        assertThat(contextCaptor.getAllValues())
-                .allSatisfy(context -> assertThat(context.assistantMessageId()).isPositive());
-
-        mockMvc.perform(get("/api/conversations")
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.total").value(1))
-                .andExpect(jsonPath("$.data.records[0].lastMessageAt").isNotEmpty());
+        sendMessage(token, conversationId, "住宿标准").andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.assistantMessage.content").value("AI: 住宿标准"));
+        ArgumentCaptor<String> questions = ArgumentCaptor.forClass(String.class);
+        verify(knowledge, org.mockito.Mockito.times(2)).answer(any(), questions.capture(), any(), any());
+        assertThat(questions.getAllValues()).containsExactly("报销期限", "住宿标准");
+        verifyNoInteractions(modelClient);
+        mockMvc.perform(get("/api/conversations/{id}/messages", conversationId).header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.total").value(4))
+                .andExpect(jsonPath("$.data.records[1].content").value("AI: 报销期限"));
+        mockMvc.perform(get("/api/conversations").header(HttpHeaders.AUTHORIZATION, bearer(token)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.total").value(1));
     }
 
+    /** 历史引用读取沿用工具审计，不将其转成新核验报告。 */
     @Test
-    @DisplayName("知识检索结果应作为引用随本轮回答返回并保留在历史消息中")
+    @DisplayName("历史AGENT仍可读取工具引用但不补造核验报告")
     void knowledgeCitationsAreReturnedWithCurrentAndHistoricalMessages() throws Exception {
-        String token = registerCustomer("conversation_knowledge_citations");
-        long conversationId = createConversation(token, "账号锁定规则");
-        ResolvedChatModel resolvedModel = new ResolvedChatModel(
-                105L,
-                "citation-model",
-                true,
-                mock(ChatModel.class)
-        );
-        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
-                .thenAnswer(invocation -> {
-                    AgentExecutionContext context = invocation.getArgument(2);
-                    AgentToolCall knowledgeCall = agentToolCallService.start(
-                            context,
-                            "search_knowledge_base",
-                            "{\"query\":\"账号锁定规则\"}"
-                    );
-                    agentToolCallService.completeSuccess(knowledgeCall.getId(), """
-                            {
-                              "status": "FOUND",
-                              "message": "请仅依据以下资料回答",
-                              "knowledgeBase": "产品帮助中心",
-                              "query": "账号锁定规则",
-                              "chunks": [
-                                {
-                                  "rank": 1,
-                                  "source": "账号安全说明.pdf",
-                                  "chunkSequence": 8,
-                                  "content": "连续五次输入错误密码后，账号将锁定三十分钟。"
-                                }
-                              ]
-                            }
-                            """);
-                    AgentToolCall ticketCall = agentToolCallService.start(
-                            context,
-                            "list_customer_tickets",
-                            "{}"
-                    );
-                    agentToolCallService.completeSuccess(ticketCall.getId(), "{\"tickets\":[]}");
-                    return new ChatCompletionResult("账号会锁定三十分钟。", 10, 6, 16);
-                });
-
-        sendMessage(token, conversationId, "密码输错后会锁定多久？")
+        String username = "conversation_knowledge_citations";
+        String token = registerCustomer(username);
+        long conversationId = createConversation(token, "旧引用读取");
+        User owner = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
+        ChatMessage old = new ChatMessage();
+        old.setConversationId(conversationId); old.setRole(ChatMessageRole.ASSISTANT);
+        old.setMode(ChatMode.AGENT); old.setStatus(ChatMessageStatus.COMPLETED); old.setContent("历史检索回答");
+        old.setCreatedAt(LocalDateTime.now()); old.setUpdatedAt(LocalDateTime.now()); chatMessageMapper.insert(old);
+        var call = agentToolCallService.start(new AgentExecutionContext(owner.getId(), conversationId, old.getId()),
+                "search_knowledge_base", "{}");
+        agentToolCallService.completeSuccess(call.getId(), """
+                {"status":"FOUND","knowledgeBase":"产品帮助中心","chunks":[{"source":"账号安全说明.pdf",
+                "chunkSequence":8,"content":"连续五次输入错误密码后，账号将锁定三十分钟。"}]}
+                """);
+        mockMvc.perform(get("/api/conversations/{id}/messages", conversationId).header(HttpHeaders.AUTHORIZATION, bearer(token)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.userMessage.citations").isEmpty())
-                .andExpect(jsonPath("$.data.assistantMessage.citations.length()").value(1))
-                .andExpect(jsonPath("$.data.assistantMessage.citations[0].knowledgeBaseName")
-                        .value("产品帮助中心"))
-                .andExpect(jsonPath("$.data.assistantMessage.citations[0].sourceName")
-                        .value("账号安全说明.pdf"))
-                .andExpect(jsonPath("$.data.assistantMessage.citations[0].chunkSequence").value(8))
-                .andExpect(jsonPath("$.data.assistantMessage.citations[0].content")
-                        .value("连续五次输入错误密码后，账号将锁定三十分钟。"));
-
-        mockMvc.perform(get("/api/conversations/{id}/messages", conversationId)
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.records[0].citations").isEmpty())
-                .andExpect(jsonPath("$.data.records[1].citations.length()").value(1))
-                .andExpect(jsonPath("$.data.records[1].citations[0].sourceName")
-                        .value("账号安全说明.pdf"));
+                .andExpect(jsonPath("$.data.records[0].mode").value("AGENT"))
+                .andExpect(jsonPath("$.data.records[0].knowledgeAnswer").doesNotExist())
+                .andExpect(jsonPath("$.data.records[0].knowledgeRunId").doesNotExist())
+                .andExpect(jsonPath("$.data.records[0].citations[0].sourceName").value("账号安全说明.pdf"))
+                .andExpect(jsonPath("$.data.records[0].citations[0].chunkSequence").value(8));
+        verifyNoInteractions(modelClient, knowledge);
     }
 
     @Test
@@ -314,7 +211,7 @@ class ConversationControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("CONVERSATION_NOT_FOUND"));
 
-        verifyNoInteractions(defaultChatModelProvider, modelClient);
+        verifyNoInteractions(defaultChatModelProvider, modelClient, knowledge);
     }
 
     /**
@@ -331,8 +228,8 @@ class ConversationControllerIntegrationTest {
                 true,
                 mock(ChatModel.class)
         ));
-        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
-                .thenReturn(new ChatCompletionResult("这条历史应当保留", 6, 5, 11));
+        when(knowledge.answer(any(), any(), any(), any()))
+                .thenReturn(trustedCompletion("这条历史应当保留", 6, 5, 11));
         sendMessage(token, conversationId, "保存一轮历史").andExpect(status().isOk());
 
         mockMvc.perform(delete("/api/conversations/{id}", conversationId)
@@ -360,88 +257,42 @@ class ConversationControllerIntegrationTest {
     }
 
     /**
-     * 验证非流式接口直接返回可供前端渲染的结构化确认卡片。
+     * 旧客户端请求也只交付可信结果，不再生成客服操作卡片。
      */
     @Test
-    @DisplayName("同步对话应在响应中返回 AI 生成的待确认操作")
-    void synchronousChatReturnsPendingAction() throws Exception {
+    @DisplayName("旧AGENT请求不生成工单或待确认操作")
+    void synchronousChatDoesNotCreatePendingAction() throws Exception {
         String token = registerCustomer("conversation_action_sync");
-        long conversationId = createConversation(token, "创建工单");
-        ResolvedChatModel resolvedModel = new ResolvedChatModel(
-                104L,
-                "action-model",
-                true,
-                mock(ChatModel.class)
-        );
-        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
-                .thenAnswer(invocation -> {
-                    AgentExecutionContext context = invocation.getArgument(2);
-                    pendingActionService.prepareCreateTicket(
-                            context,
-                            "无法完成支付",
-                            "客户付款时持续提示支付失败，需要人工处理",
-                            TicketPriority.HIGH,
-                            "核心支付流程完全不可用"
-                    );
-                    return new ChatCompletionResult("工单草稿已经整理好，请确认。", 10, 8, 18);
-                });
-
-        sendMessage(token, conversationId, "帮我转人工处理")
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.pendingActions[0].actionType").value("CREATE_TICKET"))
-                .andExpect(jsonPath("$.data.pendingActions[0].status").value("PENDING"))
-                .andExpect(jsonPath("$.data.pendingActions[0].title").value("无法完成支付"))
-                .andExpect(jsonPath("$.data.pendingActions[0].priority").value("HIGH"))
-                .andExpect(jsonPath("$.data.pendingActions[0].version").value(0));
+        long conversationId = createConversation(token, "旧客服请求");
+        when(defaultChatModelProvider.get()).thenReturn(new ResolvedChatModel(104L, "test", false, mock(ChatModel.class)));
+        when(knowledge.answer(any(), any(), any(), any())).thenReturn(trustedCompletion("维护流程依据", 10, 8, 18));
+        sendMessage(token, conversationId, "帮我转人工处理").andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.pendingActions").isEmpty())
+                .andExpect(jsonPath("$.data.assistantMessage.knowledgeAnswer").exists());
+        assertThat(pendingActionMapper.selectCount(null)).isZero();
+        assertThat(agentToolCallMapper.selectCount(null)).isZero();
+        verifyNoInteractions(modelClient);
     }
 
-    @Test
+    /** 旧别名核验失败后保存安全错误码，不回退旧生成器。 */
+    @Test @DisplayName("旧AGENT失败保存诊断且不泄露正文")
     void modelFailurePersistsSanitizedFailedAssistantMessage() throws Exception {
         String token = registerCustomer("conversation_customer_failure");
         long conversationId = createConversation(token, "失败测试");
-        ResolvedChatModel resolvedModel = new ResolvedChatModel(
-                100L,
-                "failure-model",
-                true,
-                mock(ChatModel.class)
-        );
-        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
-                .thenAnswer(invocation -> {
-                    AgentExecutionContext context = invocation.getArgument(2);
-                    pendingActionService.prepareCreateTicket(
-                            context,
-                            "失败前创建的草稿",
-                            "模型最终回答失败时该草稿必须失效",
-                            TicketPriority.MEDIUM,
-                            "一般问题"
-                    );
-                    throw new IllegalStateException("provider leaked sk-secret-value");
-                });
-
-        sendMessage(token, conversationId, "触发失败")
-                .andExpect(status().isBadGateway())
+        when(defaultChatModelProvider.get()).thenReturn(new ResolvedChatModel(100L, "failure-model", true, mock(ChatModel.class)));
+        when(knowledge.answer(any(), any(), any(), any())).thenThrow(new IllegalStateException("provider private detail"));
+        sendMessage(token, conversationId, "触发失败").andExpect(status().isBadGateway())
                 .andExpect(jsonPath("$.code").value("CHAT_GENERATION_FAILED"))
-                .andExpect(content().string(org.hamcrest.Matchers.not(
-                        org.hamcrest.Matchers.containsString("sk-secret-value")
-                )));
-
-        List<ChatMessage> messages = chatMessageMapper.selectList(
-                new LambdaQueryWrapper<ChatMessage>()
-                        .eq(ChatMessage::getConversationId, conversationId)
-                        .orderByAsc(ChatMessage::getId)
-        );
+                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("provider private detail"))));
+        var messages = chatMessageMapper.selectList(new LambdaQueryWrapper<ChatMessage>()
+                .eq(ChatMessage::getConversationId, conversationId).orderByAsc(ChatMessage::getId));
         assertThat(messages).hasSize(2);
-        assertThat(messages.get(0).getStatus()).isEqualTo(ChatMessageStatus.COMPLETED);
-        assertThat(messages.get(1).getStatus()).isEqualTo(ChatMessageStatus.FAILED);
-        assertThat(messages.get(1).getErrorCode()).isEqualTo("MODEL_CALL_FAILED");
-        assertThat(messages.get(1).getContent()).isNull();
-        AgentPendingAction invalidatedAction = pendingActionMapper.selectOne(
-                new LambdaQueryWrapper<AgentPendingAction>()
-                        .eq(AgentPendingAction::getAssistantMessageId, messages.get(1).getId())
-        );
-        assertThat(invalidatedAction.getStatus()).isEqualTo(PendingActionStatus.INVALIDATED);
+        assertThat(messages.getLast().getStatus()).isEqualTo(ChatMessageStatus.FAILED);
+        assertThat(messages.getLast().getErrorCode()).isEqualTo("KNOWLEDGE_ANSWER_FAILED");
+        assertThat(messages.getLast().getContent()).isNull();
+        assertThat(messages.getLast().getKnowledgeAnswer()).isNull();
+        assertThat(messages.getLast().getKnowledgeRunId()).isNotBlank();
+        verifyNoInteractions(modelClient);
     }
 
     @Test
@@ -467,7 +318,7 @@ class ConversationControllerIntegrationTest {
 
         assertThat(chatMessageMapper.selectCount(new LambdaQueryWrapper<ChatMessage>()
                 .eq(ChatMessage::getConversationId, conversationId))).isZero();
-        verifyNoInteractions(modelClient);
+        verifyNoInteractions(modelClient, knowledge);
     }
 
     /**
@@ -543,8 +394,8 @@ class ConversationControllerIntegrationTest {
                 mock(ChatModel.class)
         );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.complete(any(), any(ConversationModelHistory.class), any()))
-                .thenReturn(new ChatCompletionResult("现在可以继续对话", 8, 5, 13));
+        when(knowledge.answer(any(), any(), any(), any()))
+                .thenReturn(trustedCompletion("现在可以继续对话", 8, 5, 13));
 
         PreparedChatExchange abandoned = conversationPersistenceService.prepareExchange(
                 conversationId,
@@ -623,6 +474,7 @@ class ConversationControllerIntegrationTest {
                 .isEqualTo(StaleChatGenerationRecoveryService.GENERATION_INTERRUPTED);
     }
 
+    /** SSE只发送完整已核验正文并保存汇总用量，不再夹带操作卡片。 */
     @Test
     @DisplayName("客户应收到完整的 SSE 事件序列且最终回答正确入库")
     void customerReceivesStreamingAnswerAndPersistsCompletion() throws Exception {
@@ -635,41 +487,8 @@ class ConversationControllerIntegrationTest {
                 mock(ChatModel.class)
         );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.stream(any(), any(ConversationModelHistory.class), any())).thenAnswer(invocation -> {
-            AgentExecutionContext context = invocation.getArgument(2);
-            AgentToolCall knowledgeCall = agentToolCallService.start(
-                    context,
-                    "search_knowledge_base",
-                    "{\"query\":\"重置密码\"}"
-            );
-            agentToolCallService.completeSuccess(knowledgeCall.getId(), """
-                    {
-                      "status": "FOUND",
-                      "message": "请仅依据以下资料回答",
-                      "knowledgeBase": "产品帮助中心",
-                      "query": "重置密码",
-                      "chunks": [
-                        {
-                          "rank": 1,
-                          "source": "密码重置指南.md",
-                          "chunkSequence": 3,
-                          "content": "用户可以通过登录页的忘记密码入口重置密码。"
-                        }
-                      ]
-                    }
-                    """);
-            pendingActionService.prepareCreateTicket(
-                    context,
-                    "重置密码后仍无法登录",
-                    "客户重置密码后仍然无法登录，需要人工协助",
-                    TicketPriority.HIGH,
-                    "账号完全无法使用"
-            );
-            return Flux.just(
-                    new ChatStreamChunk("可以", null, null, null),
-                    new ChatStreamChunk("重置密码", 16, 5, 21)
-            );
-        });
+        when(knowledge.answer(any(), any(), any(), any()))
+                .thenReturn(trustedCompletion("可以重置密码", 16, 5, 21));
 
         MvcResult streamingRequest = mockMvc.perform(post(
                                 "/api/conversations/{id}/messages/stream",
@@ -691,19 +510,11 @@ class ConversationControllerIntegrationTest {
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(eventStream)
-                .contains("event:start", "event:delta", "event:action_required", "event:done")
-                .containsSubsequence(
-                        "event:start",
-                        "event:delta",
-                        "event:delta",
-                        "event:action_required",
-                        "event:done"
-                )
-                .contains("\"content\":\"可以\"", "\"content\":\"重置密码\"")
-                .contains("\"title\":\"重置密码后仍无法登录\"", "\"priority\":\"HIGH\"")
-                .contains("\"sourceName\":\"密码重置指南.md\"", "\"chunkSequence\":3")
-                .doesNotContain("event:error");
+        assertThat(eventStream).containsSubsequence("event:start", "event:delta", "event:done")
+                .contains("可以重置密码", "knowledgeAnswer", "KNOWLEDGE")
+                .doesNotContain("event:action_required", "event:error");
+        assertThat(eventStream.split("event:delta", -1)).hasSize(2);
+        verifyNoInteractions(modelClient);
 
         List<ChatMessage> messages = chatMessageMapper.selectList(
                 new LambdaQueryWrapper<ChatMessage>()
@@ -716,6 +527,7 @@ class ConversationControllerIntegrationTest {
         assertThat(messages.getLast().getTotalTokens()).isEqualTo(21);
     }
 
+    /** 流式核验失败只发安全错误，不泄露草案或生成完成事件。 */
     @Test
     @DisplayName("流式模型调用失败时应发送脱敏错误事件并保存失败状态")
     void streamingFailureSendsSanitizedErrorAndPersistsFailure() throws Exception {
@@ -728,8 +540,8 @@ class ConversationControllerIntegrationTest {
                 mock(ChatModel.class)
         );
         when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-        when(modelClient.stream(any(), any(ConversationModelHistory.class), any()))
-                .thenReturn(Flux.error(new IllegalStateException("provider leaked sk-stream-secret")));
+        when(knowledge.answer(any(), any(), any(), any()))
+                .thenThrow(new IllegalStateException("provider leaked sk-stream-secret"));
 
         MvcResult streamingRequest = mockMvc.perform(post(
                                 "/api/conversations/{id}/messages/stream",
@@ -760,38 +572,40 @@ class ConversationControllerIntegrationTest {
         );
         assertThat(messages).hasSize(2);
         assertThat(messages.getLast().getStatus()).isEqualTo(ChatMessageStatus.FAILED);
-        assertThat(messages.getLast().getErrorCode()).isEqualTo("MODEL_CALL_FAILED");
+        assertThat(messages.getLast().getErrorCode()).isEqualTo("KNOWLEDGE_ANSWER_FAILED");
     }
 
+    /** SSE是交付协议，不依赖厂商逐Token输出能力。 */
     @Test
-    @DisplayName("默认模型未开启流式能力时不应保存任何消息")
-    void modelWithoutStreamingSupportDoesNotPersistMessages() throws Exception {
+    @DisplayName("旧AGENT的SSE不再要求厂商支持流式")
+    void modelWithoutStreamingSupportStillDeliversVerifiedSse() throws Exception {
         String token = registerCustomer("conversation_stream_unsupported");
-        long conversationId = createConversation(token, "不支持流式测试");
-        ResolvedChatModel resolvedModel = new ResolvedChatModel(
-                103L,
-                "non-stream-model",
-                false,
-                mock(ChatModel.class)
-        );
-        when(defaultChatModelProvider.get()).thenReturn(resolvedModel);
-
-        mockMvc.perform(post("/api/conversations/{id}/messages/stream", conversationId)
-                        .header(HttpHeaders.AUTHORIZATION, bearer(token))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.TEXT_EVENT_STREAM, MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"mode": "AGENT", "content": "尝试流式调用"}
-                                """))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("MODEL_STREAMING_NOT_SUPPORTED"));
-
-        assertThat(chatMessageMapper.selectCount(new LambdaQueryWrapper<ChatMessage>()
-                .eq(ChatMessage::getConversationId, conversationId))).isZero();
-        verify(modelClient, never()).stream(any(), any(ConversationModelHistory.class), any());
+        long conversationId = createConversation(token, "厂商无流式能力");
+        when(defaultChatModelProvider.get()).thenReturn(new ResolvedChatModel(103L, "non-stream-model", false, mock(ChatModel.class)));
+        when(knowledge.answer(any(), any(), any(), any())).thenReturn(trustedCompletion("已核验正文", 1, 2, 3));
+        var pending = mockMvc.perform(post("/api/conversations/{id}/messages/stream", conversationId)
+                .header(HttpHeaders.AUTHORIZATION, bearer(token)).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM).content("""
+                        {"mode":"AGENT","content":"报销期限"}
+                        """)).andExpect(request().asyncStarted()).andReturn();
+        var body = mockMvc.perform(asyncDispatch(pending)).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        assertThat(body).containsSubsequence("event:start", "event:delta", "event:done");
+        verifyNoInteractions(modelClient);
     }
 
-    /** 显式选择旧模式以覆盖兼容协议，缺省请求由可信问答集成测试验证。 */
+    /** 为会话边界测试构造带报告和用量的可信结果，避免旧自由文本桩绕过持久化约束。 */
+    private ChatCompletionResult trustedCompletion(String text, int prompt, int output, int total) {
+        var draft = new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.ANSWERABLE,
+                List.of(new KnowledgeAnswerDraft.Claim(text, List.of(new KnowledgeAnswerDraft.Reference("E1", text)))),
+                List.of(), List.of());
+        var report = new KnowledgeAnswerReport(3, KnowledgeAnswerReport.Reason.REVIEWED, 2L, "测试制度库", "ALL",
+                LocalDateTime.now(), draft, List.of(new KnowledgeAnswerReport.Evidence("E1", 10L, 1, "测试资料.md", text,
+                new KnowledgeDocumentMetadata("test", "v1", "ALL", LocalDateTime.of(2026, 1, 1, 0, 0), null))));
+        return new ChatCompletionResult(text, prompt, output, total, report);
+    }
+
+    /** 显式发送旧AGENT别名，验证规范化后仍保留会话接口兼容。 */
     private org.springframework.test.web.servlet.ResultActions sendMessage(
             String token,
             long conversationId,

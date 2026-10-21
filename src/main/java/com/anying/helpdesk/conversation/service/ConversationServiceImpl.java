@@ -1,11 +1,8 @@
 package com.anying.helpdesk.conversation.service;
 
-import com.anying.helpdesk.agent.AgentExecutionContext;
-import com.anying.helpdesk.agent.action.dto.PendingActionResponse;
 import com.anying.helpdesk.agent.action.service.PendingActionService;
 import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
-import com.anying.helpdesk.conversation.domain.ChatMode;
 import com.anying.helpdesk.knowledge.answer.TrustedKnowledgeAnswerService;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure;
 import com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerRunService;
@@ -19,10 +16,7 @@ import com.anying.helpdesk.conversation.dto.ConversationResponse;
 import com.anying.helpdesk.conversation.dto.CreateConversationRequest;
 import com.anying.helpdesk.conversation.dto.SendMessageRequest;
 import com.anying.helpdesk.conversation.exception.ChatGenerationException;
-import com.anying.helpdesk.conversation.exception.ModelStreamingNotSupportedException;
 import com.anying.helpdesk.conversation.model.ChatCompletionResult;
-import com.anying.helpdesk.conversation.model.ChatStreamChunk;
-import com.anying.helpdesk.conversation.model.ConversationModelClient;
 import com.anying.helpdesk.modelconfig.factory.DefaultChatModelProvider;
 import com.anying.helpdesk.modelconfig.factory.ResolvedChatModel;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +27,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -43,15 +36,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ConversationServiceImpl implements ConversationService {
 
     private static final Logger log = LoggerFactory.getLogger(ConversationServiceImpl.class);
-    private static final String MODEL_CALL_FAILED = "MODEL_CALL_FAILED";
     private static final String STREAM_CANCELLED = "STREAM_CANCELLED";
     private static final String KNOWLEDGE_ANSWER_FAILED = "KNOWLEDGE_ANSWER_FAILED";
 
     private final ConversationPersistenceService persistenceService;
     private final DefaultChatModelProvider defaultChatModelProvider;
-    private final ConversationModelClient modelClient;
     private final PendingActionService pendingActionService;
-    private final KnowledgeCitationService knowledgeCitationService;
     private final TrustedKnowledgeAnswerService trustedKnowledgeAnswerService;
     private final KnowledgeAnswerRunService knowledgeAnswerRunService;
 
@@ -93,7 +83,7 @@ public class ConversationServiceImpl implements ConversationService {
         return persistenceService.pageMessages(id, page, size, customerId);
     }
 
-    /** 根据本轮模式完成普通对话或证据约束问答，失败时保留可追踪的消息状态。 */
+    /** 所有新消息共用可信问答服务，失败时保留诊断，不能回退到旧自由回答。 */
     @Override
     public ChatExchangeResponse sendMessage(Long id, SendMessageRequest request, Long customerId) {
         persistenceService.validateCanSend(id, customerId);
@@ -105,34 +95,22 @@ public class ConversationServiceImpl implements ConversationService {
                 model
         );
 
-        KnowledgeAnswerTrace trace = request.mode() == ChatMode.KNOWLEDGE ? knowledgeAnswerRunService.start(prepared, model) : null;
+        KnowledgeAnswerTrace trace = knowledgeAnswerRunService.start(prepared, model);
         ChatMessage assistantMessage;
         try {
-            ChatCompletionResult completion = request.mode() == ChatMode.KNOWLEDGE
-                    ? answerKnowledge(model, prepared, trace)
-                    : modelClient.complete(
-                    model,
-                    prepared.history(),
-                    new AgentExecutionContext(customerId, id, prepared.assistantMessageId())
-            );
-            assistantMessage = trace == null ? persistenceService.completeAssistant(prepared.assistantMessageId(), completion)
-                    : trace.stage(KnowledgeAnswerRunSnapshot.Stage.MESSAGE_PERSISTENCE,
+            ChatCompletionResult completion = answerKnowledge(model, prepared, trace);
+            assistantMessage = trace.stage(KnowledgeAnswerRunSnapshot.Stage.MESSAGE_PERSISTENCE,
                     () -> persistenceService.completeAssistant(prepared.assistantMessageId(), completion));
-            if (trace != null) trace.succeeded();
+            trace.succeeded();
         } catch (RuntimeException exception) {
-            if (trace != null) trace.failed(exception);
-            markGenerationFailed(prepared.assistantMessageId(), id,
-                    request.mode() == ChatMode.KNOWLEDGE ? knowledgeErrorCode(exception) : MODEL_CALL_FAILED, exception);
+            trace.failed(exception);
+            markGenerationFailed(prepared.assistantMessageId(), id, knowledgeErrorCode(exception), exception);
             throw new ChatGenerationException();
         }
-        List<PendingActionResponse> pendingActions = pendingActionService.listPendingByAssistantMessageId(
-                prepared.assistantMessageId(),
-                customerId
-        );
         return new ChatExchangeResponse(
                 ChatMessageResponse.from(prepared.userMessage()),
-                responseWithCitations(assistantMessage),
-                pendingActions
+                ChatMessageResponse.from(assistantMessage),
+                List.of()
         );
     }
 
@@ -143,84 +121,12 @@ public class ConversationServiceImpl implements ConversationService {
     public Flux<ChatStreamEvent> streamMessage(Long id, SendMessageRequest request, Long customerId) {
         persistenceService.validateCanSend(id, customerId);
         ResolvedChatModel model = defaultChatModelProvider.get();
-        if (request.mode() == ChatMode.AGENT && !model.supportsStreaming()) {
-            throw new ModelStreamingNotSupportedException();
-        }
-        PreparedChatExchange prepared = persistenceService.prepareExchange(
-                id,
-                customerId,
-                request,
-                model
-        );
-
-        if (request.mode() == ChatMode.KNOWLEDGE) {
-            return streamKnowledge(id, request, model, prepared);
-        }
-
-        StreamingCompletionAccumulator accumulator = new StreamingCompletionAccumulator();
-        AtomicBoolean finalized = new AtomicBoolean(false);
-        AgentExecutionContext executionContext = new AgentExecutionContext(
-                customerId,
-                id,
-                prepared.assistantMessageId()
-        );
-        Flux<ChatStreamEvent> modelEvents = Flux.defer(() -> modelClient.stream(
-                        model,
-                        prepared.history(),
-                        executionContext
-                ))
-                .doOnNext(accumulator::append)
-                .filter(chunk -> chunk.content() != null && !chunk.content().isEmpty())
-                .map(chunk -> ChatStreamEvent.delta(chunk.content()));
-        Flux<ChatStreamEvent> completionEvents = Mono.fromCallable(() -> {
-                    ChatCompletionResult completion = accumulator.toCompletionResult();
-                    ChatMessage assistantMessage = persistenceService.completeAssistant(
-                            prepared.assistantMessageId(),
-                            completion
-                    );
-                    List<PendingActionResponse> pendingActions =
-                            pendingActionService.listPendingByAssistantMessageId(
-                                    prepared.assistantMessageId(),
-                                    customerId
-                            );
-                    List<ChatStreamEvent> events = new ArrayList<>();
-                    pendingActions.stream()
-                            .map(ChatStreamEvent::actionRequired)
-                            .forEach(events::add);
-                    events.add(ChatStreamEvent.done(responseWithCitations(assistantMessage)));
-                    finalized.set(true);
-                    return events;
-                })
-                .subscribeOn(Schedulers.boundedElastic())
-                .flatMapMany(Flux::fromIterable);
-
-        return Flux.concat(
-                        Mono.just(ChatStreamEvent.start(
-                                ChatMessageResponse.from(prepared.userMessage()),
-                                prepared.assistantMessageId()
-                        )),
-                        modelEvents,
-                        completionEvents
-                )
-                .onErrorResume(exception -> Mono.fromCallable(() -> {
-                            markGenerationFailed(
-                                    prepared.assistantMessageId(),
-                                    id,
-                                    MODEL_CALL_FAILED,
-                                    exception
-                            );
-                            finalized.set(true);
-                            return ChatStreamEvent.error(
-                                    "CHAT_GENERATION_FAILED",
-                                    ChatGenerationException.USER_MESSAGE
-                            );
-                        })
-                        .subscribeOn(Schedulers.boundedElastic()))
-                .doOnCancel(() -> markCancelledStream(prepared.assistantMessageId(), id, finalized));
+        PreparedChatExchange prepared = persistenceService.prepareExchange(id, customerId, request, model);
+        return streamKnowledge(id, model, prepared);
     }
 
     /** 知识问答先核验并保存，再通过 SSE 发送完整正文，禁止草案片段提前泄露。 */
-    private Flux<ChatStreamEvent> streamKnowledge(Long id, SendMessageRequest request,
+    private Flux<ChatStreamEvent> streamKnowledge(Long id,
                                                  ResolvedChatModel model, PreparedChatExchange prepared) {
         AtomicBoolean finalized = new AtomicBoolean(false);
         KnowledgeAnswerTrace trace = knowledgeAnswerRunService.start(prepared, model);
@@ -273,16 +179,6 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     /**
-     * 为已完成的 AI 消息附加本轮知识检索产生的引用片段。
-     */
-    private ChatMessageResponse responseWithCitations(ChatMessage assistantMessage) {
-        return ChatMessageResponse.from(
-                assistantMessage,
-                knowledgeCitationService.listByAssistantMessageId(assistantMessage.getId())
-        );
-    }
-
-    /**
      * 在流式连接被客户端取消时，异步清理仍处于等待状态的 AI 消息。
      */
     private void markCancelledStream(Long messageId, Long conversationId, AtomicBoolean finalized) {
@@ -325,45 +221,4 @@ public class ConversationServiceImpl implements ConversationService {
         );
     }
 
-    private static final class StreamingCompletionAccumulator {
-
-        private final StringBuilder content = new StringBuilder();
-        private Integer promptTokens;
-        private Integer completionTokens;
-        private Integer totalTokens;
-
-        /**
-         * 累加模型返回的文本，并保留最后一次出现的 Token 用量。
-         */
-        private void append(ChatStreamChunk chunk) {
-            if (chunk.content() != null) {
-                content.append(chunk.content());
-            }
-            if (chunk.promptTokens() != null) {
-                promptTokens = chunk.promptTokens();
-            }
-            if (chunk.completionTokens() != null) {
-                completionTokens = chunk.completionTokens();
-            }
-            if (chunk.totalTokens() != null) {
-                totalTokens = chunk.totalTokens();
-            }
-        }
-
-        /**
-         * 将全部流式数据合并为可持久化的完整模型回答。
-         */
-        private ChatCompletionResult toCompletionResult() {
-            String completedContent = content.toString();
-            if (completedContent.isBlank()) {
-                throw new IllegalStateException("model returned empty content");
-            }
-            return new ChatCompletionResult(
-                    completedContent,
-                    promptTokens,
-                    completionTokens,
-                    totalTokens
-            );
-        }
-    }
 }
