@@ -147,11 +147,13 @@ class EvaluationTest(unittest.TestCase):
         client.call.return_value = {"runId": run_id, "assistantMessageId": 5, "conversationId": 100,
                                    "question": "住宿？", "applicabilityScope": "CN_SH", "status": "FAILED",
                                    "stages": [{"stage": "DRAFT", "usage": {"totalTokens": 12}},
+                                              {"stage": "REVIEW", "usage": {"totalTokens": 7}},
+                                              {"stage": "REVISION", "usage": {"totalTokens": 9}},
                                               {"stage": "REVIEW", "usage": None}]}
         evaluation.collect_diagnostics(client, result)
         self.assertEqual("CAPTURED", result["diagnosticState"])
         metrics = evaluation.measures({"planned": 1, "results": [result]})
-        self.assertEqual(12, metrics["diagnosticKnownAnswerTokens"])
+        self.assertEqual(28, metrics["diagnosticKnownAnswerTokens"])
         self.assertEqual(1, metrics["diagnosticModelStagesMissingUsage"])
         self.assertEqual(1, metrics["technicalFailures"])
         client.call.return_value["assistantMessageId"] = 6

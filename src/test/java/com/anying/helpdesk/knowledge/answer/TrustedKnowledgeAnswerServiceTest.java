@@ -201,6 +201,106 @@ class TrustedKnowledgeAnswerServiceTest {
         verifyNoInteractions(eligibility);
     }
 
+    /** 首次否决保留原案，修订使用同一目录并重新核验，所有调用用量累计。 */
+    @Test @DisplayName("具体缺陷可修订一次并交付有依据的部分解释")
+    void repairsOnceAndKeepsBothAttempts() {
+        propose(draft(KnowledgeAnswerDraft.Status.ANSWERABLE));
+        var rejected = rejection();
+        when(client.review(any(), any(), any(), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(rejected, 2, 1, 3),
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerModelClient.Review(true), 20, 5, 25));
+        when(client.revise(any(), any(), any(), any(), any(), any(), any())).thenAnswer(invocation -> {
+            assertThat(invocation.<KnowledgeAnswerModelClient.Review>getArgument(5)).isEqualTo(rejected);
+            return new KnowledgeAnswerModelClient.ModelResult<>(selection(
+                    draft(KnowledgeAnswerDraft.Status.INSUFFICIENT_EVIDENCE), invocation.getArgument(3)), 11, 6, 17);
+        });
+        var trace = trace();
+        var result = service.answer(model, QUESTION, "SH", trace);
+        assertThat(result.totalTokens()).isEqualTo(60);
+        assertThat(result.knowledgeAnswer().answer().status()).isEqualTo(KnowledgeAnswerDraft.Status.INSUFFICIENT_EVIDENCE);
+        assertThat(result.content()).contains("600", "[E1]");
+        assertThat(trace.snapshot().answerAttempts()).hasSize(2);
+        var attempts = trace.snapshot().answerAttempts();
+        assertThat(attempts.getFirst().review().approved()).isFalse();
+        assertThat(attempts.getFirst().draft().status()).isEqualTo(KnowledgeAnswerDraft.Status.ANSWERABLE);
+        assertThat(attempts.getLast().selection().citationSetId()).isEqualTo(attempts.getFirst().selection().citationSetId());
+        assertThat(attempts.getLast().review().approved()).isTrue();
+        verify(client, times(1)).revise(any(), any(), any(), any(), any(), any(), any());
+        verify(client, times(2)).review(eq(model), eq(QUESTION), eq("SH"), argThat(items -> items.size() == 2), any());
+    }
+
+    /** 修订后仍有缺陷必须失败，不能无限重试或交付首轮未核验草案。 */
+    @Test @DisplayName("修订后再次否决立即终止且保留两轮诊断")
+    void stopsAfterSecondRejection() {
+        propose(draft(KnowledgeAnswerDraft.Status.ANSWERABLE));
+        when(client.review(any(), any(), any(), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(rejection(), 2, 1, 3));
+        when(client.revise(any(), any(), any(), any(), any(), any(), any())).thenAnswer(invocation ->
+                new KnowledgeAnswerModelClient.ModelResult<>(invocation.getArgument(4), 10, 5, 15));
+        var trace = trace();
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH", trace)).hasMessage("knowledge answer review rejected");
+        assertThat(trace.snapshot().answerAttempts()).hasSize(2);
+        assertThat(trace.snapshot().status()).isEqualTo(com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerRunSnapshot.Status.FAILED);
+        verify(client, times(1)).revise(any(), any(), any(), any(), any(), any(), any());
+        verify(client, times(2)).review(any(), any(), any(), any(), any());
+        verifyNoInteractions(eligibility);
+    }
+
+    /** 修订得到的伪造片段仍由原引用校验阻断，不进入第二次复核。 */
+    @Test @DisplayName("修订不能绕过引用身份校验")
+    void revisedCitationMustBeValid() {
+        propose(draft(KnowledgeAnswerDraft.Status.ANSWERABLE));
+        when(client.review(any(), any(), any(), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(rejection(), 2, 1, 3));
+        when(client.revise(any(), any(), any(), any(), any(), any(), any())).thenAnswer(invocation ->
+                new KnowledgeAnswerModelClient.ModelResult<>(selection(new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.ANSWERABLE,
+                        List.of(claim("E999", QUOTE)), List.of(), List.of()), invocation.getArgument(3)), 10, 5, 15));
+        var trace = trace();
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH", trace)).hasMessage("unknown evidence id");
+        assertThat(trace.snapshot().answerAttempts()).hasSize(1);
+        assertThat(trace.snapshot().review()).isNull();
+        verify(client, times(1)).review(any(), any(), any(), any(), any());
+    }
+
+    /** 取消发生在首次复核时，后续阶段不能继续产生额外调用。 */
+    @Test @DisplayName("取消后的迟到否决不能启动修订")
+    void cancellationPreventsRevision() {
+        propose(draft(KnowledgeAnswerDraft.Status.ANSWERABLE));
+        var trace = trace();
+        when(client.review(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
+            trace.cancelled();
+            return new KnowledgeAnswerModelClient.ModelResult<>(rejection(), 2, 1, 3);
+        });
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH", trace)).isInstanceOf(java.util.concurrent.CancellationException.class);
+        verify(client, never()).revise(any(), any(), any(), any(), any(), any(), any());
+    }
+
+    /** 修订请求故障保留阶段分类，不自动再次调用或冒充业务证据不足。 */
+    @Test @DisplayName("修订调用故障保留原否决诊断并停止")
+    void revisionFailureIsTechnical() {
+        propose(draft(KnowledgeAnswerDraft.Status.ANSWERABLE));
+        when(client.review(any(), any(), any(), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(rejection(), 2, 1, 3));
+        when(client.revise(any(), any(), any(), any(), any(), any(), any())).thenThrow(new IllegalStateException("private"));
+        var trace = trace();
+        assertThatThrownBy(() -> service.answer(model, QUESTION, "SH", trace)).isInstanceOfSatisfying(KnowledgeAnswerFailure.class,
+                failure -> assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_REVISION_CALL_FAILED"));
+        assertThat(trace.snapshot().answerAttempts()).hasSize(1);
+        verifyNoInteractions(eligibility);
+    }
+
+    /** 构造供修订链路使用的可定位语义缺陷，不作为真实模型质量评测。 */
+    private KnowledgeAnswerModelClient.Review rejection() {
+        return new KnowledgeAnswerModelClient.Review(false, KnowledgeAnswerModelClient.ReviewReason.UNSUPPORTED_CLAIM, null,
+                List.of(new KnowledgeAnswerModelClient.ReviewIssue("claims/0", List.of("E1"), "需要保留适用条件")));
+    }
+
+    /** 创建内存诊断以验证修订、终态及用量，不写业务数据库。 */
+    private com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerTrace trace() {
+        return new com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerTrace(
+                "test", 1L, 1L, QUESTION, "SH", model, clock, ignored -> { });
+    }
+
     /** 生成期间撤回或到期的证据不能继续支撑完成回答。 */
     @Test
     @DisplayName("复核之后证据已不可用时终止本轮生成")

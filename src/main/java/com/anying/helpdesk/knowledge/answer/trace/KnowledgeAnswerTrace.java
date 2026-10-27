@@ -59,6 +59,7 @@ public final class KnowledgeAnswerTrace {
     private KnowledgeApplicabilityPolicy.Assessment applicability;
     private KnowledgeRetrievalRun retrievalRun;
     private KnowledgeAnswerContext answerContext;
+    private final List<AnswerAttempt> answerAttempts = new ArrayList<>();
 
     /** 保存服务端解析的有效范围，未解析前不冒充已经选定。 */
     public synchronized void scopes(List<String> values) {
@@ -207,6 +208,8 @@ public final class KnowledgeAnswerTrace {
     public synchronized void selected(KnowledgeAnswerModelClient.ModelResult<KnowledgeAnswerSelection> value) {
         if (status != Status.RUNNING) return;
         selection = value.value();
+        draft = null;
+        review = null;
         usage(new KnowledgeAnswerModelClient.TokenUsage(value.promptTokens(), value.completionTokens(), value.totalTokens()));
     }
 
@@ -224,6 +227,7 @@ public final class KnowledgeAnswerTrace {
     public synchronized void reviewed(KnowledgeAnswerModelClient.ModelResult<KnowledgeAnswerModelClient.Review> value) {
         if (status != Status.RUNNING) return;
         review = value.value();
+        answerAttempts.add(new AnswerAttempt(answerAttempts.size() + 1, selection, draft, review));
         usage(new KnowledgeAnswerModelClient.TokenUsage(value.promptTokens(), value.completionTokens(), value.totalTokens()));
     }
 
@@ -252,10 +256,11 @@ public final class KnowledgeAnswerTrace {
 
     /** 导出不可变列表快照，供持久化与确定性测试使用。 */
     public synchronized KnowledgeAnswerRunSnapshot snapshot() {
-        return new KnowledgeAnswerRunSnapshot(6, runId, messageId, conversationId, question, scope,
+        return new KnowledgeAnswerRunSnapshot(7, runId, messageId, conversationId, question, scope,
                 modelConfigId, modelName, status, errorCode, revision, writeFailures,
                 startedAt, LocalDateTime.now(clock), finishedAt, retrieval, retrievalTruncated,
-                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability, retrievalRun, answerContext, scopes);
+                evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability, retrievalRun, answerContext, scopes,
+                List.copyOf(answerAttempts));
     }
 
     /** 在调用前持久化运行中阶段，进程中断时仍可定位最后进入的位置。 */
@@ -314,6 +319,7 @@ public final class KnowledgeAnswerTrace {
             case RETRIEVAL -> "KNOWLEDGE_RETRIEVAL_FAILED";
             case PLANNING -> "KNOWLEDGE_PLANNING_CALL_FAILED";
             case DRAFT -> "KNOWLEDGE_DRAFT_CALL_FAILED";
+            case REVISION -> "KNOWLEDGE_REVISION_CALL_FAILED";
             case VALIDATION -> "KNOWLEDGE_STRUCTURE_INVALID";
             case REVIEW -> "KNOWLEDGE_REVIEW_CALL_FAILED";
             case EVIDENCE_RECHECK -> "KNOWLEDGE_EVIDENCE_CHECK_FAILED";

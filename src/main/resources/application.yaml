@@ -33,6 +33,7 @@ app:
   model-config:
     encryption-key: ${MODEL_CONFIG_ENCRYPTION_KEY}
   knowledge:
+    review-strategy: ${KNOWLEDGE_REVIEW_STRATEGY:GROUNDED}
     multihop:
       enabled: ${KNOWLEDGE_MULTIHOP_ENABLED:true}
       task-planning-enabled: ${KNOWLEDGE_TASK_PLANNING_ENABLED:false}

@@ -10,6 +10,15 @@
 
 ## 运行方式
 
+阶段45增加真实项目资料回放与在线验证，默认 GROUNDED 复核在首次具体否决后允许修订一次。冻结回放使用[真实现场题集](knowledge-recovery-cases.json)，保留原始50条召回，不改检索配置；与 BASELINE 各固定两次生成/复核，另外检查真实资料错误断言和既有语义反例。`DELIVERED_REQUIRES_MANUAL_CHECK` 只表示回放通过编排，必须人工阅读，不能直接算正确率。
+
+```powershell
+python -X utf8 scripts/evaluate_knowledge_recovery.py --output target/knowledge-recovery/run-01
+python -X utf8 scripts/verify_real_knowledge_answers.py --base-url http://localhost:8081 --output target/knowledge-recovery/live-01 --runtime-jar target/stage45-backend.jar
+```
+
+第一条使用本地模型配置连接真实模型、冻结检索与资格依赖，不启动 Web、不改资料。第二条要求指定端口已运行相应 JAR，以当前默认“项目开发记录”执行四题真实 HTTP；读取下述登录环境变量，每题独立会话只请求一次，前后检查资料、模型及检索配置未变。默认库不匹配时停止，不自动切库或改参数。输出目录禁止覆盖；原始输入、尝试、失败、用量与摘要保留。线上验证与冻结回放的检索数量不同必须单列，不合并计算效果。
+
 需要 Python 3.10+（只用标准库）、运行中的后端、可用的 MySQL/ES，以及已启用的默认 Chat 和 Embedding 模型。脚本通过真实 API 执行，不直接修改数据库或伪造身份。
 
 在仓库根目录被 Git 忽略的 `.env` 中配置以下四个字段，也可使用同名环境变量。环境变量优先；脚本只读取这些登录字段，不读取其他密钥。

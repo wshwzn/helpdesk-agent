@@ -160,7 +160,7 @@ class KnowledgeAnswerRunIntegrationTest {
             assertThat(stage.durationMs()).isGreaterThanOrEqualTo(0);
         });
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(6);
+        assertThat(snapshot.schemaVersion()).isEqualTo(7);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.stages().get(2).usage().totalTokens()).isEqualTo(15);
         assertThat(snapshot.stages().get(4).usage().totalTokens()).isEqualTo(25);
@@ -193,7 +193,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.FAILED);
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(6);
+        assertThat(snapshot.schemaVersion()).isEqualTo(7);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.review().approved()).isFalse();
         assertThat(snapshot.stages().getLast().errorCode()).isEqualTo(message.getErrorCode());
@@ -202,6 +202,34 @@ class KnowledgeAnswerRunIntegrationTest {
                         .header("Authorization", customerAuth)).andReturn().getResponse().getContentAsString();
         assertThat(history).contains(message.getKnowledgeRunId()).doesNotContain(QUOTE, "\"draft\"");
         verifyNoInteractions(eligibility);
+    }
+
+    /** 两轮尝试通过诊断 JSON 往返保存，客户只读最终核验答案和完整累计用量。 */
+    @Test @DisplayName("修订成功持久化两轮诊断并且不向客户泄露复核意见")
+    void repairedAnswerPersistsBothAttempts() throws Exception {
+        when(modelClient.review(any(), any(), any(), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerModelClient.Review(false,
+                        KnowledgeAnswerModelClient.ReviewReason.UNSUPPORTED_CLAIM, null,
+                        List.of(new KnowledgeAnswerModelClient.ReviewIssue("claims/0", List.of("E1"), "内部缺陷定位"))), 20, 5, 25),
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeAnswerModelClient.Review(true), 20, 5, 25));
+        when(modelClient.revise(any(), any(), any(), any(), any(), any(), any())).thenAnswer(invocation -> {
+            assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
+            return new KnowledgeAnswerModelClient.ModelResult<>(selection(invocation.getArgument(3), "E1-P1"), 10, 5, 15);
+        });
+        String body = send().andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(body).doesNotContain("内部缺陷定位", "answerAttempts");
+        var message = assistant();
+        assertThat(message.getTotalTokens()).isEqualTo(80);
+        var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
+        assertThat(snapshot.answerAttempts()).hasSize(2);
+        assertThat(snapshot.answerAttempts().getFirst().review().approved()).isFalse();
+        assertThat(snapshot.answerAttempts().getLast().review().approved()).isTrue();
+        assertThat(snapshot.stages()).extracting(KnowledgeAnswerRunSnapshot.StageResult::stage).containsSubsequence(
+                KnowledgeAnswerRunSnapshot.Stage.REVIEW, KnowledgeAnswerRunSnapshot.Stage.REVISION,
+                KnowledgeAnswerRunSnapshot.Stage.VALIDATION, KnowledgeAnswerRunSnapshot.Stage.REVIEW,
+                KnowledgeAnswerRunSnapshot.Stage.EVIDENCE_RECHECK);
+        mvc.perform(get("/api/admin/knowledge-answer-runs/" + snapshot.runId()).header("Authorization", adminAuth))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.answerAttempts[0].review.issues[0].detail").value("内部缺陷定位"));
     }
 
     /** 引用校验失败前已经保存草案，不会错记为已调用复核或零用量。 */

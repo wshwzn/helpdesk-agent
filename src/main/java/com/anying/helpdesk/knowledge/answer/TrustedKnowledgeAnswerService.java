@@ -81,26 +81,7 @@ public class TrustedKnowledgeAnswerService {
             return withRoutingUsage(withScopes(withContinuation(empty(retrieved.reason(), retrieved.baseId(), retrieved.baseName(), KnowledgeScopes.single(scopes)), input), scopes), preparation);
         }
         var evidence = retrieved.evidence();
-        var catalog = retrieved.catalog();
-        var selection = trace.stage(DRAFT, () -> {
-            var result = atStage(KNOWLEDGE_DRAFT_CALL_FAILED, () -> modelClient.draft(model, question, scope, catalog, retrieved.context()));
-            trace.selected(result);
-            return result;
-        });
-        var draft = trace.stage(VALIDATION, () -> {
-            var resolved = guard.resolve(selection.value(), catalog, evidence);
-            trace.resolved(resolved);
-            if (retrieved.context() != null) retrieved.context().validate(resolved);
-            if (scopes.size() > 1) guard.validateScopeConflicts(resolved, evidence);
-            return resolved;
-        });
-        var review = trace.stage(REVIEW, () -> {
-            var result = atStage(KNOWLEDGE_REVIEW_CALL_FAILED,
-                    () -> modelClient.review(model, question, scope, evidence, draft));
-            trace.reviewed(result);
-            requireApproved(result.value());
-            return result;
-        });
+        var verified = verifyAnswer(model, question, scope, scopes, retrieved, trace);
         LocalDateTime checkedAt = trace.stage(EVIDENCE_RECHECK, () -> {
             LocalDateTime now = LocalDateTime.now(knowledgeClock);
             var current = atStage(KNOWLEDGE_EVIDENCE_CHECK_FAILED,
@@ -116,12 +97,78 @@ public class TrustedKnowledgeAnswerService {
         });
         checkPolicy(preparation);
         var report = new KnowledgeAnswerReport(3, KnowledgeAnswerReport.Reason.REVIEWED,
-                retrieved.baseId(), retrieved.baseName(), KnowledgeScopes.single(scopes), checkedAt, draft, evidence, null, null, scopes);
+                retrieved.baseId(), retrieved.baseName(), KnowledgeScopes.single(scopes), checkedAt, verified.draft(), evidence, null, null, scopes);
         trace.answerReason(report.reason());
+        var usage = addUsage(verified.usage(), retrieved.planningUsage());
         return withRoutingUsage(withContinuation(new ChatCompletionResult(render(report),
-                sum(sum(selection.promptTokens(), review.promptTokens()), retrieved.planningUsage().promptTokens()),
-                sum(sum(selection.completionTokens(), review.completionTokens()), retrieved.planningUsage().completionTokens()),
-                sum(sum(selection.totalTokens(), review.totalTokens()), retrieved.planningUsage().totalTokens()), report), input), preparation);
+                usage.promptTokens(), usage.completionTokens(), usage.totalTokens(), report), input), preparation);
+    }
+
+    private record VerifiedAnswer(KnowledgeAnswerDraft draft, KnowledgeAnswerModelClient.TokenUsage usage) { }
+
+    /** 首轮有具体语义缺陷时只修订一次；两轮都执行引用、条件及语义核验，不循环求批准。 */
+    private VerifiedAnswer verifyAnswer(ResolvedChatModel model, String question, String scope, List<String> scopes,
+                                        Retrieved retrieved, KnowledgeAnswerTrace trace) {
+        var selection = trace.stage(DRAFT, () -> {
+            var result = atStage(KNOWLEDGE_DRAFT_CALL_FAILED,
+                    () -> modelClient.draft(model, question, scope, retrieved.catalog(), retrieved.context()));
+            trace.selected(result);
+            return result;
+        });
+        var draft = validateSelection(selection.value(), scopes, retrieved, trace);
+        var review = reviewAnswer(model, question, scope, retrieved.evidence(), draft, trace, false);
+        var usage = addUsage(usageOf(selection), usageOf(review));
+        if (Boolean.TRUE.equals(review.value().approved())) return new VerifiedAnswer(draft, usage);
+
+        var revised = trace.stage(REVISION, () -> {
+            var result = atStage(KNOWLEDGE_REVISION_CALL_FAILED, () -> modelClient.revise(model, question, scope,
+                    retrieved.catalog(), selection.value(), review.value(), retrieved.context()));
+            trace.selected(result);
+            return result;
+        });
+        var corrected = validateSelection(revised.value(), scopes, retrieved, trace);
+        var finalReview = reviewAnswer(model, question, scope, retrieved.evidence(), corrected, trace, true);
+        return new VerifiedAnswer(corrected, addUsage(usage, addUsage(usageOf(revised), usageOf(finalReview))));
+    }
+
+    /** 修订和首次生成复用同一目录与校验，不允许修订绕过范围及检索任务约束。 */
+    private KnowledgeAnswerDraft validateSelection(KnowledgeAnswerSelection selection, List<String> scopes,
+                                                   Retrieved retrieved, KnowledgeAnswerTrace trace) {
+        return trace.stage(VALIDATION, () -> {
+            var resolved = guard.resolve(selection, retrieved.catalog(), retrieved.evidence());
+            trace.resolved(resolved);
+            if (retrieved.context() != null) retrieved.context().validate(resolved);
+            if (scopes.size() > 1) guard.validateScopeConflicts(resolved, retrieved.evidence());
+            return resolved;
+        });
+    }
+
+    /** 首次具体否决作为修订输入留档；无缺陷详情的旧协议和末次否决仍按失败终止。 */
+    private KnowledgeAnswerModelClient.ModelResult<KnowledgeAnswerModelClient.Review> reviewAnswer(
+            ResolvedChatModel model, String question, String scope, List<KnowledgeAnswerReport.Evidence> evidence,
+            KnowledgeAnswerDraft draft, KnowledgeAnswerTrace trace, boolean finalAttempt) {
+        return trace.stage(REVIEW, () -> {
+            var result = atStage(KNOWLEDGE_REVIEW_CALL_FAILED,
+                    () -> modelClient.review(model, question, scope, evidence, draft));
+            trace.reviewed(result);
+            var decision = result.value();
+            if (finalAttempt || decision == null || !Boolean.FALSE.equals(decision.approved())
+                    || decision.reason() == null || decision.reason() == KnowledgeAnswerModelClient.ReviewReason.NONE
+                    || decision.issues() == null || decision.issues().isEmpty()) requireApproved(decision);
+            return result;
+        });
+    }
+
+    /** 将每次模型结果的用量独立计入本轮，包括被否决的首次草案及其复核。 */
+    private KnowledgeAnswerModelClient.TokenUsage usageOf(KnowledgeAnswerModelClient.ModelResult<?> result) {
+        return new KnowledgeAnswerModelClient.TokenUsage(result.promptTokens(), result.completionTokens(), result.totalTokens());
+    }
+
+    /** 任一调用用量未知时保持未知，不以修订后调用的统计覆盖前一次成本。 */
+    private KnowledgeAnswerModelClient.TokenUsage addUsage(KnowledgeAnswerModelClient.TokenUsage first,
+                                                          KnowledgeAnswerModelClient.TokenUsage second) {
+        return new KnowledgeAnswerModelClient.TokenUsage(sum(first.promptTokens(), second.promptTokens()),
+                sum(first.completionTokens(), second.completionTokens()), sum(first.totalTokens(), second.totalTokens()));
     }
 
     private record ApplicabilityPreparation(KnowledgeBaseResponse base,

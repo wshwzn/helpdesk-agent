@@ -108,8 +108,8 @@ def run_case(client, case, base_id):
         searches = (diagnostic.get("retrievalRun") or {}).get("searches", [])
         stages = diagnostic["stages"]
         row["searches"] = len(searches)
-        row["modelStages"] = dict(Counter(s["stage"] for s in stages if s["stage"] in ("PLANNING", "DRAFT", "REVIEW") or (s["stage"] == "APPLICABILITY" and (diagnostic.get("applicability") or {}).get("routingAttempted"))))
-        row["missingUsage"] = sum(1 for s in stages if (s["stage"] in ("PLANNING", "DRAFT", "REVIEW") or
+        row["modelStages"] = dict(Counter(s["stage"] for s in stages if s["stage"] in ("PLANNING", "DRAFT", "REVISION", "REVIEW") or (s["stage"] == "APPLICABILITY" and (diagnostic.get("applicability") or {}).get("routingAttempted"))))
+        row["missingUsage"] = sum(1 for s in stages if (s["stage"] in ("PLANNING", "DRAFT", "REVISION", "REVIEW") or
             (s["stage"] == "APPLICABILITY" and (diagnostic.get("applicability") or {}).get("routingAttempted"))) and
             (s.get("usage") or {}).get("totalTokens") is None)
         row["knownTokens"] = sum((s.get("usage") or {}).get("totalTokens") or 0 for s in stages)

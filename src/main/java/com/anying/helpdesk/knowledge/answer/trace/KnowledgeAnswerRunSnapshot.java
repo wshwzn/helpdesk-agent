@@ -25,12 +25,16 @@ public record KnowledgeAnswerRunSnapshot(
         KnowledgeAnswerModelClient.Review review, KnowledgeAnswerReport.Reason answerReason,
         List<StageResult> stages, KnowledgeCitationCatalog citationCatalog, KnowledgeAnswerSelection selection,
         KnowledgeApplicabilityPolicy.Assessment applicability, KnowledgeRetrievalRun retrievalRun,
-        KnowledgeAnswerContext answerContext, List<String> applicabilityScopes
+        KnowledgeAnswerContext answerContext, List<String> applicabilityScopes,
+        List<AnswerAttempt> answerAttempts
 ) {
     public enum Status { RUNNING, SUCCEEDED, FAILED, CANCELLED }
-    public enum Stage { APPLICABILITY, RETRIEVAL, PLANNING, DRAFT, VALIDATION, REVIEW, EVIDENCE_RECHECK, MESSAGE_PERSISTENCE }
+    public enum Stage { APPLICABILITY, RETRIEVAL, PLANNING, DRAFT, REVISION, VALIDATION, REVIEW, EVIDENCE_RECHECK, MESSAGE_PERSISTENCE }
     public enum StageStatus { RUNNING, SUCCEEDED, FAILED, CANCELLED }
 
     public record StageResult(Stage stage, StageStatus status, LocalDateTime startedAt,
                               Long durationMs, String errorCode, KnowledgeAnswerModelClient.TokenUsage usage) { }
+
+    public record AnswerAttempt(int attempt, KnowledgeAnswerSelection selection, KnowledgeAnswerDraft draft,
+                                KnowledgeAnswerModelClient.Review review) { }
 }
