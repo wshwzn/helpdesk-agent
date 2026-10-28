@@ -130,7 +130,11 @@ public class ConversationServiceImpl implements ConversationService {
                                                  ResolvedChatModel model, PreparedChatExchange prepared) {
         AtomicBoolean finalized = new AtomicBoolean(false);
         KnowledgeAnswerTrace trace = knowledgeAnswerRunService.start(prepared, model);
-        Flux<ChatStreamEvent> completed = Mono.fromCallable(() -> {
+        Flux<ChatStreamEvent> completed = Flux.create(sink -> {
+            trace.onStage(stage -> sink.next(ChatStreamEvent.progress(prepared.assistantMessageId(), stage)));
+            var generation = Schedulers.boundedElastic().schedule(() -> {
+                if (sink.isCancelled()) return;
+                try {
                     var completion = answerKnowledge(model, prepared, trace);
                     ChatMessage assistant;
                     // 取消与落库共用临界区，已取消的生成即使迟到也不能写入完成状态。
@@ -143,11 +147,16 @@ public class ConversationServiceImpl implements ConversationService {
                         trace.succeeded();
                         finalized.set(true);
                     }
-                    return List.of(ChatStreamEvent.delta(completion.content()),
-                            ChatStreamEvent.done(ChatMessageResponse.from(assistant)));
-                })
-                .subscribeOn(Schedulers.boundedElastic())
-                .flatMapMany(Flux::fromIterable);
+                    sink.next(ChatStreamEvent.delta(completion.content()));
+                    sink.next(ChatStreamEvent.done(ChatMessageResponse.from(assistant)));
+                    sink.complete();
+                } catch (RuntimeException exception) {
+                    // 取消后的迟到异常没有接收方，不再发送错误或改写取消结果。
+                    if (!sink.isCancelled()) sink.error(exception);
+                }
+            });
+            sink.onDispose(generation);
+        });
         return Flux.concat(Mono.just(ChatStreamEvent.start(ChatMessageResponse.from(prepared.userMessage()),
                         prepared.assistantMessageId())), completed)
                 .onErrorResume(exception -> Mono.fromCallable(() -> {

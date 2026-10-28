@@ -490,7 +490,7 @@ Content-Type: application/json
 - 草案模型只返回本轮 `citationSetId` 与 `evidenceId + paragraphId`。后端按空行建立片段目录、验证所属证据并逐字提取完整原文；跨轮目录、未知片段、跨证据片段均拒绝，不放宽引用校验。过长段落保留上下文但不可引用。
 - 报告含 `claims[].references[]` 的 `evidenceId` 和逐字 `quote`，通过 `evidence[]` 对应真实 `documentId`、`chunkSequence`、原文与业务版本。正文中的 `[E1]` 由服务端生成。兼容字段 `citations` 只包含实际使用的证据；报告还保留未被引用的本轮候选，便于审计遗漏。
 - `reason=NO_MATCH/NOT_CONFIGURED` 区分无命中与未配置；`REVIEWED` 表示有证据且通过复核。检索异常、协议错误、引用伪造、复核否决、生成期间证据失效均是技术失败，不能当作正确拒答统计；消息历史保存安全的知识阶段错误码（如 `KNOWLEDGE_CITATION_INVALID`），未知或旧版本错误仍为 `KNOWLEDGE_ANSWER_FAILED`，无草案正文。
-- `/messages/stream` 接受相同请求字段：先 `start`，核验和保存完成后一次性 `delta`，最后 `done`。所有入口均无需厂商流式能力；首段正文等待实际的检索、必要路由/规划、草案和复核完成，失败只有 `start/error`，不会回退旧模型或泄露草案。
+- `/messages/stream` 接受相同请求字段：先 `start`，执行阶段实时发送 `progress`，核验和保存完成后一次性 `delta`，最后 `done`；失败以 `error` 结束。`progress` 包含 `assistantMessageId`、`stage`、固定中文 `message`，不包含草稿或诊断原文。补查、修订会导致阶段重复，未执行的阶段不发送。所有入口均无需厂商流式能力，正文等待核验完成。协议与验证见 [阶段46记录](notes/46-SSE阶段进度通知.md)。
 - 升级注意：旧客户端显式发送AGENT也采用2000字限制、完整正文SSE及统一安全错误码；响应和新存储mode为KNOWLEDGE。pendingActions保留空数组，不再发action_required。前端可以隐藏模式选择；只在存在相应核验报告时展示结果状态，不能因历史AGENT有citations就标成已核验。本仓库未修改外部前端。
 - 历史消息保存 `mode`、范围和完整核验报告；历史证据不会随知识库撤回而消失，不能据此推断今天的规则。V17 会自动迁移旧消息为 AGENT。
 - V18 为新知识助手消息增加 `knowledgeRunId`，成功或失败均保留。管理员可通过 `GET /api/admin/knowledge-answer-runs/{runId}` 查询候选、草案、核验结果、分阶段耗时及已知用量；列表接口只返回摘要。客户消息不会返回未核验草案。诊断存储故障与业务结果隔离，可能留下缺失或未结束快照，不能把运行 ID 当作诊断完整性的保证。新诊断版本 2 额外保留 `citationCatalog` 和模型原始 `selection`；`draft` 是引用解析后的草案。旧诊断仍可读取。设计见 `notes/27-问答运行记录与失败诊断.md` 和 `notes/28-片段选择与原文引用.md`。

@@ -1,9 +1,24 @@
 """验证SSE评测解析器保留事件边界和失败，不误记为成功交付。"""
 import unittest
-from verify_unified_knowledge_entry import read_events, matches_history
+from verify_unified_knowledge_entry import read_events, matches_history, stream_answer
+from evaluate_trusted_knowledge import ApiError
 
 
 class UnifiedEntrySseTest(unittest.TestCase):
+    def test_progress_preserves_delivery_checks(self):
+        """阶段事件不冒充正文，兼容旧服务且继续拒绝失败或不一致的交付。"""
+        message = {"content": "已核验"}
+        events = [{"type": "start"}, {"type": "delta", "content": "已核验"},
+                  {"type": "done", "assistantMessage": message}]
+        self.assertEqual(message, stream_answer(events))
+        events.insert(1, {"type": "progress", "stage": "REVIEW"})
+        self.assertEqual(message, stream_answer(events))
+        with self.assertRaises(ApiError):
+            stream_answer(events[:2] + [{"type": "error"}])
+        events[2]["content"] = "未经核验"
+        with self.assertRaises(ValueError):
+            stream_answer(events)
+
     def test_history_tolerates_only_microsecond_rounding(self):
         """只允许数据库时间精度差异，正文变化或更大时间偏移仍失败。"""
         message = {"content": "正文", "updatedAt": "2026-10-21T14:12:02.8599245"}

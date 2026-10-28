@@ -67,6 +67,17 @@ def matches_history(message, saved):
     return True
 
 
+def stream_answer(events):
+    """兼容阶段通知，仍要求唯一完整正文与最终持久化消息一致。"""
+    delivery = [event for event in events if event["type"] != "progress"]
+    if [event["type"] for event in delivery] != ["start", "delta", "done"]:
+        raise base.ApiError(200, "STREAM_NOT_COMPLETED")
+    message = delivery[-1]["assistantMessage"]
+    if delivery[1]["content"] != message["content"]:
+        raise ValueError("SSE delta differs from persisted answer")
+    return message
+
+
 def run(client, identity, body, scopes, patterns, streaming=False, continuation=False):
     """一题只生成一次，澄清题只续答一次；读取历史与诊断核对同一消息。"""
     conversation = client.call("POST", "/api/conversations", {"title": "entry-eval-" + identity}, "customer")
@@ -77,11 +88,7 @@ def run(client, identity, body, scopes, patterns, streaming=False, continuation=
         if streaming:
             events = stream(client, path, body)
             row["events"] = events
-            if [e["type"] for e in events] != ["start", "delta", "done"]:
-                raise base.ApiError(200, "STREAM_NOT_COMPLETED")
-            message = events[-1]["assistantMessage"]
-            if events[1]["content"] != message["content"]:
-                raise ValueError("SSE delta differs from persisted answer")
+            message = stream_answer(events)
         else:
             exchange = client.call("POST", path, body, "customer")
             if exchange["pendingActions"]:

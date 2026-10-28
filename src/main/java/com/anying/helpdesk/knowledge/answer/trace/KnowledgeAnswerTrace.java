@@ -60,6 +60,12 @@ public final class KnowledgeAnswerTrace {
     private KnowledgeRetrievalRun retrievalRun;
     private KnowledgeAnswerContext answerContext;
     private final List<AnswerAttempt> answerAttempts = new ArrayList<>();
+    private Consumer<Stage> stageListener = stage -> { };
+
+    /** 在运行前绑定本次请求的阶段通知，只传递固定阶段，不暴露诊断内容。 */
+    public void onStage(Consumer<Stage> listener) {
+        stageListener = java.util.Objects.requireNonNull(listener);
+    }
 
     /** 保存服务端解析的有效范围，未解析前不冒充已经选定。 */
     public synchronized void scopes(List<String> values) {
@@ -169,6 +175,8 @@ public final class KnowledgeAnswerTrace {
     public <T> T stage(Stage stage, Supplier<T> action) {
         begin(stage);
         try {
+            stageListener.accept(stage);
+            ensureRunning();
             T value = action.get();
             if (!completeStage()) {
                 throw new CancellationException("knowledge run already cancelled");
@@ -265,10 +273,15 @@ public final class KnowledgeAnswerTrace {
 
     /** 在调用前持久化运行中阶段，进程中断时仍可定位最后进入的位置。 */
     private synchronized void begin(Stage stage) {
-        if (status != Status.RUNNING) throw new CancellationException("knowledge run already finished");
+        ensureRunning();
         stages.add(new StageResult(stage, StageStatus.RUNNING, LocalDateTime.now(clock), null, null, null));
         stageStartedNanos = System.nanoTime();
         flush();
+    }
+
+    /** 阶段通知可能触发下游同步取消，执行阶段操作前再次检查终态。 */
+    private synchronized void ensureRunning() {
+        if (status != Status.RUNNING) throw new CancellationException("knowledge run already finished");
     }
 
     /** 用单调时钟记录阶段耗时，取消后的迟到完成不能修改快照。 */

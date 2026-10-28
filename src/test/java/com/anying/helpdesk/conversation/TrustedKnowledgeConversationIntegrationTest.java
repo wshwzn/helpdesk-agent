@@ -49,6 +49,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CopyOnWriteArrayList;
+import com.anying.helpdesk.conversation.dto.ChatStreamEvent;
+import com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerTrace;
+import static com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerRunSnapshot.Stage.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -229,7 +233,7 @@ class TrustedKnowledgeConversationIntegrationTest {
                 .andExpect(request().asyncStarted()).andReturn();
         var response = mvc.perform(asyncDispatch(pending)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
-        assertThat(response).contains("event:start", "event:delta", "event:done", "knowledgeAnswer");
+        assertThat(response).contains("event:start", "event:progress", "MESSAGE_PERSISTENCE", "event:delta", "event:done", "knowledgeAnswer");
         assertThat(response).doesNotContain("event:action_required");
         assertThat(response.indexOf("event:start")).isLessThan(response.indexOf("event:delta"));
         assertThat(response.indexOf("event:delta")).isLessThan(response.indexOf("event:done"));
@@ -249,6 +253,86 @@ class TrustedKnowledgeConversationIntegrationTest {
         assertThat(events).extracting(event -> event.type()).containsExactly("start", "error");
         assertThat(assistant().getContent()).isNull();
         verifyNoInteractions(agentClient);
+    }
+
+    /** 在模型仍阻塞时必须已经收到阶段事件，修订后重复核验也必须按真实顺序通知。 */
+    @Test
+    @DisplayName("阶段实时送达且修订复核顺序正确，正文始终等待核验结束")
+    void streamsProgressBeforeModelFinishes() throws Exception {
+        CountDownLatch entered = new CountDownLatch(1);
+        CompletableFuture<Void> release = new CompletableFuture<>();
+        when(knowledge.answer(any(), any(), any(), any())).thenAnswer(invocation -> {
+            KnowledgeAnswerTrace trace = invocation.getArgument(3);
+            trace.stage(RETRIEVAL, () -> "private evidence");
+            trace.stage(DRAFT, () -> {
+                entered.countDown();
+                release.join();
+                return "private draft";
+            });
+            trace.stage(REVIEW, () -> false);
+            trace.stage(REVISION, () -> "private revision");
+            trace.stage(VALIDATION, () -> true);
+            trace.stage(REVIEW, () -> true);
+            return completion();
+        });
+        var events = new CopyOnWriteArrayList<ChatStreamEvent>();
+        CountDownLatch ended = new CountDownLatch(1);
+        var subscription = service.streamMessage(conversationId,
+                new SendMessageRequest("问题", ChatMode.KNOWLEDGE, "SH"), CUSTOMER)
+                .doFinally(signal -> ended.countDown()).subscribe(events::add);
+        try {
+            assertThat(entered.await(5, TimeUnit.SECONDS)).isTrue();
+            assertThat(events).extracting(ChatStreamEvent::type).containsExactly("start", "progress", "progress");
+            assertThat(assistant().getStatus()).isEqualTo(ChatMessageStatus.PENDING);
+            release.complete(null);
+            assertThat(ended.await(5, TimeUnit.SECONDS)).isTrue();
+            assertThat(events.stream().filter(e -> e.type().equals("progress"))).extracting(ChatStreamEvent::stage)
+                    .containsExactly(RETRIEVAL, DRAFT, REVIEW, REVISION, VALIDATION, REVIEW, MESSAGE_PERSISTENCE);
+            assertThat(events.stream().filter(e -> e.type().equals("progress"))).allSatisfy(event -> {
+                assertThat(event.assistantMessageId()).isEqualTo(assistant().getId());
+                assertThat(event.content()).isNull();
+                assertThat(event.assistantMessage()).isNull();
+                assertThat(event.message()).isNotBlank();
+            });
+            assertThat(mapper.writeValueAsString(events)).doesNotContain("private evidence", "private draft", "private revision");
+            assertThat(events.subList(events.size() - 2, events.size())).extracting(ChatStreamEvent::type)
+                    .containsExactly("delta", "done");
+        } finally {
+            release.complete(null);
+            subscription.dispose();
+        }
+    }
+
+    /** 客户端收到保存阶段立即取消时，不能因通知回调重入而继续保存答案。 */
+    @Test
+    @DisplayName("保存阶段通知触发取消时不执行最终落库")
+    void cancellingAtPersistenceProgressPreventsCompletion() {
+        service.streamMessage(conversationId,
+                new SendMessageRequest("问题", ChatMode.KNOWLEDGE, "SH"), CUSTOMER)
+                .takeUntil(event -> event.stage() == MESSAGE_PERSISTENCE)
+                .collectList().block(Duration.ofSeconds(5));
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+            assertThat(assistant().getStatus()).isEqualTo(ChatMessageStatus.FAILED);
+            assertThat(assistant().getErrorCode()).isEqualTo("STREAM_CANCELLED");
+            assertThat(assistant().getContent()).isNull();
+        });
+    }
+
+    /** 已发送阶段提示并不代表核验通过，失败时仍只能返回安全错误。 */
+    @Test
+    @DisplayName("复核阶段报错保留进度但不发送草案或完成事件")
+    void progressFailureNeverLeaksDraft() throws Exception {
+        when(knowledge.answer(any(), any(), any(), any())).thenAnswer(invocation -> {
+            KnowledgeAnswerTrace trace = invocation.getArgument(3);
+            return trace.stage(REVIEW, () -> { throw new IllegalStateException("private failed draft"); });
+        });
+        var events = service.streamMessage(conversationId,
+                new SendMessageRequest("问题", ChatMode.KNOWLEDGE, "SH"), CUSTOMER)
+                .collectList().block(Duration.ofSeconds(5));
+        assertThat(events).extracting(ChatStreamEvent::type).containsExactly("start", "progress", "error");
+        assertThat(mapper.writeValueAsString(events)).doesNotContain("private failed draft");
+        assertThat(assistant().getStatus()).isEqualTo(ChatMessageStatus.FAILED);
+        assertThat(assistant().getContent()).isNull();
     }
 
     /** 缺省、显式空值、知识模式与旧AGENT别名均使用同一可信路径，历史回读保持核验报告。 */

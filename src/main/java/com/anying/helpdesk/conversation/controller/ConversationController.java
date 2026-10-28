@@ -136,7 +136,7 @@ public class ConversationController {
     @PostMapping(value = "/{id}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(
             summary = "发送消息并流式获取 AI 回答",
-            description = "所有模式值统一：先返回 start，核验并保存后发送完整 delta 和 done；失败只返回 error，不交付草案或触发旧模型，不要求厂商支持流式"
+            description = "先返回 start，执行阶段实时发送 progress，核验并保存后发送完整 delta 和 done；失败以 error 结束，不交付草案，不要求厂商支持流式"
     )
     public Flux<ServerSentEvent<ChatStreamEvent>> streamMessage(
             @Parameter(description = "对话主键", example = "1")
