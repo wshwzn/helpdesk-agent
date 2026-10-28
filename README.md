@@ -324,6 +324,8 @@ Authorization: Bearer <accessToken>
 
 ## 模型配置
 
+DeepSeek 思考参数在 `application.yaml` 的 `app.model-config.deepseek` 下设置：`thinking-type` 默认 `enabled`（可改为 `disabled`），`reasoning-effort` 默认 `low`（可改为厂商支持的其他强度，例如 `high`）。也支持环境变量 `DEEPSEEK_THINKING_TYPE`、`DEEPSEEK_REASONING_EFFORT` 覆盖。修改后重启后端生效，作用于所有厂商标记为 `DEEPSEEK` 的文本模型；不按配置显示名识别。关闭思考时不发送强度字段，不新增管理接口或数据库字段，其他厂商不附带这两个参数。
+
 模型统一使用 OpenAI 兼容协议。管理员选择内置厂商时，后端自动使用预设地址；选择 `CUSTOM` 时才需要填写 SDK 基础地址。创建配置时的 API Key 会使用 AES-256-GCM 加密，后续接口只返回尾号掩码。
 
 按模型用途查询可选厂商及其预设地址；省略 `modelType` 时默认查询聊天模型厂商：

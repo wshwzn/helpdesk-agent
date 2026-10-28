@@ -4,6 +4,8 @@ import com.anying.helpdesk.conversation.config.ChatProperties;
 import com.anying.helpdesk.modelconfig.crypto.SecretEncryptor;
 import com.anying.helpdesk.modelconfig.domain.AiModelConfig;
 import com.anying.helpdesk.modelconfig.domain.ModelProtocol;
+import com.anying.helpdesk.modelconfig.domain.ModelVendor;
+import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.model.ChatModel;
@@ -20,22 +22,29 @@ public class OpenAiCompatibleChatModelFactory implements AiChatModelFactory {
     private final OpenAiCompatibleEndpointResolver endpointResolver;
     private final ChatProperties chatProperties;
     private final ObjectMapper objectMapper;
+    private final DeepSeekThinkingProperties deepSeekThinking;
 
+    /** 返回本工厂支持的兼容协议。 */
     @Override
     public ModelProtocol protocol() {
         return ModelProtocol.OPENAI_COMPATIBLE;
     }
 
+    /** 创建模型客户端，并仅对 DeepSeek 应用部署配置中的思考参数。 */
     @Override
     public ChatModel create(AiModelConfig config) {
         OpenAiCompatibleEndpoint endpoint = endpointResolver.resolve(config.getBaseUrl());
         OpenAiApi openAiApi = createOpenAiApi(config, endpoint);
-        OpenAiChatOptions options = OpenAiChatOptions.builder()
-                .model(config.getModelName())
-                .build();
+        var options = OpenAiChatOptions.builder().model(config.getModelName());
+        if (config.getVendor() == ModelVendor.DEEPSEEK) {
+            options.extraBody(Map.of("thinking", Map.of("type", deepSeekThinking.thinkingType())));
+            if ("enabled".equals(deepSeekThinking.thinkingType())) {
+                options.reasoningEffort(deepSeekThinking.reasoningEffort());
+            }
+        }
         return OpenAiChatModel.builder()
                 .openAiApi(openAiApi)
-                .defaultOptions(options)
+                .defaultOptions(options.build())
                 .build();
     }
 

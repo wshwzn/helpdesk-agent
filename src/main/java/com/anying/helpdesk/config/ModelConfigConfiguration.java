@@ -3,6 +3,7 @@ package com.anying.helpdesk.config;
 import com.anying.helpdesk.modelconfig.crypto.AesGcmSecretEncryptor;
 import com.anying.helpdesk.modelconfig.crypto.ModelEncryptionProperties;
 import com.anying.helpdesk.modelconfig.crypto.SecretEncryptor;
+import com.anying.helpdesk.modelconfig.factory.DeepSeekThinkingProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 @Configuration
-@EnableConfigurationProperties(ModelEncryptionProperties.class)
+@EnableConfigurationProperties({ModelEncryptionProperties.class, DeepSeekThinkingProperties.class})
 public class ModelConfigConfiguration {
 
     @Bean

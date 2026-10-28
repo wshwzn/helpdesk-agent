@@ -32,6 +32,9 @@ app:
     access-token-ttl: 240h
   model-config:
     encryption-key: ${MODEL_CONFIG_ENCRYPTION_KEY}
+    deepseek:
+      thinking-type: ${DEEPSEEK_THINKING_TYPE:enabled}
+      reasoning-effort: ${DEEPSEEK_REASONING_EFFORT:low}
   knowledge:
     review-strategy: ${KNOWLEDGE_REVIEW_STRATEGY:GROUNDED}
     multihop:
