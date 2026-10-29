@@ -224,7 +224,9 @@ class KnowledgeClarificationIntegrationTest {
                 BigDecimal.ZERO, 5, 0, 0, List.of()));
         var events = conversations.streamMessage(id, continuation(first.id(), "CN_SH"), CUSTOMER)
                 .collectList().block(Duration.ofSeconds(10));
-        assertThat(events).extracting(ChatStreamEvent::type).containsExactly("start", "delta", "done");
+        assertThat(events).extracting(ChatStreamEvent::type).contains("progress");
+        assertThat(events.stream().filter(event -> !"progress".equals(event.type())))
+                .extracting(ChatStreamEvent::type).containsExactly("start", "delta", "done");
         var latest = conversations.pageMessages(id, 1, 20, CUSTOMER).records().getLast();
         assertThat(latest.knowledgeAnswer().reason()).isEqualTo(KnowledgeAnswerReport.Reason.NO_MATCH);
         assertThat(latest.knowledgeAnswer().continuationOfMessageId()).isEqualTo(first.id());
@@ -280,7 +282,9 @@ class KnowledgeClarificationIntegrationTest {
         var first = ask(id);
         var events = conversations.streamMessage(id, continuation(first.id(), "CN_SH"), CUSTOMER)
                 .collectList().block(Duration.ofSeconds(10));
-        assertThat(events).extracting(ChatStreamEvent::type).containsExactly("start", "delta", "done");
+        assertThat(events).extracting(ChatStreamEvent::type).contains("progress");
+        assertThat(events.stream().filter(event -> !"progress".equals(event.type())))
+                .extracting(ChatStreamEvent::type).containsExactly("start", "delta", "done");
         var completed = conversations.pageMessages(id, 1, 20, CUSTOMER).records().getLast();
         assertThat(completed.knowledgeAnswer().answer().status()).isEqualTo(KnowledgeAnswerDraft.Status.ANSWERABLE);
         assertThat(completed.knowledgeAnswer().continuationOfMessageId()).isEqualTo(first.id());
