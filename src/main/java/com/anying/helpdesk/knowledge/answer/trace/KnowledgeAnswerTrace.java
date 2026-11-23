@@ -1,5 +1,7 @@
 package com.anying.helpdesk.knowledge.answer.trace;
 
+import com.anying.helpdesk.knowledge.answer.KnowledgeConversationContext;
+
 import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityPolicy;
 import com.anying.helpdesk.knowledge.answer.KnowledgeRetrievalPlan;
 import com.anying.helpdesk.knowledge.answer.KnowledgeRetrievalRun;
@@ -59,6 +61,15 @@ public final class KnowledgeAnswerTrace {
     private KnowledgeApplicabilityPolicy.Assessment applicability;
     private KnowledgeRetrievalRun retrievalRun;
     private KnowledgeAnswerContext answerContext;
+    private KnowledgeConversationContext conversationContext;
+
+    /** 保存补全问题和用量，原始用户问题保持不变。 */
+    public synchronized void contextualized(KnowledgeAnswerModelClient.ModelResult<KnowledgeConversationContext> result) {
+        if (status != Status.RUNNING) return;
+        conversationContext = result.value();
+        usage(new KnowledgeAnswerModelClient.TokenUsage(result.promptTokens(), result.completionTokens(), result.totalTokens()));
+    }
+
     private final List<AnswerAttempt> answerAttempts = new ArrayList<>();
     private Consumer<Stage> stageListener = stage -> { };
 
@@ -264,11 +275,11 @@ public final class KnowledgeAnswerTrace {
 
     /** 导出不可变列表快照，供持久化与确定性测试使用。 */
     public synchronized KnowledgeAnswerRunSnapshot snapshot() {
-        return new KnowledgeAnswerRunSnapshot(7, runId, messageId, conversationId, question, scope,
+        return new KnowledgeAnswerRunSnapshot(8, runId, messageId, conversationId, question, scope,
                 modelConfigId, modelName, status, errorCode, revision, writeFailures,
                 startedAt, LocalDateTime.now(clock), finishedAt, retrieval, retrievalTruncated,
                 evidence, draft, review, answerReason, List.copyOf(stages), citationCatalog, selection, applicability, retrievalRun, answerContext, scopes,
-                List.copyOf(answerAttempts));
+                List.copyOf(answerAttempts), conversationContext);
     }
 
     /** 在调用前持久化运行中阶段，进程中断时仍可定位最后进入的位置。 */
@@ -328,6 +339,7 @@ public final class KnowledgeAnswerTrace {
     private String fallbackCode() {
         if (stages.isEmpty()) return "KNOWLEDGE_ANSWER_FAILED";
         return switch (stages.getLast().stage()) {
+            case CONTEXT -> "KNOWLEDGE_CONTEXT_CALL_FAILED";
             case APPLICABILITY -> "KNOWLEDGE_APPLICABILITY_CALL_FAILED";
             case RETRIEVAL -> "KNOWLEDGE_RETRIEVAL_FAILED";
             case PLANNING -> "KNOWLEDGE_PLANNING_CALL_FAILED";

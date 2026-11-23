@@ -1,9 +1,15 @@
 package com.anying.helpdesk.conversation.service;
 
+import com.anying.helpdesk.knowledge.answer.KnowledgeConversationContext;
+
 import com.anying.helpdesk.agent.action.service.PendingActionService;
 import com.anying.helpdesk.common.response.PageResponse;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
 import com.anying.helpdesk.knowledge.answer.TrustedKnowledgeAnswerService;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerModelClient;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerInput;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerReport;
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerDraft;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure;
 import com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerRunService;
 import com.anying.helpdesk.knowledge.answer.trace.KnowledgeAnswerTrace;
@@ -44,6 +50,7 @@ public class ConversationServiceImpl implements ConversationService {
     private final PendingActionService pendingActionService;
     private final TrustedKnowledgeAnswerService trustedKnowledgeAnswerService;
     private final KnowledgeAnswerRunService knowledgeAnswerRunService;
+    private final KnowledgeAnswerModelClient knowledgeModelClient;
 
     @Override
     public ConversationResponse create(CreateConversationRequest request, Long customerId) {
@@ -173,13 +180,44 @@ public class ConversationServiceImpl implements ConversationService {
                 });
     }
 
-    /** 同步与流式共用已校验的问题上下文，续答不把“上海”等短回复当作新问题检索。 */
+    /** 普通追问先补全问题；范围卡片续答直接使用服务端恢复的原问题。 */
     private ChatCompletionResult answerKnowledge(ResolvedChatModel model, PreparedChatExchange prepared,
                                                 KnowledgeAnswerTrace trace) {
         var input = prepared.knowledgeInput();
-        return input.continuationOfMessageId() == null && input.scopes().size() == 1
+        var history = input.continuationOfMessageId() == null ? persistenceService.recentContext(prepared) : List.<KnowledgeConversationContext.Message>of();
+        KnowledgeAnswerModelClient.ModelResult<KnowledgeConversationContext> context = null;
+        if (!history.isEmpty()) {
+            var original = input;
+            context = trace.stage(KnowledgeAnswerRunSnapshot.Stage.CONTEXT, () -> {
+                var resolved = knowledgeModelClient.contextualize(model, original.question(), original.scopes(), history);
+                trace.contextualized(resolved);
+                return resolved;
+            });
+            if (context.value().clarification() != null) {
+                String question = context.value().clarification();
+                var draft = new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.NEEDS_CLARIFICATION,
+                        List.of(), List.of(question), List.of());
+                var report = new KnowledgeAnswerReport(3, KnowledgeAnswerReport.Reason.CONTEXT_REQUIRED,
+                        null, null, input.scope(), java.time.LocalDateTime.now(), draft, List.of(), null, null, input.scopes());
+                trace.answerReason(report.reason());
+                trace.resolved(draft);
+                return new ChatCompletionResult(question, context.promptTokens(), context.completionTokens(), context.totalTokens(), report);
+            }
+            input = new KnowledgeAnswerInput(context.value().question(), input.scope(), input.knowledgeBaseId(),
+                    null, input.policyRevision(), input.scopes());
+        }
+        var result = input.continuationOfMessageId() == null && input.scopes().size() == 1
                 ? trustedKnowledgeAnswerService.answer(model, input.question(), input.scope(), trace)
                 : trustedKnowledgeAnswerService.answer(model, input, trace);
+        return context == null ? result : new ChatCompletionResult(result.content(),
+                sumTokens(result.promptTokens(), context.promptTokens()),
+                sumTokens(result.completionTokens(), context.completionTokens()),
+                sumTokens(result.totalTokens(), context.totalTokens()), result.knowledgeAnswer());
+    }
+
+    /** 未知用量保持未知，避免上下文调用未上报时低估本轮成本。 */
+    private Integer sumTokens(Integer answer, Integer context) {
+        return answer == null || context == null ? null : answer + context;
     }
 
     /** 将知识异常映射为安全的阶段码，未分类错误仍使用兼容的通用码。 */

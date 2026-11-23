@@ -32,7 +32,7 @@ public record KnowledgeAnswerReport(
             Clarification clarification, Long continuationId) {
         this(version, reason, baseId, baseName, scope, checkedAt, answer, evidence, clarification, continuationId, null);
     }
-    public enum Reason { REVIEWED, NO_MATCH, NOT_CONFIGURED, APPLICABILITY_REQUIRED }
+    public enum Reason { REVIEWED, NO_MATCH, NOT_CONFIGURED, APPLICABILITY_REQUIRED, CONTEXT_REQUIRED }
 
     public record Clarification(String originalQuestion, long policyRevision, List<String> topicIds,
                                 List<KnowledgeApplicabilityPolicy.ScopeOption> scopeOptions) { }

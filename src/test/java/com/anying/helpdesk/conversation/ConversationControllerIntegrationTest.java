@@ -122,6 +122,17 @@ class ConversationControllerIntegrationTest {
     @MockitoBean
     private TrustedKnowledgeAnswerService knowledge;
 
+    @MockitoBean
+    private com.anying.helpdesk.knowledge.answer.KnowledgeAnswerModelClient contextModel;
+
+    /** 旧会话用例默认使用独立问题，新增理解步骤不改变这些用例的问题含义。 */
+    @org.junit.jupiter.api.BeforeEach
+    void setupContext() {
+        when(contextModel.contextualize(any(), any(), any(), any())).thenAnswer(invocation ->
+                new com.anying.helpdesk.knowledge.answer.KnowledgeAnswerModelClient.ModelResult<>(
+                        new com.anying.helpdesk.knowledge.answer.KnowledgeConversationContext(invocation.getArgument(1), null), 2, 1, 3));
+    }
+
     @AfterEach
     void cleanUp() {
         pendingActionMapper.delete(null);
@@ -132,7 +143,7 @@ class ConversationControllerIntegrationTest {
                 .likeRight(User::getUsername, "conversation_"));
     }
 
-    /** 新问答只携带本轮问题，调用发生在事务外，历史仍可阅读。 */
+    /** 独立问题不因历史改义，可信回答调用发生在事务外，历史仍可阅读。 */
     @Test @DisplayName("旧别名进入可信服务且历史不作为新事实回放")
     void customerChatsWithHistoryOutsideDatabaseTransaction() throws Exception {
         String token = registerCustomer("conversation_customer_one");

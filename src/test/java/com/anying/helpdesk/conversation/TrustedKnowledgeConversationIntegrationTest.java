@@ -1,5 +1,9 @@
 package com.anying.helpdesk.conversation;
 
+import com.anying.helpdesk.knowledge.answer.KnowledgeConversationContext;
+
+import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerModelClient;
+
 import com.anying.helpdesk.auth.domain.User;
 import com.anying.helpdesk.auth.domain.UserRole;
 import com.anying.helpdesk.conversation.domain.ChatMessage;
@@ -76,12 +80,16 @@ class TrustedKnowledgeConversationIntegrationTest {
     @MockitoBean private DefaultChatModelProvider provider;
     @MockitoBean private ConversationModelClient agentClient;
     @MockitoBean private TrustedKnowledgeAnswerService knowledge;
+    @MockitoBean private KnowledgeAnswerModelClient contextModel;
     private long conversationId;
     private String authorization;
 
     /** 创建独立对话，模型故意不支持流式以验证知识模式只依赖同步生成。 */
     @BeforeEach
     void setup() throws Exception {
+        when(contextModel.contextualize(any(), any(), any(), any())).thenAnswer(invocation ->
+                new KnowledgeAnswerModelClient.ModelResult<>(
+                        new KnowledgeConversationContext(invocation.getArgument(1), null), 2, 1, 3));
         User user = new User();
         user.setId(CUSTOMER);
         user.setUsername("knowledge_test");
@@ -216,7 +224,8 @@ class TrustedKnowledgeConversationIntegrationTest {
         assertThat(assistant().getErrorCode()).isEqualTo("KNOWLEDGE_CITATION_INVALID");
         var events = service.streamMessage(conversationId,
                 new SendMessageRequest("问题", mode, "ALL"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
-        assertThat(events).extracting(event -> event.type()).containsExactly("start", "error");
+        assertThat(events.stream().filter(event -> !"progress".equals(event.type())))
+                .extracting(event -> event.type()).containsExactly("start", "error");
         assertThat(assistant().getErrorCode()).isEqualTo("KNOWLEDGE_CITATION_INVALID");
         assertThat(assistant().getKnowledgeAnswer()).isNull();
     }
@@ -250,7 +259,8 @@ class TrustedKnowledgeConversationIntegrationTest {
         when(knowledge.answer(any(), any(), any(), any())).thenThrow(new IllegalStateException("unverified draft"));
         var events = service.streamMessage(conversationId,
                 new SendMessageRequest("问题", mode, "ALL"), CUSTOMER).collectList().block(Duration.ofSeconds(5));
-        assertThat(events).extracting(event -> event.type()).containsExactly("start", "error");
+        assertThat(events.stream().filter(event -> !"progress".equals(event.type())))
+                .extracting(event -> event.type()).containsExactly("start", "error");
         assertThat(assistant().getContent()).isNull();
         verifyNoInteractions(agentClient);
     }
@@ -410,6 +420,50 @@ class TrustedKnowledgeConversationIntegrationTest {
                     assistant().getKnowledgeRunId())).isEqualTo("CANCELLED");
         });
         verifyNoInteractions(agentClient);
+    }
+
+    /** 模型补全后的问题进入原有可信服务，历史答案只交给上下文理解且费用累计。 */
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.CsvSource({"那北京呢？,北京的住宿标准是多少？", "改问年假，如何申请？,年假如何申请？"})
+    @DisplayName("追问和换话题使用补全问题并保留原始用户输入")
+    void resolvesFollowupWithoutReplayingEvidence(String followup, String resolved) throws Exception {
+        send("{\"content\":\"上海住宿标准是多少？\",\"applicabilityScope\":\"SH\"}").andExpect(status().isOk());
+        when(contextModel.contextualize(any(), eq(followup), any(), any())).thenAnswer(invocation -> {
+            List<KnowledgeConversationContext.Message> history = invocation.getArgument(3);
+            assertThat(history).hasSize(2);
+            assertThat(history.getFirst().content()).isEqualTo("上海住宿标准是多少？");
+            assertThat(history.getLast().scopes()).containsExactly("SH");
+            return new KnowledgeAnswerModelClient.ModelResult<>(
+                    new KnowledgeConversationContext(resolved, null), 2, 1, 3);
+        });
+        send(mapper.writeValueAsString(new SendMessageRequest(followup))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.userMessage.content").value(followup))
+                .andExpect(jsonPath("$.data.assistantMessage.totalTokens").value(43));
+        verify(knowledge).answer(any(), eq(resolved), eq("ALL"), any());
+        String snapshot = jdbc.queryForObject("SELECT snapshot FROM knowledge_answer_runs WHERE run_id=?", String.class, assistant().getKnowledgeRunId());
+        assertThat(mapper.readTree(snapshot).path("conversationContext").path("question").asText()).isEqualTo(resolved);
+    }
+
+    /** 不清楚的指代先澄清，用户补充说明后仍可自然语言续问，不执行无意义检索。 */
+    @Test
+    @DisplayName("指代不清通过 SSE 返回澄清，补充说明后重新回答")
+    void clarifiesAmbiguousFollowup() throws Exception {
+        send("{\"content\":\"住宿与交通标准是什么？\"}").andExpect(status().isOk());
+        clearInvocations(knowledge);
+        when(contextModel.contextualize(any(), eq("那个怎么算？"), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(
+                        new KnowledgeConversationContext(null, "你指的是住宿还是交通？"), 2, 1, 3));
+        var events = service.streamMessage(conversationId, new SendMessageRequest("那个怎么算？"), CUSTOMER)
+                .collectList().block(Duration.ofSeconds(5));
+        assertThat(events).extracting(ChatStreamEvent::stage).contains(CONTEXT);
+        assertThat(assistant().getKnowledgeAnswer().answer().status()).isEqualTo(KnowledgeAnswerDraft.Status.NEEDS_CLARIFICATION);
+        assertThat(assistant().getContent()).isEqualTo("你指的是住宿还是交通？");
+        verifyNoInteractions(knowledge);
+        when(contextModel.contextualize(any(), eq("住宿"), any(), any())).thenReturn(
+                new KnowledgeAnswerModelClient.ModelResult<>(
+                        new KnowledgeConversationContext("住宿标准怎么算？", null), 2, 1, 3));
+        send("{\"content\":\"住宿\"}").andExpect(status().isOk());
+        verify(knowledge).answer(any(), eq("住宿标准怎么算？"), eq("ALL"), any());
     }
 
     /** 发送当前对话的同步请求。 */

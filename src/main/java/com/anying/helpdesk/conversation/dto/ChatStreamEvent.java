@@ -87,6 +87,7 @@ public record ChatStreamEvent(
     /** 返回真实开始执行的阶段，提示使用固定文案，不包含模型草稿或内部异常。 */
     public static ChatStreamEvent progress(Long assistantMessageId, Stage stage) {
         String message = switch (stage) {
+            case CONTEXT -> "正在结合上下文理解问题";
             case APPLICABILITY -> "正在识别问题的适用条件";
             case RETRIEVAL -> "正在检索知识库资料";
             case PLANNING -> "正在检查资料是否充分并规划补充检索";

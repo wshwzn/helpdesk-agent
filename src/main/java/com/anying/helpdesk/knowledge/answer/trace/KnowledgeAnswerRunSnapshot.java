@@ -1,5 +1,7 @@
 package com.anying.helpdesk.knowledge.answer.trace;
 
+import com.anying.helpdesk.knowledge.answer.KnowledgeConversationContext;
+
 import com.anying.helpdesk.knowledge.answer.KnowledgeApplicabilityPolicy;
 import com.anying.helpdesk.knowledge.answer.KnowledgeRetrievalRun;
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerContext;
@@ -26,10 +28,10 @@ public record KnowledgeAnswerRunSnapshot(
         List<StageResult> stages, KnowledgeCitationCatalog citationCatalog, KnowledgeAnswerSelection selection,
         KnowledgeApplicabilityPolicy.Assessment applicability, KnowledgeRetrievalRun retrievalRun,
         KnowledgeAnswerContext answerContext, List<String> applicabilityScopes,
-        List<AnswerAttempt> answerAttempts
+        List<AnswerAttempt> answerAttempts, KnowledgeConversationContext conversationContext
 ) {
     public enum Status { RUNNING, SUCCEEDED, FAILED, CANCELLED }
-    public enum Stage { APPLICABILITY, RETRIEVAL, PLANNING, DRAFT, REVISION, VALIDATION, REVIEW, EVIDENCE_RECHECK, MESSAGE_PERSISTENCE }
+    public enum Stage { CONTEXT, APPLICABILITY, RETRIEVAL, PLANNING, DRAFT, REVISION, VALIDATION, REVIEW, EVIDENCE_RECHECK, MESSAGE_PERSISTENCE }
     public enum StageStatus { RUNNING, SUCCEEDED, FAILED, CANCELLED }
 
     public record StageResult(Stage stage, StageStatus status, LocalDateTime startedAt,

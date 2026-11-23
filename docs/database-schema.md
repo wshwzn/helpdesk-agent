@@ -139,7 +139,7 @@
 | `status` | `VARCHAR(20)` | 否 | 无 | `RUNNING`、`SUCCEEDED`、`FAILED`、`CANCELLED`。成功指最终消息已落库；未结束快照不能视为模型还在运行的实时证明。 |
 | `error_code` | `VARCHAR(50)` | 是 | `NULL` | 固定失败码，无自由文本。除知识阶段码外可为 `STREAM_CANCELLED`、诊断专用的 `KNOWLEDGE_MESSAGE_SAVE_FAILED`；客户消息仍按原协议记录错误。 |
 | `revision` | `BIGINT` | 否 | 无 | 本次运行内递增的快照修订号，从 1 开始；不是 MyBatis 实体乐观锁。写入失败后下次修订可跳号。 |
-| `snapshot` | `MEDIUMTEXT` | 否 | 无 | `schemaVersion=7` JSON（兼容读取版本 1–6）：身份、问题、范围、回答模型配置 ID/名称、运行状态、阶段耗时、召回参数与结果、证据编号、引用目录 `citationCatalog`、模型选择 `selection`、解析后草案 `draft`、复核结果、回答原因、逐模型阶段用量、诊断写入失败次数。另有可空 `applicability`：配置快照、路由结果、续答消息 ID 和 `routingAttempted`。不得加入凭据、模型客户端对象或厂商原始异常。 |
+| `snapshot` | `MEDIUMTEXT` | 否 | 无 | `schemaVersion=8` JSON（兼容读取版本 1–7）：身份、问题、范围、回答模型配置 ID/名称、运行状态、阶段耗时、召回参数与结果、证据编号、引用目录 `citationCatalog`、模型选择 `selection`、解析后草案 `draft`、复核结果、回答原因、逐模型阶段用量、诊断写入失败次数。可空 `conversationContext` 保存补全后的 `question` 或指代不清时的 `clarification`，新增 `CONTEXT` 阶段记录用量；原始 `question` 不变。另有可空 `applicability`：配置快照、路由结果、续答消息 ID 和 `routingAttempted`。不得加入凭据、模型客户端对象或厂商原始异常。 |
 | `started_at` | `TIMESTAMP(6)` | 否 | 无 | 在已接受消息上开始诊断的时间，应用按 Asia/Shanghai 写入。 |
 | `updated_at` | `TIMESTAMP(6)` | 否 | 无 | 此快照生成时间。 |
 | `finished_at` | `TIMESTAMP(6)` | 是 | `NULL` | 终态时间；运行中为空。 |

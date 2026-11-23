@@ -27,6 +27,21 @@ class KnowledgeAnswerModelClientTest {
     private final ResolvedChatModel model = new ResolvedChatModel(1L, "test", true, chatModel);
     private final KnowledgeAnswerModelClient client = new KnowledgeAnswerModelClient(JsonMapper.builder().build());
 
+    /** 检查上下文协议能解析补全与澄清，不能同时给出两种互斥结果。 */
+    @Test @DisplayName("上下文解析支持独立问题和澄清且历史位于数据消息")
+    void contextualizesWithSeparateHistory() {
+        var history = List.of(new KnowledgeConversationContext.Message("USER", "上海住宿标准？", List.of("SH")));
+        respond("{\"question\":\"北京住宿标准？\",\"clarification\":null}");
+        assertThat(client.contextualize(model, "那北京呢", List.of("ALL"), history).value().question()).isEqualTo("北京住宿标准？");
+        var prompt = ArgumentCaptor.forClass(Prompt.class);
+        verify(chatModel).call(prompt.capture());
+        assertThat(prompt.getValue().getInstructions().getLast().getText()).contains("上海住宿标准", "那北京呢");
+        respond("{\"question\":null,\"clarification\":\"你指的是哪项费用？\"}");
+        assertThat(client.contextualize(model, "那个怎么算", List.of("ALL"), history).value().clarification()).isNotBlank();
+        respond("{\"question\":\"住宿标准\",\"clarification\":\"哪项费用？\"}");
+        assertThatThrownBy(() -> client.contextualize(model, "那个", List.of("ALL"), history)).isInstanceOf(KnowledgeAnswerFailure.class);
+    }
+
     /** 默认规划保留旧协议，不以新增必填字段拒绝原有充分判断。 */
     @Test @DisplayName("默认规划接受原三字段协议且不注入实验要求")
     void legacyPlanningRetainsProtocol() {

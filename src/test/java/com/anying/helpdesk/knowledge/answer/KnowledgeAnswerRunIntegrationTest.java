@@ -80,6 +80,8 @@ class KnowledgeAnswerRunIntegrationTest {
     /** 真实经过消息事务、核验链路和诊断表，仅替换外部检索及模型依赖。 */
     @BeforeEach
     void setup() throws Exception {
+        when(modelClient.contextualize(any(), any(), any(), any())).thenAnswer(invocation ->
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeConversationContext(invocation.getArgument(1), null), 2, 1, 3));
         customerAuth = authorization(UserRole.CUSTOMER);
         adminAuth = authorization(UserRole.ADMIN);
         String body = mvc.perform(post("/api/conversations").header("Authorization", customerAuth)
@@ -160,7 +162,7 @@ class KnowledgeAnswerRunIntegrationTest {
             assertThat(stage.durationMs()).isGreaterThanOrEqualTo(0);
         });
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(7);
+        assertThat(snapshot.schemaVersion()).isEqualTo(8);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.stages().get(2).usage().totalTokens()).isEqualTo(15);
         assertThat(snapshot.stages().get(4).usage().totalTokens()).isEqualTo(25);
@@ -193,7 +195,7 @@ class KnowledgeAnswerRunIntegrationTest {
         var snapshot = runs.find(message.getKnowledgeRunId()).orElseThrow();
         assertThat(snapshot.status()).isEqualTo(KnowledgeAnswerRunSnapshot.Status.FAILED);
         assertThat(snapshot.draft()).isEqualTo(draft(QUOTE));
-        assertThat(snapshot.schemaVersion()).isEqualTo(7);
+        assertThat(snapshot.schemaVersion()).isEqualTo(8);
         assertThat(snapshot.selection().citationSetId()).isEqualTo(snapshot.citationCatalog().citationSetId());
         assertThat(snapshot.review().approved()).isFalse();
         assertThat(snapshot.stages().getLast().errorCode()).isEqualTo(message.getErrorCode());

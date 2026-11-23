@@ -1,5 +1,7 @@
 package com.anying.helpdesk.conversation.service;
 
+import com.anying.helpdesk.knowledge.answer.KnowledgeConversationContext;
+
 import com.anying.helpdesk.knowledge.answer.KnowledgeAnswerReport;
 
 import com.anying.helpdesk.knowledge.answer.KnowledgeClarificationException;
@@ -226,6 +228,24 @@ public class ConversationPersistenceService {
 
         return new PreparedChatExchange(userMessage, assistantMessage.getId(),
                 assistantMessage.getKnowledgeRunId(), knowledgeInput);
+    }
+
+    /** 读取已鉴权请求之前的最近六条对话文字，不重放工具或失败回答。 */
+    public List<KnowledgeConversationContext.Message> recentContext(PreparedChatExchange prepared) {
+        var rows = chatMessageMapper.selectList(new LambdaQueryWrapper<ChatMessage>()
+                .eq(ChatMessage::getConversationId, prepared.userMessage().getConversationId())
+                .lt(ChatMessage::getId, prepared.userMessage().getId())
+                .eq(ChatMessage::getMode, ChatMode.KNOWLEDGE)
+                .eq(ChatMessage::getStatus, ChatMessageStatus.COMPLETED)
+                .in(ChatMessage::getRole, ChatMessageRole.USER, ChatMessageRole.ASSISTANT)
+                .orderByDesc(ChatMessage::getId).last("LIMIT 6"));
+        return rows.reversed().stream().map(message -> {
+            String content = message.getContent() == null ? "" : message.getContent();
+            if (content.length() > 2000) content = content.substring(0, 2000) + "（后文截断）";
+            return new KnowledgeConversationContext.Message(
+                    message.getRole().name(), content, message.getApplicabilityScopes() == null
+                    ? List.of(message.getApplicabilityScope()) : message.getApplicabilityScopes());
+        }).toList();
     }
 
     /** 只允许续答当前对话最后一条结构化澄清，原问题和知识库均由服务端恢复。 */

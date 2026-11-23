@@ -61,6 +61,8 @@ class KnowledgeClarificationIntegrationTest {
     /** 只替换外部检索与模型，真实验证数据库配置、会话事务和澄清报告往返。 */
     @BeforeEach
     void setup() {
+        when(model.contextualize(any(), any(), any(), any())).thenAnswer(invocation ->
+                new KnowledgeAnswerModelClient.ModelResult<>(new KnowledgeConversationContext(invocation.getArgument(1), null), 2, 1, 3));
         admin = auth(UserRole.ADMIN, CUSTOMER);
         customer = auth(UserRole.CUSTOMER, CUSTOMER);
         var base = new KnowledgeBase();
