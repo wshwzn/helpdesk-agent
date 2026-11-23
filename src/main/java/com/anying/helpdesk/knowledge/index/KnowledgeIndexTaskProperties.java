@@ -15,6 +15,8 @@ import org.springframework.validation.annotation.Validated;
 public class KnowledgeIndexTaskProperties {
     private boolean enabled = true;
     @Min(1)
+    private int concurrency = 3;
+    @Min(1)
     private int maxAttempts = 3;
     @Min(30)
     private int leaseSeconds = 120;

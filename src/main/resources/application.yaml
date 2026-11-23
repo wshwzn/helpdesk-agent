@@ -48,6 +48,7 @@ app:
       lease-seconds: ${KNOWLEDGE_SOURCE_LEASE_SECONDS:300}
     index-tasks:
       enabled: ${KNOWLEDGE_INDEX_TASKS_ENABLED:true}
+      concurrency: ${KNOWLEDGE_INDEX_CONCURRENCY:3}
       max-attempts: ${KNOWLEDGE_INDEX_MAX_ATTEMPTS:3}
       lease-seconds: ${KNOWLEDGE_INDEX_LEASE_SECONDS:120}
       retry-delay-seconds: ${KNOWLEDGE_INDEX_RETRY_DELAY_SECONDS:30}

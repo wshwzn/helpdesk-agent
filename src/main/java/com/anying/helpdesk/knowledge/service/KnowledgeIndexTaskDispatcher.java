@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
+import java.util.stream.IntStream;
 
 @Component
 public class KnowledgeIndexTaskDispatcher {
@@ -17,16 +19,16 @@ public class KnowledgeIndexTaskDispatcher {
     private final KnowledgeDocumentIndexWorker worker;
     private final KnowledgeIndexTaskProperties properties;
     private final Executor executor;
-    private final AtomicBoolean busy = new AtomicBoolean();
-    private volatile KnowledgeIndexClaim running;
+    private final List<Slot> slots;
 
-    /** 每实例限制一个执行任务，数据库租约负责跨实例协调。 */
+    /** 按配置创建固定执行位，数据库租约负责跨实例协调。 */
     public KnowledgeIndexTaskDispatcher(KnowledgeIndexTaskStore tasks, KnowledgeDocumentIndexWorker worker,
             KnowledgeIndexTaskProperties properties, @Qualifier("knowledgeIndexExecutor") Executor executor) {
         this.tasks = tasks;
         this.worker = worker;
         this.properties = properties;
         this.executor = executor;
+        this.slots = IntStream.range(0, properties.getConcurrency()).mapToObj(i -> new Slot()).toList();
     }
 
     /** 短周期续租或分派执行；数据库中没有任务的 PENDING 文档不会被扫描。 */
@@ -35,33 +37,49 @@ public class KnowledgeIndexTaskDispatcher {
         if (!properties.isEnabled()) {
             return;
         }
-        KnowledgeIndexClaim claim = running;
-        if (claim != null) {
-            tasks.renew(claim);
+        for (Slot slot : slots) {
+            dispatch(slot);
         }
-        if (!busy.compareAndSet(false, true)) {
+    }
+
+    /** 为执行中的文档续租，并向空闲执行位分派任务。 */
+    private void dispatch(Slot slot) {
+        KnowledgeIndexClaim claim = slot.running;
+        if (claim != null) {
+            try {
+                tasks.renew(claim);
+            } catch (RuntimeException exception) {
+                log.warn("Knowledge index lease renewal failed ({})", exception.getClass().getSimpleName());
+            }
+        }
+        if (!slot.busy.compareAndSet(false, true)) {
             return;
         }
         try {
-            executor.execute(this::runNext);
+            executor.execute(() -> runNext(slot));
         } catch (RuntimeException exception) {
-            busy.set(false);
+            slot.busy.set(false);
             log.warn("Knowledge index executor unavailable ({})", exception.getClass().getSimpleName());
         }
     }
 
     /** 执行线程就绪后才领取任务，避免租约在本地线程队列中被耗尽。 */
-    private void runNext() {
+    private void runNext(Slot slot) {
         try {
-            running = tasks.claimNext();
-            if (running != null) {
-                worker.index(running);
+            slot.running = tasks.claimNext();
+            if (slot.running != null) {
+                worker.index(slot.running);
             }
         } catch (RuntimeException exception) {
             log.warn("Knowledge index dispatch failed ({})", exception.getClass().getSimpleName());
         } finally {
-            running = null;
-            busy.set(false);
+            slot.running = null;
+            slot.busy.set(false);
         }
+    }
+
+    private static final class Slot {
+        private final AtomicBoolean busy = new AtomicBoolean();
+        private volatile KnowledgeIndexClaim running;
     }
 }

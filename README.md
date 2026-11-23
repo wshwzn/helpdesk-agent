@@ -138,10 +138,13 @@ KNOWLEDGE_EMBEDDING_BATCH_SIZE=16
 
 ```properties
 KNOWLEDGE_INDEX_TASKS_ENABLED=true
+KNOWLEDGE_INDEX_CONCURRENCY=3
 KNOWLEDGE_INDEX_MAX_ATTEMPTS=3
 KNOWLEDGE_INDEX_LEASE_SECONDS=120
 KNOWLEDGE_INDEX_RETRY_DELAY_SECONDS=30
 ```
+
+每个实例默认同时处理 3 份文档，每 2 秒为运行任务续租并补充空闲执行位。工作线程开始执行后才领取任务，每份文档独立重试、提交索引批次。`KNOWLEDGE_INDEX_CONCURRENCY` 修改后重启生效；多实例的总并发是各实例并发数之和，需要结合向量模型配额调整。
 
 **V20 升级前先停止旧版实例，不与旧工作者混跑。** 历史 PROCESSING 标为 FAILED / INDEX_TASK_MISSING，管理员检查后重试；历史有效索引继续兼容。索引批次隔离与任务设计、测试边界见 [`notes/33-文档提交与可靠索引.md`](notes/33-文档提交与可靠索引.md)。
 

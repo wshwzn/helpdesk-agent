@@ -15,11 +15,11 @@ public class KnowledgeIndexingConfiguration {
      * 创建容量受限的知识库索引线程池，避免大批文档耗尽 Web 请求线程。
      */
     @Bean(name = "knowledgeIndexExecutor")
-    public Executor knowledgeIndexExecutor() {
+    public Executor knowledgeIndexExecutor(KnowledgeIndexTaskProperties properties) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(2);
-        executor.setQueueCapacity(50);
+        executor.setCorePoolSize(properties.getConcurrency());
+        executor.setMaxPoolSize(properties.getConcurrency());
+        executor.setQueueCapacity(properties.getConcurrency());
         executor.setThreadNamePrefix("knowledge-index-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
