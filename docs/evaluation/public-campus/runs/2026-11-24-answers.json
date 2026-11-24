@@ -1,0 +1,5250 @@
+{
+  "summary": {
+    "assessment": "SAME_MODEL_ASSISTED_NOT_HUMAN_REVIEWED",
+    "complete": true,
+    "arms": {
+      "baseline": {
+        "planned": 80,
+        "executed": 80,
+        "answerable": 70,
+        "unanswerable": 10,
+        "delivered": 74,
+        "answerableDelivered": 64,
+        "answerableStatus": 64,
+        "failures": 6,
+        "unexecuted": 0,
+        "correctComplete": 62,
+        "correctAbstentions": 10,
+        "judgeFailures": 0,
+        "citedClaims": 200,
+        "supportedCitedClaims": 200,
+        "allClaims": 200,
+        "unjudgedClaims": 0,
+        "correctDeliveryRate": 0.8857142857142857,
+        "correctAbstentionRate": 1.0,
+        "citationSupportRate": 1.0,
+        "citationCoverage": 1.0
+      },
+      "full": {
+        "planned": 80,
+        "executed": 80,
+        "answerable": 70,
+        "unanswerable": 10,
+        "delivered": 63,
+        "answerableDelivered": 59,
+        "answerableStatus": 59,
+        "failures": 17,
+        "unexecuted": 0,
+        "correctComplete": 58,
+        "correctAbstentions": 4,
+        "judgeFailures": 0,
+        "citedClaims": 165,
+        "supportedCitedClaims": 165,
+        "allClaims": 165,
+        "unjudgedClaims": 0,
+        "correctDeliveryRate": 0.8285714285714286,
+        "correctAbstentionRate": 0.4,
+        "citationSupportRate": 1.0,
+        "citationCoverage": 1.0
+      }
+    },
+    "fullErrors": {
+      "KNOWLEDGE_STRUCTURE_INVALID": 6,
+      "KNOWLEDGE_REVIEW_INCOMPLETE_ANSWER": 5,
+      "KNOWLEDGE_REVIEW_UNSUPPORTED_CLAIM": 1,
+      "KNOWLEDGE_DRAFT_CALL_FAILED": 1,
+      "KNOWLEDGE_REVIEW_CALL_FAILED": 1,
+      "KNOWLEDGE_REVIEW_WRONG_STATUS": 2,
+      "KNOWLEDGE_PROTOCOL_INVALID": 1
+    },
+    "revisedCases": [
+      "q016",
+      "q030",
+      "q035",
+      "q043",
+      "q066",
+      "q067",
+      "q071",
+      "q097",
+      "n02",
+      "n01",
+      "n03",
+      "n04",
+      "n06",
+      "n07",
+      "n08",
+      "n10"
+    ],
+    "pairedCorrectness": {
+      "True->True": 58,
+      "False->False": 8,
+      "True->False": 4
+    }
+  },
+  "generation": {
+    "datasetSha256": "910d066c4acc5f0b0f787aa8207164d14bbb684244cef3dc8a17abcd43610a9a",
+    "judgePromptSha256": "2a58ca58f2b579ae5e7e20755e5c0164ebdfa1cd2da4310164e24ec4b82e7c63",
+    "modelConfigId": 9,
+    "assessment": "SAME_MODEL_ASSISTED_NOT_HUMAN_REVIEWED",
+    "mode": "FROZEN_REAL_RETRIEVAL_SHARED_DRAFT_REVIEW_ABLATION",
+    "workers": 3,
+    "modelName": "deepseek-flash"
+  },
+  "judge": {
+    "workers": 3,
+    "modelName": "deepseek-flash",
+    "datasetSha256": "910d066c4acc5f0b0f787aa8207164d14bbb684244cef3dc8a17abcd43610a9a",
+    "judgePromptSha256": "fda112a98064b56accb65036764bad00f4ed8b6425ccf321ef3fe07e1edd9b53",
+    "modelConfigId": 9,
+    "assessment": "SAME_MODEL_ASSISTED_NOT_HUMAN_REVIEWED",
+    "mode": "FROZEN_REAL_RETRIEVAL_SHARED_DRAFT_REVIEW_ABLATION"
+  },
+  "environment": {
+    "gitHead": "99707eba76fa6ef28975ed427c761e91b5d4f037",
+    "sourceSha256": "a4f9f9cae7199f504e3518407ed8060b2c622c20a4b30f2f3ddd30863d6b42b7",
+    "retrievalRunSha256": "4edc7f5957cced97509aaaeac5fab76486dc5ad09437f8caf1b61e6a1f76c015",
+    "annotationStatus": "AI_ASSISTED_NOT_HUMAN_REVIEWED",
+    "settings": {
+      "candidateLimit": 25,
+      "vectorMinSimilarity": 0.0,
+      "resultLimit": 10
+    },
+    "topChunks": 10,
+    "plannedAnswerable": 70,
+    "plannedUnanswerable": 10,
+    "comparison": "same draft and citation structure validation; full adds semantic review and at most one revision",
+    "exclusions": [
+      "live retrieval",
+      "multihop planning",
+      "conversation history",
+      "HTTP/SSE",
+      "live eligibility recheck"
+    ]
+  },
+  "rawSha256": {
+    "dataset.json": "910d066c4acc5f0b0f787aa8207164d14bbb684244cef3dc8a17abcd43610a9a",
+    "calls.jsonl": "9737766a1e27a87e8b6300b873144fb8e6dcc72a7bd4354861d0b0be2cf1afec",
+    "judgments.jsonl": "a7a7be5956f62c0d692b1b87d9ea6eb663c6932298555b8e1f63995dd8b0054e"
+  },
+  "results": [
+    {
+      "id": "q003",
+      "question": "几个同学想自己成立一个学生社团，能直接开展活动吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 5840,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引用第四十条明确要求学生成立团体须书面申请、报学校批准并施行登记和年检制度，且团体须在规范范围内活动，足以支持“不能未经批准直接成立并开展活动”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文直接包含“学生团体应当在宪法、法律、法规和学校管理制度范围内活动，接受学校的领导和管理”，完整支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1引文直接包含“学生团体邀请校外组织、人员到校举办讲座等活动，需经学校批准”，完整支持该结论。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E2第十二条引文完整支持港澳台学生成立社团须申请批准、未经批准不得成立或开展活动的结论。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "E1引文包含“学生进行课外活动不得影响学校正常的教育教学秩序和生活秩序”，直接支持该结论。"
+            }
+          ],
+          "reason": "问题问普通学生能否直接成立社团并开展活动，必要要点是：可依规成立参加学生团体、须书面申请并经学校批准及登记年检、未经批准不能直接成立开展活动。答案已覆盖这些要点，但错误地加入了仅适用于港澳台学生的特别规定（claims/3），对普通学生情形属于无关且易生歧义的额外断言，因此不算实质完整准确。"
+        },
+        "totalTokens": 7409
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引用第四十条明确要求学生成立团体须书面申请、报学校批准并施行登记和年检制度，且团体须在规范范围内活动，足以支持“不能未经批准直接成立并开展活动”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文直接包含“学生团体应当在宪法、法律、法规和学校管理制度范围内活动，接受学校的领导和管理”，完整支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1引文直接包含“学生团体邀请校外组织、人员到校举办讲座等活动，需经学校批准”，完整支持该结论。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E2第十二条引文完整支持港澳台学生成立社团须申请批准、未经批准不得成立或开展活动的结论。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "E1引文包含“学生进行课外活动不得影响学校正常的教育教学秩序和生活秩序”，直接支持该结论。"
+            }
+          ],
+          "reason": "问题问普通学生能否直接成立社团并开展活动，必要要点是：可依规成立参加学生团体、须书面申请并经学校批准及登记年检、未经批准不能直接成立开展活动。答案已覆盖这些要点，但错误地加入了仅适用于港澳台学生的特别规定（claims/3），对普通学生情形属于无关且易生歧义的额外断言，因此不算实质完整准确。"
+        },
+        "totalTokens": 7409
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生可以根据学校有关规定，在校内成立、参加学生团体；但成立团体应当按学校有关规定提出书面申请，报学校批准并施行登记和年检制度，不能未经批准直接成立并开展活动。",
+          "学生团体应当在宪法、法律、法规和学校管理制度范围内活动，接受学校的领导和管理。",
+          "学生团体邀请校外组织、人员到校举办讲座等活动，需经学校批准。",
+          "港澳台学生在校内单独或与内地学生共同成立学生社团组织，须按规定提出书面申请，报学校批准并施行登记和年检制度，未经批准，不得成立或开展活动。",
+          "学生进行课外活动不得影响学校正常的教育教学秩序和生活秩序。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生可以根据学校有关规定，在校内成立、参加学生团体；但成立团体应当按学校有关规定提出书面申请，报学校批准并施行登记和年检制度，不能未经批准直接成立并开展活动。",
+          "学生团体应当在宪法、法律、法规和学校管理制度范围内活动，接受学校的领导和管理。",
+          "学生团体邀请校外组织、人员到校举办讲座等活动，需经学校批准。",
+          "港澳台学生在校内单独或与内地学生共同成立学生社团组织，须按规定提出书面申请，报学校批准并施行登记和年检制度，未经批准，不得成立或开展活动。",
+          "学生进行课外活动不得影响学校正常的教育教学秩序和生活秩序。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q004",
+      "question": "学生使用校园网络时，有哪些被明确禁止的行为？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 5831,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1第四十三条明确列出不得登录非法网站、不得传播非法文字音频视频资料、不得编造或传播虚假有害信息，结论完整覆盖这些禁止行为。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E1第四十三条明确写有不得攻击、侵入他人计算机和移动通讯网络系统，结论与该禁止项一致。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文E10第十五条明确写有学生不得蓄意在计算机网络上进行干扰选课系统活动及处分后果，结论有直接依据。"
+            }
+          ],
+          "reason": "答案完整覆盖了第四十三条所列的网络使用禁止行为（非法网站、非法资料传播、虚假有害信息、攻击侵入计算机和移动通讯网络系统），并补充了选课系统干扰这一有据禁止项，无缺失或错误。"
+        },
+        "totalTokens": 7368
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1第四十三条明确列出不得登录非法网站、不得传播非法文字音频视频资料、不得编造或传播虚假有害信息，结论完整覆盖这些禁止行为。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E1第四十三条明确写有不得攻击、侵入他人计算机和移动通讯网络系统，结论与该禁止项一致。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文E10第十五条明确写有学生不得蓄意在计算机网络上进行干扰选课系统活动及处分后果，结论有直接依据。"
+            }
+          ],
+          "reason": "答案完整覆盖了第四十三条所列的网络使用禁止行为（非法网站、非法资料传播、虚假有害信息、攻击侵入计算机和移动通讯网络系统），并补充了选课系统干扰这一有据禁止项，无缺失或错误。"
+        },
+        "totalTokens": 7368
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生应当遵守国家和学校关于网络使用的有关规定，不得登录非法网站，不得传播非法文字、音频、视频资料等，不得编造或者传播虚假、有害信息。",
+          "学生不得攻击、侵入他人计算机和移动通讯网络系统。",
+          "学生不得蓄意在计算机网络上进行干扰选课系统活动，违者一经查实，按《深圳大学学生违纪处分办法》相关规定予以处分。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生应当遵守国家和学校关于网络使用的有关规定，不得登录非法网站，不得传播非法文字、音频、视频资料等，不得编造或者传播虚假、有害信息。",
+          "学生不得攻击、侵入他人计算机和移动通讯网络系统。",
+          "学生不得蓄意在计算机网络上进行干扰选课系统活动，违者一经查实，按《深圳大学学生违纪处分办法》相关规定予以处分。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q007",
+      "question": "本科生申请辅修需要满足什么条件，应该在第几个学期提出申请？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 5595,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "直接引用E2第十七条，明确必修课程合格且未受过处分的在校生有申请资格，覆盖资格条件。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "直接引用E2第十七条，明确在第三学期向双方学院（部）提出申请，并说明后续审核备案公示程序，回答问题所需学期要点。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "直接引用E2第十九条，属于补充限制条件，有原文依据且与问题相关。"
+            }
+          ],
+          "reason": "答案覆盖全部必要要点：申请资格（必修课程合格且未受过处分）和申请学期（第三学期）；并附有申请程序及只允许申请一个专业的限制，均有E2原文引用支持，无无据断言。"
+        },
+        "totalTokens": 7303
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "直接引用E2第十七条，明确必修课程合格且未受过处分的在校生有申请资格，覆盖资格条件。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "直接引用E2第十七条，明确在第三学期向双方学院（部）提出申请，并说明后续审核备案公示程序，回答问题所需学期要点。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "直接引用E2第十九条，属于补充限制条件，有原文依据且与问题相关。"
+            }
+          ],
+          "reason": "答案覆盖全部必要要点：申请资格（必修课程合格且未受过处分）和申请学期（第三学期）；并附有申请程序及只允许申请一个专业的限制，均有E2原文引用支持，无无据断言。"
+        },
+        "totalTokens": 7303
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "必修课程合格且未受过处分的在校生有资格申请修读辅修专业、辅修学士学位。",
+          "申请程序为：学生在第三学期向双方学院（部）提出申请，申请修读的专业所在学院（部）根据学院（部）情况对学生修读资格进行审核，并于学期末将经审核批准的学生名单报教务管理部门备案，同时予以公示。",
+          "学生在校期间，只允许申请修读一个专业作为辅修专业或辅修学士学位。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "必修课程合格且未受过处分的在校生有资格申请修读辅修专业、辅修学士学位。",
+          "申请程序为：学生在第三学期向双方学院（部）提出申请，申请修读的专业所在学院（部）根据学院（部）情况对学生修读资格进行审核，并于学期末将经审核批准的学生名单报教务管理部门备案，同时予以公示。",
+          "学生在校期间，只允许申请修读一个专业作为辅修专业或辅修学士学位。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q008",
+      "question": "休学快到期了还不能回来，忘记办理延长手续会怎么样？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_STRUCTURE_INVALID",
+      "durationMs": 1624,
+      "baselineJudge": null,
+      "fullJudge": null,
+      "baseline": null,
+      "full": null
+    },
+    {
+      "id": "q011",
+      "question": "主修学位没拿到，只完成辅修要求，能单独拿辅修学位吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1918,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E4引文明确写明“对没有取得主修学士学位的学生不得授予辅修学士学位”，直接支撑该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E4引文说明辅修学士学位在主修学士学位证书中注明、不单独发放学位证书；E1还写明该辅修学士学位不证明学历，两处引文共同支撑整个结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1和E2均包含第二十一条原文，支撑未完成辅修学士学位但符合辅修专业要求时可改为申请辅修专业。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E3第十五条原文明确辅修专业证书只证明完成另一专业辅修计划，不证明学历，引文足以支撑。"
+            }
+          ],
+          "reason": "答案正确回答了核心问题：未取得主修学士学位不得授予辅修学士学位，且辅修学士学位不单独发证、在主修学位证书中注明、不证明学历；并补充了可改为申请辅修专业的路径及辅修专业证书性质，均有原文依据，覆盖必要要点，无无据断言。"
+        },
+        "totalTokens": 7881
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E4引文明确写明“对没有取得主修学士学位的学生不得授予辅修学士学位”，直接支撑该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E4引文说明辅修学士学位在主修学士学位证书中注明、不单独发放学位证书；E1还写明该辅修学士学位不证明学历，两处引文共同支撑整个结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1和E2均包含第二十一条原文，支撑未完成辅修学士学位但符合辅修专业要求时可改为申请辅修专业。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E3第十五条原文明确辅修专业证书只证明完成另一专业辅修计划，不证明学历，引文足以支撑。"
+            }
+          ],
+          "reason": "答案正确回答了核心问题：未取得主修学士学位不得授予辅修学士学位，且辅修学士学位不单独发证、在主修学位证书中注明、不证明学历；并补充了可改为申请辅修专业的路径及辅修专业证书性质，均有原文依据，覆盖必要要点，无无据断言。"
+        },
+        "totalTokens": 7881
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "对没有取得主修学士学位的学生，不得授予辅修学士学位。",
+          "辅修学士学位在主修学士学位证书中予以注明，不单独发放学位证书；该辅修学士学位不证明学历。",
+          "修读辅修学士学位的学生在主修专业申请毕业时，虽未完成辅修学士学位的学习，但符合辅修专业培养方案规定的课程及学分要求的，可改为申请辅修专业。",
+          "辅修专业证书只证明学生完成主修专业外的另一专业辅修计划，不证明学历。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "对没有取得主修学士学位的学生，不得授予辅修学士学位。",
+          "辅修学士学位在主修学士学位证书中予以注明，不单独发放学位证书；该辅修学士学位不证明学历。",
+          "修读辅修学士学位的学生在主修专业申请毕业时，虽未完成辅修学士学位的学习，但符合辅修专业培养方案规定的课程及学分要求的，可改为申请辅修专业。",
+          "辅修专业证书只证明学生完成主修专业外的另一专业辅修计划，不证明学历。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q012",
+      "question": "参加双学士培养项目，毕业拿到的是两本学位证还是一本？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1580,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1和E2的引文均明确写明“双学士学位只发放一本学位证书，所授两个学位在证书中予以注明”，足以支持该结论；引用段落与完整证据无冲突。"
+            }
+          ],
+          "reason": "答案实质正确且覆盖问题唯一必要要点：双学士学位只发一本学位证书，并在证书中注明两个学位。E1、E2的引文均直接支持该结论，无缺失或错误。"
+        },
+        "totalTokens": 7281
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1和E2的引文均明确写明“双学士学位只发放一本学位证书，所授两个学位在证书中予以注明”，足以支持该结论；引用段落与完整证据无冲突。"
+            }
+          ],
+          "reason": "答案实质正确且覆盖问题唯一必要要点：双学士学位只发一本学位证书，并在证书中注明两个学位。E1、E2的引文均直接支持该结论，无缺失或错误。"
+        },
+        "totalTokens": 7281
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "双学士学位只发放一本学位证书，所授两个学位在证书中予以注明。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "双学士学位只发放一本学位证书，所授两个学位在证书中予以注明。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q015",
+      "question": "办理休学保留学籍后，那段时间还要交专业学费和课程费用吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2051,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1明确载明“学生休学保留学籍期间，不缴纳专业学费和课程学分学费”，直接支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文完整覆盖按学习时间按月结算、每学期按5个月计算、不足1个月按1个月计算以及起止时点等要点，且未忽略E1其他限制条件。"
+            }
+          ],
+          "reason": "答案正确回答了核心问题：休学保留学籍期间不缴纳专业学费和课程学分学费；并补充了学籍异动时按实际学习时间按月结算的规则，与E1一致，无缺失要点或无据断言。"
+        },
+        "totalTokens": 7603
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1明确载明“学生休学保留学籍期间，不缴纳专业学费和课程学分学费”，直接支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文完整覆盖按学习时间按月结算、每学期按5个月计算、不足1个月按1个月计算以及起止时点等要点，且未忽略E1其他限制条件。"
+            }
+          ],
+          "reason": "答案正确回答了核心问题：休学保留学籍期间不缴纳专业学费和课程学分学费；并补充了学籍异动时按实际学习时间按月结算的规则，与E1一致，无缺失要点或无据断言。"
+        },
+        "totalTokens": 7603
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生休学保留学籍期间，不缴纳专业学费和课程学分学费。",
+          "因休学、出国留学保留学籍、退学、转学等原因中断学习的学生，根据学习时间，按月结算当学期的专业学费和课程学分学费；每学期按5个月计算，不足1个月按1个月计算，实际学习时间的起始时点为开学日，截止时点为办理离校手续日。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生休学保留学籍期间，不缴纳专业学费和课程学分学费。",
+          "因休学、出国留学保留学籍、退学、转学等原因中断学习的学生，根据学习时间，按月结算当学期的专业学费和课程学分学费；每学期按5个月计算，不足1个月按1个月计算，实际学习时间的起始时点为开学日，截止时点为办理离校手续日。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q016",
+      "question": "转到了学费更贵的专业，差额从什么时候开始算？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 4015,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1和E2引文均明确：转专业后若转入专业学费与原专业不一致，从批准转入时开始按转入专业标准计收，并多退少补；该引文足以支持“从批准转入时开始算”这一结论。"
+            }
+          ],
+          "reason": "答案命中必要要点：从批准转入时开始按转入专业学费标准计收，并实行多退少补；与参考答案条款一致，无缺失或无据断言。"
+        },
+        "totalTokens": 7215
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引用 E1、E2 的同一原文明确：批准转专业且转入专业学费与原专业不一致的，从批准转入时开始按转入专业标准计收，并多退少补，直接覆盖问题所需全部要点。"
+            }
+          ],
+          "reason": "答案准确覆盖必要要点：转专业后按新专业标准计收专业学费的起始时点为“批准转入时”，并有多退少补；未遗漏限制条件，无无据断言。"
+        },
+        "totalTokens": 7212
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生被批准转专业后，如转入专业的专业学费高于原专业（即不一致），从批准转入时开始改按转入专业的专业学费标准计收专业学费，并实行多退少补。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生在校期间被批准转专业的，如转入专业的专业学费与原专业不一致，从批准转入时开始按转入专业的专业学费标准计收专业学费，并实行多退少补。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q019",
+      "question": "大类分流确定了专业，这次算不算用掉了一次转专业机会？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2564,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文直接对应参考段落，明确大类招生分专业不记录为转专业。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第四条原文支持学生学期间只能转一次专业。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E2第十二条原文支持再申请专业调整按转专业办法执行。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1第二条原文支持当学期大类分流学生原则上不得申请转入本院同一大类其他专业。"
+            }
+          ],
+          "reason": "答案实质正确：核心要点“大类招生分专业不记录为转专业”有直接依据；补充的转专业次数限制和后续申请规则也有引文支持，无忽略限制或反证。"
+        },
+        "totalTokens": 7312
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文直接对应参考段落，明确大类招生分专业不记录为转专业。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第四条原文支持学生学期间只能转一次专业。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E2第十二条原文支持再申请专业调整按转专业办法执行。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1第二条原文支持当学期大类分流学生原则上不得申请转入本院同一大类其他专业。"
+            }
+          ],
+          "reason": "答案实质正确：核心要点“大类招生分专业不记录为转专业”有直接依据；补充的转专业次数限制和后续申请规则也有引文支持，无忽略限制或反证。"
+        },
+        "totalTokens": 7312
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生经专业分流确定专业后，不得随意变更；大类招生分专业的学生不记录为转专业。",
+          "学生在学期间只能转一次专业。",
+          "经学校批准完成学籍变更手续的学生，若再申请专业调整，按照《深圳大学本科生转专业管理办法（试行）》（深大校发〔2021〕257号）执行。",
+          "当学期已进行本科大类招生专业分流的学生，原则上该学期不得申请转入本院（部）内同一大类的其他专业。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生经专业分流确定专业后，不得随意变更；大类招生分专业的学生不记录为转专业。",
+          "学生在学期间只能转一次专业。",
+          "经学校批准完成学籍变更手续的学生，若再申请专业调整，按照《深圳大学本科生转专业管理办法（试行）》（深大校发〔2021〕257号）执行。",
+          "当学期已进行本科大类招生专业分流的学生，原则上该学期不得申请转入本院（部）内同一大类的其他专业。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q020",
+      "question": "大类分流已经办完学籍变更，之后还想换专业，应该按什么规定办理？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 3479,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引用E1第十一条原文，直接支持“不得随意变更、不记录为转专业”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引用E1第十二条原文，直接支持完成学籍变更后再申请调整适用《深圳大学本科生转专业管理办法（试行）》（深大校发〔2021〕257号）的结论，也是问题核心答案。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引用E2第二条原文，完整支持适用范围及当学期分流学生原则上不得申请转入本院（部）内同一大类其他专业的限制。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "引用E2第四条原文，完整支持转专业时间安排与在校期间只能转一次专业的结论。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "引用E2第五条及其（一）（二）项，完整支持基本条件的结论。"
+            },
+            {
+              "path": "claims/5",
+              "supported": true,
+              "reason": "引用E2第六条及其（一）（二）（三）项，完整支持三类不得申请转专业的情形。"
+            },
+            {
+              "path": "claims/6",
+              "supported": true,
+              "reason": "引用E2第七条及其（一）至（四）项，完整支持招生类别限制的四项要求。"
+            },
+            {
+              "path": "claims/7",
+              "supported": true,
+              "reason": "引用E2第九条及其（一）项，完整支持须参加专业能力考试且笔试60分及以上有效的结论。"
+            }
+          ],
+          "reason": "答案覆盖了问题所需核心要点：完成学籍变更后再申请专业调整应按《深圳大学本科生转专业管理办法（试行）》（深大校发〔2021〕257号）执行；并补充了该办法的适用范围、时间与次数限制、基本条件、禁止情形、招生类别限制及考试要求。未发现与引文冲突的无据断言。"
+        },
+        "totalTokens": 8162
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引用E1第十一条原文，直接支持“不得随意变更、不记录为转专业”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引用E1第十二条原文，直接支持完成学籍变更后再申请调整适用《深圳大学本科生转专业管理办法（试行）》（深大校发〔2021〕257号）的结论，也是问题核心答案。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引用E2第二条原文，完整支持适用范围及当学期分流学生原则上不得申请转入本院（部）内同一大类其他专业的限制。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "引用E2第四条原文，完整支持转专业时间安排与在校期间只能转一次专业的结论。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "引用E2第五条及其（一）（二）项，完整支持基本条件的结论。"
+            },
+            {
+              "path": "claims/5",
+              "supported": true,
+              "reason": "引用E2第六条及其（一）（二）（三）项，完整支持三类不得申请转专业的情形。"
+            },
+            {
+              "path": "claims/6",
+              "supported": true,
+              "reason": "引用E2第七条及其（一）至（四）项，完整支持招生类别限制的四项要求。"
+            },
+            {
+              "path": "claims/7",
+              "supported": true,
+              "reason": "引用E2第九条及其（一）项，完整支持须参加专业能力考试且笔试60分及以上有效的结论。"
+            }
+          ],
+          "reason": "答案覆盖了问题所需核心要点：完成学籍变更后再申请专业调整应按《深圳大学本科生转专业管理办法（试行）》（深大校发〔2021〕257号）执行；并补充了该办法的适用范围、时间与次数限制、基本条件、禁止情形、招生类别限制及考试要求。未发现与引文冲突的无据断言。"
+        },
+        "totalTokens": 8162
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生经专业分流确定专业后，不得随意变更；大类招生分专业的学生不记录为转专业。",
+          "经学校批准完成学籍变更手续的学生，若再申请专业调整，按照《深圳大学本科生转专业管理办法（试行）》（深大校发〔2021〕257号）执行。",
+          "转专业管理办法适用于按专业招生录取及按大类招生录取、经专业分流已确定专业的在校普通高等教育本科生；但当学期已进行本科大类招生专业分流的学生，原则上该学期不得申请转入本院（部）内同一大类的其他专业。",
+          "学校转专业工作定于每学年第二学期进行，学生在学期间只能转一次专业。",
+          "学生应符合基本条件：思想品德操行合格、遵纪守法、身体条件符合拟转入专业要求，并对所申请转入的专业有兴趣和志向。",
+          "在休学、保留学籍和保留入学资格期间的，已向学校申请毕业的，或已有一次转专业记录的，不得申请转专业。",
+          "申请转专业还须符合招生类别限制：按体育类、艺术类等单独术科考试录取的学生不得跨类转专业，普通文理类录取的学生不得转入有单独术科考试的专业；按定向招生计划录取的学生在学期间按录取专业学习、不得转专业；本科第二批次录取的学生不得转入第一批次录取的专业；按照其他招生规定不能转专业的学生，在校学习期间不得申请转专业。",
+          "申请转专业的学生必须参加学院（部）的专业能力考试，其中专业能力笔试得分需达到60分及以上方为有效。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生经专业分流确定专业后，不得随意变更；大类招生分专业的学生不记录为转专业。",
+          "经学校批准完成学籍变更手续的学生，若再申请专业调整，按照《深圳大学本科生转专业管理办法（试行）》（深大校发〔2021〕257号）执行。",
+          "转专业管理办法适用于按专业招生录取及按大类招生录取、经专业分流已确定专业的在校普通高等教育本科生；但当学期已进行本科大类招生专业分流的学生，原则上该学期不得申请转入本院（部）内同一大类的其他专业。",
+          "学校转专业工作定于每学年第二学期进行，学生在学期间只能转一次专业。",
+          "学生应符合基本条件：思想品德操行合格、遵纪守法、身体条件符合拟转入专业要求，并对所申请转入的专业有兴趣和志向。",
+          "在休学、保留学籍和保留入学资格期间的，已向学校申请毕业的，或已有一次转专业记录的，不得申请转专业。",
+          "申请转专业还须符合招生类别限制：按体育类、艺术类等单独术科考试录取的学生不得跨类转专业，普通文理类录取的学生不得转入有单独术科考试的专业；按定向招生计划录取的学生在学期间按录取专业学习、不得转专业；本科第二批次录取的学生不得转入第一批次录取的专业；按照其他招生规定不能转专业的学生，在校学习期间不得申请转专业。",
+          "申请转专业的学生必须参加学院（部）的专业能力考试，其中专业能力笔试得分需达到60分及以上方为有效。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q023",
+      "question": "转专业拟录取名单公示了，但我反悔了，什么时候还能撤回申请？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 3222,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引文明确：公示拟同意转入学生名单期间，学生需撤销转专业申请的，应在公示期内向所在学院提出撤销申请，逾期不予受理。该结论整体得到引用支持。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1、E2均载明第十三条：对转专业结果有异议的，可在转专业名单公示期内向学校教务管理部门提出申诉，逾期不予受理；引用内容足以支持该申诉渠道的表述，且将其与撤销申请区分开。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1、E2均载明第十四条：经学校批准转专业的学生，不得再申请转回原专业就读，引用足以支持该结论。"
+            }
+          ],
+          "reason": "答案正确回答了撤销申请的时间：应在拟同意转入学生名单公示期内向所在学院提出，逾期不予受理；并补充了申诉渠道和转专业后不得转回原专业的规则，均与引用条文一致，覆盖必要要点。"
+        },
+        "totalTokens": 7241
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引文明确：公示拟同意转入学生名单期间，学生需撤销转专业申请的，应在公示期内向所在学院提出撤销申请，逾期不予受理。该结论整体得到引用支持。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1、E2均载明第十三条：对转专业结果有异议的，可在转专业名单公示期内向学校教务管理部门提出申诉，逾期不予受理；引用内容足以支持该申诉渠道的表述，且将其与撤销申请区分开。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1、E2均载明第十四条：经学校批准转专业的学生，不得再申请转回原专业就读，引用足以支持该结论。"
+            }
+          ],
+          "reason": "答案正确回答了撤销申请的时间：应在拟同意转入学生名单公示期内向所在学院提出，逾期不予受理；并补充了申诉渠道和转专业后不得转回原专业的规则，均与引用条文一致，覆盖必要要点。"
+        },
+        "totalTokens": 7241
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "接收学院（部）公示拟同意转入学生名单期间，学生需撤销转专业申请的，应在公示期内向所在学院提出撤销申请，逾期不予受理。",
+          "学生对转专业结果有异议的，可在转专业名单公示期内向学校教务管理部门提出申诉，逾期不予受理；这属于对结果提出异议的申诉渠道，与撤销转专业申请是不同事项。",
+          "经学校批准转专业的学生，不得再申请转回原专业就读。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "接收学院（部）公示拟同意转入学生名单期间，学生需撤销转专业申请的，应在公示期内向所在学院提出撤销申请，逾期不予受理。",
+          "学生对转专业结果有异议的，可在转专业名单公示期内向学校教务管理部门提出申诉，逾期不予受理；这属于对结果提出异议的申诉渠道，与撤销转专业申请是不同事项。",
+          "经学校批准转专业的学生，不得再申请转回原专业就读。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q024",
+      "question": "转专业笔试至少要考多少分，面试名单按接收人数的多少倍确定？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2535,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确写明专业能力笔试得分需达到60分及以上方为有效，且申请转专业须参加专业能力考试，结论完整且无忽略限制。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确写明按接收专业允许学生转入人数的1.2倍确定参加专业能力面试的学生名单，结论完整且无忽略限制。"
+            }
+          ],
+          "reason": "答案覆盖两项必要要点：笔试有效分数为60分及以上，面试名单按允许转入人数的1.2倍确定；引用充分，无缺失或错误。"
+        },
+        "totalTokens": 7112
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确写明专业能力笔试得分需达到60分及以上方为有效，且申请转专业须参加专业能力考试，结论完整且无忽略限制。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确写明按接收专业允许学生转入人数的1.2倍确定参加专业能力面试的学生名单，结论完整且无忽略限制。"
+            }
+          ],
+          "reason": "答案覆盖两项必要要点：笔试有效分数为60分及以上，面试名单按允许转入人数的1.2倍确定；引用充分，无缺失或错误。"
+        },
+        "totalTokens": 7112
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "申请转专业的学生必须参加学院（部）的专业能力考试；其中专业能力笔试得分需达到60分及以上方为有效。",
+          "接收学院（部）根据学生专业能力笔试成绩，按照接收专业允许学生转入人数的1.2倍确定参加专业能力面试的学生名单。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "申请转专业的学生必须参加学院（部）的专业能力考试；其中专业能力笔试得分需达到60分及以上方为有效。",
+          "接收学院（部）根据学生专业能力笔试成绩，按照接收专业允许学生转入人数的1.2倍确定参加专业能力面试的学生名单。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q027",
+      "question": "学校给我发了学业预警，家长也会收到通知吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1645,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文直接对应第七条，明确通知书一式三份且一份由学院（部）送达学生家长，结论完整。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文为第五条原文，关于学业预警触发条件，虽与家长通知问题不直接相关，但内容有据且未与答案要点矛盾。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文为E2第八条（二）原文，直接支持学院（部）需联系家长并沟通情况，结论完整。"
+            }
+          ],
+          "reason": "答案实质回答了问题：学业预警通知书一式三份，其中一份由学院（部）送达学生家长；并补充学院定期联系家长。必要要点齐全，无缺失或无据断言。"
+        },
+        "totalTokens": 7324
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文直接对应第七条，明确通知书一式三份且一份由学院（部）送达学生家长，结论完整。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文为第五条原文，关于学业预警触发条件，虽与家长通知问题不直接相关，但内容有据且未与答案要点矛盾。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文为E2第八条（二）原文，直接支持学院（部）需联系家长并沟通情况，结论完整。"
+            }
+          ],
+          "reason": "答案实质回答了问题：学业预警通知书一式三份，其中一份由学院（部）送达学生家长；并补充学院定期联系家长。必要要点齐全，无缺失或无据断言。"
+        },
+        "totalTokens": 7324
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "对每学期进入学业预警范围的学生，由所在学院（部）发出《深圳大学本科生学业预警通知书》，该通知书一式三份，其中一份由学院（部）送达学生家长。",
+          "学生当学期取得的课程学分合计未达到当学期所选课程总学分的二分之一的，学校向学生本人发出学业预警。",
+          "学院（部）在对学业预警学生加强管理和引导的同时，需及时和学生家长取得联系，定期沟通学生各方面情况，并认真做好相关工作记录。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "对每学期进入学业预警范围的学生，由所在学院（部）发出《深圳大学本科生学业预警通知书》，该通知书一式三份，其中一份由学院（部）送达学生家长。",
+          "学生当学期取得的课程学分合计未达到当学期所选课程总学分的二分之一的，学校向学生本人发出学业预警。",
+          "学院（部）在对学业预警学生加强管理和引导的同时，需及时和学生家长取得联系，定期沟通学生各方面情况，并认真做好相关工作记录。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q028",
+      "question": "暂缓退学休学一年的决定下来了，需要在几个工作日内办理离校手续？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1809,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E3引文明确：对同意给予暂缓退学休学一年机会的学生，应在《暂缓退学休学一年处理决定书》下发后的5个工作日内到教务管理部门完成休学离校手续，与结论一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E3引文明确要求“保证休学期间必须离校生活学习”，与结论一致。"
+            }
+          ],
+          "reason": "答案完整且正确，覆盖问题所需全部必要要点：5个工作日内、到教务管理部门、完成休学离校手续；另附休学期间须离校生活学习，属有据补充。"
+        },
+        "totalTokens": 7920
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E3引文明确：对同意给予暂缓退学休学一年机会的学生，应在《暂缓退学休学一年处理决定书》下发后的5个工作日内到教务管理部门完成休学离校手续，与结论一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E3引文明确要求“保证休学期间必须离校生活学习”，与结论一致。"
+            }
+          ],
+          "reason": "答案完整且正确，覆盖问题所需全部必要要点：5个工作日内、到教务管理部门、完成休学离校手续；另附休学期间须离校生活学习，属有据补充。"
+        },
+        "totalTokens": 7920
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "被学校批准暂缓退学休学一年的学生，须在下发《暂缓退学休学一年处理决定书》的5个工作日内，到学校教务管理部门完成休学离校手续。",
+          "暂缓退学休学一年的学生在休学期间必须离校生活学习。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "被学校批准暂缓退学休学一年的学生，须在下发《暂缓退学休学一年处理决定书》的5个工作日内，到学校教务管理部门完成休学离校手续。",
+          "暂缓退学休学一年的学生在休学期间必须离校生活学习。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q030",
+      "question": "姓名里的生僻字在学籍系统里变成问号，申请更正要准备什么？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_STRUCTURE_INVALID",
+      "durationMs": 7523,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第四条明确更正指第五条第（一）、（二）项情形，E1第五条第（二）项即姓名生僻字显示“？”的情形，引文足以支持归类结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1、E2第五条第（二）项原文完整列明申请表、身份证和户口本原件、复印件及其扫描电子文件，并要求身份证号须与录取数据一致，直接支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第三条原文明确须由学生本人提出申请，声明材料属实并承担所有后果和责任，引文足以支持。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E2第六条及其第（一）、（二）项原文分别规定非本人提出、不能提供第五条规定材料的不予受理，引文足以支持。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "E2、E3第七条原文明确只受理当年报到入学新生的更正申请，期限为入学报到起三个月内（不超过当年12月），逾期按招生数据管理并发证，引文足以支持。"
+            },
+            {
+              "path": "claims/5",
+              "supported": true,
+              "reason": "E3第八条原文完整规定教务部审核汇总、学校权限内发文公布、需报上级主管部门的报送省教育厅审批及未通过仍以原信息为准，引文足以支持。"
+            },
+            {
+              "path": "claims/6",
+              "supported": true,
+              "reason": "E3第九条原文明确通过省教育厅审批后不再受理再次变更申请，引文足以支持。"
+            }
+          ],
+          "reason": "答案完整覆盖了生僻字显示为“？”情形所需的申请材料（申请表、身份证和户口本原件/复印件/扫描电子文件）及身份证号须与录取数据一致这一必要条件，并正确说明由本人申请、不予受理情形、受理期限和审批流程，均有原文引证，无无据断言。"
+        },
+        "totalTokens": 7325
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学籍身份信息变更中，“更正”指第五条第（一）、（二）项所列情形，姓名中生僻字显示为“？”属于其中第（二）项情形。",
+          "因姓名中有生僻字显示为“？”而导致信息不符的，由学生本人向教务部提交《深圳大学全日制本科生学籍身份信息变更申请表》、身份证和户口本原件、复印件及其扫描电子文件，身份证号须与录取数据一致。",
+          "申请变更学籍身份信息须由学生本人提出申请，声明所提交的材料属实并承担所有后果和责任。",
+          "不能提供本办法第五条规定材料的，或非学生本人提出的，学校不予受理学籍身份信息更改申请。",
+          "学校按规定只受理当年报到入学新生的高考报名信息更正申请，受理时间为自入学报到起三个月内（不超过当年12月份）；在上述期限内未提交更正申请和相关证明材料的，一律按招生数据进行学籍管理和发放学历证书。",
+          "符合变更条件申请的，由教务部审核汇总；属学校权限内的学校发文公布，需报上级主管部门的由学校行文统一报送省教育厅审批，通过审批的由教务部进行学籍身份信息变更处理，未通过的仍以原招生录取信息为准。",
+          "本科生学籍身份信息变更申请通过省教育厅审批后，学校不再受理学生再次变更的申请。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "q031",
+      "question": "学籍身份信息已经获省教育厅批准改过一次，还能再次申请修改吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1479,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引文第九条直接对应问题，明确省教育厅审批后不再受理再次变更申请。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文第八条完整说明教务部审核、校内权限发文以及需报省教育厅审批的流程，引文足以支持该结论。"
+            }
+          ],
+          "reason": "答案直接回答不能再申请，并引用第九条作为核心依据，同时补充第八条审批流程，实质正确且覆盖问题必要要点；无无据断言或忽略限制条件。"
+        },
+        "totalTokens": 7113
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引文第九条直接对应问题，明确省教育厅审批后不再受理再次变更申请。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文第八条完整说明教务部审核、校内权限发文以及需报省教育厅审批的流程，引文足以支持该结论。"
+            }
+          ],
+          "reason": "答案直接回答不能再申请，并引用第九条作为核心依据，同时补充第八条审批流程，实质正确且覆盖问题必要要点；无无据断言或忽略限制条件。"
+        },
+        "totalTokens": 7113
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "本科生学籍身份信息变更申请通过省教育厅审批后，学校不再受理学生再次变更的申请。",
+          "符合本科生学籍身份信息变更条件申请的，由教务部审核汇总；属学校权限内的，学校发文公布；需报上级主管部门的，学校行文统一报送省教育厅进行审批。通过省教育厅审批的，由教务部进行学籍身份信息变更处理。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "本科生学籍身份信息变更申请通过省教育厅审批后，学校不再受理学生再次变更的申请。",
+          "符合本科生学籍身份信息变更条件申请的，由教务部审核汇总；属学校权限内的，学校发文公布；需报上级主管部门的，学校行文统一报送省教育厅进行审批。通过省教育厅审批的，由教务部进行学籍身份信息变更处理。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q032",
+      "question": "已经提交毕业申请或者已经毕业了，学校还受理学籍身份信息更改吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2634,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1明确引用第六条及第（四）（五）项，完整覆盖“非新生已提出毕业申请”和“已毕业、结业、退学（肄业）”两类不予受理情形，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第七条引文明确只受理当年报到入学新生的高考报名信息更正申请、三个月内受理及逾期按招生数据管理发证，引文足以支持该结论。"
+            }
+          ],
+          "reason": "答案正确指出已提出毕业申请的非新生和已毕业、结业、退学（肄业）学生均不予受理学籍身份信息更改，并补充当年新生高考报名信息更正的受理期限及逾期后果；必要要点齐全，无无据断言。"
+        },
+        "totalTokens": 7160
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1明确引用第六条及第（四）（五）项，完整覆盖“非新生已提出毕业申请”和“已毕业、结业、退学（肄业）”两类不予受理情形，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第七条引文明确只受理当年报到入学新生的高考报名信息更正申请、三个月内受理及逾期按招生数据管理发证，引文足以支持该结论。"
+            }
+          ],
+          "reason": "答案正确指出已提出毕业申请的非新生和已毕业、结业、退学（肄业）学生均不予受理学籍身份信息更改，并补充当年新生高考报名信息更正的受理期限及逾期后果；必要要点齐全，无无据断言。"
+        },
+        "totalTokens": 7160
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "属下列情况之一的，学校不予受理学籍身份信息更改申请：新生入学报到学期的，非新生已提出毕业申请的；学生已毕业、结业、退学（肄业）的。",
+          "学校只受理当年报到入学新生的高考报名信息更正申请，受理时间为自入学报到起三个月内（不超过当年12月份）；在上述期限内未提交更正申请和相关证明材料的，一律按招生数据进行学籍管理和发放学历证书。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "属下列情况之一的，学校不予受理学籍身份信息更改申请：新生入学报到学期的，非新生已提出毕业申请的；学生已毕业、结业、退学（肄业）的。",
+          "学校只受理当年报到入学新生的高考报名信息更正申请，受理时间为自入学报到起三个月内（不超过当年12月份）；在上述期限内未提交更正申请和相关证明材料的，一律按招生数据进行学籍管理和发放学历证书。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q034",
+      "question": "理工类学生上学期绩点超过3.0，第二阶段最多能选多少学分？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2352,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1第十一条明确：理工类专业上一学期平均学分绩点3.0以上的学生，在选课第二阶段选课学分上限提高至32，结论完整对应问题所需要点。"
+            }
+          ],
+          "reason": "答案正确指出理工类绩点3.0以上学生第二阶段选课上限为32学分，与参考段落一致，无缺失或错误。"
+        },
+        "totalTokens": 7365
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1第十一条明确：理工类专业上一学期平均学分绩点3.0以上的学生，在选课第二阶段选课学分上限提高至32，结论完整对应问题所需要点。"
+            }
+          ],
+          "reason": "答案正确指出理工类绩点3.0以上学生第二阶段选课上限为32学分，与参考段落一致，无缺失或错误。"
+        },
+        "totalTokens": 7365
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "理工类（授予理学、工学、建筑学、医学、药学、护理学学士学位）专业学生，若上一学期平均学分绩点在3.0以上，在选课第二阶段选课学分上限提高至32。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "理工类（授予理学、工学、建筑学、医学、药学、护理学学士学位）专业学生，若上一学期平均学分绩点在3.0以上，在选课第二阶段选课学分上限提高至32。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q035",
+      "question": "挂掉的必修课已经停开了，应该怎么选择重修课程？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_REVIEW_INCOMPLETE_ANSWER",
+      "durationMs": 12388,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文直接对应 referenceParagraphs 第八条，完整覆盖问题所问停开必修课的重修选择程序：开课学院指定内容相近替代课程、经教务部批准、方可重修选课。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1 第七条引文支持必修课成绩为F必须重修原课程；作为规则背景成立，且与第八条停开例外不矛盾。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1 第九条（二）引文完整支持该结论，属于休学、保留学籍学生复学后遇停开课的特别处理，结论有据且未遗漏引文中的书面报教务部审批备案要求。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1 第三条引文支持须在规定选课时间内由本人选课、不得委托他人代理，结论与引文一致。"
+            }
+          ],
+          "reason": "答案实质正确并覆盖必要要点：必修课成绩F须重修；停开时由开课学院指定内容相近替代课程，经教务部批准后重修选课。补充的复学停开处理与选课程序均有原引文依据，未发现无据断言或忽略限制条件。"
+        },
+        "totalTokens": 7436
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "凡需重修的必修课程，如因特殊情况开课学院（部）已不再开设时，由开课学院（部）指定一门内容相近的替代课程，经教务部批准后学生方可进行重修选课。",
+          "专业培养方案中学分性质为必修的课程，学生考核成绩为F的，必须重修原课程。",
+          "休学、保留学籍学生复学后均按原年级的培养方案进行选课学习，所缺课程要求全部补齐；如有已停开的课程，则应由开课学院指定相近的课程补修，并将替代课程书面报教务部审批备案。",
+          "学生须在学校规定的选课时间内由本人进行选课来确定所修读课程，不得委托他人代理。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "q036",
+      "question": "想再修一遍已经通过的同名课程刷分，新成绩能覆盖原成绩吗，学分会重复计算吗？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_STRUCTURE_INVALID",
+      "durationMs": 2225,
+      "baselineJudge": null,
+      "fullJudge": null,
+      "baseline": null,
+      "full": null
+    },
+    {
+      "id": "q038",
+      "question": "因为考试违纪被处分后重修的课程，还能申请免听吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2902,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文直接对应问题：因违反考场纪律受处分而重修原课的学生不能申请该课的免听。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文完整支持免听的一般申请条件，即绩点2.0以上或经任课老师面试/笔试认可。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文完整支持实践性强课程及学院认定不宜免听课程不能申请免听。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "两条引文分别支持每学期只能申请一门免听课程、申请时间为第一周。"
+            }
+          ],
+          "reason": "答案实质正确：明确回答不能申请，并引用对应禁止性条款；同时补充的一般条件、课程范围、申请数量与时间均有原文依据，覆盖必要要点，无无据断言。"
+        },
+        "totalTokens": 7156
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文直接对应问题：因违反考场纪律受处分而重修原课的学生不能申请该课的免听。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文完整支持免听的一般申请条件，即绩点2.0以上或经任课老师面试/笔试认可。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文完整支持实践性强课程及学院认定不宜免听课程不能申请免听。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "两条引文分别支持每学期只能申请一门免听课程、申请时间为第一周。"
+            }
+          ],
+          "reason": "答案实质正确：明确回答不能申请，并引用对应禁止性条款；同时补充的一般条件、课程范围、申请数量与时间均有原文依据，覆盖必要要点，无无据断言。"
+        },
+        "totalTokens": 7156
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "不能申请。因违反考场纪律受处分而重修原课的学生，不能申请该课的免听。",
+          "免听的一般申请条件是：上学期平均学分绩点2.0以上，或对该门课程的基本内容已较好掌握并经任课老师面试或笔试考察认可。",
+          "实验课、设计类等各种实践性较强的课程，或开课学院（部）确定为不宜免听的课程，不能申请免听。",
+          "学生每学期只能申请一门课程免听，免听申请时间为每学期第一周。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "不能申请。因违反考场纪律受处分而重修原课的学生，不能申请该课的免听。",
+          "免听的一般申请条件是：上学期平均学分绩点2.0以上，或对该门课程的基本内容已较好掌握并经任课老师面试或笔试考察认可。",
+          "实验课、设计类等各种实践性较强的课程，或开课学院（部）确定为不宜免听的课程，不能申请免听。",
+          "学生每学期只能申请一门课程免听，免听申请时间为每学期第一周。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q039",
+      "question": "免修考试考到什么等级才能通过，通过后还能放弃免修再参加期末考试吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2054,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引文明确：免修考试成绩必须在B级（含B级）以上方可获得免修资格。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文明确：免修资格一旦取得不得放弃，成绩作为最终考核成绩，获得免修考试的学生相应课程不得再参加期末考试。"
+            }
+          ],
+          "reason": "答案正确且完整覆盖问题必要要点：通过等级为B级（含B级）以上；取得资格后不得放弃，成绩作为最终考核成绩，且不得再参加期末考试。无无据断言。"
+        },
+        "totalTokens": 7158
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引文明确：免修考试成绩必须在B级（含B级）以上方可获得免修资格。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文明确：免修资格一旦取得不得放弃，成绩作为最终考核成绩，获得免修考试的学生相应课程不得再参加期末考试。"
+            }
+          ],
+          "reason": "答案正确且完整覆盖问题必要要点：通过等级为B级（含B级）以上；取得资格后不得放弃，成绩作为最终考核成绩，且不得再参加期末考试。无无据断言。"
+        },
+        "totalTokens": 7158
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "免修考试成绩必须在B级（含B级）以上方可获得免修资格。",
+          "免修资格一旦取得，不得放弃，免修考试成绩作为该门课程该学期的最终考核成绩；获得免修考试的学生相应课程不得再参加期末考试。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "免修考试成绩必须在B级（含B级）以上方可获得免修资格。",
+          "免修资格一旦取得，不得放弃，免修考试成绩作为该门课程该学期的最终考核成绩；获得免修考试的学生相应课程不得再参加期末考试。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q040",
+      "question": "体育课、思政课和带实验的课程能申请免修吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1667,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文与《课程免听免修的规定》第八条原文一致，覆盖思政课、体育课及含实验设计的课程均不能申请免修这一必要要点；另有E2第三十二条关于免修须办理手续属程序性，不构成本问题反证。"
+            }
+          ],
+          "reason": "答案准确引用第八条，完整回答体育课、思政课和带实验的课程均不能申请免修，无缺失或无据断言。"
+        },
+        "totalTokens": 6891
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文与《课程免听免修的规定》第八条原文一致，覆盖思政课、体育课及含实验设计的课程均不能申请免修这一必要要点；另有E2第三十二条关于免修须办理手续属程序性，不构成本问题反证。"
+            }
+          ],
+          "reason": "答案准确引用第八条，完整回答体育课、思政课和带实验的课程均不能申请免修，无缺失或无据断言。"
+        },
+        "totalTokens": 6891
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "思想政治理论课、体育课、实践性教学环节或含实验、设计的课程，以及开课学院（部）认为不宜免修的课程，不能申请免修。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "思想政治理论课、体育课、实践性教学环节或含实验、设计的课程，以及开课学院（部）认为不宜免修的课程，不能申请免修。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q042",
+      "question": "想转到同一个城市的另一所大学，按转学实施细则允许吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2104,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第二条原文明确：学生应在被录取学校完成学业，因患病或确有特殊困难且高考分数达标方可申请转学，引文完整支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第三条列举不得转学情形，其第（六）项明确规定“拟转入学校与转出学校在同一城市的”不得转学，两条引文合并足以支持该结论。"
+            }
+          ],
+          "reason": "答案覆盖问题必要要点：同城转学属于禁止情形；并补充一般转学前提（患病或特殊困难且高考分数达标），与E1原文一致，无遗漏或错误。"
+        },
+        "totalTokens": 6863
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第二条原文明确：学生应在被录取学校完成学业，因患病或确有特殊困难且高考分数达标方可申请转学，引文完整支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第三条列举不得转学情形，其第（六）项明确规定“拟转入学校与转出学校在同一城市的”不得转学，两条引文合并足以支持该结论。"
+            }
+          ],
+          "reason": "答案覆盖问题必要要点：同城转学属于禁止情形；并补充一般转学前提（患病或特殊困难且高考分数达标），与E1原文一致，无遗漏或错误。"
+        },
+        "totalTokens": 6863
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生原则上应在被录取学校完成学业；只有因患病或确有特殊困难无法继续在本校学习，且高考分数达到拟转入学校相关专业在生源地相应年份的高考录取分数，才可申请转学。",
+          "拟转入学校与转出学校在同一城市的，属于不得转学的情形之一。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生原则上应在被录取学校完成学业；只有因患病或确有特殊困难无法继续在本校学习，且高考分数达到拟转入学校相关专业在生源地相应年份的高考录取分数，才可申请转学。",
+          "拟转入学校与转出学校在同一城市的，属于不得转学的情形之一。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q043",
+      "question": "身体原因导致没法继续在原校读书，申请转学需要什么医疗证明？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_REVIEW_INCOMPLETE_ANSWER",
+      "durationMs": 6724,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2第二条与第(一)项明确因患病可申请转学，并明确需转出和拟转入高校指定医院检查证明、加盖“疾病诊断证明专用章”、提供原就诊医院原始病历；回答完整覆盖问题所需必要要点。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第二条原文明确须高考分数达到拟转入学校相关专业在生源地相应年份高考录取分数，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E2第三条及第（一）至（四）项列举不得转学情形，引用与结论一致；虽使用“等情形”，但所列各项均由引文支持，未发现无据内容。"
+            }
+          ],
+          "reason": "答案覆盖患病转学的医疗证明必要要点：指定医院检查证明、加盖“疾病诊断证明专用章”、原就诊医院原始病历；并补充高考分数条件与不得转学情形，均有E2引文支持，无缺失或错误。"
+        },
+        "totalTokens": 7991
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生因患病无法继续在本校学习的，可以申请转学；因患病申请转学需提供经转出和拟转入高校指定医院的检查证明，检查证明需盖有“疾病诊断证明专用章”，同时提供原就诊医院的原始病历。",
+          "申请转学还须满足高考分数条件：高考分数达到拟转入学校相关专业在生源地相应年份的高考录取分数。",
+          "入学未满一学期或毕业前一年、高考成绩低于拟转入学校相关专业同一生源地相应年份录取成绩、由低学历层次转为高学历层次、通过定向就业招生录取等情形不得转学。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "q044",
+      "question": "跨省转学的备案，是转入学校办还是转出学校办？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2115,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "claims/0 的引文明确写“跨省转学的，由转入、转出高校分别发文报所在省教育主管部门备案”，完整支持“分别发文”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "claims/1 的引文明确写“在规定的时间内，学校将《普通高校学生转学备案表》及相关证明材料报省教育主管部门备案”，支持该程序性表述。"
+            }
+          ],
+          "reason": "答案正确指出跨省转学由转入、转出高校分别发文报所在省教育主管部门备案，并补充了在规定时间报送备案表及材料；无缺失必要要点或无据断言。"
+        },
+        "totalTokens": 6787
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "claims/0 的引文明确写“跨省转学的，由转入、转出高校分别发文报所在省教育主管部门备案”，完整支持“分别发文”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "claims/1 的引文明确写“在规定的时间内，学校将《普通高校学生转学备案表》及相关证明材料报省教育主管部门备案”，支持该程序性表述。"
+            }
+          ],
+          "reason": "答案正确指出跨省转学由转入、转出高校分别发文报所在省教育主管部门备案，并补充了在规定时间报送备案表及材料；无缺失必要要点或无据断言。"
+        },
+        "totalTokens": 6787
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "跨省转学的，由转入、转出高校分别发文报所在省教育主管部门备案。",
+          "转学备案须在规定的时间内进行，学校将《普通高校学生转学备案表》及相关证明材料报省教育主管部门备案。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "跨省转学的，由转入、转出高校分别发文报所在省教育主管部门备案。",
+          "转学备案须在规定的时间内进行，学校将《普通高校学生转学备案表》及相关证明材料报省教育主管部门备案。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q046",
+      "question": "交流时读了与原专业不相关的专业课和语言课，能转成原专业的专业学分吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2839,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2第六条（二）原文完整包含该结论，且与问题情形（交流专业不同于原专业）直接对应；E1引文相同可佐证。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第六条（三）原文明确语言类课程学分不能转换为专业课学分，只能转换为公共选修学分；E1引文相同可佐证。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E2第六条引言及（一）原文支持“原专业或相近专业可转换、方案须报教务审核”的结论；所引E1片段虽为截断引文，但E2引文足以完整支持该结论，未忽略限制条件。"
+            }
+          ],
+          "reason": "答案正确回应问题：交流专业与原专业不相关时，所获校外学分不能转为原专业专业课学分，只能转为公共选修学分；语言类课程同样只能转公共选修学分。答案额外补充了原专业或相近专业情形下的转换规则，属相关且原文有据，不影响完整性；无冲突或缺失必要要点。"
+        },
+        "totalTokens": 7434
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2第六条（二）原文完整包含该结论，且与问题情形（交流专业不同于原专业）直接对应；E1引文相同可佐证。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第六条（三）原文明确语言类课程学分不能转换为专业课学分，只能转换为公共选修学分；E1引文相同可佐证。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E2第六条引言及（一）原文支持“原专业或相近专业可转换、方案须报教务审核”的结论；所引E1片段虽为截断引文，但E2引文足以完整支持该结论，未忽略限制条件。"
+            }
+          ],
+          "reason": "答案正确回应问题：交流专业与原专业不相关时，所获校外学分不能转为原专业专业课学分，只能转为公共选修学分；语言类课程同样只能转公共选修学分。答案额外补充了原专业或相近专业情形下的转换规则，属相关且原文有据，不影响完整性；无冲突或缺失必要要点。"
+        },
+        "totalTokens": 7434
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "参加交流学习的专业为不同于原专业或非相近专业的，学习期间所获校外院校的学分不能转换成学生原专业的专业课学分，但可转换为公共选修学分。",
+          "语言类课程学分不能转换为专业课学分，只能转换为公共选修学分。",
+          "参加国（境）外和国内校际交流项目学习（不以攻读对方学校学士学位为目的）的学生，若交流专业为原专业或相近专业，所获校外院校学分按学生所在学院（部）提出的学分转换方案转换成原专业相应学分，方案须报学校教务管理部门审核。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "参加交流学习的专业为不同于原专业或非相近专业的，学习期间所获校外院校的学分不能转换成学生原专业的专业课学分，但可转换为公共选修学分。",
+          "语言类课程学分不能转换为专业课学分，只能转换为公共选修学分。",
+          "参加国（境）外和国内校际交流项目学习（不以攻读对方学校学士学位为目的）的学生，若交流专业为原专业或相近专业，所获校外院校学分按学生所在学院（部）提出的学分转换方案转换成原专业相应学分，方案须报学校教务管理部门审核。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q047",
+      "question": "已经向学校申请毕业，还能报名去外校交流吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2130,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E2中第四条原文即为“学校不接受已申请毕业的学生申请赴校外学校交流学习”，直接支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E2中第二条原文说明细则适用于全日制在校本科生赴其他高校参加校际交流项目、个人自行联系学习等情形，支持该适用范围结论，且与问题相关。"
+            }
+          ],
+          "reason": "答案正确：依据第四条明确回答已申请毕业的学生不能申请赴校外交流；补充第二条说明适用对象，未遗漏必要要点，也无无据断言。"
+        },
+        "totalTokens": 7232
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E2中第四条原文即为“学校不接受已申请毕业的学生申请赴校外学校交流学习”，直接支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E2中第二条原文说明细则适用于全日制在校本科生赴其他高校参加校际交流项目、个人自行联系学习等情形，支持该适用范围结论，且与问题相关。"
+            }
+          ],
+          "reason": "答案正确：依据第四条明确回答已申请毕业的学生不能申请赴校外交流；补充第二条说明适用对象，未遗漏必要要点，也无无据断言。"
+        },
+        "totalTokens": 7232
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学校不接受已申请毕业的学生申请赴校外学校交流学习。",
+          "该细则适用于我校全日制在校本科生赴其他高校攻读学士学位联合培养课程、参加校际交流项目学习、个人自行联系学习的学籍和学分管理。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学校不接受已申请毕业的学生申请赴校外学校交流学习。",
+          "该细则适用于我校全日制在校本科生赴其他高校攻读学士学位联合培养课程、参加校际交流项目学习、个人自行联系学习的学籍和学分管理。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q048",
+      "question": "自己联系境外学校学习，最长能去多久，出发前的选课方案要不要审批？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2500,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第七条明确个人自行联系赴国（境）外院校学习的情形，其第（二）项规定学习时间不得超过1年，两条引文合并足以支持“最长1年”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第七条（三）原文即“须提交经所在学院（部）审核同意的选课方案，由教务管理部门审查批准”，与结论一致，说明出发前需要审批。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第七条（三）原文明确“未提供选课方案或选课方案未获批准的，所获学分学校不予承认”，结论有直接依据。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1第七条（四）原文载明回校后由学院（部）按选课方案提出学分转换方案并报教务管理部门审核，结论有直接依据；虽非问题直接所问，但属同一制度的有据补充，不构成无据断言。"
+            }
+          ],
+          "reason": "答案要点齐全且正确：学习时间上限为1年（E1第七条第二项）；出发前选课方案须经学院（部）审核同意并由教务管理部门批准，未批准则学分不予承认（E1第七条第三项）。未遗漏必要要点，未发现与证据中的限制条件相冲突之处；额外提到的回校后学分转换流程亦有原文支持。"
+        },
+        "totalTokens": 7775
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第七条明确个人自行联系赴国（境）外院校学习的情形，其第（二）项规定学习时间不得超过1年，两条引文合并足以支持“最长1年”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第七条（三）原文即“须提交经所在学院（部）审核同意的选课方案，由教务管理部门审查批准”，与结论一致，说明出发前需要审批。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第七条（三）原文明确“未提供选课方案或选课方案未获批准的，所获学分学校不予承认”，结论有直接依据。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1第七条（四）原文载明回校后由学院（部）按选课方案提出学分转换方案并报教务管理部门审核，结论有直接依据；虽非问题直接所问，但属同一制度的有据补充，不构成无据断言。"
+            }
+          ],
+          "reason": "答案要点齐全且正确：学习时间上限为1年（E1第七条第二项）；出发前选课方案须经学院（部）审核同意并由教务管理部门批准，未批准则学分不予承认（E1第七条第三项）。未遗漏必要要点，未发现与证据中的限制条件相冲突之处；额外提到的回校后学分转换流程亦有原文支持。"
+        },
+        "totalTokens": 7775
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "经学校批准、个人自行联系赴国（境）外院校学习（不以攻读对方院校学位为目的，仅向深圳大学申请学位）的学生，学习时间不得超过1年。",
+          "个人自行联系赴国（境）外院校学习的学生，向学校申请赴国（境）外学习时，须提交经所在学院（部）审核同意的选课方案，由教务管理部门审查批准。",
+          "未提供选课方案或选课方案未获批准的，所获学分学校不予承认。",
+          "学生回校后，由所在学院（部）严格按选课方案提出学分转换方案并报教务管理部门审核。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "经学校批准、个人自行联系赴国（境）外院校学习（不以攻读对方院校学位为目的，仅向深圳大学申请学位）的学生，学习时间不得超过1年。",
+          "个人自行联系赴国（境）外院校学习的学生，向学校申请赴国（境）外学习时，须提交经所在学院（部）审核同意的选课方案，由教务管理部门审查批准。",
+          "未提供选课方案或选课方案未获批准的，所获学分学校不予承认。",
+          "学生回校后，由所在学院（部）严格按选课方案提出学分转换方案并报教务管理部门审核。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q050",
+      "question": "港澳台学生能住学校宿舍吗，入住需要签什么协议？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2056,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "该结论引用 E1 第十三条原文，完整覆盖“可住统一安排宿舍、须签《深圳大学学生住宿协议书》、遵守住宿管理办法”三个要点。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "该结论引用 E2 第二条原文，明确该规定适用于港澳台全日制本科生；虽非问题核心必要要点，但属于对适用范围的补充，引文足以直接支持且无被忽略的限制或反证。"
+            }
+          ],
+          "reason": "答案正确回答了港澳台学生可入住学校统一安排宿舍，并明确须签订《深圳大学学生住宿协议书》且遵守住宿管理办法；必要要点齐全，无无据断言。"
+        },
+        "totalTokens": 6101
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "该结论引用 E1 第十三条原文，完整覆盖“可住统一安排宿舍、须签《深圳大学学生住宿协议书》、遵守住宿管理办法”三个要点。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "该结论引用 E2 第二条原文，明确该规定适用于港澳台全日制本科生；虽非问题核心必要要点，但属于对适用范围的补充，引文足以直接支持且无被忽略的限制或反证。"
+            }
+          ],
+          "reason": "答案正确回答了港澳台学生可入住学校统一安排宿舍，并明确须签订《深圳大学学生住宿协议书》且遵守住宿管理办法；必要要点齐全，无无据断言。"
+        },
+        "totalTokens": 6101
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "港澳台学生可入住学校统一安排的学生宿舍，须签订《深圳大学学生住宿协议书》，并遵守《深圳大学学生住宿管理办法（修订）》。",
+          "该规定适用于学校港澳台全日制本科生。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "港澳台学生可入住学校统一安排的学生宿舍，须签订《深圳大学学生住宿协议书》，并遵守《深圳大学学生住宿管理办法（修订）》。",
+          "该规定适用于学校港澳台全日制本科生。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q051",
+      "question": "港澳台学生是否可以参加学校基本医疗保险？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1476,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "答案结论“可按规定参加学校基本医疗保险，并享受有关待遇”与引用E1第十四条原文完全一致，足以支持该结论。"
+            }
+          ],
+          "reason": "答案完整且实质正确：直接依据E1第十四条回答港澳台学生可按规定参加学校基本医疗保险并享受待遇，无缺失必要要点，无无据断言。"
+        },
+        "totalTokens": 7060
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "答案结论“可按规定参加学校基本医疗保险，并享受有关待遇”与引用E1第十四条原文完全一致，足以支持该结论。"
+            }
+          ],
+          "reason": "答案完整且实质正确：直接依据E1第十四条回答港澳台学生可按规定参加学校基本医疗保险并享受待遇，无缺失必要要点，无无据断言。"
+        },
+        "totalTokens": 7060
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "港澳台学生可按规定参加学校基本医疗保险，并享受有关待遇。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "港澳台学生可按规定参加学校基本医疗保险，并享受有关待遇。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q052",
+      "question": "港澳台学生想和内地学生共同成立社团，需要经过批准和年检吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2472,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第十二条明确覆盖港澳台学生单独或与内地学生共同成立社团，须书面申请、报学校批准并施行登记和年检制度，未经批准不得成立或开展活动，直接回答批准和年检问题。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第二条原文支持该规定适用于学校港澳台全日制本科生，属适用范围说明。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E3第四十条原文支持学生成立团体应书面申请、报学校批准并施行登记和年检制度，与问题相关且引文完整支持。"
+            }
+          ],
+          "reason": "答案正确且完整：引用港澳台专项规定第十二条明确回答需报学校批准并施行登记和年检制度，且补充适用范围和相关一般规定，无无据断言。"
+        },
+        "totalTokens": 6551
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第十二条明确覆盖港澳台学生单独或与内地学生共同成立社团，须书面申请、报学校批准并施行登记和年检制度，未经批准不得成立或开展活动，直接回答批准和年检问题。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第二条原文支持该规定适用于学校港澳台全日制本科生，属适用范围说明。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E3第四十条原文支持学生成立团体应书面申请、报学校批准并施行登记和年检制度，与问题相关且引文完整支持。"
+            }
+          ],
+          "reason": "答案正确且完整：引用港澳台专项规定第十二条明确回答需报学校批准并施行登记和年检制度，且补充适用范围和相关一般规定，无无据断言。"
+        },
+        "totalTokens": 6551
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "港澳台学生在校内单独或与内地学生共同成立学生社团组织，须按规定提出书面申请，报学校批准并施行登记和年检制度；未经批准，不得成立或开展活动。",
+          "该规定适用于学校港澳台全日制本科生。",
+          "学生成立团体，应当按学校有关规定提出书面申请，报学校批准并施行登记和年检制度。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "港澳台学生在校内单独或与内地学生共同成立学生社团组织，须按规定提出书面申请，报学校批准并施行登记和年检制度；未经批准，不得成立或开展活动。",
+          "该规定适用于学校港澳台全日制本科生。",
+          "学生成立团体，应当按学校有关规定提出书面申请，报学校批准并施行登记和年检制度。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q054",
+      "question": "同学临时需要学生证办事，我能把自己的借给他吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2866,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确写明“学生证只限本人使用……不准转借他人”，直接支持“不能借给别人”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文完整收录第六条关于利用补证机会获取两张学生证、擅自更改信息或为非本校学生办证属违规并给予处分的规定；虽与“临时借用”不直接对应，但属同一证件管理规定且由原文支持，无无据断言。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文完整收录第四条关于持本人学生证报到注册及未盖章注册无效的规定，属于学生证使用管理相关内容；结论由引文直接支持。"
+            }
+          ],
+          "reason": "问题问能否把学生证借给同学。必要要点是学生证只限本人使用、不准转借他人。答案以第三条为核心给出否定结论，实质正确且覆盖必要要点；其余两条为同一规定中关于违规处分及注册使用的原文，有引文支持，不构成缺失或错误。"
+        },
+        "totalTokens": 7450
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确写明“学生证只限本人使用……不准转借他人”，直接支持“不能借给别人”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文完整收录第六条关于利用补证机会获取两张学生证、擅自更改信息或为非本校学生办证属违规并给予处分的规定；虽与“临时借用”不直接对应，但属同一证件管理规定且由原文支持，无无据断言。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文完整收录第四条关于持本人学生证报到注册及未盖章注册无效的规定，属于学生证使用管理相关内容；结论由引文直接支持。"
+            }
+          ],
+          "reason": "问题问能否把学生证借给同学。必要要点是学生证只限本人使用、不准转借他人。答案以第三条为核心给出否定结论，实质正确且覆盖必要要点；其余两条为同一规定中关于违规处分及注册使用的原文，有引文支持，不构成缺失或错误。"
+        },
+        "totalTokens": 7450
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生证只限本人使用，应妥善保管，不准转借他人，学生证不得擅自涂改。",
+          "凡利用补发学生证机会获取两张学生证，擅自更改学生证上姓名、地点等情况或利用补证机会为非本校学生办证者，均属违规，视情节轻重，给予相应的处分。",
+          "学生每学期应持本人学生证在规定时间内到校报到，交费后到学院办理注册手续，学院在学生证注册栏内盖章注册，未盖章注册的学生证无效。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生证只限本人使用，应妥善保管，不准转借他人，学生证不得擅自涂改。",
+          "凡利用补发学生证机会获取两张学生证，擅自更改学生证上姓名、地点等情况或利用补证机会为非本校学生办证者，均属违规，视情节轻重，给予相应的处分。",
+          "学生每学期应持本人学生证在规定时间内到校报到，交费后到学院办理注册手续，学院在学生证注册栏内盖章注册，未盖章注册的学生证无效。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q055",
+      "question": "家里搬家后学生证上的乘车区间需要更改，要去哪里办理，带什么证明？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1957,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第七条原文明确说明乘车区间到达站变更需持相关证明材料到教务部办理变更手续，结论与引文一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第七条原文明确说明因家庭地址变更或户口迁移的，需出具相关户籍证明的复印件，结论与引文一致。"
+            }
+          ],
+          "reason": "答案完整覆盖问题两个必要要点：办理地点为教务部，所需证明为相关户籍证明的复印件（针对家庭地址变更情形），且均有E1引用支持，无无据断言。"
+        },
+        "totalTokens": 7370
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第七条原文明确说明乘车区间到达站变更需持相关证明材料到教务部办理变更手续，结论与引文一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第七条原文明确说明因家庭地址变更或户口迁移的，需出具相关户籍证明的复印件，结论与引文一致。"
+            }
+          ],
+          "reason": "答案完整覆盖问题两个必要要点：办理地点为教务部，所需证明为相关户籍证明的复印件（针对家庭地址变更情形），且均有E1引用支持，无无据断言。"
+        },
+        "totalTokens": 7370
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生证里记载的乘车区间到达站如需变更，应持相关证明材料到教务部办理变更手续。",
+          "因家庭地址变更或户口迁移的，需出具相关户籍证明的复印件。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生证里记载的乘车区间到达站如需变更，应持相关证明材料到教务部办理变更手续。",
+          "因家庭地址变更或户口迁移的，需出具相关户籍证明的复印件。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q056",
+      "question": "学生证这个学期还没盖注册章，能算有效证件吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2284,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第四条原文明确：学生证须经学院在学生证注册栏内盖章注册，未盖章注册的学生证无效，直接支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第七条第（一）项原文明确说明在注册系统注册并在学生证上加盖注册专用章，作为已注册凭证和学生证有效凭证，支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E2第七条第（四）项原文有对应规定，但该结论与问题“未盖章是否有效”无直接关联，属额外但无冲突的依据。"
+            }
+          ],
+          "reason": "答案实质回答了问题：未盖注册章的学生证无效；引文完整支持且未忽略限制或反证，覆盖必要要点。"
+        },
+        "totalTokens": 7288
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第四条原文明确：学生证须经学院在学生证注册栏内盖章注册，未盖章注册的学生证无效，直接支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第七条第（一）项原文明确说明在注册系统注册并在学生证上加盖注册专用章，作为已注册凭证和学生证有效凭证，支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E2第七条第（四）项原文有对应规定，但该结论与问题“未盖章是否有效”无直接关联，属额外但无冲突的依据。"
+            }
+          ],
+          "reason": "答案实质回答了问题：未盖注册章的学生证无效；引文完整支持且未忽略限制或反证，覆盖必要要点。"
+        },
+        "totalTokens": 7288
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生每学期应持本人学生证在规定时间内到校报到，交费后到学院办理注册手续，学院在学生证注册栏内盖章注册；未盖章注册的学生证无效。",
+          "学生注册时须持本人学生证和校园卡，由注册人员在学校注册系统中为学生注册并在学生证上加盖注册专用章，作为已注册凭证和学生证有效凭证。",
+          "学生遗失学生证的，经学院（部）同意后，可先注册，补办学生证后，缓期办理验证手续。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生每学期应持本人学生证在规定时间内到校报到，交费后到学院办理注册手续，学院在学生证注册栏内盖章注册；未盖章注册的学生证无效。",
+          "学生注册时须持本人学生证和校园卡，由注册人员在学校注册系统中为学生注册并在学生证上加盖注册专用章，作为已注册凭证和学生证有效凭证。",
+          "学生遗失学生证的，经学院（部）同意后，可先注册，补办学生证后，缓期办理验证手续。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q058",
+      "question": "获得推免资格是不是连研究生复试也不用参加？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2049,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E4第二条明确界定“免试”为不参加全国硕士研究生入学统一考试初试、直接进入复试，足以支持“并非连复试也不需要参加”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E2原文包含该句，能够完整支持结论；但该结论与问题无关，属于无关信息。"
+            }
+          ],
+          "reason": "答案正确回答了问题：推免的“免试”仅免初试，仍需进入复试，引文依据充分。必要要点已覆盖；第二条为无关附加信息，但不影响核心回答的正确完整性。"
+        },
+        "totalTokens": 6835
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E4第二条明确界定“免试”为不参加全国硕士研究生入学统一考试初试、直接进入复试，足以支持“并非连复试也不需要参加”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E2原文包含该句，能够完整支持结论；但该结论与问题无关，属于无关信息。"
+            }
+          ],
+          "reason": "答案正确回答了问题：推免的“免试”仅免初试，仍需进入复试，引文依据充分。必要要点已覆盖；第二条为无关附加信息，但不影响核心回答的正确完整性。"
+        },
+        "totalTokens": 6835
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "推免中的“免试”仅指普通高校应届本科毕业生可不参加全国硕士研究生入学统一考试初试，直接进入复试环节；并非连复试也不需要参加。",
+          "学生申请推免资格即视为同意学校在推免工作范围内公示其姓名、学号、成绩、排名等必要信息。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "推免中的“免试”仅指普通高校应届本科毕业生可不参加全国硕士研究生入学统一考试初试，直接进入复试环节；并非连复试也不需要参加。",
+          "学生申请推免资格即视为同意学校在推免工作范围内公示其姓名、学号、成绩、排名等必要信息。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q059",
+      "question": "非外语专业申请推免，英语四级、六级、托福和雅思分别达到什么成绩可满足外语条件？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2493,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1与E3引文明确写明非外语专业学生大学英语四级考试成绩达到500分及以上满足外语条件，引用足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1与E3引文明确写明非外语专业学生六级考试成绩达到425分及以上满足外语条件，引用足以支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1与E3引文明确写明非外语专业学生托福网考成绩达到80分及以上满足外语条件，引用足以支持该结论。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1与E3引文明确写明非外语专业学生雅思成绩达到6.0及以上满足外语条件，引用足以支持该结论。"
+            }
+          ],
+          "reason": "回答完整覆盖问题所需的四级500分、六级425分、托福网考80分、雅思6.0四个外语条件，且每项均有原文引文支持；E2、E3等其他证据中关于成绩转换或推免其他条件的规定不影响本题外语条件。无冲突。"
+        },
+        "totalTokens": 7760
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1与E3引文明确写明非外语专业学生大学英语四级考试成绩达到500分及以上满足外语条件，引用足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1与E3引文明确写明非外语专业学生六级考试成绩达到425分及以上满足外语条件，引用足以支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1与E3引文明确写明非外语专业学生托福网考成绩达到80分及以上满足外语条件，引用足以支持该结论。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1与E3引文明确写明非外语专业学生雅思成绩达到6.0及以上满足外语条件，引用足以支持该结论。"
+            }
+          ],
+          "reason": "回答完整覆盖问题所需的四级500分、六级425分、托福网考80分、雅思6.0四个外语条件，且每项均有原文引文支持；E2、E3等其他证据中关于成绩转换或推免其他条件的规定不影响本题外语条件。无冲突。"
+        },
+        "totalTokens": 7760
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "非外语专业学生申请推免，大学英语四级考试成绩达到500分及以上可满足外语条件。",
+          "非外语专业学生申请推免，大学英语六级考试成绩达到425分及以上可满足外语条件。",
+          "非外语专业学生申请推免，托福网考成绩达到80分及以上可满足外语条件。",
+          "非外语专业学生申请推免，雅思成绩达到6.0及以上可满足外语条件。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "非外语专业学生申请推免，大学英语四级考试成绩达到500分及以上可满足外语条件。",
+          "非外语专业学生申请推免，大学英语六级考试成绩达到425分及以上可满足外语条件。",
+          "非外语专业学生申请推免，托福网考成绩达到80分及以上可满足外语条件。",
+          "非外语专业学生申请推免，雅思成绩达到6.0及以上可满足外语条件。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q060",
+      "question": "推免综合成绩中学业成绩至少占多少，学院能另外组织笔试面试来选拔吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2472,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1第十三条明确：学业成绩在综合成绩评定中占比应不低于50%，且以本科阶段学业成绩及学习情况为最基础遴选要求，覆盖问题第一问。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E1第十三条明确“不得专门组织遴选推免生的考试（包括笔试、面试等）”，直接回答第二问。"
+            }
+          ],
+          "reason": "答案完整覆盖两个必要要点：学业成绩占比不低于50%，以及不得专门组织笔试面试等遴选考试；引用与原文一致，无缺失或错误。"
+        },
+        "totalTokens": 7249
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1第十三条明确：学业成绩在综合成绩评定中占比应不低于50%，且以本科阶段学业成绩及学习情况为最基础遴选要求，覆盖问题第一问。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E1第十三条明确“不得专门组织遴选推免生的考试（包括笔试、面试等）”，直接回答第二问。"
+            }
+          ],
+          "reason": "答案完整覆盖两个必要要点：学业成绩占比不低于50%，以及不得专门组织笔试面试等遴选考试；引用与原文一致，无缺失或错误。"
+        },
+        "totalTokens": 7249
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "推免生综合成绩评定应注重学生的一贯学业表现，将本科阶段学业成绩及学习情况作为推免工作最基础的遴选要求；学业成绩在综合成绩评定中占比应不低于50%。",
+          "不得专门组织遴选推免生的考试（包括笔试、面试等）。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "推免生综合成绩评定应注重学生的一贯学业表现，将本科阶段学业成绩及学习情况作为推免工作最基础的遴选要求；学业成绩在综合成绩评定中占比应不低于50%。",
+          "不得专门组织遴选推免生的考试（包括笔试、面试等）。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q062",
+      "question": "毕业离校手续没办完能领证吗，如果本人来不了可以让别人代领吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2255,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确写明“学生领取证书时必须按照学校要求办理完离校的所有手续”，与结论一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确写明证书一般需本人签领，特殊情况不能签领需提供本人委托书、双方身份证原件方可代领。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E3引文包含“经本人申请、所在学院（部）审核、学校批准，可予毕业。学生办理完离校手续后由学校发给相关证书”，与结论一致；虽然该条件未在回答中用于拒答或补充，但仍属有据。"
+            }
+          ],
+          "reason": "答案完整覆盖问题两个必要要点：离校手续未办完不能领证（须先办完离校手续）；本人不能来可代领，但须提供本人委托书和双方身份证原件。附带的毕业审批与发证条件也有引文支持，无无据断言。"
+        },
+        "totalTokens": 7622
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确写明“学生领取证书时必须按照学校要求办理完离校的所有手续”，与结论一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确写明证书一般需本人签领，特殊情况不能签领需提供本人委托书、双方身份证原件方可代领。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E3引文包含“经本人申请、所在学院（部）审核、学校批准，可予毕业。学生办理完离校手续后由学校发给相关证书”，与结论一致；虽然该条件未在回答中用于拒答或补充，但仍属有据。"
+            }
+          ],
+          "reason": "答案完整覆盖问题两个必要要点：离校手续未办完不能领证（须先办完离校手续）；本人不能来可代领，但须提供本人委托书和双方身份证原件。附带的毕业审批与发证条件也有引文支持，无无据断言。"
+        },
+        "totalTokens": 7622
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生领取证书时必须按照学校要求办理完离校的所有手续。",
+          "证书一般需由本人签领；若确有特殊情况本人不能签领，则需提供本人委托书、双方身份证原件方可代领。",
+          "学生毕业须经本人申请、所在学院（部）审核、学校批准；学生办理完离校手续后由学校发给相关证书。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生领取证书时必须按照学校要求办理完离校的所有手续。",
+          "证书一般需由本人签领；若确有特殊情况本人不能签领，则需提供本人委托书、双方身份证原件方可代领。",
+          "学生毕业须经本人申请、所在学院（部）审核、学校批准；学生办理完离校手续后由学校发给相关证书。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q063",
+      "question": "辅修专业证书属于学历证书吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2469,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E5第十五条引文明确“辅修专业证书只证明学生完成主修专业外的另一专业辅修计划，不证明学历”，足以支持“不属于学历证书、不证明学历”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第二条引文分别说明本科证书含辅修证书、学历证书、学位证书，并说明辅修证书适用于修满主修学分且完成辅修课程的情形，且为“非学历证书”，足以支持该结论。"
+            }
+          ],
+          "reason": "答案实质正确且覆盖必要要点：辅修专业证书不是学历证书，只证明完成辅修计划；E2与E5引文均支持，无忽略证据中的限制或反证。"
+        },
+        "totalTokens": 7534
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E5第十五条引文明确“辅修专业证书只证明学生完成主修专业外的另一专业辅修计划，不证明学历”，足以支持“不属于学历证书、不证明学历”的结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第二条引文分别说明本科证书含辅修证书、学历证书、学位证书，并说明辅修证书适用于修满主修学分且完成辅修课程的情形，且为“非学历证书”，足以支持该结论。"
+            }
+          ],
+          "reason": "答案实质正确且覆盖必要要点：辅修专业证书不是学历证书，只证明完成辅修计划；E2与E5引文均支持，无忽略证据中的限制或反证。"
+        },
+        "totalTokens": 7534
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "辅修专业证书不属于学历证书，它只证明学生完成主修专业外的另一专业辅修计划，不证明学历。",
+          "辅修证书属于本科证书中的一类，适用于本科生中修满主修专业培养方案规定学分，并完成辅修专业培养方案规定课程修读并获得相应学分的情形，辅修证书为非学历证书。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "辅修专业证书不属于学历证书，它只证明学生完成主修专业外的另一专业辅修计划，不证明学历。",
+          "辅修证书属于本科证书中的一类，适用于本科生中修满主修专业培养方案规定学分，并完成辅修专业培养方案规定课程修读并获得相应学分的情形，辅修证书为非学历证书。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q064",
+      "question": "学院已经领走了毕业证，我暂时没去拿，证书由谁保管？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1964,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E2第十二条原文明确：学院已在教务管理部门签领而学生因故未领取的毕业证书，留存各学院，各学院应安排专人负责管理，并按规定发放，直接回答保管主体。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E2第十一条原文明确领取证书须办完离校手续、证书一般由本人签领及代领要求，与问题相关且引用支持。"
+            }
+          ],
+          "reason": "答案正确指出证书留存各学院并由专人管理发放，覆盖问题必要要点；附加的领取/代领规定有E2原文依据，无无据断言。"
+        },
+        "totalTokens": 7627
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E2第十二条原文明确：学院已在教务管理部门签领而学生因故未领取的毕业证书，留存各学院，各学院应安排专人负责管理，并按规定发放，直接回答保管主体。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E2第十一条原文明确领取证书须办完离校手续、证书一般由本人签领及代领要求，与问题相关且引用支持。"
+            }
+          ],
+          "reason": "答案正确指出证书留存各学院并由专人管理发放，覆盖问题必要要点；附加的领取/代领规定有E2原文依据，无无据断言。"
+        },
+        "totalTokens": 7627
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学院已在教务管理部门签领而学生因故未领取的毕业证书，留存各学院，各学院应安排专人负责管理，并按规定进行发放。",
+          "学生领取证书时必须按照学校要求办理完离校的所有手续；证书一般需由本人签领，若确有特殊情况本人不能签领，则需提供本人委托书、双方身份证原件方可代领。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学院已在教务管理部门签领而学生因故未领取的毕业证书，留存各学院，各学院应安排专人负责管理，并按规定进行发放。",
+          "学生领取证书时必须按照学校要求办理完离校的所有手续；证书一般需由本人签领，若确有特殊情况本人不能签领，则需提供本人委托书、双方身份证原件方可代领。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q066",
+      "question": "高考考的是日语，高中也学日语，申请替代大学英语还要求学校具备什么条件？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 5593,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引用E1第三条完整覆盖问题所指条件：高考非英语语种、高中外语课程同为高考考试语种、且我校已经设置了该外语语种的专业；回答准确提取“学校已设置该外语语种专业”这一附加条件。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第四条可替代课程列表中明确列出日语对应的课程为日语(2)(二外)、日语(3)(二外)、日语高级读解，引用足以支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1原文明确载明俄语对应替代课程待学校设置了俄语专业后再另行公布，引用支持该结论。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1原文明确载明列表中的课程若因特殊原因连续一年以上没有开设，由外国语学院指定补修课程，引用支持该结论。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "E1第二条原文明确本办法适用于全日制本科在校学生，引用支持该结论。"
+            }
+          ],
+          "reason": "问题所问的必要要点为“学校须已设置该外语语种专业”，答案已准确覆盖该核心条件，并补充适用对象、日语可替代课程、俄语待设置专业后公布、课程未开设时由外国语学院指定补修等有据内容，无无据断言，整体正确完整。"
+        },
+        "totalTokens": 7575
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文第三条明确要求“我校已经设置了该外语语种的专业”，且同时列明高考语种和高中外语课程语种两个条件，完整回答了所问的学校条件。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "日语对应课程列表与E1原文一致，属于补充信息，有引文依据。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文第五条完整支持申请时间、书面申请及高考成绩单复印件、高中三年非英语语种成绩单原件等材料要求。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "引文第二条原文一致，属适用范围的补充说明。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "引文第四条原文一致，属毕业要求的补充说明。"
+            },
+            {
+              "path": "claims/5",
+              "supported": true,
+              "reason": "引文中关于课程连续一年以上未开设时由外国语学院指定补修课程的表述与之相符。"
+            }
+          ],
+          "reason": "答案正确指出学校须已设置日语专业这一必要前提，并覆盖了问题所需要点；补充的课程列表、申请材料、适用范围等均有原文依据，无缺失或错误。"
+        },
+        "totalTokens": 7662
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "高考选择非英语作为外语考试语种、且高中阶段外语课程同为高考考试语种的学生，申请用学校指定高考考试语种相应课程的学分替代专业培养方案中规定的大学英语课程学分，还须我校已经设置了该外语语种的专业。",
+          "按语种课程列表，日语对应的可替代大学英语课程为：日语(2)(二外)、日语(3)(二外)、日语高级读解。",
+          "俄语对应替代课程待学校设置了俄语专业后再另行公布。",
+          "列表中的课程若因特殊原因连续一年以上没有开设，由外国语学院指定补修课程。",
+          "本办法适用于全日制本科在校学生。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "申请以非英语语种课程学分替代大学英语课程学分，除学生本人高考选择非英语作为外语考试语种、且高中阶段外语课程同为高考考试语种外，还要求学校已经设置了该外语语种的专业。",
+          "就日语而言，对应可替代大学英语的课程为日语(2)(二外)、日语(3)(二外)、日语高级读解。",
+          "学生需在每学期开学二周内向教务部提出书面申请，申请时必须提供高考成绩单复印件和高中成绩单的原件，且高中成绩单中必须有三年的非英语语种成绩。",
+          "本办法适用于全日制本科在校学生。",
+          "通过学校资格审查、允许用非英语语种课程替代大学英语课程的学生，毕业时必须完成指定非英语语种相应课程的学习并取得学分。",
+          "列表中的课程若因特殊原因连续一年以上没有开设，由外国语学院指定补修课程。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q067",
+      "question": "替代大学英语的非英语课程挂科了，能参加补考吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 6832,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1第六条完整支持该结论：非英语语种替代课程在毕业资格审查时替换大学英语学分；修读相应替代课程考核成绩为F的，必须重修，学校不给予安排补考。结论与引文一致，无遗漏限制条件。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E1第三条和第五条分别支持申请条件（高考非英语语种、学校已设置该语种专业、高中外语课程同为高考考试语种）与申请程序（每学期开学二周内向教务部书面申请，提供高考成绩单复印件和高中成绩单原件，高中成绩单须有三年非英语语种成绩）。结论与引文一致，未忽略条件。"
+            }
+          ],
+          "reason": "答案直接回答了问题：替代大学英语的非英语课程考核成绩为F时必须重修，学校不给予安排补考。主要结论有E1第六条引文支持；补充的申请条件和程序也有E1第三条、第五条依据，实质正确且覆盖问题必要要点。无无据断言，故correctComplete=true，非应拒答情形。"
+        },
+        "totalTokens": 6952
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文与结论一致，E1第六条明确替代课程成绩为F必须重修、学校不给予补考，直接回答所问。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "结论关于申请资格和申请程序的内容分别由E1第三条、第五条引文完整支持，虽非问题必要要点但不含无据断言。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "结论关于补考一般规则的表述由E2第二条、第三条及第三条第（一）项引文支持，但该一般规则不适用于本问的替代课程，未与E1第六条冲突。"
+            }
+          ],
+          "reason": "答案以E1第六条明确回答：替代大学英语的非英语语种课程考核成绩为F时必须重修，学校不给予安排补考。问题唯一必要要点完整且正确；其余关于申请条件及一般补考规则的补充均有引文依据，未与特别规定冲突。"
+        },
+        "totalTokens": 7072
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "非英语语种替代课程仅作为在学生毕业资格审查时替换大学英语课程的学分；学生修读相应替代课程时，若考核成绩为F的，必须重修，学校不给予安排补考。",
+          "申请该替代需满足：高考中选择非英语作为外语考试语种，且学校已设置该外语语种的专业，高中阶段外语课程同为高考考试语种；申请时须在每学期开学二周内向教务部提出书面申请，并提供高考成绩单复印件和高中成绩单原件，高中成绩单中须有三年的非英语语种成绩。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "非英语语种替代课程仅作为在学生毕业资格审查时替换大学英语课程的学分；学生修读相应替代课程时，若考核成绩为F的，必须重修，学校不给予安排补考。",
+          "申请用非英语语种课程替代大学英语需满足：高考中选择非英语作为外语考试语种，且我校已设置该外语语种的专业，高中阶段外语课程同为高考考试语种；需在每学期开学二周内向教务部提出书面申请，提供高考成绩单复印件和高中成绩单原件，且高中成绩单中必须有三年的非英语语种成绩。",
+          "补考管理的一般规则为：主修专业培养方案中若有必修课程不合格，学校给予补考机会；但选修课程（包括辅修、双专业、双学位培养方案中的所有课程）等情形不给予补考。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q068",
+      "question": "指定的外语替代课程连续一年多没开，缺的课由谁来安排？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_STRUCTURE_INVALID",
+      "durationMs": 1771,
+      "baselineJudge": null,
+      "fullJudge": null,
+      "baseline": null,
+      "full": null
+    },
+    {
+      "id": "q070",
+      "question": "大学英语已经过了并拿到学分，后来考出更高雅思成绩，还能申请转换吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2149,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第三条明确雅思6.5分及以上可申请转换，且转换对象限于“尚未获得学分”的大学英语课程，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第四条第一项原文直接规定：获得托福或雅思成绩前已完成大学英语课程修读并取得学分的，不予受理成绩转换申请。"
+            }
+          ],
+          "reason": "答案实质正确且覆盖问题必要要点：先说明转换仅适用于尚未获得学分的大学英语课程，再依据第四条第一项明确已修读并取得学分者不予受理；两项结论均有E1引文支持，无缺失或错误。"
+        },
+        "totalTokens": 6799
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第三条明确雅思6.5分及以上可申请转换，且转换对象限于“尚未获得学分”的大学英语课程，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第四条第一项原文直接规定：获得托福或雅思成绩前已完成大学英语课程修读并取得学分的，不予受理成绩转换申请。"
+            }
+          ],
+          "reason": "答案实质正确且覆盖问题必要要点：先说明转换仅适用于尚未获得学分的大学英语课程，再依据第四条第一项明确已修读并取得学分者不予受理；两项结论均有E1引文支持，无缺失或错误。"
+        },
+        "totalTokens": 6799
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "雅思（学术类）成绩达到6.5及以上，可申请将有效期内的雅思成绩转换成所在专业培养方案“通识模块”中、由大学英语教学部开设且尚未获得学分的英语类必修或选择性必修课程的成績；转换仅针对尚未获得学分的大学英语课程。",
+          "若学生在获得托福或雅思考试成绩前，已经完成大学英语课程的修读并获得该课程学分，不予受理成绩转换申请。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "雅思（学术类）成绩达到6.5及以上，可申请将有效期内的雅思成绩转换成所在专业培养方案“通识模块”中、由大学英语教学部开设且尚未获得学分的英语类必修或选择性必修课程的成績；转换仅针对尚未获得学分的大学英语课程。",
+          "若学生在获得托福或雅思考试成绩前，已经完成大学英语课程的修读并获得该课程学分，不予受理成绩转换申请。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q071",
+      "question": "之前用过一次雅思换英语成绩，后来托福考得更好，能再换一次吗？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_REVIEW_UNSUPPORTED_CLAIM",
+      "durationMs": 9597,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2引用第八条原文准确，直接支持“在校期间仅限一次”。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第三条原文完整覆盖自愿参加考试、分数门槛及可转换课程范围，引用足以支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第四条（一）原文支持：取得成绩前已修读并获学分则不予受理。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1第五条及第（一）（二）（三）项原文共同支持受理时间与申请流程，引用充分。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "E2第十二条原文支持自2026年9月起实施及旧办法废止，引用充分。"
+            }
+          ],
+          "reason": "问题核心是“已换过一次后能否再用更好托福成绩换”，答案正确引用第八条“仅限一次”并给出否定结论。但回答为满足“全部必要要点”还加入了多项与问题无关的申请条件、流程和实施条款，并未回答“托福考得更好能否例外”；同时缺少依据E1第八条或整体上明确说明不能再次转换的必要表述（claims只复述条文未落到具体结论）。另有资料时效问题：办法第十二条规定自2026年9月起实施，答案未说明所依据办法的适用时间是否覆盖该次申请，不能算完整。"
+        },
+        "totalTokens": 7475
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生在校期间申请托福或雅思成绩转换成大学英语课程的成绩仅限一次。",
+          "申请转换需学生自愿参加托福iBT或雅思（学术类）考试，成绩达到托福90分或4.5分及以上、或雅思6.5及以上，且拟转换的课程为由大学英语教学部开设、在“通识模块”中尚未获得学分的英语类必修或选择性必修课程。",
+          "若学生在获得托福或雅思考试成绩前已完成大学英语课程修读并取得该课程学分，则不予受理成绩转换申请。",
+          "每学期教学周第2周和教学周最后一周内受理申请；学生需通过内部网提交网上申请，并在当周周五前将托福或雅思成绩单原件及复印件提交至学校教务部，教务部审查通过后予以转换。",
+          "本办法自2026年9月起实施，原《深圳大学学生托福雅思成绩转换认定办法》（深大教务【2017】8号）同时废止。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "q072",
+      "question": "学期第2周和最后一周申请英语成绩转换，课程学费的处理有什么差别？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2260,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2 第五条明确记载每学期教学周第2周和教学周最后一周内受理学生申请，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1 第九条第（一）项明确记载在教学周第2周受理申请的，学生无需缴纳学分学费，引文直接支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1 第九条第（二）项完整记载最后一周受理时按当学期是否选修该课程区分是否缴纳，引文直接支持该结论，无限定条件被忽略。"
+            }
+          ],
+          "reason": "答案覆盖问题全部必要要点：受理申请的两周（教学周第2周与最后一周）及两周的学费差别——第2周受理无需缴纳学分学费；最后一周受理则视当学期是否选修该课程而定，未选修无需缴纳，已选修需按规定缴纳。答案与引用原文一致，无缺失或无据断言。"
+        },
+        "totalTokens": 7035
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2 第五条明确记载每学期教学周第2周和教学周最后一周内受理学生申请，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1 第九条第（一）项明确记载在教学周第2周受理申请的，学生无需缴纳学分学费，引文直接支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1 第九条第（二）项完整记载最后一周受理时按当学期是否选修该课程区分是否缴纳，引文直接支持该结论，无限定条件被忽略。"
+            }
+          ],
+          "reason": "答案覆盖问题全部必要要点：受理申请的两周（教学周第2周与最后一周）及两周的学费差别——第2周受理无需缴纳学分学费；最后一周受理则视当学期是否选修该课程而定，未选修无需缴纳，已选修需按规定缴纳。答案与引用原文一致，无缺失或无据断言。"
+        },
+        "totalTokens": 7035
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "每学期教学周第2周和教学周最后一周内受理成绩转换申请。",
+          "在教学周第2周受理申请的，学生无需缴纳学分学费。",
+          "在教学周最后一周受理申请的，若当学期未选修该课程，学生无需缴纳；若当学期已选修该课程，学生需按规定缴纳。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "每学期教学周第2周和教学周最后一周内受理成绩转换申请。",
+          "在教学周第2周受理申请的，学生无需缴纳学分学费。",
+          "在教学周最后一周受理申请的，若当学期未选修该课程，学生无需缴纳；若当学期已选修该课程，学生需按规定缴纳。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q074",
+      "question": "新生还没做人像比对能不能选课，多次比对失败应该找哪个部门？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2675,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确写明未完成人像比对的新生不得进行后续选课等操作，并说明应携带有效居民二代身份证前往指定区域核查，足以支持。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确写明证件类型为非中华人民共和国居民二代身份证或多次无法比对成功的新生，应当前往学校招生办公室处理，直接回答问题第二问。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文明确写明因事假、病假不在校的新生返校报到后应尽快前往学校招生办公室进行人像比对补录，属于有据补充，无无据断言。"
+            }
+          ],
+          "reason": "答案完整覆盖两个必要要点：未完成人像比对不得选课；多次比对失败应前往学校招生办公室处理。附加的病假补录说明也有引文依据，无缺失或错误。"
+        },
+        "totalTokens": 7630
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确写明未完成人像比对的新生不得进行后续选课等操作，并说明应携带有效居民二代身份证前往指定区域核查，足以支持。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确写明证件类型为非中华人民共和国居民二代身份证或多次无法比对成功的新生，应当前往学校招生办公室处理，直接回答问题第二问。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文明确写明因事假、病假不在校的新生返校报到后应尽快前往学校招生办公室进行人像比对补录，属于有据补充，无无据断言。"
+            }
+          ],
+          "reason": "答案完整覆盖两个必要要点：未完成人像比对不得选课；多次比对失败应前往学校招生办公室处理。附加的病假补录说明也有引文依据，无缺失或错误。"
+        },
+        "totalTokens": 7630
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "新生应当在规定时间内携带有效的居民二代身份证自行前往指定区域核查，未完成人像比对的新生不得进行后续选课等操作。",
+          "证件类型为非中华人民共和国居民二代身份证或多次无法比对成功的新生，应当前往学校招生办公室处理。",
+          "因事假、病假不在校的新生，返校报到后应当尽快前往学校招生办公室进行人像比对补录。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "新生应当在规定时间内携带有效的居民二代身份证自行前往指定区域核查，未完成人像比对的新生不得进行后续选课等操作。",
+          "证件类型为非中华人民共和国居民二代身份证或多次无法比对成功的新生，应当前往学校招生办公室处理。",
+          "因事假、病假不在校的新生，返校报到后应当尽快前往学校招生办公室进行人像比对补录。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q075",
+      "question": "收到取消入学资格的通知后不服，能在多久内向哪里申诉？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1513,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1与E2引文均直接载明：收到通知之日起10个工作日内向学校申诉处理委员会提出书面申诉，完整涵盖期限与受理主体。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2引文明确载明取消入学资格或学籍的决定应书面通知本人并告知申诉渠道和申诉期限，属对问题背景的必要补充且有直接引文支持。"
+            }
+          ],
+          "reason": "答案实质正确且覆盖全部必要要点：申诉期限为收到通知之日起10个工作日内，受理主体为学校申诉处理委员会，方式为书面申诉；并补充书面通知及告知申诉渠道期限的要求，均有引文支持，无缺失或无据断言。"
+        },
+        "totalTokens": 6931
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1与E2引文均直接载明：收到通知之日起10个工作日内向学校申诉处理委员会提出书面申诉，完整涵盖期限与受理主体。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2引文明确载明取消入学资格或学籍的决定应书面通知本人并告知申诉渠道和申诉期限，属对问题背景的必要补充且有直接引文支持。"
+            }
+          ],
+          "reason": "答案实质正确且覆盖全部必要要点：申诉期限为收到通知之日起10个工作日内，受理主体为学校申诉处理委员会，方式为书面申诉；并补充书面通知及告知申诉渠道期限的要求，均有引文支持，无缺失或无据断言。"
+        },
+        "totalTokens": 6931
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生对取消入学资格或学籍的决定有异议的，应当在收到通知之日起10个工作日内向学校申诉处理委员会提出书面申诉。",
+          "取消入学资格或学籍的决定应书面通知学生本人，并告知其申诉渠道和申诉期限。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生对取消入学资格或学籍的决定有异议的，应当在收到通知之日起10个工作日内向学校申诉处理委员会提出书面申诉。",
+          "取消入学资格或学籍的决定应书面通知学生本人，并告知其申诉渠道和申诉期限。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q076",
+      "question": "户口迁移证上的信息和录取名册不一致，学校会给新生办理落户吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1780,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文与E1中第十二条原文一致，完整覆盖核对主体、核对事项及“如有不同，将不予办理落户手续”的结论。"
+            }
+          ],
+          "reason": "答案正确且完整：户口迁移证主项信息与录取名册不符时不予办理落户手续，并说明了核对主体与核对项目，无缺失要点。"
+        },
+        "totalTokens": 6620
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文与E1中第十二条原文一致，完整覆盖核对主体、核对事项及“如有不同，将不予办理落户手续”的结论。"
+            }
+          ],
+          "reason": "答案正确且完整：户口迁移证主项信息与录取名册不符时不予办理落户手续，并说明了核对主体与核对项目，无缺失要点。"
+        },
+        "totalTokens": 6620
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学校安全保卫部户证科根据学校招生办公室提供的新生数据及录取名册，核对需要迁移户口的新生户口迁移证原件上的主项信息（姓名、性别、民族、出生年月、身份证号码、籍贯等）是否与新生录取名册信息相符；如有不同，将不予办理落户手续。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学校安全保卫部户证科根据学校招生办公室提供的新生数据及录取名册，核对需要迁移户口的新生户口迁移证原件上的主项信息（姓名、性别、民族、出生年月、身份证号码、籍贯等）是否与新生录取名册信息相符；如有不同，将不予办理落户手续。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q078",
+      "question": "缺课或者欠交作业达到什么程度，老师可以取消期末考试资格？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2368,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1/E3的第十二条明确规定：缺课时数累计超过规定教学时数三分之一，或缺交平时作业、实验报告量超过三分之一，可取消考试资格并记F；答案完整对应两个并列条件。"
+            }
+          ],
+          "reason": "答案准确覆盖必要要点：缺课超过教学时数1/3，或缺交平时作业、实验报告量超过1/3，老师可取消期末考试资格并记载F。无缺失或无据断言。"
+        },
+        "totalTokens": 7132
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1/E3的第十二条明确规定：缺课时数累计超过规定教学时数三分之一，或缺交平时作业、实验报告量超过三分之一，可取消考试资格并记F；答案完整对应两个并列条件。"
+            }
+          ],
+          "reason": "答案准确覆盖必要要点：缺课超过教学时数1/3，或缺交平时作业、实验报告量超过1/3，老师可取消期末考试资格并记载F。无缺失或无据断言。"
+        },
+        "totalTokens": 7132
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "期末考核前，任课教师须认真审查学生参加考核的资格；对缺课时数累计超过规定教学时数三分之一，或缺交平时作业、实验报告量超过三分之一的学生，可取消其考试资格，成绩记载为F。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "期末考核前，任课教师须认真审查学生参加考核的资格；对缺课时数累计超过规定教学时数三分之一，或缺交平时作业、实验报告量超过三分之一的学生，可取消其考试资格，成绩记载为F。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q079",
+      "question": "我怀疑期末考试成绩算错了，复查试卷找谁，最晚什么时候申请？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2731,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1明确写明对成绩有异议可向开课学院（部）提出复查试卷申请，由开课学院（部）负责核查。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E1明确写明申请复查试卷须在课程结束后下一学期开学上课周次第一至第二周内进行，逾期不再受理。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文E1第三十九条载明更改成绩须由任课教师填写《成绩变动登记表》、附原始材料，经开课学院（部）核查、教务管理部门审批，申请时间为下一学期上课周次第一至第二周；与第四十条衔接一致。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "引文E1载明成绩录入系统后不得改动，确需更改的须按第三十九条程序办理，未超出引用内容。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "引文E1明确写明学生可通过学校教务管理部门网站查询本人成绩。"
+            }
+          ],
+          "reason": "答案覆盖必要要点：复查受理单位为开课学院（部）、申请期限为课程结束后下一学期开学上课周次第一至第二周且逾期不受理；补充的更改程序及限制均有原文依据，无无据断言。"
+        },
+        "totalTokens": 7845
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E1明确写明对成绩有异议可向开课学院（部）提出复查试卷申请，由开课学院（部）负责核查。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E1明确写明申请复查试卷须在课程结束后下一学期开学上课周次第一至第二周内进行，逾期不再受理。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文E1第三十九条载明更改成绩须由任课教师填写《成绩变动登记表》、附原始材料，经开课学院（部）核查、教务管理部门审批，申请时间为下一学期上课周次第一至第二周；与第四十条衔接一致。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "引文E1载明成绩录入系统后不得改动，确需更改的须按第三十九条程序办理，未超出引用内容。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "引文E1明确写明学生可通过学校教务管理部门网站查询本人成绩。"
+            }
+          ],
+          "reason": "答案覆盖必要要点：复查受理单位为开课学院（部）、申请期限为课程结束后下一学期开学上课周次第一至第二周且逾期不受理；补充的更改程序及限制均有原文依据，无无据断言。"
+        },
+        "totalTokens": 7845
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生对考试成绩有异议的，可向开课学院（部）提出复查试卷申请，由开课学院（部）负责核查。",
+          "学生申请复查试卷须在该课程结束后的下一学期开学上课周次的第一至第二周内进行，逾期不再受理。",
+          "经核查后确需更改成绩的，按第三十九条规定程序办理成绩变更手续：由任课教师填写《深圳大学课程成绩变动登记表》，并附必要的原始材料（如试卷、成绩记录等），经开课学院（部）核查、学校教务管理部门审批同意后方可更改；成绩变更申请时间为该课程结束后的下一学期上课周次的第一至第二周内，逾期不再受理。",
+          "各科成绩一经录入成绩管理系统，不得改动；成绩确实有误才可依上述程序更改。",
+          "学生可通过学校教务管理部门网站查询本人成绩。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生对考试成绩有异议的，可向开课学院（部）提出复查试卷申请，由开课学院（部）负责核查。",
+          "学生申请复查试卷须在该课程结束后的下一学期开学上课周次的第一至第二周内进行，逾期不再受理。",
+          "经核查后确需更改成绩的，按第三十九条规定程序办理成绩变更手续：由任课教师填写《深圳大学课程成绩变动登记表》，并附必要的原始材料（如试卷、成绩记录等），经开课学院（部）核查、学校教务管理部门审批同意后方可更改；成绩变更申请时间为该课程结束后的下一学期上课周次的第一至第二周内，逾期不再受理。",
+          "各科成绩一经录入成绩管理系统，不得改动；成绩确实有误才可依上述程序更改。",
+          "学生可通过学校教务管理部门网站查询本人成绩。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q080",
+      "question": "以期末考核为主和以过程考核为主的课程，平时成绩与期末成绩的比例有什么区别？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 3704,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引文明确说明综合基本成绩由平时总评成绩和期末基本题成绩按比例计算，属于回答比例区别的背景结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文完整给出期末考核为主课程的比例：平时30%或40%，期末基本题70%或60%。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1引文完整给出过程考核为主课程的比例：平时70%或60%，期末基本题30%或40%。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E2引文虽支持该平时考核次数结论，但与问题所问“平时成绩与期末成绩比例区别”无关，属于无必要的附加断言；不过其内容有引文支持。"
+            }
+          ],
+          "reason": "答案正确覆盖问题必要要点：期末考核为主课程平时占比30%或40%、期末占比70%或60%；过程考核为主课程平时占比70%或60%、期末占比30%或40%。第三项关于平时考核记录的结论与比例问题无关，但不影响核心回答的正确完整性。"
+        },
+        "totalTokens": 7657
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1引文明确说明综合基本成绩由平时总评成绩和期末基本题成绩按比例计算，属于回答比例区别的背景结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1引文完整给出期末考核为主课程的比例：平时30%或40%，期末基本题70%或60%。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1引文完整给出过程考核为主课程的比例：平时70%或60%，期末基本题30%或40%。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E2引文虽支持该平时考核次数结论，但与问题所问“平时成绩与期末成绩比例区别”无关，属于无必要的附加断言；不过其内容有引文支持。"
+            }
+          ],
+          "reason": "答案正确覆盖问题必要要点：期末考核为主课程平时占比30%或40%、期末占比70%或60%；过程考核为主课程平时占比70%或60%、期末占比30%或40%。第三项关于平时考核记录的结论与比例问题无关，但不影响核心回答的正确完整性。"
+        },
+        "totalTokens": 7657
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "根据课程的考核类型，课程的综合基本成绩由平时总评成绩和期末基本题成绩按比例计算。",
+          "期末考核为主的课程，其平时总评成绩占30％或40％，期末基本题成绩占70%或60％。",
+          "过程考核为主的课程，其平时总评成绩占70％或60％，期末基本题成绩占30%或40％。",
+          "过程考核为主的课程，平时考核累计不少于8次记录；期末考核为主的课程，平时考核累计不少于4次记录。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "根据课程的考核类型，课程的综合基本成绩由平时总评成绩和期末基本题成绩按比例计算。",
+          "期末考核为主的课程，其平时总评成绩占30％或40％，期末基本题成绩占70%或60％。",
+          "过程考核为主的课程，其平时总评成绩占70％或60％，期末基本题成绩占30%或40％。",
+          "过程考核为主的课程，平时考核累计不少于8次记录；期末考核为主的课程，平时考核累计不少于4次记录。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q082",
+      "question": "没有申请缓考就缺席了期末考试，还能补考吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2083,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第三条列明不给予补考的情形，第（二）项明确“未办理缓考，期末考试为缺考的课程”不给予补考，两处引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第十一条原文完整引用，明确因个人原因不能参加补考时学校不再安排其他考试时间、须重修，足以支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E3第三十四条原文明确因考试安排冲突、患病住院或突发意外事件不能参加考试须申请缓考，未获批准或擅自不参加视为缺考并记F，足以支持该结论。"
+            }
+          ],
+          "reason": "答案正确且完整：核心要点为未办理缓考而缺考期末考试的课程不给予补考（E1第三条第二项），并补充因个人原因不能补考须重修（E1第十一条）及缺考成绩记载为F（E3第三十四条），全部必要要点均有引文支持，无无据断言。"
+        },
+        "totalTokens": 6888
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第三条列明不给予补考的情形，第（二）项明确“未办理缓考，期末考试为缺考的课程”不给予补考，两处引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第十一条原文完整引用，明确因个人原因不能参加补考时学校不再安排其他考试时间、须重修，足以支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E3第三十四条原文明确因考试安排冲突、患病住院或突发意外事件不能参加考试须申请缓考，未获批准或擅自不参加视为缺考并记F，足以支持该结论。"
+            }
+          ],
+          "reason": "答案正确且完整：核心要点为未办理缓考而缺考期末考试的课程不给予补考（E1第三条第二项），并补充因个人原因不能补考须重修（E1第十一条）及缺考成绩记载为F（E3第三十四条），全部必要要点均有引文支持，无无据断言。"
+        },
+        "totalTokens": 6888
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "课程若未办理缓考且期末考试为缺考，不给予补考。",
+          "学生因个人原因不能参加补考的，学校不再安排其他考试时间，相应不合格的课程必须重修。",
+          "凡因考试安排冲突、患病住院或突发意外事件不能参加考试的，学生须向教务管理部门申请缓考；缓考申请未获批准或擅自不参加考试者，视为缺考，成绩记载为F。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "课程若未办理缓考且期末考试为缺考，不给予补考。",
+          "学生因个人原因不能参加补考的，学校不再安排其他考试时间，相应不合格的课程必须重修。",
+          "凡因考试安排冲突、患病住院或突发意外事件不能参加考试的，学生须向教务管理部门申请缓考；缓考申请未获批准或擅自不参加考试者，视为缺考，成绩记载为F。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q083",
+      "question": "因为自己的事情错过了补考，学校会再安排一次吗？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_STRUCTURE_INVALID",
+      "durationMs": 3113,
+      "baselineJudge": null,
+      "fullJudge": null,
+      "baseline": null,
+      "full": null
+    },
+    {
+      "id": "q084",
+      "question": "补考排考实在冲突只能去考一门，没法参加的其他课程学费怎么处理？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2409,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第八条原文明确：补考由教务部统一安排、交叉编排考场，以课程不冲突为前提；排考无法避免冲突时学生可自行选择参加其中一门考试。引文覆盖该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第八条原文明确：无法参加考试的其他课程，在当前学期减免相应课程学分数的课程学分学费。引文直接支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第十五条原文明确：本规定适用于2015年及其后入学的新生，2015年前入学学生按学年制学费收取办法执行。引文支持该适用范围结论。"
+            }
+          ],
+          "reason": "答案覆盖了问题全部必要要点：补考交叉编排与冲突时选择一门、其他无法参加课程减免相应课程学分学费，并正确补充了适用范围（2015年及以后入学新生），无无据断言。"
+        },
+        "totalTokens": 7348
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第八条原文明确：补考由教务部统一安排、交叉编排考场，以课程不冲突为前提；排考无法避免冲突时学生可自行选择参加其中一门考试。引文覆盖该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第八条原文明确：无法参加考试的其他课程，在当前学期减免相应课程学分数的课程学分学费。引文直接支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第十五条原文明确：本规定适用于2015年及其后入学的新生，2015年前入学学生按学年制学费收取办法执行。引文支持该适用范围结论。"
+            }
+          ],
+          "reason": "答案覆盖了问题全部必要要点：补考交叉编排与冲突时选择一门、其他无法参加课程减免相应课程学分学费，并正确补充了适用范围（2015年及以后入学新生），无无据断言。"
+        },
+        "totalTokens": 7348
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "由教务部统一安排的补考采取多门课程交叉编排考场，以学生课程不冲突为前提；确因在规定的考试时段内排考无法避免冲突的，学生可以自行选择参加其中一门考试。",
+          "上述因排考冲突无法参加的其他课程，在当前学期减免相应课程学分数的课程学分学费。",
+          "该减免规定适用于本补考规定所指向的对象：本规定适用于2015年及其后入学的新生。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "由教务部统一安排的补考采取多门课程交叉编排考场，以学生课程不冲突为前提；确因在规定的考试时段内排考无法避免冲突的，学生可以自行选择参加其中一门考试。",
+          "上述因排考冲突无法参加的其他课程，在当前学期减免相应课程学分数的课程学分学费。",
+          "该减免规定适用于本补考规定所指向的对象：本规定适用于2015年及其后入学的新生。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q086",
+      "question": "开卷考试可以带自备草稿纸、借别人的书或者用电脑查资料吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2081,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2第八条原文明确：只准携带必要文具和开卷考试中主讲教师允许使用的书籍、参考资料，严禁自带草稿纸，直接支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第八条原文明确：采用开卷考试方式的，不得借用他人书本、笔记等，不得使用计算机或其他电子设备查阅资料，该结论与引文一致。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E2第九条原文明确：考试过程中，考生不得擅自相互借用物品，引文足以支持该结论。"
+            }
+          ],
+          "reason": "答案以第八条为核心，明确回答开卷考试不可自带草稿纸、不可借用他人书本笔记、不可使用电脑等电子设备查资料，覆盖问题全部必要要点；额外引用第九条禁止擅自借用物品，有原文依据，无无据断言或遗漏。"
+        },
+        "totalTokens": 7838
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2第八条原文明确：只准携带必要文具和开卷考试中主讲教师允许使用的书籍、参考资料，严禁自带草稿纸，直接支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第八条原文明确：采用开卷考试方式的，不得借用他人书本、笔记等，不得使用计算机或其他电子设备查阅资料，该结论与引文一致。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E2第九条原文明确：考试过程中，考生不得擅自相互借用物品，引文足以支持该结论。"
+            }
+          ],
+          "reason": "答案以第八条为核心，明确回答开卷考试不可自带草稿纸、不可借用他人书本笔记、不可使用电脑等电子设备查资料，覆盖问题全部必要要点；额外引用第九条禁止擅自借用物品，有原文依据，无无据断言或遗漏。"
+        },
+        "totalTokens": 7838
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "参加考试时，考生只准携带笔、尺、橡皮等必要文具用品和开卷考试中主讲教师允许使用的书籍、参考资料，严禁自带草稿纸。",
+          "采用开卷考试方式的，不得借用他人书本、笔记等，不得使用计算机或其他电子设备查阅资料。",
+          "考试过程中，考生不得擅自相互借用物品。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "参加考试时，考生只准携带笔、尺、橡皮等必要文具用品和开卷考试中主讲教师允许使用的书籍、参考资料，严禁自带草稿纸。",
+          "采用开卷考试方式的，不得借用他人书本、笔记等，不得使用计算机或其他电子设备查阅资料。",
+          "考试过程中，考生不得擅自相互借用物品。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q087",
+      "question": "把能收发信息的设备带进考场，即使没实际发消息，也属于作弊吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1701,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第十四条明确将'携带具有发送或者接收信息功能的设备进入考场'列为考试作弊行为，条文以携带行为本身为要件，未要求实际发送或接收信息；引文完整覆盖了'在考试过程中携带该设备即认定为考试作弊'这一结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E4第八条原文支持'只准携带必要文具用品及允许使用的书籍、参考资料'等表述，引文与结论一致；但该点对回答核心问题属于补充性内容。"
+            }
+          ],
+          "reason": "回答正确。必要要点为：依E1第十四条第（四）项，携带具有发送或接收信息功能的设备进入考场即认定为考试作弊，不以实际收发消息为条件。答案已完整覆盖该要点，且没有无据断言。"
+        },
+        "totalTokens": 7511
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第十四条明确将'携带具有发送或者接收信息功能的设备进入考场'列为考试作弊行为，条文以携带行为本身为要件，未要求实际发送或接收信息；引文完整覆盖了'在考试过程中携带该设备即认定为考试作弊'这一结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E4第八条原文支持'只准携带必要文具用品及允许使用的书籍、参考资料'等表述，引文与结论一致；但该点对回答核心问题属于补充性内容。"
+            }
+          ],
+          "reason": "回答正确。必要要点为：依E1第十四条第（四）项，携带具有发送或接收信息功能的设备进入考场即认定为考试作弊，不以实际收发消息为条件。答案已完整覆盖该要点，且没有无据断言。"
+        },
+        "totalTokens": 7511
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "考生违背考试公平、公正原则，在考试过程中携带具有发送或者接收信息功能的设备进入考场的，认定为考试作弊。",
+          "《深圳大学本科考试考场纪律（修订）》要求考生只准携带笔、尺、橡皮等必要文具用品和开卷考试中主讲教师允许使用的书籍、参考资料，严禁自带草稿纸。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "考生违背考试公平、公正原则，在考试过程中携带具有发送或者接收信息功能的设备进入考场的，认定为考试作弊。",
+          "《深圳大学本科考试考场纪律（修订）》要求考生只准携带笔、尺、橡皮等必要文具用品和开卷考试中主讲教师允许使用的书籍、参考资料，严禁自带草稿纸。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q088",
+      "question": "参加考试应提前多久到场，能不能只带电子版证件？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1473,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确要求携带本人有效实体证件，并规定提前15分钟到达考场，结论与引文完全一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确写明未带齐证件或走错考场的考生应听从监考人员指令立即退出考场，结论与引文一致。"
+            }
+          ],
+          "reason": "答案涵盖两个必要要点：提前15分钟到场；须携带有效实体证件（身份证、准考证、学生证等），并说明未带齐证件的后果。据此可回答能否只带电子版证件：须为实体证件，电子版不符合要求。答案实质正确、完整，无无据断言。"
+        },
+        "totalTokens": 7526
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确要求携带本人有效实体证件，并规定提前15分钟到达考场，结论与引文完全一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确写明未带齐证件或走错考场的考生应听从监考人员指令立即退出考场，结论与引文一致。"
+            }
+          ],
+          "reason": "答案涵盖两个必要要点：提前15分钟到场；须携带有效实体证件（身份证、准考证、学生证等），并说明未带齐证件的后果。据此可回答能否只带电子版证件：须为实体证件，电子版不符合要求。答案实质正确、完整，无无据断言。"
+        },
+        "totalTokens": 7526
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "考生须携带考试规定的本人有效实体证件（身份证、准考证、学生证等），提前15分钟到达考场，按指定座位入座，并把本人证件放在入座座位右上角，以备检查。",
+          "未带齐证件或走错考场的考生，应听从监考人员的指令，立即退出考场。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "考生须携带考试规定的本人有效实体证件（身份证、准考证、学生证等），提前15分钟到达考场，按指定座位入座，并把本人证件放在入座座位右上角，以备检查。",
+          "未带齐证件或走错考场的考生，应听从监考人员的指令，立即退出考场。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q090",
+      "question": "因考试撞时间申请缓考，学校统一排考和学院自行排考分别需要交纸质材料吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2614,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第三条明确列出“（一）课程期末考试时间安排冲突的”为可申请缓考情形，引文足以支持。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第八条第（一）项明确学校统一排期课程由系统自动核验审批、无需提交纸质材料，引文完整支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第八条第（二）项明确学院自行安排课程须打印《缓考申请登记表》、经任课教师签字后提交线下审核窗口，引文完整支持。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E2第十二条原文即冲突时优先必修课、选修课缓考，引文直接支持；虽非问题必要要点，但属有据内容，不构成错误。"
+            }
+          ],
+          "reason": "答案覆盖问题全部必要要点：学校统一排期课程无需纸质材料，学院自行安排课程需打印登记表并经任课教师签字后线下提交；均引自E1第八条。第三条缓考资格与第十二条冲突处理规则亦有出处，无无据断言或忽略限制条件。"
+        },
+        "totalTokens": 7472
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第三条明确列出“（一）课程期末考试时间安排冲突的”为可申请缓考情形，引文足以支持。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第八条第（一）项明确学校统一排期课程由系统自动核验审批、无需提交纸质材料，引文完整支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第八条第（二）项明确学院自行安排课程须打印《缓考申请登记表》、经任课教师签字后提交线下审核窗口，引文完整支持。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E2第十二条原文即冲突时优先必修课、选修课缓考，引文直接支持；虽非问题必要要点，但属有据内容，不构成错误。"
+            }
+          ],
+          "reason": "答案覆盖问题全部必要要点：学校统一排期课程无需纸质材料，学院自行安排课程需打印登记表并经任课教师签字后线下提交；均引自E1第八条。第三条缓考资格与第十二条冲突处理规则亦有出处，无无据断言或忽略限制条件。"
+        },
+        "totalTokens": 7472
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "课程期末考试时间安排冲突属于可申请缓考的情形之一。",
+          "课程冲突缓考中，学校统一排期课程由系统自动核验审批，无需提交纸质材料。",
+          "课程冲突缓考中，学院自行安排课程提交线上申请后，须自行打印《缓考申请登记表》，经任课教师签字同意后，提交至线下审核窗口办理。",
+          "因两门及以上课程考试时间冲突申请缓考的，原则上优先参加必修课考试，选修课办理缓考。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "课程期末考试时间安排冲突属于可申请缓考的情形之一。",
+          "课程冲突缓考中，学校统一排期课程由系统自动核验审批，无需提交纸质材料。",
+          "课程冲突缓考中，学院自行安排课程提交线上申请后，须自行打印《缓考申请登记表》，经任课教师签字同意后，提交至线下审核窗口办理。",
+          "因两门及以上课程考试时间冲突申请缓考的，原则上优先参加必修课考试，选修课办理缓考。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q091",
+      "question": "突然急病错过考试，没来得及提前办缓考，最迟什么时候能补手续？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1983,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2 第十三条明确：因急病未能提前申请缓考的，须在该课程考试次日持急诊病假证明补办手续，逾期按旷考处理；该引文直接完整支持结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1 第七条载明材料提交后三个工作日内可登录原申请系统查询审核状态；引文与结论一致，但该结论并非问题所必需。"
+            }
+          ],
+          "reason": "答案正确且完整覆盖问题必要要点：最迟须在该课程考试次日持急诊病假证明补办申请手续，逾期按旷考处理；未遗漏限制条件，也无无据断言。"
+        },
+        "totalTokens": 7666
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2 第十三条明确：因急病未能提前申请缓考的，须在该课程考试次日持急诊病假证明补办手续，逾期按旷考处理；该引文直接完整支持结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1 第七条载明材料提交后三个工作日内可登录原申请系统查询审核状态；引文与结论一致，但该结论并非问题所必需。"
+            }
+          ],
+          "reason": "答案正确且完整覆盖问题必要要点：最迟须在该课程考试次日持急诊病假证明补办申请手续，逾期按旷考处理；未遗漏限制条件，也无无据断言。"
+        },
+        "totalTokens": 7666
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "因急病未能提前申请缓考的，须在该课程考试次日持急诊病假证明补办申请手续，逾期未办的按旷考处理。",
+          "缓考申请材料提交后三个工作日内，学生可登录原申请系统查询缓考申请审核状态。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "因急病未能提前申请缓考的，须在该课程考试次日持急诊病假证明补办申请手续，逾期未办的按旷考处理。",
+          "缓考申请材料提交后三个工作日内，学生可登录原申请系统查询缓考申请审核状态。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q092",
+      "question": "必修课和选修课考试时间撞了，原则上哪门去考、哪门申请缓考？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 2113,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引用E4第十二条原文，直接支持“原则上优先参加必修课考试，选修课办理缓考”。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引用E1第九条原文，补充了必修课因排考冲突缓考不合格的后果，但与问题核心无直接冲突。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引用E1第五条原文，说明补考与缓考同时进行及组织方式，属相关背景，但非问题必需要点。"
+            }
+          ],
+          "reason": "答案核心要点齐全且正确：两门及以上课程考试冲突时，原则上优先参加必修课考试，选修课办理缓考。补充的缓考不合格后果与缓考安排为有据相关解释，未遗漏或歪曲问题必要要点。"
+        },
+        "totalTokens": 7382
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引用E4第十二条原文，直接支持“原则上优先参加必修课考试，选修课办理缓考”。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引用E1第九条原文，补充了必修课因排考冲突缓考不合格的后果，但与问题核心无直接冲突。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引用E1第五条原文，说明补考与缓考同时进行及组织方式，属相关背景，但非问题必需要点。"
+            }
+          ],
+          "reason": "答案核心要点齐全且正确：两门及以上课程考试冲突时，原则上优先参加必修课考试，选修课办理缓考。补充的缓考不合格后果与缓考安排为有据相关解释，未遗漏或歪曲问题必要要点。"
+        },
+        "totalTokens": 7382
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "因两门及以上课程考试时间冲突申请缓考的，原则上优先参加必修课考试，选修课办理缓考。",
+          "必修课程因期末考试排考冲突需参加缓考的，若缓考不合格（作弊或无故缺席缓考的课程除外），学校不再另行安排时间补考，在当前学期减免相应课程学分数的课程学分学费。",
+          "补考与缓考同时进行，考试一般由教务部统一安排；采用特殊形式考试的课程，由开课单位自行组织，但考试须在教务部规定的时间内完成。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "因两门及以上课程考试时间冲突申请缓考的，原则上优先参加必修课考试，选修课办理缓考。",
+          "必修课程因期末考试排考冲突需参加缓考的，若缓考不合格（作弊或无故缺席缓考的课程除外），学校不再另行安排时间补考，在当前学期减免相应课程学分数的课程学分学费。",
+          "补考与缓考同时进行，考试一般由教务部统一安排；采用特殊形式考试的课程，由开课单位自行组织，但考试须在教务部规定的时间内完成。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q093",
+      "question": "某门课考试作弊后，我想申请这门课补考，或者重修时申请免听，这两条路允许吗？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "durationMs": 2000,
+      "baselineJudge": null,
+      "fullJudge": null,
+      "baseline": null,
+      "full": null
+    },
+    {
+      "id": "q094",
+      "question": "转专业名单公示后反悔，最晚什么时候撤销？如果最终转成了，专业学费从什么时候按新标准算？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_REVIEW_CALL_FAILED",
+      "durationMs": 1600,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2引文明确规定公示期内向所在学院提出撤销申请，逾期不予受理，完整支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1与E4引文均明确规定经批准转专业且专业学费不一致时，自批准转入时起按转入专业标准计收并多退少补，完整支持该结论。"
+            }
+          ],
+          "reason": "答案覆盖两个必要要点：撤销转专业申请的最晚时点为公示期内（向所在学院提出，逾期不受理）；专业学费自批准转入时起按转入专业标准计收并多退少补。无缺失、无捏造或忽略限制条件。"
+        },
+        "totalTokens": 7134
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "接收学院（部）公示拟同意转入学生名单后，学生需撤销转专业申请的，应在公示期内向所在学院提出撤销申请，逾期不予受理。",
+          "学生在校期间被批准转专业的，如转入专业的专业学费与原专业不一致，从批准转入时开始按转入专业的专业学费标准计收专业学费，并实行多退少补。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "q095",
+      "question": "搬家后想改学生证乘车区间，同时学籍系统姓名生僻字显示异常，这两件事分别要准备哪些材料？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 46371,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E2明确写明乘车区间变更需持相关证明材料到教务部办理；因家庭地址变更或户口迁移需出具相关户籍证明复印件，结论与引文一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E1、E3均完整列出生僻字显示为“？”情形所需材料：申请表、身份证和户口本原件、复印件及扫描电子文件，并注明身份证号须与录取数据一致；结论完整复述。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文E3第三条明确学籍身份信息变更须学生本人提出申请，声明材料属实并承担所有后果和责任；结论有依据。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "引文E1第六条及第（一）（二）项明确非学生本人提出、不能提供第五条规定材料的，学校不予受理；结论与引文一致。"
+            }
+          ],
+          "reason": "答案覆盖了问题的两个必要要点：乘车区间变更所需材料（相关证明材料、家庭地址变更或户口迁移的户籍证明复印件）和生僻字学籍姓名异常所需材料（申请表、身份证和户口本原件/复印件/扫描电子文件、身份证号与录取数据一致）。此外合理补充了本人申请、材料属实声明及不予受理情形，均有引文支持，无无据断言。"
+        },
+        "totalTokens": 7160
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文E2明确写明乘车区间变更需持相关证明材料到教务部办理；因家庭地址变更或户口迁移需出具相关户籍证明复印件，结论与引文一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文E1、E3均完整列出生僻字显示为“？”情形所需材料：申请表、身份证和户口本原件、复印件及扫描电子文件，并注明身份证号须与录取数据一致；结论完整复述。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引文E3第三条明确学籍身份信息变更须学生本人提出申请，声明材料属实并承担所有后果和责任；结论有依据。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "引文E1第六条及第（一）（二）项明确非学生本人提出、不能提供第五条规定材料的，学校不予受理；结论与引文一致。"
+            }
+          ],
+          "reason": "答案覆盖了问题的两个必要要点：乘车区间变更所需材料（相关证明材料、家庭地址变更或户口迁移的户籍证明复印件）和生僻字学籍姓名异常所需材料（申请表、身份证和户口本原件/复印件/扫描电子文件、身份证号与录取数据一致）。此外合理补充了本人申请、材料属实声明及不予受理情形，均有引文支持，无无据断言。"
+        },
+        "totalTokens": 7160
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生证里记载的乘车区间到达站如需变更，应持相关证明材料到教务部办理变更手续；因家庭地址变更或户口迁移的，需出具相关户籍证明的复印件。",
+          "因姓名中有生僻字显示为“？”而导致学籍身份信息不符的，由学生本人向教务部提交《深圳大学全日制本科生学籍身份信息变更申请表》、身份证和户口本原件、复印件及其扫描电子文件，身份证号须与录取数据一致。",
+          "学籍身份信息变更申请须由学生本人提出，声明所提交的材料属实并承担所有后果和责任。",
+          "不能提供规定材料的，或非学生本人提出的学籍身份信息更改申请，学校不予受理。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学生证里记载的乘车区间到达站如需变更，应持相关证明材料到教务部办理变更手续；因家庭地址变更或户口迁移的，需出具相关户籍证明的复印件。",
+          "因姓名中有生僻字显示为“？”而导致学籍身份信息不符的，由学生本人向教务部提交《深圳大学全日制本科生学籍身份信息变更申请表》、身份证和户口本原件、复印件及其扫描电子文件，身份证号须与录取数据一致。",
+          "学籍身份信息变更申请须由学生本人提出，声明所提交的材料属实并承担所有后果和责任。",
+          "不能提供规定材料的，或非学生本人提出的学籍身份信息更改申请，学校不予受理。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q096",
+      "question": "我是理工类学生，绩点超过3.0，第二阶段最多能选多少学分？上学期成绩有疑问还能在什么时候申请复查？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 46786,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确：一般上限28；理工类且上学期平均学分绩点3.0以上者，第二阶段上限提高至32。回答的条件和数字完整对应。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确：向开课学院（部）提出复查试卷申请，由该学院核查；申请须在该课程结束后下一学期开学上课周次第一至第二周内，逾期不受理。回答完整覆盖对象、程序和时限。"
+            }
+          ],
+          "reason": "两个问题均被回答：选课第二阶段上限为32学分（并说明一般上限28）；成绩复查须在课程结束后下一学期开学上课周次第一至第二周内向开课学院（部）提出，逾期不再受理。无缺失要点或无据断言。"
+        },
+        "totalTokens": 7252
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文明确：一般上限28；理工类且上学期平均学分绩点3.0以上者，第二阶段上限提高至32。回答的条件和数字完整对应。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文明确：向开课学院（部）提出复查试卷申请，由该学院核查；申请须在该课程结束后下一学期开学上课周次第一至第二周内，逾期不受理。回答完整覆盖对象、程序和时限。"
+            }
+          ],
+          "reason": "两个问题均被回答：选课第二阶段上限为32学分（并说明一般上限28）；成绩复查须在课程结束后下一学期开学上课周次第一至第二周内向开课学院（部）提出，逾期不再受理。无缺失要点或无据断言。"
+        },
+        "totalTokens": 7252
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "理工类（授予理学、工学、建筑学、医学、药学、护理学学士学位）专业学生上一学期平均学分绩点在3.0以上的，在选课第二阶段选课学分上限提高至32；一般本科生每学期选课学分上限为28。",
+          "学生对考试成绩有异议的，可向开课学院（部）提出复查试卷申请，由开课学院（部）负责核查；须在该课程结束后的下一学期开学上课周次的第一至第二周内进行，逾期不再受理。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "理工类（授予理学、工学、建筑学、医学、药学、护理学学士学位）专业学生上一学期平均学分绩点在3.0以上的，在选课第二阶段选课学分上限提高至32；一般本科生每学期选课学分上限为28。",
+          "学生对考试成绩有异议的，可向开课学院（部）提出复查试卷申请，由开课学院（部）负责核查；须在该课程结束后的下一学期开学上课周次的第一至第二周内进行，逾期不再受理。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q097",
+      "question": "我已经申请毕业，还能申请赴外校交流，或者更改学籍身份信息吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 5288,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "答案中的该结论与E2引文完全一致，直接支持“已申请毕业的学生不能申请赴校外交流学习”。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E3引文明确列出不予受理学籍身份信息更改申请的第四种情形，支持“非新生已提出毕业申请的”不予受理；答案将此作为已申请毕业者不能更改学籍身份信息的依据，与问题对应。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1引文原文包含该句中关于仅受理新生高考报名信息更正申请、受理期限及逾期按招生数据管理发证的完整内容，完整支持该结论。"
+            }
+          ],
+          "reason": "问题问已申请毕业者能否申请赴外校交流或更改学籍身份信息。答案两个必要要点均有依据：赴外校交流被E2第四条直接禁止；更改学籍身份信息被E3第六条第（四）项列为不予受理情形。答案还补充了新生高考报名信息更正的受理期限规则，属有依据的相关限制，不构成无据断言，也不影响完整性。"
+        },
+        "totalTokens": 6964
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E2第四条明确“学校不接受已申请毕业的学生申请赴校外学校交流学习”，第二条界定适用对象，引用足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E3第六条列举不予受理情形，其第（四）项原文为“新生入学报到学期的，非新生已提出毕业申请的”，引用支持“非新生已提出毕业申请”不予受理学籍身份信息更改。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第七条与答案陈述一致，说明仅受理当年新生高考报名信息更正且限三个月内，期限外按招生数据管理。"
+            }
+          ],
+          "reason": "答案覆盖两个问题要点：已申请毕业者不能申请赴外校交流（E2第四条），且非新生已提出毕业申请属不予受理学籍身份信息更改情形（E3第六条第四项）；补充的高考报名信息更正受理期限有E1第七条依据，无无据断言，故完整正确。"
+        },
+        "totalTokens": 7053
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学校不接受已申请毕业的学生申请赴校外学校交流学习。",
+          "属下列情况之一的，学校不予受理学籍身份信息更改申请：新生入学报到学期的，非新生已提出毕业申请的。",
+          "学校按规定只受理当年报到入学新生的高考报名信息更正申请，受理时间为自入学报到起三个月内（不超过当年12月份）；在上述期限内未提交更正申请和相关证明材料的，一律按招生数据进行学籍管理和发放学历证书。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "学校不接受已申请毕业的学生申请赴校外学校交流学习；该细则适用于我校全日制在校本科生赴其他高校攻读学士学位联合培养课程、参加校际交流项目学习、个人自行联系学习的学籍和学分管理。",
+          "属下列情况之一的，学校不予受理学籍身份信息更改申请，其中一种情形为：新生入学报到学期的；另一种情形为：非新生已提出毕业申请的。",
+          "学校按规定只受理当年报到入学新生的高考报名信息更正申请，受理时间为自入学报到起三个月内（不超过当年12月份）；在上述期限内未提交更正申请和相关证明材料的，一律按招生数据进行学籍管理和发放学历证书。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q098",
+      "question": "用小语种替代英语时挂科能补考吗？用托福雅思换英语成绩的方式，在校能用几次？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 3182,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引用E1第六条原文明确：非英语语种替代课程考核成绩为F须重修，学校不给予安排补考，足以支持结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引用E1第二条、第三条、第五条分别支持适用对象、申请条件及申请时限和材料要求，结论完整对应原文。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引用E3第八条原文明确学生在校期间申请托福或雅思成绩转换成大学英语课程成绩仅限一次，足以支持。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "引用E2第三条支持成绩条件及转换范围，结论与原文一致。"
+            }
+          ],
+          "reason": "两问必要要点均已覆盖：小语种替代课程挂科须重修且不安排补考；托福雅思成绩转换在校期间仅限一次。答案虽含补充条件，但均有原文依据，无错误或无据断言。"
+        },
+        "totalTokens": 7250
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引用E1第六条原文明确：非英语语种替代课程考核成绩为F须重修，学校不给予安排补考，足以支持结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引用E1第二条、第三条、第五条分别支持适用对象、申请条件及申请时限和材料要求，结论完整对应原文。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "引用E3第八条原文明确学生在校期间申请托福或雅思成绩转换成大学英语课程成绩仅限一次，足以支持。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "引用E2第三条支持成绩条件及转换范围，结论与原文一致。"
+            }
+          ],
+          "reason": "两问必要要点均已覆盖：小语种替代课程挂科须重修且不安排补考；托福雅思成绩转换在校期间仅限一次。答案虽含补充条件，但均有原文依据，无错误或无据断言。"
+        },
+        "totalTokens": 7250
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "获准以非英语语种课程替代大学英语课程的学生，修读相应替代课程时若考核成绩为F，必须重修，学校不给予安排补考。",
+          "申请以非英语语种替代大学英语，须满足：高考中选择非英语作为外语考试语种、我校已设置该外语语种专业、高中阶段外语课程同为高考考试语种；且仅限全日制本科在校学生，并在每学期开学二周内向教务部提出书面申请，提供高考成绩单复印件和高中成绩单原件（高中成绩单须有三年的非英语语种成绩）。",
+          "学生在校期间申请托福或雅思成绩转换成大学英语课程的成绩仅限一次。",
+          "托福成绩（含新/旧版iBT）达到90分或4.5分及以上，或雅思（学术类）成绩达到6.5及以上，可申请将有效期内的成绩转换成所在专业培养方案“通识模块”中由大学英语教学部开设且尚未获得学分的英语类必修或选择性必修课程的成绩。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "获准以非英语语种课程替代大学英语课程的学生，修读相应替代课程时若考核成绩为F，必须重修，学校不给予安排补考。",
+          "申请以非英语语种替代大学英语，须满足：高考中选择非英语作为外语考试语种、我校已设置该外语语种专业、高中阶段外语课程同为高考考试语种；且仅限全日制本科在校学生，并在每学期开学二周内向教务部提出书面申请，提供高考成绩单复印件和高中成绩单原件（高中成绩单须有三年的非英语语种成绩）。",
+          "学生在校期间申请托福或雅思成绩转换成大学英语课程的成绩仅限一次。",
+          "托福成绩（含新/旧版iBT）达到90分或4.5分及以上，或雅思（学术类）成绩达到6.5及以上，可申请将有效期内的成绩转换成所在专业培养方案“通识模块”中由大学英语教学部开设且尚未获得学分的英语类必修或选择性必修课程的成绩。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q099",
+      "question": "开卷考试可以借同学的书吗？如果以后因为个人原因错过补考，能要求另安排一次吗？",
+      "answerable": true,
+      "fullError": null,
+      "durationMs": 1824,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文为E2第八条，明确写明“采用开卷考试方式的，不得借用他人书本、笔记等”，完整支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文为E1第十一条，明确写明“因学生个人原因不能参加补考的，学校不再安排其他考试时间，相应不合格的课程必须重修”，完整支持该结论。"
+            }
+          ],
+          "reason": "答案覆盖两个必要要点：开卷考试不得借用他人书本笔记等；因个人原因错过补考不再另排考试、须重修。引文准确且无无据断言。"
+        },
+        "totalTokens": 7632
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": true,
+          "appropriateAbstention": false,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文为E2第八条，明确写明“采用开卷考试方式的，不得借用他人书本、笔记等”，完整支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文为E1第十一条，明确写明“因学生个人原因不能参加补考的，学校不再安排其他考试时间，相应不合格的课程必须重修”，完整支持该结论。"
+            }
+          ],
+          "reason": "答案覆盖两个必要要点：开卷考试不得借用他人书本笔记等；因个人原因错过补考不再另排考试、须重修。引文准确且无无据断言。"
+        },
+        "totalTokens": 7632
+      },
+      "baseline": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "采用开卷考试方式的，考生不得借用他人书本、笔记等，也不得使用计算机或其他电子设备查阅资料。",
+          "因学生个人原因不能参加补考的，学校不再安排其他考试时间，相应不合格的课程必须重修。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "ANSWERABLE",
+        "claims": [
+          "采用开卷考试方式的，考生不得借用他人书本、笔记等，也不得使用计算机或其他电子设备查阅资料。",
+          "因学生个人原因不能参加补考的，学校不再安排其他考试时间，相应不合格的课程必须重修。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "q100",
+      "question": "大类分流算不算转专业记录？双学士项目毕业会发几本学位证？",
+      "answerable": true,
+      "fullError": "KNOWLEDGE_STRUCTURE_INVALID",
+      "durationMs": 2346,
+      "baselineJudge": null,
+      "fullJudge": null,
+      "baseline": null,
+      "full": null
+    },
+    {
+      "id": "n01",
+      "question": "今年计算机专业推免的具体名额是多少？",
+      "answerable": false,
+      "fullError": "KNOWLEDGE_REVIEW_WRONG_STATUS",
+      "durationMs": 6674,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第十条原文明确说明全校推免生总指标由教育部每年度下达，学校依据总指标及学科布局、专业建设、科研竞赛获奖、升学率、本科生规模等统筹规划，具体下达各学院（部）指标，结论引文足以支持。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第七条原文明确推免生遴选工作领导小组负责根据国家下达指标进行校内分配并统筹部署遴选工作，引文直接支持。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第十一条原文明确学院（部）应根据各专业发展要求、结合学生实际适当分配各专业具体推荐指标，引文直接支持。"
+            }
+          ],
+          "reason": "答案正确说明无法确定“今年计算机专业推免的具体名额”，因为制度只规定总指标由教育部每年度下达、学校统筹分配至学院（部）、学院（部）再分配至各专业，并未给出具体名额数字；结论均有原文依据，未捏造名额数据。问题问的是具体名额这一事实，属于无法从制度文本确定的事项，答案以需澄清方式拒答并给出有据解释，适当。"
+        },
+        "totalTokens": 7288
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "NEEDS_CLARIFICATION",
+        "claims": [
+          "全校推免生的总指标由教育部每年度下达；学校依据总指标和学校学科发展布局需要、各学院（部）本科专业建设情况、本研一体化培养需要、学生科研竞赛获奖、国内升学率、本科生科研创新情况和本科生规模等统筹规划，具体下达各学院（部）推免生指标。",
+          "推免生遴选工作领导小组负责根据国家下达的推免生指标进行校内分配，并就遴选工作进行统筹和部署。",
+          "学院（部）应根据各专业发展要求，结合学生实际，综合考虑，适当分配各专业具体的推荐指标。"
+        ],
+        "missingConditions": [
+          "“今年”具体指哪个推免年度？",
+          "需要查询的是计算机专业所在具体学院（部）吗？"
+        ],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "n02",
+      "question": "补办学生证需要交多少钱？",
+      "answerable": false,
+      "fullError": "KNOWLEDGE_REVIEW_WRONG_STATUS",
+      "durationMs": 5942,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第五条原文直接支持补办流程和受理时间，但未涉及补办费用，故该条结论本身有据但不回答费用问题"
+            }
+          ],
+          "reason": "问题问补办学生证费用，证据E1仅规定补办流程与受理/领取时间，未提及任何收费金额或免费；答案正确标明证据不足并给出有据的相关流程，未捏造费用，符合适当拒答。但因问题事实无法从证据确定且未覆盖费用要点，答案不完整。"
+        },
+        "totalTokens": 7082
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [
+          "学生证遗失需到所在学院登记，由学院统一交教务部办理学生证补办手续；受理补办申请在每月第二周的星期四、星期五，领取时间为每月最后一周的星期五。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "n03",
+      "question": "学校宿舍每晚几点关门？",
+      "answerable": false,
+      "fullError": "KNOWLEDGE_REVIEW_INCOMPLETE_ANSWER",
+      "durationMs": 8138,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1和E3引文明确记载学校建立健全住宿管理制度、学生应遵守住宿管理规定，结论与引文一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第十三条明确记载港澳台学生可入住统一安排宿舍、须签订住宿协议书并遵守住宿管理办法，结论完整引用该条。"
+            }
+          ],
+          "reason": "问题询问宿舍每晚关门时间，证据中仅有住宿管理制度的原则性规定和港澳台学生住宿安排，没有任何关于门禁或关门时间的具体条款。答案标注证据不足并未捏造关门时间，属于有依据的正确拒答；但所给结论仅为住宿管理的一般规则，不能回答所问具体事实，故不算实质完整。"
+        },
+        "totalTokens": 6707
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [
+          "学校建立健全学生住宿管理制度，学生应当遵守学校关于学生住宿管理的规定。",
+          "港澳台学生可入住学校统一安排的学生宿舍，须签订《深圳大学学生住宿协议书》，遵守《深圳大学学生住宿管理办法（修订）》。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "n04",
+      "question": "申请缓考的线下窗口具体在哪栋楼哪个房间？",
+      "answerable": false,
+      "fullError": null,
+      "durationMs": 4199,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第八条(二)原文仅称“提交至线下审核窗口办理”，引文足以支持该流程描述，但未给出具体楼栋房间。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第六条原文明确“按要求提交至指定审核部门”，引文支持该概括表述，但未指明具体位置。"
+            }
+          ],
+          "reason": "问题询问线下窗口具体楼栋和房间，全部所引证据均只笼统提及“线下审核窗口”“指定审核部门”，没有具体地址，无法确定；回答以证据不足明确拒答且未捏造地点，符合要求。"
+        },
+        "totalTokens": 7261
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第八条第（二）项原文明确学院自行安排课程须打印登记表、经任课教师签字后提交至线下审核窗口办理，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第六条原文明确按缓考原因分类准备佐证材料并提交至指定审核部门，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "所引E1条款只提到线下审核窗口和指定审核部门，未记载楼栋或房间号；结论限于现有资料无法确定具体位置，未捏造事实，引文足以支持该否定性判断。"
+            }
+          ],
+          "reason": "问题问的是线下窗口具体楼栋和房间号，提供的制度文本仅提及线下审核窗口/指定审核部门，未给出具体地点，因此该问题属于资料不足。答案明确以证据不足拒答，并给出有依据的相关说明，未虚构具体位置；但所问事实无法确定，故不能视为实质正确且完整的回答，correctComplete为false。答案的每条claims均有对应引文支持，缺少的是校内线下窗口的具体楼栋与房间信息。"
+        },
+        "totalTokens": 7482
+      },
+      "baseline": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [
+          "课程冲突缓考中，学院自行安排课程需在提交线上申请后自行打印《缓考申请登记表》，经任课教师签字同意后，提交至线下审核窗口办理。",
+          "学生须根据缓考原因分类准备对应佐证材料，按要求提交至指定审核部门。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [
+          "课程冲突缓考中，学院自行安排课程需提交线上申请后自行打印《缓考申请登记表》，经任课教师签字同意后，提交至线下审核窗口办理。",
+          "学生须根据缓考原因分类准备对应佐证材料，按要求提交至指定审核部门。",
+          "现有资料未记载线下审核窗口所在的楼栋及房间号，无法据此确定其具体位置。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "n05",
+      "question": "2027年春季学期第一天是几月几号？",
+      "answerable": false,
+      "fullError": null,
+      "durationMs": 1667,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [],
+          "reason": "问题询问2027年春季学期第一天日期，属具体校历事实。全部证据（学生证、成绩转换、证书、学籍、选课、补考、入学复查、考核等规定）均未载明2027年春季学期开学日期，无法据此确定。答案以INSUFFICIENT_EVIDENCE拒答并给出空claims，未捏造日期，属有据拒答；因answerable=false，不满足correctComplete。"
+        },
+        "totalTokens": 5734
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [],
+          "reason": "问题询问2027年春季学期第一天日期，属具体校历事实。全部证据（学生证、成绩转换、证书、学籍、选课、补考、入学复查、考核等规定）均未载明2027年春季学期开学日期，无法据此确定。答案以INSUFFICIENT_EVIDENCE拒答并给出空claims，未捏造日期，属有据拒答；因answerable=false，不满足correctComplete。"
+        },
+        "totalTokens": 5734
+      },
+      "baseline": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "n06",
+      "question": "我的这次补考具体安排在哪间教室？",
+      "answerable": false,
+      "fullError": "KNOWLEDGE_REVIEW_INCOMPLETE_ANSWER",
+      "durationMs": 6763,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E1第四条原文明确说明名单由教务部统一筛选并公布，引文足以支持该结论。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E1第五条原文完整覆盖补考与缓考同时进行、一般由教务部统一安排以及特殊形式课程由开课单位自行组织且须在规定时间内完成，引文支持整个结论。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E1第六条原文明确考试安排公布时间、网上查询方式及特殊形式课程由开课学院公布，引文支持整个结论。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E1第八条原文明确交叉编排考场、课程不冲突前提及冲突时的选择规则，引文支持整个结论。"
+            }
+          ],
+          "reason": "问题询问个人补考的具体教室，属无法从现有制度文本确定的事实；回答以INSUFFICIENT_EVIDENCE正确拒答，未捏造教室信息，且所列相关结论均有E1原文依据。但所列claims仅说明名单筛选、组织方式与查询途径，未直接回应或解释“具体教室无法确定”这一核心点（例如可指出考场安排需以个人考试安排查询结果为准），且answerable=false时不应将一般制度性陈述作为回答要点来凑完整性；因此correctComplete为false，appropriateAbstention为true。"
+        },
+        "totalTokens": 7731
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [
+          "符合补考要求的学生名单由教务部统一从系统中筛选并公布。",
+          "补考与缓考同时进行，考试一般由教务部统一安排；采用特殊形式考试的课程由开课单位自行组织，但考试须在教务部规定的时间内完成。",
+          "由教务部统一安排的补考，考试安排在下学期开学前两周内网上公布，学生需自行在个人考试安排中查询；采用特殊形式考试的课程，由开课学院自行向学生公布考试安排。",
+          "由教务部统一安排的补考采取多门课程交叉编排考场，以学生课程不冲突为前提；确因规定考试时段内排考无法避免冲突的，学生可以自行选择参加其中一门考试。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "n07",
+      "question": "2027届计算机专业每位学生的推免排名是多少？",
+      "answerable": false,
+      "fullError": "KNOWLEDGE_REVIEW_INCOMPLETE_ANSWER",
+      "durationMs": 8490,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "E6第十三条原文直接支持学业成绩占比不低于50%、不得专门组织推免考试等表述。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "E2第(二)项原文直接支持资格审查、评定百分制综合成绩、公示综合成绩排名及公示内容等表述。"
+            },
+            {
+              "path": "claims/2",
+              "supported": true,
+              "reason": "E6第(一)项原文直接支持与直系亲属或学历职称职务明显高于本人者合作的成果仅参考、不纳入综合成绩计算体系。"
+            },
+            {
+              "path": "claims/3",
+              "supported": true,
+              "reason": "E2第(三)项原文直接支持领导小组审批、全校公示、推免服务系统备案及广东省招生办审核后正式公布。"
+            },
+            {
+              "path": "claims/4",
+              "supported": true,
+              "reason": "E3第二十三条原文直接支持本办法适用于2027届及之后毕业的应届本科毕业生。"
+            }
+          ],
+          "reason": "所问为2027届计算机专业每位学生的推免排名，属于具体个人排名事实，参考材料仅规定评定与公示程序，未给出任何学生名单或排名；answerable=false且回答以INSUFFICIENT_EVIDENCE明确表示无法确定，未捏造排名，所附程序性结论均有引文依据，故拒答适当。但回答未直接回应“每位学生排名”这一事实不可得，且附带大量程序性内容，不能视为对问题的完整回答，因此correctComplete为false。"
+        },
+        "totalTokens": 7737
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [
+          "推免生综合成绩评定应注重学生的一贯学业表现，将本科阶段学业成绩及学习情况作为推免工作最基础的遴选要求；学业成绩在综合成绩评定中占比应不低于50%，且不得专门组织遴选推免生的考试（包括笔试、面试等）。",
+          "各学院（部）推免生遴选工作小组对申请人进行资格审查，对通过资格审查的申请人予以公布，并评定百分制综合成绩；确定综合成绩与名次后，按综合成绩排名对所有申请人进行公示，公示内容包括申请人姓名、专业、绩点、外语成绩等基本资格条件信息，公示期不少于学校要求时限，并按分配指标确定拟推荐名单，学院（部）将通过公示的推免生名单报送教务部。",
+          "学生与直系亲属或学历、职称、职务明显高于本人者合作的科研成果、竞赛奖项等仅作为参考，不纳入学生本人推免遴选综合评价成绩计算体系，同等条件下可优先考虑。",
+          "推免生名单经学校推免生遴选工作领导小组审批后向全校公示，最终推免生名单以推免服务系统备案信息为准，学校将在广东省招生办公室审核通过后正式公布推免生名单。",
+          "本办法适用于2027届及之后毕业的应届本科毕业生。"
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "n08",
+      "question": "我所在专业毕业最低要修多少学分？",
+      "answerable": false,
+      "fullError": "KNOWLEDGE_PROTOCOL_INVALID",
+      "durationMs": 7236,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [
+            {
+              "path": "claims/0",
+              "supported": true,
+              "reason": "引文来自E1《深圳大学本科生学籍管理规定》，明确总学分要求按相应年级专业的培养方案执行，是毕业资格必要条件；与答案中“学校实行学分制”等表述一致。"
+            },
+            {
+              "path": "claims/1",
+              "supported": true,
+              "reason": "引文来自E4，公式中出现的“专业应修最低课程学分数”只能说明该数因专业而异，答案归纳为“按专业确定”有引文依据；但它并不能回答具体专业毕业最低总学分，且该“课程学分数”用于学费计算，不等同于问题所问毕业最低总学分。"
+            }
+          ],
+          "reason": "问题问所在专业毕业最低要修多少学分，现有证据只能说明各年级专业按培养方案执行，未提供任何具体专业或年级的总学分要求；答案正确说明需要补充年级和专业信息，未捏造具体数字，属于有依据的拒答。但回答未覆盖/未给出任何具体数值也合理，因为事实无法确定；两条claims为相关背景，但claims/1的学费公式并非毕业学分规定，作为解释必要要点有偏离。"
+        },
+        "totalTokens": 7552
+      },
+      "fullJudge": null,
+      "baseline": {
+        "status": "NEEDS_CLARIFICATION",
+        "claims": [
+          "学校实行学分制，学分累计达到所学专业培养方案的总学分要求，是学生取得毕业资格的必要条件；各年级各专业的总学分要求按相应的培养方案执行。",
+          "学分制收费中，专业学费标准=（专业学年制学费总额-100×专业应修最低课程学分数），即专业应修最低课程学分数按专业确定。"
+        ],
+        "missingConditions": [
+          "您是哪一年级入学的学生？",
+          "您主修的是哪个专业（或哪个学院、专业培养方案）？"
+        ],
+        "conflicts": []
+      },
+      "full": null
+    },
+    {
+      "id": "n09",
+      "question": "校医院今天下午哪位医生值班？",
+      "answerable": false,
+      "fullError": null,
+      "durationMs": 1625,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [],
+          "reason": "问题询问校医院今日下午值班医生，属于具体实时事实，所给制度文本均未包含校医院值班安排信息。答案以证据不足明确拒答，未捏造具体医生，也未以无关制度作无据推断，因此适当拒答成立；但因无答案内容可覆盖所问事实，correctComplete 不成立。"
+        },
+        "totalTokens": 7145
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [],
+          "reason": "问题询问校医院今日下午值班医生，属于具体实时事实，所给制度文本均未包含校医院值班安排信息。答案以证据不足明确拒答，未捏造具体医生，也未以无关制度作无据推断，因此适当拒答成立；但因无答案内容可覆盖所问事实，correctComplete 不成立。"
+        },
+        "totalTokens": 7145
+      },
+      "baseline": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    },
+    {
+      "id": "n10",
+      "question": "暑假图书馆每天几点开门？",
+      "answerable": false,
+      "fullError": null,
+      "durationMs": 3722,
+      "baselineJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [],
+          "reason": "问题询问暑假期间图书馆每天几点开门，属于图书馆开放时间安排。给定材料均为学籍管理、注册、请假、休退学、学位及证书管理等条文，没有任何关于图书馆暑假开放时间的依据。答案以证据不足明确拒答，未捏造开放时间，拒答适当；但因 answerable=false，不能视作正确完整回答。"
+        },
+        "totalTokens": 7100
+      },
+      "fullJudge": {
+        "assessment": {
+          "correctComplete": false,
+          "appropriateAbstention": true,
+          "claims": [],
+          "reason": "问题询问暑假期间图书馆每天几点开门，属于图书馆开放时间安排。给定材料均为学籍管理、注册、请假、休退学、学位及证书管理等条文，没有任何关于图书馆暑假开放时间的依据。答案以证据不足明确拒答，未捏造开放时间，拒答适当；但因 answerable=false，不能视作正确完整回答。"
+        },
+        "totalTokens": 7100
+      },
+      "baseline": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "full": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [],
+        "missingConditions": [],
+        "conflicts": []
+      }
+    }
+  ]
+}

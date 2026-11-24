@@ -111,7 +111,7 @@ public class KnowledgeAnswerRecoveryEvaluationCli {
     }
 
     /** 注入完整冻结证据及匹配元数据，复用生产编排与校验，不改线上资料或默认知识库。 */
-    private static TrustedKnowledgeAnswerService service(Case item, KnowledgeAnswerModelClient client, Clock clock) {
+    static TrustedKnowledgeAnswerService service(Case item, KnowledgeAnswerModelClient client, Clock clock) {
         var bases = mock(KnowledgeBaseService.class);
         var collector = mock(KnowledgeEvidenceCollector.class);
         var eligibility = mock(KnowledgeDocumentEligibilityService.class);

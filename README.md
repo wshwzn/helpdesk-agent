@@ -271,6 +271,8 @@ Content-Type: application/json
 
 公开制度的三路检索对照、100 题分集及证据段落评分见 [公开制度检索评测](docs/evaluation/public-campus/README.md)。管理员可通过 `POST /api/admin/knowledge-bases/{id}/search-candidates` 获取完整双路候选并集，避免普通 Top-K 截断影响单路基线；该接口不改变问答流程的检索结果上限。
 
+检索后的正确交付、引用支持与无答案拒答对照见 [问答质量评测](docs/evaluation/public-campus/ANSWERS.md)。80 题首轮实验保留所有失败及同模型辅助评分，不将其作为人工准确率或质量提升证明。
+
 管理员可以维护固定检索评测集。每道问题支持选择 1～20 个 `READY` 状态的期望文档，单次最多批量运行 100 道问题：
 
 ```http
