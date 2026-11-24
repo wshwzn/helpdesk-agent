@@ -269,6 +269,8 @@ Content-Type: application/json
 
 响应会回显本次生效的三个参数，并给出融合名次、RRF 分数以及 Chunk 在 BM25、KNN 两路中的名次和原始分数，便于调试召回效果。向量检索只使用由当前默认 Embedding 配置生成的 Chunk；切换默认向量模型后，应重新索引文档并重新评估相似度阈值。
 
+公开制度的三路检索对照、100 题分集及证据段落评分见 [公开制度检索评测](docs/evaluation/public-campus/README.md)。管理员可通过 `POST /api/admin/knowledge-bases/{id}/search-candidates` 获取完整双路候选并集，避免普通 Top-K 截断影响单路基线；该接口不改变问答流程的检索结果上限。
+
 管理员可以维护固定检索评测集。每道问题支持选择 1～20 个 `READY` 状态的期望文档，单次最多批量运行 100 道问题：
 
 ```http

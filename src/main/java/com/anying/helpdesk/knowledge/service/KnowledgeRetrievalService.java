@@ -46,6 +46,14 @@ public class KnowledgeRetrievalService {
         return search(knowledgeBaseId, request, settings);
     }
 
+    /** 返回完整双路候选并集供管理员评测，保留生产检索的准入条件与 RRF 排序。 */
+    public KnowledgeSearchResponse searchCandidates(Long knowledgeBaseId, KnowledgeSearchRequest request) {
+        var settings = knowledgeBaseService.getRetrievalSettings(knowledgeBaseId);
+        return search(knowledgeBaseId, request, new KnowledgeRetrievalSettingsResponse(knowledgeBaseId,
+                settings.candidateLimit(), settings.vectorMinSimilarity(), settings.candidateLimit() * 2,
+                settings.version()));
+    }
+
     /**
      * 使用调用方提供的固定参数快照执行检索，保证批量评测期间口径一致。
      */

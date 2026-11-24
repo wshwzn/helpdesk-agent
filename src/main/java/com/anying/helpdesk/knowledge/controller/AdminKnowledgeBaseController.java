@@ -371,6 +371,14 @@ public class AdminKnowledgeBaseController {
         return ApiResponse.ok(knowledgeRetrievalService.search(id, request));
     }
 
+    /** 返回完整候选供管理员对比单路与融合效果，避免融合截断造成评测偏差。 */
+    @PostMapping("/{id}/search-candidates")
+    @Operation(summary = "查询检索评测候选", description = "复用资料准入与双路召回，返回最多两倍候选窗口的完整并集，仅供管理员评测")
+    public ApiResponse<KnowledgeSearchResponse> searchCandidates(
+            @PathVariable @Min(1) Long id, @Valid @RequestBody KnowledgeSearchRequest request) {
+        return ApiResponse.ok(knowledgeRetrievalService.searchCandidates(id, request));
+    }
+
     /**
      * 删除指定文档对象及其元数据。
      */

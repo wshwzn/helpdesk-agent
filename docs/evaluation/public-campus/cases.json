@@ -1,0 +1,1684 @@
+{
+  "id": "szu-undergraduate-v1",
+  "annotationStatus": "AI_ASSISTED_NOT_HUMAN_REVIEWED",
+  "cases": [
+    {
+      "id": "q001",
+      "split": "dev",
+      "category": "direct",
+      "question": "除开除学籍之外，学校处分一般会持续多久？解除后还影响评奖吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1983",
+            "paragraph": "p087",
+            "paragraphSha256": "f27848175edd58f4d0feb814546a7d0af2c81207eb879f1a71892123346fc76b"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q002",
+      "split": "dev",
+      "category": "paraphrase",
+      "question": "我觉得学校处分不合理，学生有权向哪些渠道提出异议？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1983",
+            "paragraph": "p016",
+            "paragraphSha256": "22cbae63941140dab52e9e7468b7003baa15fa1245a96bd006fd90d09437ac7d"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q003",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "几个同学想自己成立一个学生社团，能直接开展活动吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1983",
+            "paragraph": "p075",
+            "paragraphSha256": "04a639ef8c0e9b9b38801b0860a543bdebe042133b19e4732e730ec223292497"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q004",
+      "split": "test",
+      "category": "direct",
+      "question": "学生使用校园网络时，有哪些被明确禁止的行为？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1983",
+            "paragraph": "p080",
+            "paragraphSha256": "7e8eaea9a382c0bf6296259966af438ff2c3811f0be5711b6057c9301448a895"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q005",
+      "split": "dev",
+      "category": "direct",
+      "question": "本科没能按期毕业，最长可以在校学习多少年？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1984",
+            "paragraph": "p033",
+            "paragraphSha256": "40509fbd1acb1f4f2fb0c29c75245f9663e0b79b7ac6a4f3ce450691e97c1f30"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q006",
+      "split": "dev",
+      "category": "condition",
+      "question": "通过竞赛或专利取得的创新创业学分，最多能抵多少学分，会算进绩点吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1984",
+            "paragraph": "p078",
+            "paragraphSha256": "91be63e64fc55c7f7dd70577c363ab899ccd443ed5d5cbbefebeae589bf812fc"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q007",
+      "split": "test",
+      "category": "direct",
+      "question": "本科生申请辅修需要满足什么条件，应该在第几个学期提出申请？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1984",
+            "paragraph": "p042",
+            "paragraphSha256": "1d40c8d94b73411b86b0554e755cc8f37e7d867fd6e2a7220be5a80a1bfaf2b6"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q008",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "休学快到期了还不能回来，忘记办理延长手续会怎么样？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1984",
+            "paragraph": "p107",
+            "paragraphSha256": "86babfb5ca3f28208945789c9493ba2b321537cdd6c90e2ff80e5f5acd844cc6"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q009",
+      "split": "dev",
+      "category": "direct",
+      "question": "特别优秀的学士学位获得者能获得什么额外表彰？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1986",
+            "paragraph": "p035",
+            "paragraphSha256": "9e1e02683bc2c807166e4315655c966a6d3621364a08a4847a1abd073bce8d8d"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q010",
+      "split": "dev",
+      "category": "condition",
+      "question": "两所学校联合培养的学士学位，由哪所学校发证，会各发一本吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1986",
+            "paragraph": "p034",
+            "paragraphSha256": "1f0cae6ff2cef3c87bc9f95749ae41c744d832a334bd0902bf48fa3a2fa6b854"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q011",
+      "split": "test",
+      "category": "condition",
+      "question": "主修学位没拿到，只完成辅修要求，能单独拿辅修学位吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1986",
+            "paragraph": "p027",
+            "paragraphSha256": "39ae488f402885485546174676df3aedab5c2296e8f6e1e44f327e2368970c6b"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q012",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "参加双学士培养项目，毕业拿到的是两本学位证还是一本？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1986",
+            "paragraph": "p030",
+            "paragraphSha256": "6dee0bcafbe78235dae989b4ff7d09e72a4fc5f3cf4c34e4940b0b87af9144e0"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q013",
+      "split": "dev",
+      "category": "direct",
+      "question": "课程学分学费每学分多少钱，按实际选课还是实际通过的学分收费？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1987",
+            "paragraph": "p007",
+            "paragraphSha256": "e64eaa3aa1351d56cd16ff758e10640b9590bd86ed401101dcd1d2377d29c5ed"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q014",
+      "split": "dev",
+      "category": "condition",
+      "question": "获准免听和获准免修的课程，学分学费分别怎么收？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1987",
+            "paragraph": "p016",
+            "paragraphSha256": "6b8ec95fed283d9238ae9305db58a40ccc98ceb280c22378c96e28252c57e9a3"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q015",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "办理休学保留学籍后，那段时间还要交专业学费和课程费用吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1987",
+            "paragraph": "p028",
+            "paragraphSha256": "a3c7f09aa54f9bb7913bb6e073b5f1995853fa17dbd4d8dccfcbfd51e7dede99"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q016",
+      "split": "test",
+      "category": "condition",
+      "question": "转到了学费更贵的专业，差额从什么时候开始算？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1987",
+            "paragraph": "p026",
+            "paragraphSha256": "d92e073996e6ecf5aaf4caacc1e3a344ede2747d9c674ccf323e4a362f2c8f6e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q017",
+      "split": "dev",
+      "category": "direct",
+      "question": "按大类入学后，通常在第几个学期进行专业分流？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1988",
+            "paragraph": "p007",
+            "paragraphSha256": "3fbe7cff3949ac6a5cc0fbc068d59ea63bbfbc047ae423a736c9e586bd41831e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q018",
+      "split": "dev",
+      "category": "condition",
+      "question": "同一个学院里不同招生大类的学生，能跨大类参加专业分流吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1988",
+            "paragraph": "p005",
+            "paragraphSha256": "7096dab06498cc320eaead50ffb47abcc27f67f30efa74a8ed2022d013d88c65"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q019",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "大类分流确定了专业，这次算不算用掉了一次转专业机会？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1988",
+            "paragraph": "p018",
+            "paragraphSha256": "f0e4b5f343b75f2006fc878e5f0f2396f97f88aef772bce39a42acf5d65ea54f"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q020",
+      "split": "test",
+      "category": "condition",
+      "question": "大类分流已经办完学籍变更，之后还想换专业，应该按什么规定办理？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1988",
+            "paragraph": "p019",
+            "paragraphSha256": "588918d6d84579298b6796fe83ade3567f26a57b44ffb51ddbce283be53d254f"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q021",
+      "split": "dev",
+      "category": "direct",
+      "question": "本科转专业每年什么时候办理，在校期间能转几次？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1989",
+            "paragraph": "p005",
+            "paragraphSha256": "5d89d5d7f424e98146e6096c160e796f183ad86b1099941497ee8b1d436f23b3"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q022",
+      "split": "dev",
+      "category": "condition",
+      "question": "现在正在休学，能不能申请转专业？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1989",
+            "paragraph": "p010",
+            "paragraphSha256": "673efb50aaf11b9a87db5b6e5f34baa11fb54a9c84a2cbb32c97514519211a4a"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q023",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "转专业拟录取名单公示了，但我反悔了，什么时候还能撤回申请？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1989",
+            "paragraph": "p032",
+            "paragraphSha256": "14781a2356d4b06662ac3485e198878c676c8c3173b025f7a783ff110992b153"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q024",
+      "split": "test",
+      "category": "direct",
+      "question": "转专业笔试至少要考多少分，面试名单按接收人数的多少倍确定？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1989",
+            "paragraph": "p021",
+            "paragraphSha256": "f6c1803f83915ff01192b8dac76169e4d3a23e38da1c68d5a586464b6688655d"
+          }
+        ],
+        [
+          {
+            "document": "szu-1989",
+            "paragraph": "p022",
+            "paragraphSha256": "dcd4f1310c80ab24186674e9b48b7dee5e352e435d0260a30c7db9c1b83f56f3"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q025",
+      "split": "dev",
+      "category": "direct",
+      "question": "一个学期通过的课程学分达到什么比例，才不会因这个指标收到学业预警？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1990",
+            "paragraph": "p010",
+            "paragraphSha256": "efb4baf45ee3661296e09defc11b9f53362507c75a23f8b5b191c79e757521e0"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q026",
+      "split": "dev",
+      "category": "condition",
+      "question": "收到学业预警后选课上限是多少，预警取消后又是多少？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1990",
+            "paragraph": "p011",
+            "paragraphSha256": "58010bf6be587cf3d738d68ab64df3158165ff4571cb11432156faf01957ba1e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q027",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "学校给我发了学业预警，家长也会收到通知吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1990",
+            "paragraph": "p012",
+            "paragraphSha256": "9a3f5c14246d65573978b47758f3ed348afde82fcb852dc28cc3a8e78014ab40"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q028",
+      "split": "test",
+      "category": "condition",
+      "question": "暂缓退学休学一年的决定下来了，需要在几个工作日内办理离校手续？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1990",
+            "paragraph": "p024",
+            "paragraphSha256": "2bc0a56588738f4ded19965642e8c8c032e3ea316ece849e6ef14455cfd0781d"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q029",
+      "split": "dev",
+      "category": "direct",
+      "question": "新生发现高考报名信息填错了，学籍更正申请最晚什么时候提交？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1991",
+            "paragraph": "p024",
+            "paragraphSha256": "77255cc7447e8c5023ebb12336805e86dce404abf514b77c28e770e4cde3ba37"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q030",
+      "split": "test",
+      "category": "condition",
+      "question": "姓名里的生僻字在学籍系统里变成问号，申请更正要准备什么？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1991",
+            "paragraph": "p010",
+            "paragraphSha256": "2c7d2e54d98ce3494c1a9f55e00f0319ac454451f50e597767f643e9e283c943"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q031",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "学籍身份信息已经获省教育厅批准改过一次，还能再次申请修改吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1991",
+            "paragraph": "p026",
+            "paragraphSha256": "53907334f45cecc5837ed719dba116630b59e5098a3b2330df0d96c22798e93c"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q032",
+      "split": "test",
+      "category": "condition",
+      "question": "已经提交毕业申请或者已经毕业了，学校还受理学籍身份信息更改吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1991",
+            "paragraph": "p022",
+            "paragraphSha256": "a0fa2915d07ba6639819a454951d6fa9a202399e751c8acc9376a392f442e100"
+          }
+        ],
+        [
+          {
+            "document": "szu-1991",
+            "paragraph": "p023",
+            "paragraphSha256": "03c022ed37203b02025ea95ebcdece065ac1f78a38e9502b5f923c9a317d14a7"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q033",
+      "split": "dev",
+      "category": "paraphrase",
+      "question": "选课时间已经结束，我还能自己修改选课结果吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1992",
+            "paragraph": "p006",
+            "paragraphSha256": "939b98470fddaf81a31f8c986a3174faef928e501afdea05c098cf21a2fd3004"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q034",
+      "split": "test",
+      "category": "condition",
+      "question": "理工类学生上学期绩点超过3.0，第二阶段最多能选多少学分？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1992",
+            "paragraph": "p018",
+            "paragraphSha256": "8ae65dc4a01f827b96fa4196053824702d4dd9068a5ff3460cbd88fef28be86e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q035",
+      "split": "test",
+      "category": "condition",
+      "question": "挂掉的必修课已经停开了，应该怎么选择重修课程？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1992",
+            "paragraph": "p009",
+            "paragraphSha256": "ec64a62ca50dd2c6e7a49f42fb3fcd4a0494f2941440c3055bb5d73132235af4"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q036",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "想再修一遍已经通过的同名课程刷分，新成绩能覆盖原成绩吗，学分会重复计算吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1992",
+            "paragraph": "p021",
+            "paragraphSha256": "5b24133eb4aaf6ce6eb13fe6d73f96b10fd22e7ec1f0a66ff06d54710d4c07da"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q037",
+      "split": "dev",
+      "category": "direct",
+      "question": "每学期能申请几门课免听，申请时间是哪一周？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1993",
+            "paragraph": "p007",
+            "paragraphSha256": "de2cdd39b05f84fc6643699a92826be6a87c07024cea074b04ca54dabf3dce09"
+          }
+        ],
+        [
+          {
+            "document": "szu-1993",
+            "paragraph": "p008",
+            "paragraphSha256": "14f7e4c5358362eb539b9f694b0c4127edd3e76b9a504f46cdefc099be4e6ce7"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q038",
+      "split": "test",
+      "category": "condition",
+      "question": "因为考试违纪被处分后重修的课程，还能申请免听吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1993",
+            "paragraph": "p005",
+            "paragraphSha256": "2b21d2e3a4629cc98a1d807fac374b3800f6e033b4aa20a44a577dfb21dd76a1"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q039",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "免修考试考到什么等级才能通过，通过后还能放弃免修再参加期末考试吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1993",
+            "paragraph": "p027",
+            "paragraphSha256": "fd70a2c826e6a6835cc2f8c4fb29a8b2708de199d2f11ad1845ab5041242c64a"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q040",
+      "split": "test",
+      "category": "condition",
+      "question": "体育课、思政课和带实验的课程能申请免修吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1993",
+            "paragraph": "p021",
+            "paragraphSha256": "727e76d6fa29309c415ee0cd3087c8b71edecbfec6443002c3ddeea4f7962c14"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q041",
+      "split": "dev",
+      "category": "direct",
+      "question": "想从深大转到另一所大学，通常每年哪几个月受理转出申请？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1994",
+            "paragraph": "p019",
+            "paragraphSha256": "7f8a78888635c2f4d7bb96249a109c5780e5a198edbab50ca9bb4a22c805abb7"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q042",
+      "split": "test",
+      "category": "condition",
+      "question": "想转到同一个城市的另一所大学，按转学实施细则允许吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1994",
+            "paragraph": "p012",
+            "paragraphSha256": "397e4716b252fe0bc5475020c2afc232e2c0be215374673fa9a202d8fbe94323"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q043",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "身体原因导致没法继续在原校读书，申请转学需要什么医疗证明？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1994",
+            "paragraph": "p004",
+            "paragraphSha256": "7ea4da99b7a52677c1f1a5562e47c5475fd66294a82c6fa4c0ee338f42fc5476"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q044",
+      "split": "test",
+      "category": "condition",
+      "question": "跨省转学的备案，是转入学校办还是转出学校办？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1994",
+            "paragraph": "p025",
+            "paragraphSha256": "7a8af03fd424d8d953d246796a14b0404358b4563023cea6dbb0e9b67c8bb524"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q045",
+      "split": "dev",
+      "category": "direct",
+      "question": "从外校交流回来申请学分转换，需要交哪一种成绩单？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1995",
+            "paragraph": "p026",
+            "paragraphSha256": "a462855f05ea7de8bf3abaa77693cc8dd584ce65c05e9c9788fc666150df3bc9"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q046",
+      "split": "test",
+      "category": "condition",
+      "question": "交流时读了与原专业不相关的专业课和语言课，能转成原专业的专业学分吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1995",
+            "paragraph": "p012",
+            "paragraphSha256": "491d2bbda565ee9ddf9d857edae71643f5da6e95d2b42badfe31895f9f374df6"
+          }
+        ],
+        [
+          {
+            "document": "szu-1995",
+            "paragraph": "p013",
+            "paragraphSha256": "9c2810e023af1c3489bd8ee71a50dc5c0b493964a064b5a4e41cb8df83257ea3"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q047",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "已经向学校申请毕业，还能报名去外校交流吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1995",
+            "paragraph": "p005",
+            "paragraphSha256": "504ea9c264999b1192571a212833cdc80ed9d8c4f049a9850a8a121177f06992"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q048",
+      "split": "test",
+      "category": "condition",
+      "question": "自己联系境外学校学习，最长能去多久，出发前的选课方案要不要审批？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1995",
+            "paragraph": "p017",
+            "paragraphSha256": "433dda819b7fcd7a5aa2d0f59749f65d96ea1e2b58e2bf6c122225c7fd313baa"
+          }
+        ],
+        [
+          {
+            "document": "szu-1995",
+            "paragraph": "p018",
+            "paragraphSha256": "82f3dc9e6655044bc1983b24835d6528bcae39016065e0b46ef79fbf3870651a"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q049",
+      "split": "dev",
+      "category": "direct",
+      "question": "港澳台学生能参加学校普通奖学金评选吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1996",
+            "paragraph": "p016",
+            "paragraphSha256": "2182c1ce3640c1cafb7cf600950428d61b1703e7e492424f0a4d9955f1f0ea2d"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q050",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "港澳台学生能住学校宿舍吗，入住需要签什么协议？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1996",
+            "paragraph": "p019",
+            "paragraphSha256": "dfa06bd2c042eb5aeed82b8bd60469cfea365ceb0071218253feda6915c47f3e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q051",
+      "split": "test",
+      "category": "direct",
+      "question": "港澳台学生是否可以参加学校基本医疗保险？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1996",
+            "paragraph": "p020",
+            "paragraphSha256": "1df692ccf200b65a62838f44344175da424fefe5af4af4b04f4e4e175e2772bb"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q052",
+      "split": "test",
+      "category": "condition",
+      "question": "港澳台学生想和内地学生共同成立社团，需要经过批准和年检吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1996",
+            "paragraph": "p018",
+            "paragraphSha256": "b2da70af4ea77406d6240480ff69da1872758611308e202bc8233874d98960ee"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q053",
+      "split": "dev",
+      "category": "direct",
+      "question": "学生证丢了，去哪登记，每月什么时候可以申请补办和领取？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1997",
+            "paragraph": "p005",
+            "paragraphSha256": "7a1a18346ef24392438e32d99a3f460f7591572e591903d75f5882bf8af0b03e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q054",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "同学临时需要学生证办事，我能把自己的借给他吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1997",
+            "paragraph": "p003",
+            "paragraphSha256": "9c66b501851c1eccffba156531b658273cd3c9f39face235e1cd87ad2eeb1861"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q055",
+      "split": "test",
+      "category": "condition",
+      "question": "家里搬家后学生证上的乘车区间需要更改，要去哪里办理，带什么证明？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1997",
+            "paragraph": "p007",
+            "paragraphSha256": "1d6e31c5db2ed388ad16df671a5c9d1e8cb3af251eed38d0d53bd02601ce6a2b"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q056",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "学生证这个学期还没盖注册章，能算有效证件吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1997",
+            "paragraph": "p004",
+            "paragraphSha256": "94fe6f0811dedd0eff04b169b12b196d06fb27e4fe552a87c35491f1ea7cbe66"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q057",
+      "split": "dev",
+      "category": "direct",
+      "question": "这份2026年修订的推免办法从哪一届毕业生开始适用？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-3377",
+            "paragraph": "p050",
+            "paragraphSha256": "12391536ebbef91fc3a1cf77066d10273da5c68a75f1c294a390a61440ecd71b"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q058",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "获得推免资格是不是连研究生复试也不用参加？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-3377",
+            "paragraph": "p004",
+            "paragraphSha256": "676566d565b2afb8327baf77fb70be964c9465e064721b74f9b095524d15b3a6"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q059",
+      "split": "test",
+      "category": "condition",
+      "question": "非外语专业申请推免，英语四级、六级、托福和雅思分别达到什么成绩可满足外语条件？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-3377",
+            "paragraph": "p026",
+            "paragraphSha256": "17903929e51d9ee057dd087bf6dbca632eba6fe8fed7ffa836ce4efe7813c4d5"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q060",
+      "split": "test",
+      "category": "direct",
+      "question": "推免综合成绩中学业成绩至少占多少，学院能另外组织笔试面试来选拔吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-3377",
+            "paragraph": "p030",
+            "paragraphSha256": "84dc984aa4c64a1703db8ce56bb92aba09522bd0c3cf1551f675dfece929f89a"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q061",
+      "split": "dev",
+      "category": "direct",
+      "question": "毕业证和学位证丢失后能补发原证吗，替代证明是否具有同等效力？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1999",
+            "paragraph": "p008",
+            "paragraphSha256": "6a2567bb6e227d24b7897e81a793a14789090e57b13fdef64f46c3f980c4bc42"
+          }
+        ],
+        [
+          {
+            "document": "szu-1999",
+            "paragraph": "p009",
+            "paragraphSha256": "1ae3e74ebe2e7e127adc1020bc1fbd08d17477b1443632ffcf5eba40838ce5eb"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q062",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "毕业离校手续没办完能领证吗，如果本人来不了可以让别人代领吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1999",
+            "paragraph": "p033",
+            "paragraphSha256": "3dc13f42cd6b5121488172d7b494729875915810666fa350dd9c7a0d995c326e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q063",
+      "split": "test",
+      "category": "direct",
+      "question": "辅修专业证书属于学历证书吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1999",
+            "paragraph": "p005",
+            "paragraphSha256": "ddb528eb95a1c01ac983eb4043a8971654cc4200ef08cd464996c038f50cdd82"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q064",
+      "split": "test",
+      "category": "condition",
+      "question": "学院已经领走了毕业证，我暂时没去拿，证书由谁保管？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1999",
+            "paragraph": "p034",
+            "paragraphSha256": "93f5b0f7120389dba6b3b90fe505de7ec7e9e25c42368e61ea8057ce1cfd19ff"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q065",
+      "split": "dev",
+      "category": "direct",
+      "question": "申请用非英语语种课程替代大学英语，什么时候提交申请，要带什么成绩证明？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2597",
+            "paragraph": "p018",
+            "paragraphSha256": "bc2bd60304caa357768793afba3ef43823029aac2693e239a327a04f11c38fd7"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q066",
+      "split": "test",
+      "category": "condition",
+      "question": "高考考的是日语，高中也学日语，申请替代大学英语还要求学校具备什么条件？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2597",
+            "paragraph": "p003",
+            "paragraphSha256": "83ab56fdf3f70b188212e52236d3981ef16f724cfde3e849d8263d0b285cf734"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q067",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "替代大学英语的非英语课程挂科了，能参加补考吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2597",
+            "paragraph": "p019",
+            "paragraphSha256": "ba6067eda46f0aa145ba681398a861639757edfa937501da1f52e3a5aea0ff56"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q068",
+      "split": "test",
+      "category": "condition",
+      "question": "指定的外语替代课程连续一年多没开，缺的课由谁来安排？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2597",
+            "paragraph": "p017",
+            "paragraphSha256": "b2aa7d87d117db790916d56628fa9ad0ec7bc86be050cfc157399fc46fd30a62"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q069",
+      "split": "dev",
+      "category": "direct",
+      "question": "托福雅思成绩换大学英语成绩的申请，安排在哪两周，纸质材料什么时候交？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2001",
+            "paragraph": "p027",
+            "paragraphSha256": "c1bbc16560e1f80b6e86f873a154b042c7d9eb14703734d8171588d8615b6478"
+          }
+        ],
+        [
+          {
+            "document": "szu-2001",
+            "paragraph": "p029",
+            "paragraphSha256": "b004168fe1054a8c519fdadf9f85ba1724328893e2e6690d1cd77a3c1c1eb741"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q070",
+      "split": "test",
+      "category": "condition",
+      "question": "大学英语已经过了并拿到学分，后来考出更高雅思成绩，还能申请转换吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2001",
+            "paragraph": "p024",
+            "paragraphSha256": "41c3c3dfab56d3a127b5517517ab4d62785fc19d9a5944368773333de504b229"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q071",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "之前用过一次雅思换英语成绩，后来托福考得更好，能再换一次吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2001",
+            "paragraph": "p036",
+            "paragraphSha256": "0fbd38d4322edbbb978d9c3999770df0174ea3cf3cdfb906c1968756643cc217"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q072",
+      "split": "test",
+      "category": "condition",
+      "question": "学期第2周和最后一周申请英语成绩转换，课程学费的处理有什么差别？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2001",
+            "paragraph": "p038",
+            "paragraphSha256": "9bf6bf96e2a23a0e25d7c5c29d36704f9eeeafaa1e4b479e9bb46f60fb9c41ee"
+          }
+        ],
+        [
+          {
+            "document": "szu-2001",
+            "paragraph": "p039",
+            "paragraphSha256": "8f7d997f22e98015531ca00dd1cfbf958233a59c6b4c6aab81b4c601abd451ad"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q073",
+      "split": "dev",
+      "category": "direct",
+      "question": "新生入学资格复查一般应在入学后多久内完成？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2002",
+            "paragraph": "p024",
+            "paragraphSha256": "05c608b5d160b31f1e7b816b19cae5b8171177e87c153f4b40d72780f34b1239"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q074",
+      "split": "test",
+      "category": "condition",
+      "question": "新生还没做人像比对能不能选课，多次比对失败应该找哪个部门？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2002",
+            "paragraph": "p011",
+            "paragraphSha256": "8933554b1dba9e93506b492952c8d41e9d95e28d0ab593c3252333610a751dd8"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q075",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "收到取消入学资格的通知后不服，能在多久内向哪里申诉？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2002",
+            "paragraph": "p022",
+            "paragraphSha256": "a6860830a94ee9377b891ae31bc06fd800e38ac45dbf41d0b181304bbf98d331"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q076",
+      "split": "test",
+      "category": "condition",
+      "question": "户口迁移证上的信息和录取名册不一致，学校会给新生办理落户吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2002",
+            "paragraph": "p019",
+            "paragraphSha256": "d9740749e27b14141a9d7bb56f457f4dae82a83bc52b5d204dc9f7e4bd0cf52e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q077",
+      "split": "dev",
+      "category": "direct",
+      "question": "平时考核至少要用几种方式，过程考核为主和期末考核为主分别至少记录几次？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2003",
+            "paragraph": "p015",
+            "paragraphSha256": "bf040ae66220df826cdeb05f0117617e19490bda525cb5bb3e6a55b9f2ff4c9e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q078",
+      "split": "test",
+      "category": "condition",
+      "question": "缺课或者欠交作业达到什么程度，老师可以取消期末考试资格？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2003",
+            "paragraph": "p017",
+            "paragraphSha256": "452703b5163ab343f7eac034be21ee507e19d4766e3b1ddea4a85af1fe47f391"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q079",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "我怀疑期末考试成绩算错了，复查试卷找谁，最晚什么时候申请？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2003",
+            "paragraph": "p109",
+            "paragraphSha256": "e37fb771e67363d4c93c0c59c7743fd4868685b07822763d945282a09cbabdce"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q080",
+      "split": "test",
+      "category": "direct",
+      "question": "以期末考核为主和以过程考核为主的课程，平时成绩与期末成绩的比例有什么区别？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2003",
+            "paragraph": "p039",
+            "paragraphSha256": "448bf77d017a8739b04071ecc321183256b7bd62bd231e2be6d0f6e1df5279bb"
+          }
+        ],
+        [
+          {
+            "document": "szu-2003",
+            "paragraph": "p040",
+            "paragraphSha256": "af4ff04e8e0e796bcdebcd4cd11cd1c47d804a8390ee1253489d165e68b435bb"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q081",
+      "split": "dev",
+      "category": "direct",
+      "question": "补考总评合格后，最终成绩记成什么等级？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2004",
+            "paragraph": "p018",
+            "paragraphSha256": "480679fa8dfc13bcdb2703b960ace0e5f29c33183bbbeafe6b1110355214b178"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q082",
+      "split": "test",
+      "category": "condition",
+      "question": "没有申请缓考就缺席了期末考试，还能补考吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2004",
+            "paragraph": "p005",
+            "paragraphSha256": "9ef3aeedb2bcc05e2bca11349cc37dceb5ee25e20e740628a260c5901c17e6b6"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q083",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "因为自己的事情错过了补考，学校会再安排一次吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2004",
+            "paragraph": "p016",
+            "paragraphSha256": "ee043b3ab3d6d6da137fac281dbd2fd806f1df5f10c6186bb60876519c1d7d90"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q084",
+      "split": "test",
+      "category": "condition",
+      "question": "补考排考实在冲突只能去考一门，没法参加的其他课程学费怎么处理？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2004",
+            "paragraph": "p013",
+            "paragraphSha256": "9cfa9b47f45a7c18fcc83470a486eb11674e7f4fce8170c3608a289070061f45"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q085",
+      "split": "dev",
+      "category": "direct",
+      "question": "考试迟到多久不能进场，开考后多久才允许交卷离开？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2005",
+            "paragraph": "p010",
+            "paragraphSha256": "594595d31de1ce1b3a9ab683e68ffb27c29655dc24054ccdc407850a9f772b61"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q086",
+      "split": "test",
+      "category": "condition",
+      "question": "开卷考试可以带自备草稿纸、借别人的书或者用电脑查资料吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2005",
+            "paragraph": "p011",
+            "paragraphSha256": "41116edd987e86b82663e9951e55fc95e928af727c994d64e3e86ed0375ee3db"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q087",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "把能收发信息的设备带进考场，即使没实际发消息，也属于作弊吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2005",
+            "paragraph": "p035",
+            "paragraphSha256": "482960e47f8ee9ac256abf5c27074a9696caf885f7c13e59269bce1b4dd88a1f"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q088",
+      "split": "test",
+      "category": "direct",
+      "question": "参加考试应提前多久到场，能不能只带电子版证件？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2005",
+            "paragraph": "p009",
+            "paragraphSha256": "fcad711fb447d381a904de021e144f5b1b4f5178b4814f05fe58f1d7294e4e69"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q089",
+      "split": "dev",
+      "category": "direct",
+      "question": "缓考材料交上去后，一般几个工作日可以查询审核状态？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2006",
+            "paragraph": "p018",
+            "paragraphSha256": "40a7792fc72aa0dbbbc3046be7640f5a1f53ac6778ab3f4a136f6d8b06f55bbc"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q090",
+      "split": "test",
+      "category": "condition",
+      "question": "因考试撞时间申请缓考，学校统一排考和学院自行排考分别需要交纸质材料吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2006",
+            "paragraph": "p021",
+            "paragraphSha256": "504c13d200e5b1892c20815e1d31b76089871c97ba6eabf4702072e88504792f"
+          }
+        ],
+        [
+          {
+            "document": "szu-2006",
+            "paragraph": "p022",
+            "paragraphSha256": "1723ebb26209655743d1c2974d41b07b55277929c1f13c454f7807844d4490f1"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q091",
+      "split": "test",
+      "category": "paraphrase",
+      "question": "突然急病错过考试，没来得及提前办缓考，最迟什么时候能补手续？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2006",
+            "paragraph": "p040",
+            "paragraphSha256": "731fbd32749b80844174337701cfe818b4a1e4ddcb44d471717303ad4779f37f"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q092",
+      "split": "test",
+      "category": "condition",
+      "question": "必修课和选修课考试时间撞了，原则上哪门去考、哪门申请缓考？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2006",
+            "paragraph": "p039",
+            "paragraphSha256": "ffb28fb2ca23b06b4a1c52be44a3fc04ba6f0e93a2030a578d6f4acd43720f81"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q093",
+      "split": "test",
+      "category": "multi_document",
+      "question": "某门课考试作弊后，我想申请这门课补考，或者重修时申请免听，这两条路允许吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1993",
+            "paragraph": "p005",
+            "paragraphSha256": "2b21d2e3a4629cc98a1d807fac374b3800f6e033b4aa20a44a577dfb21dd76a1"
+          }
+        ],
+        [
+          {
+            "document": "szu-2004",
+            "paragraph": "p006",
+            "paragraphSha256": "aa010d7aed274f89e49160531d5f33aa84739c553d820276c240f560aa80d00e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q094",
+      "split": "test",
+      "category": "multi_document",
+      "question": "转专业名单公示后反悔，最晚什么时候撤销？如果最终转成了，专业学费从什么时候按新标准算？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1989",
+            "paragraph": "p032",
+            "paragraphSha256": "14781a2356d4b06662ac3485e198878c676c8c3173b025f7a783ff110992b153"
+          }
+        ],
+        [
+          {
+            "document": "szu-1987",
+            "paragraph": "p026",
+            "paragraphSha256": "d92e073996e6ecf5aaf4caacc1e3a344ede2747d9c674ccf323e4a362f2c8f6e"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q095",
+      "split": "test",
+      "category": "multi_document",
+      "question": "搬家后想改学生证乘车区间，同时学籍系统姓名生僻字显示异常，这两件事分别要准备哪些材料？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1997",
+            "paragraph": "p007",
+            "paragraphSha256": "1d6e31c5db2ed388ad16df671a5c9d1e8cb3af251eed38d0d53bd02601ce6a2b"
+          }
+        ],
+        [
+          {
+            "document": "szu-1991",
+            "paragraph": "p010",
+            "paragraphSha256": "2c7d2e54d98ce3494c1a9f55e00f0319ac454451f50e597767f643e9e283c943"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q096",
+      "split": "test",
+      "category": "multi_document",
+      "question": "我是理工类学生，绩点超过3.0，第二阶段最多能选多少学分？上学期成绩有疑问还能在什么时候申请复查？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1992",
+            "paragraph": "p018",
+            "paragraphSha256": "8ae65dc4a01f827b96fa4196053824702d4dd9068a5ff3460cbd88fef28be86e"
+          }
+        ],
+        [
+          {
+            "document": "szu-2003",
+            "paragraph": "p109",
+            "paragraphSha256": "e37fb771e67363d4c93c0c59c7743fd4868685b07822763d945282a09cbabdce"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q097",
+      "split": "test",
+      "category": "multi_document",
+      "question": "我已经申请毕业，还能申请赴外校交流，或者更改学籍身份信息吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1995",
+            "paragraph": "p005",
+            "paragraphSha256": "504ea9c264999b1192571a212833cdc80ed9d8c4f049a9850a8a121177f06992"
+          }
+        ],
+        [
+          {
+            "document": "szu-1991",
+            "paragraph": "p022",
+            "paragraphSha256": "a0fa2915d07ba6639819a454951d6fa9a202399e751c8acc9376a392f442e100"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q098",
+      "split": "test",
+      "category": "multi_document",
+      "question": "用小语种替代英语时挂科能补考吗？用托福雅思换英语成绩的方式，在校能用几次？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2597",
+            "paragraph": "p019",
+            "paragraphSha256": "ba6067eda46f0aa145ba681398a861639757edfa937501da1f52e3a5aea0ff56"
+          }
+        ],
+        [
+          {
+            "document": "szu-2001",
+            "paragraph": "p036",
+            "paragraphSha256": "0fbd38d4322edbbb978d9c3999770df0174ea3cf3cdfb906c1968756643cc217"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q099",
+      "split": "test",
+      "category": "multi_document",
+      "question": "开卷考试可以借同学的书吗？如果以后因为个人原因错过补考，能要求另安排一次吗？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-2005",
+            "paragraph": "p011",
+            "paragraphSha256": "41116edd987e86b82663e9951e55fc95e928af727c994d64e3e86ed0375ee3db"
+          }
+        ],
+        [
+          {
+            "document": "szu-2004",
+            "paragraph": "p016",
+            "paragraphSha256": "ee043b3ab3d6d6da137fac281dbd2fd806f1df5f10c6186bb60876519c1d7d90"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "q100",
+      "split": "test",
+      "category": "multi_document",
+      "question": "大类分流算不算转专业记录？双学士项目毕业会发几本学位证？",
+      "evidenceGroups": [
+        [
+          {
+            "document": "szu-1988",
+            "paragraph": "p018",
+            "paragraphSha256": "f0e4b5f343b75f2006fc878e5f0f2396f97f88aef772bce39a42acf5d65ea54f"
+          }
+        ],
+        [
+          {
+            "document": "szu-1986",
+            "paragraph": "p030",
+            "paragraphSha256": "6dee0bcafbe78235dae989b4ff7d09e72a4fc5f3cf4c34e4940b0b87af9144e0"
+          }
+        ]
+      ]
+    }
+  ],
+  "unanswerable": [
+    {
+      "id": "n01",
+      "question": "今年计算机专业推免的具体名额是多少？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    },
+    {
+      "id": "n02",
+      "question": "补办学生证需要交多少钱？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    },
+    {
+      "id": "n03",
+      "question": "学校宿舍每晚几点关门？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    },
+    {
+      "id": "n04",
+      "question": "申请缓考的线下窗口具体在哪栋楼哪个房间？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    },
+    {
+      "id": "n05",
+      "question": "2027年春季学期第一天是几月几号？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    },
+    {
+      "id": "n06",
+      "question": "我的这次补考具体安排在哪间教室？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    },
+    {
+      "id": "n07",
+      "question": "2027届计算机专业每位学生的推免排名是多少？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    },
+    {
+      "id": "n08",
+      "question": "我所在专业毕业最低要修多少学分？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    },
+    {
+      "id": "n09",
+      "question": "校医院今天下午哪位医生值班？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    },
+    {
+      "id": "n10",
+      "question": "暑假图书馆每天几点开门？",
+      "reason": "Not specified by the frozen corpus; reserved for separate answer/refusal evaluation."
+    }
+  ]
+}

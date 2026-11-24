@@ -1,0 +1,5031 @@
+{
+  "id": "szu-undergraduate-v1",
+  "capturedOn": "2026-11-24",
+  "extractionVersion": 1,
+  "documents": [
+    {
+      "id": "szu-1983",
+      "title": "深圳大学学生管理规定",
+      "url": "https://jwb.szu.edu.cn/info/1356/1983.htm",
+      "textSha256": "833fa6cd6a24231cf272e3f282540e33a34c01d6ebfddc9355462780c257648c",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "57815d689f1183580487e457d884969f33cedf2bb9aba5cf92885b71b875c912"
+        },
+        {
+          "id": "p002",
+          "sha256": "7f868723cca64e4b32dfb1692d9e8db1b78178e504b13ba9be1245fb7c786eca"
+        },
+        {
+          "id": "p003",
+          "sha256": "b8c28bc50239ddfe14e19540e06c999a7028b4f8fb4ae8f0a24ad652e0723308"
+        },
+        {
+          "id": "p004",
+          "sha256": "9288bab7f93545c93541b002e5e33f8257277844d045e8a88d9ea630414359c8"
+        },
+        {
+          "id": "p005",
+          "sha256": "0cb149948ac4c772204affe02be5f77ab5c5d4b6cf62ac0b81892932210f168c"
+        },
+        {
+          "id": "p006",
+          "sha256": "8c58bbf6a5a90baf6f99de679502b155de07065726521676bd96dd75e9a76e83"
+        },
+        {
+          "id": "p007",
+          "sha256": "048b3c490053ebff78cb7d3f900a4cf5216a5d7b71586370d1cc40d437ce5860"
+        },
+        {
+          "id": "p008",
+          "sha256": "4c62364ccd536e72866e64285a17d49cdc7b97582e73fe687473e42bb16e26a8"
+        },
+        {
+          "id": "p009",
+          "sha256": "d084532b864fea6d5e9e65a4936a9a134c684f7f2e712e0d8ba3019c41984a35"
+        },
+        {
+          "id": "p010",
+          "sha256": "b834c5b0e5941f1c456a66943e71aad36f43935c87fa52bd2555e1c62d5fff17"
+        },
+        {
+          "id": "p011",
+          "sha256": "2c725b322ceeed22b1f6d960a20e4ec0d433ba4e0c1734b9f62c05ccbed05f3d"
+        },
+        {
+          "id": "p012",
+          "sha256": "aa2dab5a9c289d58ea2d6ac15faa872809b108458f03be08d8279c45235059ac"
+        },
+        {
+          "id": "p013",
+          "sha256": "6a65b341695b6299707dcf620521cdcc4caf286766dbb1a6cecd9f8ae43c8350"
+        },
+        {
+          "id": "p014",
+          "sha256": "ac570c65c9c5535b8da13a271d22b92a5f274a96933b487deeff6f0a506c48ad"
+        },
+        {
+          "id": "p015",
+          "sha256": "ba496a49a8a3731858f31c475465e88632e4b79621dad079f78dbf22ec046915"
+        },
+        {
+          "id": "p016",
+          "sha256": "22cbae63941140dab52e9e7468b7003baa15fa1245a96bd006fd90d09437ac7d"
+        },
+        {
+          "id": "p017",
+          "sha256": "ca7ceabb7b7acf23448282ea08ce3eb6a202f0729bd21ba6d375b7341eb4bdd9"
+        },
+        {
+          "id": "p018",
+          "sha256": "94b11c26b20a31622db45ed170382467031cccb331d7cf6a1849b20ce21c97cc"
+        },
+        {
+          "id": "p019",
+          "sha256": "763714045453def9edf56290a149e0bb129423df32ea9355ed443d6e00057348"
+        },
+        {
+          "id": "p020",
+          "sha256": "d29a3520e5ba736b8821ffa8ba494adddaa6947c2cfa21538dba453b0141c433"
+        },
+        {
+          "id": "p021",
+          "sha256": "6f5bb567a027c52100949fa426aff093147a759022570a775fe863d103435329"
+        },
+        {
+          "id": "p022",
+          "sha256": "53eecb9d9aa4aa6d83912cd714f639d4e91d289e920e29883567ec1251a5f460"
+        },
+        {
+          "id": "p023",
+          "sha256": "1a01b16964791bb222b0764c423025eba3b6a50b92713c2a42dcdd2385376963"
+        },
+        {
+          "id": "p024",
+          "sha256": "80fde5cd69db2455d55b605b6b1ac4ec85efa0bd727764fb51318703b6d85971"
+        },
+        {
+          "id": "p025",
+          "sha256": "0feb71f911d5df6581f3ff5cde5eb57b81691b3098b22248ddf9234ee57e07bd"
+        },
+        {
+          "id": "p026",
+          "sha256": "40a1b1ef5a34b2c855c1dc1a351fb13b9cd2278c51e3b7847e5d3da0b3eac6df"
+        },
+        {
+          "id": "p027",
+          "sha256": "a237738295a6c37a2a9bf5281a396e2adeb7ae5a37f0d936f534642dc55174ff"
+        },
+        {
+          "id": "p028",
+          "sha256": "f75d8116f54ecd79eebf46ae81a34f12d596ffae09cb2cbb8b85abde6d00d5b4"
+        },
+        {
+          "id": "p029",
+          "sha256": "175305fe3c0608eb048f55836f124b47ff1071edb0867f32a8a64a45fb2e2d43"
+        },
+        {
+          "id": "p030",
+          "sha256": "7331ed09b23487dc531a92cbc8fde90186c0588c232e20a062c9cc93379b5757"
+        },
+        {
+          "id": "p031",
+          "sha256": "e9a8b3d5af954fefb52ed08807cfed6265adc8c4c13c61022c83f00456571b35"
+        },
+        {
+          "id": "p032",
+          "sha256": "925ee11915fa9b624e924a265c18be39c6cb6662c5ca4cb31e816cd7ab6c7b2c"
+        },
+        {
+          "id": "p033",
+          "sha256": "7605254186b97c80bdd8efe1f35afed8df560a85c6490f3313d19904aaf02dad"
+        },
+        {
+          "id": "p034",
+          "sha256": "4d5886e37379788abd15ed8ea6b350081b4a2b245c2a0e1d2b1837002f15f99c"
+        },
+        {
+          "id": "p035",
+          "sha256": "6e74a0eb43e55926abdab1f960994d982723d30b735667450b7024430a8ead95"
+        },
+        {
+          "id": "p036",
+          "sha256": "e7c3e868883c2599377441f6a48bb2041f4a717180460477300cea05b1d62c4d"
+        },
+        {
+          "id": "p037",
+          "sha256": "cdb5e24dd9edbcf0a2e41457232e5d0cebedd106a67dcedba94e20067c88345b"
+        },
+        {
+          "id": "p038",
+          "sha256": "ce383c327e44e02553659de11e20fcf7e1909bed704751f0c277d727a099c8a3"
+        },
+        {
+          "id": "p039",
+          "sha256": "02a3b7c41eb87964452044d88c28381a883b215892a4d5b8d825749544216a07"
+        },
+        {
+          "id": "p040",
+          "sha256": "e75c3c9ad7526f5e71911acc7720266bcd14bf9db13dc343ff44de9bd4c6bc2b"
+        },
+        {
+          "id": "p041",
+          "sha256": "b8a51a1c0563ee821f8f660aa1e6933bd82a6685b9e723be4055b99858c75e57"
+        },
+        {
+          "id": "p042",
+          "sha256": "2c23ce55b4bd3f700b91cf4773cf991de628619d52baf501d64f7adf3b4a80d5"
+        },
+        {
+          "id": "p043",
+          "sha256": "dbf20617d9f4ef4f938013d63224b0e89dc46c9534eff43f5d1979cb3f93d39e"
+        },
+        {
+          "id": "p044",
+          "sha256": "8d99cc268998f0155f2a96aaf084361310f30a950be9fa904a9c659ffe52a169"
+        },
+        {
+          "id": "p045",
+          "sha256": "8e499e57159b2d29986bd73497b0e77cd78ee177886275c0d2aad105bef75027"
+        },
+        {
+          "id": "p046",
+          "sha256": "78ed2903a2278d07a35d806f28845522807b86ff354c10c7fbbdf6d49333e151"
+        },
+        {
+          "id": "p047",
+          "sha256": "2dc2ead35a169b7177c0259655501f7f14597e8a9f1f3795d416dfd8ba448e6a"
+        },
+        {
+          "id": "p048",
+          "sha256": "27a463faa0d91b660afdd1a25c92039b4e8cf57e4177417975e5453d012a2e86"
+        },
+        {
+          "id": "p049",
+          "sha256": "ccf0f02e76100f2d4ef8ce83c9e472c74fe9345f9cd106f9d04c186cf281a0ec"
+        },
+        {
+          "id": "p050",
+          "sha256": "484891a194c5b15a23f5046b7c75b66382a7f22b90dc37f303d4988d2c647fa9"
+        },
+        {
+          "id": "p051",
+          "sha256": "3520a1a25cef20e6c253a99961047f736e56a2dd5ee55296d43f480cc48d9312"
+        },
+        {
+          "id": "p052",
+          "sha256": "8462274fddeecf5976d500ddac77f51030e359507014fbba71473435b664037d"
+        },
+        {
+          "id": "p053",
+          "sha256": "55de24ffbb7bd720238c29d74f6bdc8cff609a985a1cd550e41a87612700c4ba"
+        },
+        {
+          "id": "p054",
+          "sha256": "afb51bf8ad3b2b6cb77f38c0534ddef367bdc36c01082dfba926f13de3e776a4"
+        },
+        {
+          "id": "p055",
+          "sha256": "41dbfbf2d44a56edeb4a8b8cc81239583efd16a32e198d176843eb1c166f60e8"
+        },
+        {
+          "id": "p056",
+          "sha256": "6d4f9cbd18cac69c336e81204a083353be620774aa319a8089c2e07fe8c01a25"
+        },
+        {
+          "id": "p057",
+          "sha256": "1e688cb919af9470b0909421ef83b3d4fea2392e917ab80269ef5ce2f6b6453a"
+        },
+        {
+          "id": "p058",
+          "sha256": "56e4e93dc29c99741063eb7623364c973ab171611598e310e2b6442c48aaa3a2"
+        },
+        {
+          "id": "p059",
+          "sha256": "6df4bf6833480c22e4cea7cff8177f656f73f7bfcc3a7fbcee634a5fc0fb59c7"
+        },
+        {
+          "id": "p060",
+          "sha256": "3a36de8e0571e6482bf8abc359ede2f7699a914c0a3f9edb1cde6369bfe95337"
+        },
+        {
+          "id": "p061",
+          "sha256": "3fe81a015e5cffd1b828be60fb7c973518fb238a2ed1cd09d21b50afb8db53a7"
+        },
+        {
+          "id": "p062",
+          "sha256": "3b1feb2cfcec8a332c94f1d6adbaaf6be90f284e0db0820bc94f9e10a31e8408"
+        },
+        {
+          "id": "p063",
+          "sha256": "424c9d9626bf7f0dc074ae2a77365c3d898a7b47fe2fc2c1976e308aa232c83b"
+        },
+        {
+          "id": "p064",
+          "sha256": "5b843242aa7a36642c591c61529b592cc18ec025e64c52b624c6f2d59698dd86"
+        },
+        {
+          "id": "p065",
+          "sha256": "f7ef32e79fee2633727053af8ae093dfe5e5b410a1a113d0fc7aab11fae96bbb"
+        },
+        {
+          "id": "p066",
+          "sha256": "8539715f92ee20361e152841fddc2c988b3417c7c88f61bf919c4e15e9d98663"
+        },
+        {
+          "id": "p067",
+          "sha256": "3f41f301e91115e3a44ea5a3d38fb79f0d5fff757ef2fb3f171de946d987cfd0"
+        },
+        {
+          "id": "p068",
+          "sha256": "e35a2009422210679e1172b37d085dfdcec9a6243d189627a5ea6d42de641933"
+        },
+        {
+          "id": "p069",
+          "sha256": "82d66e3f8df596ee7a755affc0d81b0e28677bcc91c3a3e2d5611c40e686a793"
+        },
+        {
+          "id": "p070",
+          "sha256": "68b7c211ebdb97df3ae995791af1104e2e47564642425c3e6f439731c432ec52"
+        },
+        {
+          "id": "p071",
+          "sha256": "2dd3755ec79005a8cf9a176ec0246eaad71876a4396190603bcb554dcb1783fa"
+        },
+        {
+          "id": "p072",
+          "sha256": "68662e868970b05b1a85bb67f05ed2ca3830d5b5906b0bbb189b157d7b2d6427"
+        },
+        {
+          "id": "p073",
+          "sha256": "d3348a2dd06d6bd7b5e629773287382fe51f063e4791b9d2c162388e9c8146d0"
+        },
+        {
+          "id": "p074",
+          "sha256": "14017ea2d3afaaad8cd52423a50c65f70f89e462e8519a3a6e6a18c28da3e01e"
+        },
+        {
+          "id": "p075",
+          "sha256": "04a639ef8c0e9b9b38801b0860a543bdebe042133b19e4732e730ec223292497"
+        },
+        {
+          "id": "p076",
+          "sha256": "4313981ea6b10e5265f3bbc6e03d6d448f91becb253c93918a7c04a15f406088"
+        },
+        {
+          "id": "p077",
+          "sha256": "08e27a3e526a77faf17abdbf0ad0d4ed37b2877c7c6eba36d56301c3ba3b60d3"
+        },
+        {
+          "id": "p078",
+          "sha256": "c35eede2d25cacc449c6ad42c661f6afb3851e27ca3abfd93116294a3d1caca9"
+        },
+        {
+          "id": "p079",
+          "sha256": "516d343ff6f9578858e3c966a78a768e608906bd4b98a6a3362f8fb14429ba6a"
+        },
+        {
+          "id": "p080",
+          "sha256": "7e8eaea9a382c0bf6296259966af438ff2c3811f0be5711b6057c9301448a895"
+        },
+        {
+          "id": "p081",
+          "sha256": "b76675ab8e5161d20785d1579b3797a213f2c77605e22bee15ad9c5fade465b9"
+        },
+        {
+          "id": "p082",
+          "sha256": "00813ed41f57ab19d772096e89f14c4e25b496f00083d9e00bf0389c78b6eee4"
+        },
+        {
+          "id": "p083",
+          "sha256": "7746c29a69d764c11c6f494efbb676bc2386cdae00461f5c5cc3ebdb2eb5a469"
+        },
+        {
+          "id": "p084",
+          "sha256": "23858cedd77497e1001fedafc21c8c6967b274c689709b64d2d8078a81de374a"
+        },
+        {
+          "id": "p085",
+          "sha256": "882286b7cebf1620d32bf78e997f5848ff739b54081eb2660f7c28442268cd34"
+        },
+        {
+          "id": "p086",
+          "sha256": "9b471090c5bca3af339cbb086937a539f275dde745ec5341e49150b5bbb4356e"
+        },
+        {
+          "id": "p087",
+          "sha256": "f27848175edd58f4d0feb814546a7d0af2c81207eb879f1a71892123346fc76b"
+        },
+        {
+          "id": "p088",
+          "sha256": "3e828c2d4aa1c2bfe02da54d0e7a990a1d42df47e1634d2036c9df455aa64c43"
+        },
+        {
+          "id": "p089",
+          "sha256": "d31244302b5fb8b4d7525c2c434c4ea6c5c364732ce08ed701e3496e3291ab24"
+        },
+        {
+          "id": "p090",
+          "sha256": "5dc301ed39862b75a5f921d4700a6b09267e9a1c4e10c830a643ac6ea52938f1"
+        },
+        {
+          "id": "p091",
+          "sha256": "8b1a3aad7d9b00d828b8603cd474e68c5c48263f3d203d35149a73a016d7fe53"
+        },
+        {
+          "id": "p092",
+          "sha256": "cdd9acf427b65c7692723a699704fe687c1abec76753a66e52fa441bf1c7aa19"
+        },
+        {
+          "id": "p093",
+          "sha256": "5c66836f9b72e27595ddc0611b55e407299e963f229316a8af09fcf4191fa10b"
+        },
+        {
+          "id": "p094",
+          "sha256": "3995c71e8efaadb03716c982ad63c31a95313fa0fdcf543a2041d90a256da457"
+        },
+        {
+          "id": "p095",
+          "sha256": "035ab33cf0f00c559bd58447fe80ffe796ed2361c8c735348cda1db29bddcac5"
+        },
+        {
+          "id": "p096",
+          "sha256": "6afa9dab41fa44e72389bece6e0d6b88435732ca2286f83c26bafa9cdbe0bc59"
+        },
+        {
+          "id": "p097",
+          "sha256": "8b3d4b61cad68cf017b9552b9717f32c692cecd080e33f70e13c07584c4537e4"
+        }
+      ]
+    },
+    {
+      "id": "szu-1984",
+      "title": "深圳大学普通高等教育本科生学籍管理规定（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1356/1984.htm",
+      "textSha256": "9726c2480079ec094b31c5297d4fee939c255f848721afaa5d1ccd9edfc60a8b",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "a26ef2b0709dacf65406ffb46802506b7423af7af4e491925d88df06928caeaa"
+        },
+        {
+          "id": "p002",
+          "sha256": "76c6f9facd16a33d360b9a017670b6b5559d1694b2d0ae346363176b5719af21"
+        },
+        {
+          "id": "p003",
+          "sha256": "ac484fdf6c6940fbdcc420c2f7d541111c056d78f80780b51cca502529e6857b"
+        },
+        {
+          "id": "p004",
+          "sha256": "07e9c908afc20f8b2fb4b617dcf4088842f84b9976f82a13e4ec5a26a4eeddd7"
+        },
+        {
+          "id": "p005",
+          "sha256": "34cf00ecb52d19abf3660f2b523446056fc699ee7cee8b6ef8cc99afce7bfd53"
+        },
+        {
+          "id": "p006",
+          "sha256": "13b19b5599286c590e40c1f5983860b7be85aa0d21d9ddcd8883d46cb1ce32ec"
+        },
+        {
+          "id": "p007",
+          "sha256": "214b92cf770308d3e1dca6baf4274c12b8fff2ab2c5f1b6ff7feb6b39622d2e8"
+        },
+        {
+          "id": "p008",
+          "sha256": "f3b2555b01ac6dbd0bc3c900a8c179113ed2e1b8fb2069ce75b708c3038adeef"
+        },
+        {
+          "id": "p009",
+          "sha256": "095f64dc0c89ddcca3f09400dc22ee39493faa5a84ce399336443abe4808d27a"
+        },
+        {
+          "id": "p010",
+          "sha256": "c4085a87a7fdac9744684ca93b8db47cf5e4a6a08e4c21e8370f302cf56a31d6"
+        },
+        {
+          "id": "p011",
+          "sha256": "6ce1a78ff271fa13a00fbb4684baf37eb41d15ecd9200a9ba7a6954dca0ca162"
+        },
+        {
+          "id": "p012",
+          "sha256": "c29f347887e7c367a3e224b64ba81a34b95e05765be53ef108b336c477df6b3a"
+        },
+        {
+          "id": "p013",
+          "sha256": "cd3f840edfef32497c8f071b7de678f3ebda2e2813ccec764666157bf33f7703"
+        },
+        {
+          "id": "p014",
+          "sha256": "5498d82ba1a3f78925d3e79d49d200e3d32f990fb5045ce66a25f24bb1b40281"
+        },
+        {
+          "id": "p015",
+          "sha256": "e054f8d82c11f78e74383c3a6b75ce2960bdbb07837984f7bc0f7cfaa6fe6686"
+        },
+        {
+          "id": "p016",
+          "sha256": "8f0b9249872873c8664ddb8d07030bf289467247bf29e2699c7c4569d69439be"
+        },
+        {
+          "id": "p017",
+          "sha256": "1519f864a60036e5c5d385922c25cdb62071dd3cdf806dd8ff1da08b7b83902c"
+        },
+        {
+          "id": "p018",
+          "sha256": "bff2da5dc980a37fa894d3f79f49f1427acb6db81a521d786f178f2f6faa40cc"
+        },
+        {
+          "id": "p019",
+          "sha256": "fa991eb09c53d07a65dcdc0a2fbdaa234d5bed550dd7ff68ed60d5d369633ae8"
+        },
+        {
+          "id": "p020",
+          "sha256": "2ee37f09cc9caffac725fbda537ab4e407ad695bb43dfac8e5dfe4c8083a93eb"
+        },
+        {
+          "id": "p021",
+          "sha256": "62b99066a4e994d3e7e9c860fbf3213e12a18aa640854ce71b19612a1b63c411"
+        },
+        {
+          "id": "p022",
+          "sha256": "e7bff0e7885fa2672c25a503401eb87de3c9e6875148535581030bba77df369f"
+        },
+        {
+          "id": "p023",
+          "sha256": "fca0fa1509138a976c22fb94541158c23ad7a34ed3bcc032d29174c74b5dd141"
+        },
+        {
+          "id": "p024",
+          "sha256": "28bd200d7793a370ab47f37c915f563784efb682faa21233b889297e950dca9f"
+        },
+        {
+          "id": "p025",
+          "sha256": "8668fd9ae709395fd88dd9635cf9d5626e02f1eb5bb009eca8190e222746c5b9"
+        },
+        {
+          "id": "p026",
+          "sha256": "9290d8e6d63e9a8d2442a499cdc05f887c53f38b124715f1ad589ddcce260ecf"
+        },
+        {
+          "id": "p027",
+          "sha256": "3d0e96b2a81d3240055cadd874d41f575ba96c4551cdd1af44864d27563f4cdf"
+        },
+        {
+          "id": "p028",
+          "sha256": "4fc3f598104a7f8162ca6b25ebcb36b8f4ea64b5e148568a24f0568cc1140eb7"
+        },
+        {
+          "id": "p029",
+          "sha256": "5d3cc1da69b867d0dca2ecaa29ae986e5cd9e32e66e83200a33c85e4063d7d63"
+        },
+        {
+          "id": "p030",
+          "sha256": "d4d728ab9c7d033f2f450904ec60e2f1b55cd09970cf715f982a7951fb34cbda"
+        },
+        {
+          "id": "p031",
+          "sha256": "2a87607a3e2d942646004923362b53c44295dd753e805e78273211b9389d98b6"
+        },
+        {
+          "id": "p032",
+          "sha256": "f77ba4423c591a12c4c0403373e67315909c8c6ae6e4b81982a3a48ec5655037"
+        },
+        {
+          "id": "p033",
+          "sha256": "40509fbd1acb1f4f2fb0c29c75245f9663e0b79b7ac6a4f3ce450691e97c1f30"
+        },
+        {
+          "id": "p034",
+          "sha256": "f0e5443e94e85b515e717873458c0d971de32e8c2af7cc3177645f3ffef78fda"
+        },
+        {
+          "id": "p035",
+          "sha256": "6a5e21c5663026610eef7f94404540507337d93277dd605c0b419f05c57a23b5"
+        },
+        {
+          "id": "p036",
+          "sha256": "91a7ecde6bf629bea15f7b4413e133535678327876375ec92cc09959cfec92e7"
+        },
+        {
+          "id": "p037",
+          "sha256": "a0fdfbcd4f8b9c8e431d6d18192d6f27803e5473dae0e0871907beaee1f76735"
+        },
+        {
+          "id": "p038",
+          "sha256": "dc4222b9cf5368bc00e529c4dc0950c09516c1690bcaea1f7c4a6ad676a2c819"
+        },
+        {
+          "id": "p039",
+          "sha256": "932b69933a0875cce8cf465668dcb7943a3fcb7b77f44ba5392abd303642a7ba"
+        },
+        {
+          "id": "p040",
+          "sha256": "70e42d022e9ad316bd52e47e26c893cb32668f55d1de38a554cea92141e5e95a"
+        },
+        {
+          "id": "p041",
+          "sha256": "444c07bf3559b9b4b1c73330f183b7751683e04aba6f9268c4d06f63a75016ea"
+        },
+        {
+          "id": "p042",
+          "sha256": "1d40c8d94b73411b86b0554e755cc8f37e7d867fd6e2a7220be5a80a1bfaf2b6"
+        },
+        {
+          "id": "p043",
+          "sha256": "ec970e4ab2973108050570849f743c99ea3c80542562f47b8bdb9f7cfb646a5a"
+        },
+        {
+          "id": "p044",
+          "sha256": "bb3adecfebcdd4eafce8167b3aaf26f3ab1cf5f93583374271959cc006215c74"
+        },
+        {
+          "id": "p045",
+          "sha256": "75146e49a31b023bee1b1a06d857f3f6579c8d55dfae05949d7e9d58b6ba547f"
+        },
+        {
+          "id": "p046",
+          "sha256": "9f89d9dc82ae8e7857371f49be1ca294a59ac8e163e68d28726bc38716008e6b"
+        },
+        {
+          "id": "p047",
+          "sha256": "cc463956c172576463c67524d2c7f3640be6ffa636f8462107304763d14be5df"
+        },
+        {
+          "id": "p048",
+          "sha256": "b0a8a69eb350168eba4537ed04d9c932553075a0d3a0787e7fd1d9d86df5609a"
+        },
+        {
+          "id": "p049",
+          "sha256": "c5d4235e21a3f42f625c27cdaf3fccb6b20c368824cfddb9c2b481d60d96bcaa"
+        },
+        {
+          "id": "p050",
+          "sha256": "66a4e936d835c1f88f00bf9701ab1739f65e849b100c564212ecd78eb2fd2f59"
+        },
+        {
+          "id": "p051",
+          "sha256": "3bbe6f0481d6c65dc12d61000832294c8f349d874e9207719c5cd17cd7a9b29e"
+        },
+        {
+          "id": "p052",
+          "sha256": "47c0fcd477340d9a2a4ec93938a97b254a0f1a605d77d1c858babbb3de7d9c17"
+        },
+        {
+          "id": "p053",
+          "sha256": "463359c74a0e49f450b0095aaaafbe2054f61d77ec54259e9319e595c405bae7"
+        },
+        {
+          "id": "p054",
+          "sha256": "3914695b2e9dc5b7506b2b988dde32df8861a39b7145e3b91fdcf0b4a80fde47"
+        },
+        {
+          "id": "p055",
+          "sha256": "15ab1c66cc810da9b163d3e0eb7883eb1deb3ff5c7394c574ae2289301c0179e"
+        },
+        {
+          "id": "p056",
+          "sha256": "2170e4b707f457d80c6e720a2a4e253721b8d92a84acad9f88b9b4661d7470ba"
+        },
+        {
+          "id": "p057",
+          "sha256": "f1ac492587a008dcc5c311a58a31cb3c2ae96d28a9d6fbeeebc32153de2ce805"
+        },
+        {
+          "id": "p058",
+          "sha256": "4f7e4e4d712dc32d09a2d1398fde3ee6475695cf47d289914950abe0946000b2"
+        },
+        {
+          "id": "p059",
+          "sha256": "c4db35a65a2957d3e6d38ecd385ad390f78c139d65b91a48711d552fba727d69"
+        },
+        {
+          "id": "p060",
+          "sha256": "a938b0bb25595c2b27ad27975d147dafe33c3bfae4fc9a1f966a4222a8c985c6"
+        },
+        {
+          "id": "p061",
+          "sha256": "3af3b010e01dc959c8b8bb968cedbdb70d68cffb56300ec5caeb6a5cab03dc7e"
+        },
+        {
+          "id": "p062",
+          "sha256": "9a9c5f40de2d8f655b10e5f9dcd0ab95f30750f630904e817237e46d08ba5c1f"
+        },
+        {
+          "id": "p063",
+          "sha256": "bcaa83f51e1b928ad63446ab89f5522226a88acccd1942437d5d11b1822ec8f5"
+        },
+        {
+          "id": "p064",
+          "sha256": "bfd0af58474b6c265fb9ab36a942caf3a369cc052e9a2bbcf8659c4f6ff3715b"
+        },
+        {
+          "id": "p065",
+          "sha256": "c756f41eb4739eb56128f1ea4fa89ff96001493f0bebaf691b05351762671889"
+        },
+        {
+          "id": "p066",
+          "sha256": "2c9728ac292c0cfb35f7e281e7a516e6864b989fb7202cef3337a4f2cc5df830"
+        },
+        {
+          "id": "p067",
+          "sha256": "f253f4c5e0008eda1b9b0f82856da9ffe401128e0407b4bf9cc0d24764dd130f"
+        },
+        {
+          "id": "p068",
+          "sha256": "4b7cd2e1dbc797feea221b5349799a2030a83323ce3fe6f680d3818809cbb30c"
+        },
+        {
+          "id": "p069",
+          "sha256": "5a3174c7f6d59196d675e145ff032383c2c77bf411ddc5442fbc4ad312489099"
+        },
+        {
+          "id": "p070",
+          "sha256": "130b4e0b1a15ebd961224a1508e3e87e156dd505db9f5aa33dfb108202212b88"
+        },
+        {
+          "id": "p071",
+          "sha256": "98bf7621586de5ab68255a05adea7175e7cab988adb3a651100f3a81ce4b9e24"
+        },
+        {
+          "id": "p072",
+          "sha256": "020dc5a66fb3ccc01dccaf32b2ef1cf8610e136cbd1e790fec0cea0b8005d358"
+        },
+        {
+          "id": "p073",
+          "sha256": "836229a900ea6385bc90df5a436058ba4639ac870cd87fe615a9ba2acdbe5a24"
+        },
+        {
+          "id": "p074",
+          "sha256": "53218808adecc55f5704042f6b9969b7cfc48952c56146726941a1d58fbdb4c7"
+        },
+        {
+          "id": "p075",
+          "sha256": "3e2497bb192c303611b933bffc5dd2c95c9224891f6ca1f15cc14a08d9542bc1"
+        },
+        {
+          "id": "p076",
+          "sha256": "916e14d055c9bdee60367c6d63da6cf3f94276643c659639f8de5658af1388d7"
+        },
+        {
+          "id": "p077",
+          "sha256": "dcd9ed3a4eeff5d591ada4864fa50ee0fb8d264ee2c816b9f903fb0b1eec02a1"
+        },
+        {
+          "id": "p078",
+          "sha256": "91be63e64fc55c7f7dd70577c363ab899ccd443ed5d5cbbefebeae589bf812fc"
+        },
+        {
+          "id": "p079",
+          "sha256": "41b9185bffb7011ee1e0cd3b31fd4a6b751af0854fd19a7f859af65dbfd78988"
+        },
+        {
+          "id": "p080",
+          "sha256": "5c91ddea67d318a1dee3c251cb7b4aa82acd26bbd17e0efdcb7df0d623e30b3b"
+        },
+        {
+          "id": "p081",
+          "sha256": "cc8e691f704b796e17aceef550363b5dd179a7b06bc3993c763a5005bf7b4f85"
+        },
+        {
+          "id": "p082",
+          "sha256": "ce41c57d37ea626a5173946c93bcc4b3da1b636bca409dbdc6d62f34c01a14ab"
+        },
+        {
+          "id": "p083",
+          "sha256": "1714338debacfebcf7dc1294cafa9baf3ba29f988be22d83adadaf76e8bf4c3a"
+        },
+        {
+          "id": "p084",
+          "sha256": "f7da62825116a31869f263b71064b3271bb8bb80cb58221751d6c0e9f3820590"
+        },
+        {
+          "id": "p085",
+          "sha256": "9e65cb54e6eb523b4379225cf9c6278408d29c63e87074680d01439cb8d228b3"
+        },
+        {
+          "id": "p086",
+          "sha256": "b421c7e3ce1f5083a0f0cdb5c1325db04ee635d6d42392a6befd83911bae0d9a"
+        },
+        {
+          "id": "p087",
+          "sha256": "200e3592b5f2f27524d39903d3fef1815309aca5fa95cd623c85baae0698d8b9"
+        },
+        {
+          "id": "p088",
+          "sha256": "b120c8788d9ce067eebb38ff7b1e26aac190d374b2429ccd0ff33e32c48136e1"
+        },
+        {
+          "id": "p089",
+          "sha256": "70fe2aac3d389ee5ab6637ab7bd087858f93e36778f22569a6c6e67b6df3baa5"
+        },
+        {
+          "id": "p090",
+          "sha256": "716bfe1abba605f7a2825e13cdd95cc660ffbaed7d7075d47befbfb6792c549d"
+        },
+        {
+          "id": "p091",
+          "sha256": "120f67706b2aa124a154e4328c23387485bda6a982b9d7edbac2a3ed1a7fe1d3"
+        },
+        {
+          "id": "p092",
+          "sha256": "ed2e4f3424671b117347979c77ae186a63a72b5bfc58ee5d3339fcd4b7351ade"
+        },
+        {
+          "id": "p093",
+          "sha256": "67a7b1d2ec7fc681be66ed3e28420c18ec5272273fcd44520f392df95a1c0d9a"
+        },
+        {
+          "id": "p094",
+          "sha256": "bff855d9447d8d828104b6a960c0c8243e0b14910414885bced1155ecf8d0c71"
+        },
+        {
+          "id": "p095",
+          "sha256": "e610d0e2a03fe4fc1b132f8adf4bd8346fe34a680180827d3c442ea7b3a48cde"
+        },
+        {
+          "id": "p096",
+          "sha256": "3705b443a332224623704a2cef906e0e51ea3195a062030261b7fee064f3c9d0"
+        },
+        {
+          "id": "p097",
+          "sha256": "c6067d9ab1a2d3365e0760eeb04a6fef03b09265346aa46e79b2f87fa2269e90"
+        },
+        {
+          "id": "p098",
+          "sha256": "4850126f77d500ac725b7f4a9fe6f3245ca13f60b9acf35cc92d69462dcebb01"
+        },
+        {
+          "id": "p099",
+          "sha256": "461a0f5af6ede108e54291fdfab32871f415c5065c328b9bf2d049206210df41"
+        },
+        {
+          "id": "p100",
+          "sha256": "c5d28d24c9925812c3222caaa95d1888ae4ea35c76f4d442f8ec6573a0b93169"
+        },
+        {
+          "id": "p101",
+          "sha256": "38720c345b1d7a88a8c1ec64f58a50bedb1af8294f61196444c19b65cc4f724d"
+        },
+        {
+          "id": "p102",
+          "sha256": "433236641b44e88c7b971505760dac185ae2dc4cbf262fd84ee322d8eeac50c7"
+        },
+        {
+          "id": "p103",
+          "sha256": "522ac74456fa6536f40866ea0e4663109c180eafd349fe71905f699784bf2c74"
+        },
+        {
+          "id": "p104",
+          "sha256": "7ae109cd22c7b9eb0b4c774b090a2bcddf0483034389d7ef757854405f98f600"
+        },
+        {
+          "id": "p105",
+          "sha256": "c6230ec971d13b7fada8749530f85147a09bc05fdef536c387d83a983d915290"
+        },
+        {
+          "id": "p106",
+          "sha256": "977de6a63a2358e70a220d9679991bc268856418dc53e2303391e724f3a58391"
+        },
+        {
+          "id": "p107",
+          "sha256": "86babfb5ca3f28208945789c9493ba2b321537cdd6c90e2ff80e5f5acd844cc6"
+        },
+        {
+          "id": "p108",
+          "sha256": "e3cf5fe5b32490f0172693b43fa22efbaf1dcc4fd4f092abbb049626a2709d1d"
+        },
+        {
+          "id": "p109",
+          "sha256": "6d577b566eadd305be37646fe828ef3f356912d6018726acadbf87eccd380eb2"
+        },
+        {
+          "id": "p110",
+          "sha256": "3c7ade8bdc9c8b43e274c8ac368fe826020c7eb4914df7abddb676e32e0aee52"
+        },
+        {
+          "id": "p111",
+          "sha256": "31f6dcfa3371cad4a0bfac2cacdbd271ae85ebdc3167ea164175bc3832da5a9a"
+        },
+        {
+          "id": "p112",
+          "sha256": "eca5f979c0fb883c6a1e9a3d463d69c1756ec8b592dab3453d2bcf39bd78997e"
+        },
+        {
+          "id": "p113",
+          "sha256": "e8e78b3b6add1c90fc76064faea82171028afade14ae8842ece4e2480cb18fdd"
+        },
+        {
+          "id": "p114",
+          "sha256": "259f6919b51abb024bf9c074e644955eaf96cece696563cf79cb8b70d4cb4293"
+        },
+        {
+          "id": "p115",
+          "sha256": "f64452e1b55519fe418ddd25ee4962e603b58b7b4e026ae106e099c7d823a107"
+        },
+        {
+          "id": "p116",
+          "sha256": "4ea306f32eb8924344129f0649e8496bcaef61c398e4e14942ce557f76cea4ee"
+        },
+        {
+          "id": "p117",
+          "sha256": "8277c30c5ef82bdef1616efd5008d972a0685f5b0b9403a7234478eceec0b738"
+        },
+        {
+          "id": "p118",
+          "sha256": "616480b251a7b23acbda60e659980d1b3fae5aa4f8548d73dfecf8bab159911a"
+        },
+        {
+          "id": "p119",
+          "sha256": "7a92db2e6ccf2d69ca6c053f06489c39de94c936d705d0fb1958cf5c04d305cf"
+        },
+        {
+          "id": "p120",
+          "sha256": "1444b2f6b6dc993664b666fa04b4c6061b4b537e1735ea1529662abdcf368c99"
+        },
+        {
+          "id": "p121",
+          "sha256": "5bbbbd4120782e06b1b06ac0be55c384977b4358d252a6977ae69d32b25d9721"
+        },
+        {
+          "id": "p122",
+          "sha256": "984a71f6cc2845cd1ed154b28e97324ddd4f8fb8e24a75052c4a5aa358352985"
+        },
+        {
+          "id": "p123",
+          "sha256": "86ea5ff194ca26f037aed2cdb046b4c375aa4d6c2a26358096db204b080c2003"
+        },
+        {
+          "id": "p124",
+          "sha256": "e7f5bc042d4b6e1ab2eb8bc2580845a9c879400950ff8bb858fcc62bffd4f5e4"
+        },
+        {
+          "id": "p125",
+          "sha256": "aecb8ed297117d438e12134a9d24d10a274596cb6d4b8ad287f660a79c3c7978"
+        },
+        {
+          "id": "p126",
+          "sha256": "903c0c1b4f29ee73c551d18eef04e3afbf4de6b04745474b392e4c82e53b2bd2"
+        },
+        {
+          "id": "p127",
+          "sha256": "0061b9a982099de9ccdf36aa506898158c6056e9865f295fb5bbba970973bff2"
+        },
+        {
+          "id": "p128",
+          "sha256": "2f862fef2691df55b36ee4990b29fdec7240e334f8b2e2ca29deb1f70dde6969"
+        },
+        {
+          "id": "p129",
+          "sha256": "d2e005f3377308a13ac4bc33b78ae4971cef17fa8291b3a45cf0fb2829d635be"
+        },
+        {
+          "id": "p130",
+          "sha256": "db85a6a2e0349856674907837c6825a32981a0557ead3ac23b21361a803e20db"
+        },
+        {
+          "id": "p131",
+          "sha256": "f31b02d85ecdfb90d1f214b657d556c99ccc0b994439857a021cc2fdbeccb5a7"
+        },
+        {
+          "id": "p132",
+          "sha256": "f89b76fdcee1dab8a3e6fb031d1e1afe2cd54b16a0608bd77f0a9ff959d52cdd"
+        },
+        {
+          "id": "p133",
+          "sha256": "280ceea19d03e29bb77634a276412cfbdc0adaee07605c42bae5e23fabfe7755"
+        },
+        {
+          "id": "p134",
+          "sha256": "8cd5a0511c2894bfbb213dbfd7e4b2b536fee3a717f11b3e10453d03fae0aa73"
+        },
+        {
+          "id": "p135",
+          "sha256": "cb536bda3f25f0d1c67c71e7d3f5bd77e3db11750ed0f20cfb1f4897e81de3f4"
+        },
+        {
+          "id": "p136",
+          "sha256": "839aa56805a13165cbb90e914b2dc3e088b19209c0578ff380f3479fe382c752"
+        },
+        {
+          "id": "p137",
+          "sha256": "78269ca9d9467e4799645bf2d543cf71142caa14584df672f62bcd3c21fb16ef"
+        },
+        {
+          "id": "p138",
+          "sha256": "971603596d8af0789e290f15899b5d1f21ef5793c60ca147598b31e0ffa28919"
+        },
+        {
+          "id": "p139",
+          "sha256": "d4c796741f27bb6a953c02af324f00e906024102d41126bb27f837e61601907b"
+        },
+        {
+          "id": "p140",
+          "sha256": "b30dad5e324d8914af3d8fb686e899e324595cfb4c713736c4bf320c9689a4c0"
+        },
+        {
+          "id": "p141",
+          "sha256": "5efa27953fd3494e2bea1b2f7f4c607b6a1cf45374c6ef4bc28daec2dfb3bc13"
+        },
+        {
+          "id": "p142",
+          "sha256": "cb27057fc34bc01a8e783a3959401a7f0729c19c5262be877cc94391c99957fa"
+        },
+        {
+          "id": "p143",
+          "sha256": "e40c940303dfc4088f5449c18699db956ec7cf3f587985240b4fec0505395ebf"
+        },
+        {
+          "id": "p144",
+          "sha256": "4d95585c772ce68c865703a503e309b09f3b4040cd7c15ebe9d23d3552627081"
+        },
+        {
+          "id": "p145",
+          "sha256": "bbbfa595cc988834e3ce9e28d68024d26369ed31e679fb6b2afa9d650e929283"
+        },
+        {
+          "id": "p146",
+          "sha256": "b7edf8a89795f190dd061784103b25e74b66628a1e62a96c69f075ff137fae5f"
+        },
+        {
+          "id": "p147",
+          "sha256": "cfef61ec418d3d415a6495b6ff0614cb6b1548cddd1f57b7dd182adb70c58ba5"
+        },
+        {
+          "id": "p148",
+          "sha256": "f385bf76a23d45c6e8caec05c2ecc6a6d75e07ee4bbfc12eb3a3a9f38b690897"
+        },
+        {
+          "id": "p149",
+          "sha256": "d4fc81b45ed65c8fb1926b352115cdf96f14f912d59d47ee2d1fbd82b7031449"
+        },
+        {
+          "id": "p150",
+          "sha256": "71462641036fd26a213ec37f67b3d2b33e2715d2799428f6abe1b6093ee69a8e"
+        },
+        {
+          "id": "p151",
+          "sha256": "723fe08c532e37f83365b3cf00bb42a62aaabe79a2e579abef41b75a185446c9"
+        },
+        {
+          "id": "p152",
+          "sha256": "4fbef0d929d9f192f685ed5ab8a5690674a03aad7e5dc9555a203411cbb34824"
+        },
+        {
+          "id": "p153",
+          "sha256": "c9a5286da7e7da068e5b230ea68ab9daa20ba74deac0f94b11881fe6741ae403"
+        },
+        {
+          "id": "p154",
+          "sha256": "f83544a66e5f52bc48f0d5a03c16177cfd0a7d7392f295be64b4e6732823d0bc"
+        },
+        {
+          "id": "p155",
+          "sha256": "6c406deb901395dd689706785179371d9f97cb294ee398403fe384a1eb68c7c2"
+        },
+        {
+          "id": "p156",
+          "sha256": "01c71ae8c29c84efc210a21f5554d042f9a70712a8962b587d73613264b910d6"
+        },
+        {
+          "id": "p157",
+          "sha256": "5ae3db09c223b168a4eeb649c86d2a4afd13891e4ba8bcf11e6fe14a6621f682"
+        },
+        {
+          "id": "p158",
+          "sha256": "277b3d7b558679adb8a7bb022bd965ca8baeb9f9fa5636786529e531f2955156"
+        },
+        {
+          "id": "p159",
+          "sha256": "6894ec1af88085a412a68ad006e75c24ba14248f56b801f7bf8deab6c599d4ff"
+        },
+        {
+          "id": "p160",
+          "sha256": "b0b77b7fe9324176e9ed1b2754a3f5ff6aba15af1c114907fc96f14e27f70897"
+        },
+        {
+          "id": "p161",
+          "sha256": "2b42cf26038359739428c63aee6caa125e89a009b8fe2fdb47f6283ae74b747c"
+        }
+      ]
+    },
+    {
+      "id": "szu-1986",
+      "title": "深圳大学学位授予工作细则（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1356/1986.htm",
+      "textSha256": "7badb2976bab07f0cd511239ca955b95143e0265b9c163f120d80cb2ba697ddf",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "af47ce51158f91cb56f520c6fe9d5b73cbf6f226a226d0f2874e927a001057fb"
+        },
+        {
+          "id": "p002",
+          "sha256": "57815d689f1183580487e457d884969f33cedf2bb9aba5cf92885b71b875c912"
+        },
+        {
+          "id": "p003",
+          "sha256": "ca4f09d923d0c78de34358ae8576ab3965385e66a8de794fa1b3a1affcea4085"
+        },
+        {
+          "id": "p004",
+          "sha256": "32e44e90d9469305306a8dcd0a493abe971ba1d32f019ea4cb0ced23f4bdf51a"
+        },
+        {
+          "id": "p005",
+          "sha256": "de1831d03d0076ed494d6ad51ce0daac766e589c05f3e243a10c700f14e5a093"
+        },
+        {
+          "id": "p006",
+          "sha256": "e340ccdbac36b4d45a8c7a9d5f0f48cfe6458ef06a61bd2168b9af64fc9837cd"
+        },
+        {
+          "id": "p007",
+          "sha256": "0fa155f240c350487650395009c51cc30fae93b2fcd70fa103d6d1e1d7f8535e"
+        },
+        {
+          "id": "p008",
+          "sha256": "127d74b507d2a0ea71d1b956c5b29bde6498525aa3b0065c853b7a8ea633db8d"
+        },
+        {
+          "id": "p009",
+          "sha256": "472bfbdb053a7cfbfe1bbfff564078b6fd0269270301e692310db1e4d7c314a8"
+        },
+        {
+          "id": "p010",
+          "sha256": "98ff84979652780f8cc32dc53009e7121fb57f49491dad40b87105d45d263f1c"
+        },
+        {
+          "id": "p011",
+          "sha256": "28f5bf2f4086b55eaca2373f085d60a2614c03dde53e45e21b46e4e35abc4000"
+        },
+        {
+          "id": "p012",
+          "sha256": "2b8d516ffaaf9e76d919d8c385014f494bc103f36be984bf608a0174a24631c0"
+        },
+        {
+          "id": "p013",
+          "sha256": "a57e26b9ad897bf460c447dd8d6075b47534c7f1c2226c56e2ba1141e36a4cb4"
+        },
+        {
+          "id": "p014",
+          "sha256": "71fce9e4d93bc230c754abc3b2788c265fcc756bad2b0cc9ae8e13e076c16188"
+        },
+        {
+          "id": "p015",
+          "sha256": "257c4fd27448b2784406d422aa7a93d10c935525b1f2841d911e5ca14503714b"
+        },
+        {
+          "id": "p016",
+          "sha256": "4e715a194262dd9c5673bbee3fda259e1d8bf7ad41a6c992f5edf198c365e9e6"
+        },
+        {
+          "id": "p017",
+          "sha256": "4bafbfbcdbbccc77706d39fccf5c7cf1d05ce25118815da8b5896da103339993"
+        },
+        {
+          "id": "p018",
+          "sha256": "5dcc29cf62ff841a03abbd0c928bb0dbb203cef404fad6f3e5ecf0dc05c6bdd2"
+        },
+        {
+          "id": "p019",
+          "sha256": "f9fad3c67cf29746bbad8d7ce242394fd41d76558cc2e302dc0d655242839e21"
+        },
+        {
+          "id": "p020",
+          "sha256": "4e5ef62b748d0cf06d57a9838cae0ed6d578300627a69e4bd56ae0c77f2e01b8"
+        },
+        {
+          "id": "p021",
+          "sha256": "a1be27876634d102bec66eedb277fe349ddf8e878cfc7e8328e02c859cb48a2e"
+        },
+        {
+          "id": "p022",
+          "sha256": "ab6ef752584fa0aebcc9f7272a93258f85ea33cee769d0f42bd477597360dfbb"
+        },
+        {
+          "id": "p023",
+          "sha256": "8d1c13adcf2615fc818686157600cd4ade5c256dab6efa5dcba9bdaea7dde41f"
+        },
+        {
+          "id": "p024",
+          "sha256": "f68dedf4b0312aa679e5587819d6ab71d19771ae0a1c6236ec7bf57c672b0f3a"
+        },
+        {
+          "id": "p025",
+          "sha256": "1ad35f9c5cccd5289c7d4dace1cd025d163563b9c814ec9fb48c3cdee9f67c51"
+        },
+        {
+          "id": "p026",
+          "sha256": "f9446b540440d6d706147c127da644f6aeb4ac99ee543cffd32a09f4ec2fdd48"
+        },
+        {
+          "id": "p027",
+          "sha256": "39ae488f402885485546174676df3aedab5c2296e8f6e1e44f327e2368970c6b"
+        },
+        {
+          "id": "p028",
+          "sha256": "09137695b334df4cd40333a068532a92fefa149fedaaa6f8bb56025f8ba536d8"
+        },
+        {
+          "id": "p029",
+          "sha256": "f5214ee9573382f4447e490fd3f2dcfe8eb85695b214d2405e7629f443c987ea"
+        },
+        {
+          "id": "p030",
+          "sha256": "6dee0bcafbe78235dae989b4ff7d09e72a4fc5f3cf4c34e4940b0b87af9144e0"
+        },
+        {
+          "id": "p031",
+          "sha256": "2596b600873d9f3b154eddcb2ad94fd415eefea00129f14b6de9d9f3f3ddfa63"
+        },
+        {
+          "id": "p032",
+          "sha256": "58072d4f868fecf0714916d2e4d9031111ce4ab6564aafaa05bd440db3689407"
+        },
+        {
+          "id": "p033",
+          "sha256": "e2f54e63cec1ad3b80bf0ad9e8075f080d99ffbeee7809d87829b405a62bbdb4"
+        },
+        {
+          "id": "p034",
+          "sha256": "1f0cae6ff2cef3c87bc9f95749ae41c744d832a334bd0902bf48fa3a2fa6b854"
+        },
+        {
+          "id": "p035",
+          "sha256": "9e1e02683bc2c807166e4315655c966a6d3621364a08a4847a1abd073bce8d8d"
+        },
+        {
+          "id": "p036",
+          "sha256": "378a3768ec9ff56ffb3ffe0eaed1edbe50aba28ae3c6f4fb22f353e95e853ef2"
+        },
+        {
+          "id": "p037",
+          "sha256": "8ce122e21087a6f6b977ac65f91fbef67447a4ed1f465c5fb6854d9f5901baae"
+        },
+        {
+          "id": "p038",
+          "sha256": "f80baaef86ae2e5ec43fe692597b41039db318621b59c637b5aa4bc725aa1eb7"
+        },
+        {
+          "id": "p039",
+          "sha256": "90a9cd2d532ea0489fcb35a2ce7c7be9ce9cdce79f25da818b8f384919ed831d"
+        },
+        {
+          "id": "p040",
+          "sha256": "99abda01d0e542d219af7cefdfbb59b111f2a74dbd73ab4f2db6e2fe0998080c"
+        },
+        {
+          "id": "p041",
+          "sha256": "e22a46057f9d89aff4e2ba78ae22904f3a6408b3a96a5872be13d15d5f8982d1"
+        },
+        {
+          "id": "p042",
+          "sha256": "4712887b3b62a853df2c259adba742a0ad15d7ffd04bb2228d9599aea98f2166"
+        },
+        {
+          "id": "p043",
+          "sha256": "2be5662de66e7d2b3ccb2879ffeaac2d37309c8b556769160d80d381170272f5"
+        },
+        {
+          "id": "p044",
+          "sha256": "11b468f7594f1a066b2ca0d3d2b3732dc0d413872cb7e77c5b4b6e74f09fb320"
+        },
+        {
+          "id": "p045",
+          "sha256": "6381ba187e88bc158f33094419ca38e6cc6138796a50b653b70c0a33ead06e03"
+        },
+        {
+          "id": "p046",
+          "sha256": "1245805a45031e93c42af9ade59adb4516df212dab1d3eb13bd993234e1adc59"
+        },
+        {
+          "id": "p047",
+          "sha256": "b58a4fd181832524b7f17edc1985c81d01422a19b652cbe87f84c4674ac98456"
+        },
+        {
+          "id": "p048",
+          "sha256": "d8aff9a5113448c70d7589c0cddbc61f17f4e61d6229050dcd62da7e5e070602"
+        },
+        {
+          "id": "p049",
+          "sha256": "8d92be26d5e8d9b2a66f53ff3b600db637b6bf1c0bd0c82c3099057a3cd1aeca"
+        },
+        {
+          "id": "p050",
+          "sha256": "bcffe1321856ab57a573f621a53f9bc9ad9a1811cb47f48860a6cec661a53a9d"
+        },
+        {
+          "id": "p051",
+          "sha256": "3423e1aa55e51983c19c80dce7e7987dbb84cd246bf10793a9c073410b5ac212"
+        },
+        {
+          "id": "p052",
+          "sha256": "9e01f8aa1e29e701330cde5993c91b5251a0b9a2689c9f90a7d90f15ef3815ee"
+        },
+        {
+          "id": "p053",
+          "sha256": "7515a8aecbfc194ba3c6492fc4cb69d0ec5ab7ad32cf64e9487ce16c423bf452"
+        },
+        {
+          "id": "p054",
+          "sha256": "bdd1c2d6416ca55072b68c785a96775584ac929f80bddd78eb35875da35e9431"
+        },
+        {
+          "id": "p055",
+          "sha256": "4c77d13fd607e09ed19a7c33061e0a8bb409ecbbb381daf217805009085850d7"
+        },
+        {
+          "id": "p056",
+          "sha256": "a2df1cbcb04aed36c56a37c69057672a9534eb75346e08c29797a088f676cfef"
+        },
+        {
+          "id": "p057",
+          "sha256": "ad3146c5e117a670f8ccd9fc8fa7b470ab457c6fc863f9788b6a2fd2dd068a73"
+        },
+        {
+          "id": "p058",
+          "sha256": "65419bd0039757e523c43c57f43d32a8fa1a1b738a13ac7445b4a05f4ac232eb"
+        },
+        {
+          "id": "p059",
+          "sha256": "93496756037e40b82a510b6a56fd19d2df904ea6b9167f234978f200caecd9c4"
+        },
+        {
+          "id": "p060",
+          "sha256": "8bedfd2f1042e33f774e88d19f8450cdc77d24675bc93353a97e1d7d1225e0e1"
+        },
+        {
+          "id": "p061",
+          "sha256": "88849680e38a02549fc7ee551770d005914c282bd6357ec636701b12034ec4ce"
+        },
+        {
+          "id": "p062",
+          "sha256": "5fe1a3564de6b31edbc1bfb6cfa4a1d2061df298158cbf78638711f871343c08"
+        },
+        {
+          "id": "p063",
+          "sha256": "37900a7f7f66217f76ff2d58429b30907761ab8f1b8155f979fe1384caac0bbc"
+        },
+        {
+          "id": "p064",
+          "sha256": "4267b84c69d6872d6b0c19d8d4197a64e3de24c68a048a6350d60f082a370fb9"
+        },
+        {
+          "id": "p065",
+          "sha256": "bdde6f8e3f0a24a525f99f2ec0b8497d3b31d5f2df6a30e474c11891e2a58b92"
+        },
+        {
+          "id": "p066",
+          "sha256": "e94b7e80680457aa2f82a4038b7a2979f63f58521b88946cf1257eac51172b10"
+        },
+        {
+          "id": "p067",
+          "sha256": "9e133d9d1cc0a13fe90942ead9e19f332352308a15e927360e4da5f5b7fa98e2"
+        },
+        {
+          "id": "p068",
+          "sha256": "cc0272b9fa13fcd955e8aab1349f64dab1fd302c065e0964a4fd9b9a4c6f1e12"
+        },
+        {
+          "id": "p069",
+          "sha256": "b6449e6fb2cc8523c50d3f089d9a13b01667e64b261fe3d83295635f08aaeaa6"
+        },
+        {
+          "id": "p070",
+          "sha256": "b6921c770eecf4d1ce41c301569b4e66b8e4d772f0cad45bec9e441f67485473"
+        },
+        {
+          "id": "p071",
+          "sha256": "6a964a54853bb5fdd43dac21a6f81310a2bfc21bbc4a5201f24518c73b829b86"
+        },
+        {
+          "id": "p072",
+          "sha256": "b6520279f239111383e2bb2cce58d4e46b41933e22975475fc2248a6e3100350"
+        },
+        {
+          "id": "p073",
+          "sha256": "de9c583e0bf218b597a983e424f88d2343f49adead7dba034f0915f52974c891"
+        },
+        {
+          "id": "p074",
+          "sha256": "ee8a078c540ae56ee0517c60c0eca96aee22d384103ed84698fd51d1a6f016cb"
+        },
+        {
+          "id": "p075",
+          "sha256": "779af28e3e19e57d4b99918a1dfa544133e0c37640683101c4f2f74a4024b758"
+        },
+        {
+          "id": "p076",
+          "sha256": "4586bb536dfc9613e0e5a934d493a978e8f806af8a073d7b82c654d42c903cd2"
+        },
+        {
+          "id": "p077",
+          "sha256": "d44dcc9dea696cb0abf58db9a2b0a859add1ba69122334447b221d2177a35294"
+        },
+        {
+          "id": "p078",
+          "sha256": "b0b3686858c6e43373145889b8c9452ed9fda12f25d5ec10e16b679ce76d1a57"
+        },
+        {
+          "id": "p079",
+          "sha256": "fd7ecf7ce55794c5af58389776759a6f131f84258ae46eb48aa29296a085171b"
+        },
+        {
+          "id": "p080",
+          "sha256": "42c0f749e0a465625f8394d7b7c6a1e018d2fab3cfb47044f7a197ef9cce6ff9"
+        },
+        {
+          "id": "p081",
+          "sha256": "c3852272e96aae6bcff17bcd2aaa6fb52d3f8e02fe76dc39c5f6b4d6a8fad5da"
+        },
+        {
+          "id": "p082",
+          "sha256": "b0c0b51f2bae9105e745af0d4b780599533ebfec29c50071892756b6500a86dd"
+        },
+        {
+          "id": "p083",
+          "sha256": "ffccb16e3f9151098555b934da2a092152918e6ceb157d03ae34819cd997d6d8"
+        },
+        {
+          "id": "p084",
+          "sha256": "dfaccfbbb1839174a83a8dde2b34030b15a0f3d6f2cf795fabd7636652c989e1"
+        },
+        {
+          "id": "p085",
+          "sha256": "64509150dc2ea46772251f77d23f9eba42dd496b2fac781efa565ac33f9d6908"
+        },
+        {
+          "id": "p086",
+          "sha256": "0ba591d58c6fc3702703add931e1f4100946acca0328814736b26dd0944051ba"
+        },
+        {
+          "id": "p087",
+          "sha256": "760896bc11aef61a16db68f05fa1d65fa0bf389d26d649a786d9e6a6be4c78ee"
+        },
+        {
+          "id": "p088",
+          "sha256": "ff3f5f6178b6215a0b3c399b4bc06b32efbd2935c5af86853426dfa5b44a3698"
+        },
+        {
+          "id": "p089",
+          "sha256": "8b80cb9ecdc71df63f701499a2e7f382f52540aa9b6e314a393024367db0e1ab"
+        },
+        {
+          "id": "p090",
+          "sha256": "13808fcaf1b1a977fac58083f45941fc38e8876806025e44eb2cf8dcb10db137"
+        },
+        {
+          "id": "p091",
+          "sha256": "8bde11e9857628b4058e4df7bcaa09847c52e83129694107550227826bdc2f56"
+        },
+        {
+          "id": "p092",
+          "sha256": "090569d8fc89a6d2e6fb6cba7e0b0f626c4d29f6dc449d0d9545400de6d8646e"
+        },
+        {
+          "id": "p093",
+          "sha256": "93d34bc625c797989930d4cfdd6075758eda0511553ec97b0fa3424eee7b8d06"
+        },
+        {
+          "id": "p094",
+          "sha256": "fa981428f77d23d9acda7231bad2212998fa735946dea2751d5a9660dff8f710"
+        },
+        {
+          "id": "p095",
+          "sha256": "95570df28b309d4d13eb08a50fd16c3ae92310beba6e04953bfabf4790ce30cd"
+        },
+        {
+          "id": "p096",
+          "sha256": "1d5a8cb3ad0e4998efc7c57e2981ab203119e20d3a219a89981a5ddb657dc7d1"
+        },
+        {
+          "id": "p097",
+          "sha256": "f6d46f1ecb8f402f6b76170931619febafda0a34690382ac314c0d5e425405e4"
+        },
+        {
+          "id": "p098",
+          "sha256": "80b69fd663394e5ff70d212143c3e31c0a7cc710a7439e9217bd738e5821cf79"
+        },
+        {
+          "id": "p099",
+          "sha256": "6016c9e8f3fed1659ca0342e889b75e280c21dc0abd839615ddf738018a03f40"
+        },
+        {
+          "id": "p100",
+          "sha256": "fbf2007d4b3f07c731938a76c02d4c82eb3df709087b5a173cb960303660ac87"
+        },
+        {
+          "id": "p101",
+          "sha256": "b493e5c19711878ba1e670e880d368104559f8847d544fdf6a1f206ab0fb73a9"
+        },
+        {
+          "id": "p102",
+          "sha256": "eb39bc28e62864f4a62eba0ed6b55e16e77e4e6073f7edbdd51b6d676b0a7662"
+        },
+        {
+          "id": "p103",
+          "sha256": "ed486531ec091604bb325f30100020c33c83eddbf2c1a7315c4c72ce099bfa50"
+        },
+        {
+          "id": "p104",
+          "sha256": "4ef83cb01048e296dd10b6e702ae228dc7166e24dadcc1f79bed9e6ed4b12d8f"
+        },
+        {
+          "id": "p105",
+          "sha256": "155e0cea5d017fe17250f0daab8ba08bac4eea906fdeb3fac4ef1702bea35015"
+        },
+        {
+          "id": "p106",
+          "sha256": "ace13520f2f18dbb59cb2b1ec13f3941f536e2bcc0d770a6b83b83d4886712f1"
+        },
+        {
+          "id": "p107",
+          "sha256": "dc3bcab27679433f86f2758ced39b670920fe278a058b850abc563b07356d5c7"
+        },
+        {
+          "id": "p108",
+          "sha256": "32aa47239f43b9286929a93a1737a1dfb55eadeb143d160c7922ddce15b0bad5"
+        },
+        {
+          "id": "p109",
+          "sha256": "9e01f8aa1e29e701330cde5993c91b5251a0b9a2689c9f90a7d90f15ef3815ee"
+        },
+        {
+          "id": "p110",
+          "sha256": "891bf647d84c621d8a247eb8356cdb1becdb809c4e7cd07d77dcdbff01025935"
+        },
+        {
+          "id": "p111",
+          "sha256": "7395c713c84b5794534b2041a00bef975124d0036c1504aade3550cec6d5ff43"
+        },
+        {
+          "id": "p112",
+          "sha256": "86143dcea30989ede7ac42e51fdc8b40310462aedbc5beca91f3d93468c34994"
+        },
+        {
+          "id": "p113",
+          "sha256": "a2df1cbcb04aed36c56a37c69057672a9534eb75346e08c29797a088f676cfef"
+        },
+        {
+          "id": "p114",
+          "sha256": "ad3146c5e117a670f8ccd9fc8fa7b470ab457c6fc863f9788b6a2fd2dd068a73"
+        },
+        {
+          "id": "p115",
+          "sha256": "edf41e17c68cb5f8286cf5c0e7e0405b6090038c63f46680fc787fdcc210e5e2"
+        },
+        {
+          "id": "p116",
+          "sha256": "b37291607dc185b50a84aeff7c8b3e90148c299d1bdd742268a2c7a427e5eaab"
+        },
+        {
+          "id": "p117",
+          "sha256": "c5a0549eb5aaf5ccb82d9832316c7cbbdd53d67ca9da9434fcf9d5638724d33c"
+        },
+        {
+          "id": "p118",
+          "sha256": "5bca40b95baa1784904f9bfba3730374e80f66b5c95231709ffffa2fcf66a454"
+        },
+        {
+          "id": "p119",
+          "sha256": "c8fa1769148844c9041af4b551f98d3484607234450cdf8181919d90a5967b21"
+        },
+        {
+          "id": "p120",
+          "sha256": "bd1f701b60458f4a59bdd33f60eb1d295040b946f77c96323e25a3d10a088f3e"
+        },
+        {
+          "id": "p121",
+          "sha256": "42d143f66f7444c74ac05b49ca493387b5d9901c0ba95aed53319d22ec9c79fa"
+        },
+        {
+          "id": "p122",
+          "sha256": "3e4324b4b5160ba9026fd4febed61212db2b1cc4511856593efa5ac1761bc6bb"
+        },
+        {
+          "id": "p123",
+          "sha256": "616beb1097c62094f57a8736180758e08ba55abb25f78f5948b2f6ee280d489d"
+        },
+        {
+          "id": "p124",
+          "sha256": "cd0be67fe22a802585e4c74f159f04c2d194008eadc34325402626362bf68c08"
+        },
+        {
+          "id": "p125",
+          "sha256": "f7d90788f693f4def118ca73bee3703607820d88bd6ac00974ca743ab1c23105"
+        },
+        {
+          "id": "p126",
+          "sha256": "ef09cf9aa2773252002c88f2f9e0d27f7ec0d5e981cadb64b24b8cf2bf89bb8d"
+        },
+        {
+          "id": "p127",
+          "sha256": "0a42d5dc6fc035d91a4cfa614e2c5b9501e4bf67652f1511320b1aef6767b65d"
+        },
+        {
+          "id": "p128",
+          "sha256": "b6921c770eecf4d1ce41c301569b4e66b8e4d772f0cad45bec9e441f67485473"
+        },
+        {
+          "id": "p129",
+          "sha256": "74c17fa7b56de7b90a07f125efd66e7e9d3f6ac6c4b2e1ee49f99fd081f4e044"
+        },
+        {
+          "id": "p130",
+          "sha256": "a8f83db5e81f238e3f357044e67454965b051e3a0e4e045a9ee7e4fc03b57646"
+        },
+        {
+          "id": "p131",
+          "sha256": "e8e8f1cfa53313545b0a02f8403e509cb70eff9500e490356df06c2539018af0"
+        },
+        {
+          "id": "p132",
+          "sha256": "e48ae87f5d548d3c69679e17766f3ae0b9acf7a1c4cc29db3c91c076c31351d5"
+        },
+        {
+          "id": "p133",
+          "sha256": "1418f2a86febf14a11ce7d28e9084a6302c2680b7b5002a05d69db52b88d4d83"
+        },
+        {
+          "id": "p134",
+          "sha256": "ec14c96c9687932372f10ca0ce563ba17a6577c3bc9cae1798cecb257e6417bd"
+        },
+        {
+          "id": "p135",
+          "sha256": "6d0d923e62e44724a59c1e3832dba07475a0a093e91a6b5bd576a6f36d4623c4"
+        },
+        {
+          "id": "p136",
+          "sha256": "32eda54b481782ea225e39abd2e0e5ea91479e64eb4edc03255b5bcde9e30576"
+        },
+        {
+          "id": "p137",
+          "sha256": "58fde5d9ed9f0a9bb40c0d9b4633de40bfb7b234c59bb270501d0022a96e040b"
+        },
+        {
+          "id": "p138",
+          "sha256": "501b1b22f8a718a840c3986a0bb2a1c4a8ddc4119e07d28fdbc382a48080fc0d"
+        },
+        {
+          "id": "p139",
+          "sha256": "a80ef9a3c5fb4900ed702b99279762df2d3fee45ca9c995009c217b70e40245d"
+        },
+        {
+          "id": "p140",
+          "sha256": "0c077e08ebc90a2993d8b847ac9f51d16981b61854768744ee678b82de6d4c49"
+        },
+        {
+          "id": "p141",
+          "sha256": "b71cc79660aafd71cc0589bfdff59a9c1a8c99d0321d14c2dac9659d5f39f2e2"
+        },
+        {
+          "id": "p142",
+          "sha256": "e2f3b6d2527d2a2b4ed9760265dacf05683210d66451351d5caae53cab80842a"
+        },
+        {
+          "id": "p143",
+          "sha256": "3830fe7f9c7ce61b5ec446953972d1be932a10e121cfebec28e41c4712072112"
+        },
+        {
+          "id": "p144",
+          "sha256": "cb717e29508fb9b73d6f3bbb19e8809d7c2a300e2430e9e93ffd2738f4b3598e"
+        },
+        {
+          "id": "p145",
+          "sha256": "f554c407459ecf0b091a05a28061e823876811de1536e3e9ad31ecc86af6db13"
+        },
+        {
+          "id": "p146",
+          "sha256": "5ddd0672793aa029e450ce03c70cf55d032afb8c7b3ed7c4c205f9a39057fffd"
+        },
+        {
+          "id": "p147",
+          "sha256": "0592aa0ff2ee1941d3a5d62b2281c6105ddfce49758d7eb1c83dcd19821dd944"
+        },
+        {
+          "id": "p148",
+          "sha256": "f53c5dc5f751dfba22041a7867a4677d58b50954c519c1ab5aaeca16f929d775"
+        },
+        {
+          "id": "p149",
+          "sha256": "1d99be6668ae151c6b60ed937c0307f8420e6ba4c51cc941b27983e52ed1209d"
+        },
+        {
+          "id": "p150",
+          "sha256": "f6ee1846e3143927c71c0c547f9d083465347bde092f74f2a39ced7a0942bac7"
+        },
+        {
+          "id": "p151",
+          "sha256": "ca9d8b0325c39b95378a78f5096a707811d3f9632af904f6486b077391db04d8"
+        },
+        {
+          "id": "p152",
+          "sha256": "9ca82ecf6fdd81401a0e5baac5a0dbf5db00d570204f93cda27c8509bffa25ca"
+        },
+        {
+          "id": "p153",
+          "sha256": "8ce3cd02aba9bd7801fa6967fdf00394453a39663048635ef40a88d6ed3216dd"
+        },
+        {
+          "id": "p154",
+          "sha256": "4cac99ace1f53a8c264a72a03fe6c7329029dea40afbda87ebbfc1e1e5e907ec"
+        },
+        {
+          "id": "p155",
+          "sha256": "bc25428215390448bcc3fe10e0bc5c426059b9a5c5a3183fd92ca7c19215b227"
+        },
+        {
+          "id": "p156",
+          "sha256": "66abe20d5df2a1b11cea96ba5ce811b0593aa68d6154bc227f7323d3a2033388"
+        },
+        {
+          "id": "p157",
+          "sha256": "6c0e67dc4f7dcacae36cf37e9e3e173267c709bc722ff5912117300d138945ab"
+        },
+        {
+          "id": "p158",
+          "sha256": "ee31942d16d1efe75eb6f1ec4054e4346986ada4223229e5b8977d7b257cac2c"
+        },
+        {
+          "id": "p159",
+          "sha256": "77d6e4eb2e6e5906513fd0b591d400aed9d0fb965922457161c2348ab036e838"
+        },
+        {
+          "id": "p160",
+          "sha256": "968c54d5ded4e4ae40815fac08a0f099846192cced56a9cec663a75f5c7c46b6"
+        },
+        {
+          "id": "p161",
+          "sha256": "87544f12ffac5a87de89eeb83fc9cdce5984dd6e6e253905e7740f6652138759"
+        },
+        {
+          "id": "p162",
+          "sha256": "85cde8b671702bf68d34abbd9b8d1b236a6b4ae8524897737ed8f2dbd7bec810"
+        },
+        {
+          "id": "p163",
+          "sha256": "18933f672d36b04410d477db1c3c47a48f87afe38b23d83292519291bf32bb0b"
+        },
+        {
+          "id": "p164",
+          "sha256": "e408866736ef1609d8221701baa239545c3960639cdc15f4184bc7f96f939c5c"
+        },
+        {
+          "id": "p165",
+          "sha256": "b0f92ce77ed1668130702dbf63ffd2c0227df7105d37c5a3a5bba5454ed331b8"
+        },
+        {
+          "id": "p166",
+          "sha256": "472c155d479d730bc3271085787bdf4604acfc52af677f39db1691615a181725"
+        },
+        {
+          "id": "p167",
+          "sha256": "0b6ceab692726fbe14ab53f7526bd651e076d7093ab96a80095718ff62baecd0"
+        },
+        {
+          "id": "p168",
+          "sha256": "6b7b6b8201bf4a16e92281678300ecd04063bdeb514b034ffe88d850d6827243"
+        },
+        {
+          "id": "p169",
+          "sha256": "e2f22f818435cc04b69b96e7e33afbfa97a49ed69fff14f492c2e5137c843728"
+        },
+        {
+          "id": "p170",
+          "sha256": "4f48f23edfc463e913454380b795370feaf54d9b04f41fede5ab6f3775da30e4"
+        },
+        {
+          "id": "p171",
+          "sha256": "aba487756f00790e1ffb61a769bd5c02ba0ef5c54347fe5459521167a5290d53"
+        },
+        {
+          "id": "p172",
+          "sha256": "65a23e871c184b39aa1af091072a18c89e52a9e7946cf44ebdf82b081650c230"
+        },
+        {
+          "id": "p173",
+          "sha256": "bf6c4e7114fddc7c09715167ed657b69d370c1c539706772929bd7bcb41ba943"
+        },
+        {
+          "id": "p174",
+          "sha256": "8eeaa8ab39ed0734548a67e35a1a4863c028a2f5e98aa77844b355198031bb35"
+        },
+        {
+          "id": "p175",
+          "sha256": "c63ed57f3352e4edff96daa5db4b5977cf74d37783d7c6e32dbb17ea5a0d1d15"
+        },
+        {
+          "id": "p176",
+          "sha256": "abfcc0b6d3dd09444566ec732d36d15828cd4eee6f9679e4c7a50a4637a46b5a"
+        },
+        {
+          "id": "p177",
+          "sha256": "9b85253eeb608b1d72bbb4ede393bae10459fe6937beac98f639aea28bb6de49"
+        },
+        {
+          "id": "p178",
+          "sha256": "c84313ae4aa469298510bff9b1296886901f7053f9af92a69a6ae65ca1d06e7d"
+        },
+        {
+          "id": "p179",
+          "sha256": "39a6e6ef22be788eca3c90e2c8e17ee7ee21b14bf12db7fc2ba48f24c1f592da"
+        },
+        {
+          "id": "p180",
+          "sha256": "b648095bd9bc389a89d1e1bfb95f698b5f2d67fba0a660cf1f93c4d1f171fb82"
+        },
+        {
+          "id": "p181",
+          "sha256": "f2bca2201b3ed84dc058c18701e65399b124572672c6322157018401d531fdb1"
+        },
+        {
+          "id": "p182",
+          "sha256": "42b3913ef074297beb25db09f995d781a6154585191d2d845c5c2df4d91cae75"
+        },
+        {
+          "id": "p183",
+          "sha256": "1739f37ca67612a95449c7e810e9bd3fdd6aa677c89c0a8943e3cdb521eb6d2b"
+        },
+        {
+          "id": "p184",
+          "sha256": "ed52ffaaf2fe8100038f2063e71115ca15110946a75123aa6fe3d1ce17106331"
+        },
+        {
+          "id": "p185",
+          "sha256": "49ef3f829e9b2784303464f5756e83bdea846cc43e7beeef29fb1aaa4a6d6082"
+        },
+        {
+          "id": "p186",
+          "sha256": "fb5240366819de56e28f3b089b7c502d718d098cf298147137a268dd2117ce0a"
+        },
+        {
+          "id": "p187",
+          "sha256": "99759b6f923b7d7ba566a746a6e07e393297e3ce4b24a56dc08c42f18e0b8160"
+        }
+      ]
+    },
+    {
+      "id": "szu-1987",
+      "title": "深圳大学学分制收费管理办法（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1356/1987.htm",
+      "textSha256": "4adf9e35bbba032adf130798ee599ab4b1cbd841fc14195895944ebe426c2ab8",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "76c6f9facd16a33d360b9a017670b6b5559d1694b2d0ae346363176b5719af21"
+        },
+        {
+          "id": "p002",
+          "sha256": "0d3acbc68d1fd4034a8d1bc61d68625d91deeaf29f146e1b8951463de9ef2253"
+        },
+        {
+          "id": "p003",
+          "sha256": "4738860d0518055351066e38969ad700787af448266aa21359e15f8828f666c5"
+        },
+        {
+          "id": "p004",
+          "sha256": "50841ad08686013c6728f868f284782c1c1e65b173122fddca363c339f4c9ac7"
+        },
+        {
+          "id": "p005",
+          "sha256": "17e4aa8650ce2f3be0d43446c1efc95b2af469ee1e5a382bf70609f133c6e6f0"
+        },
+        {
+          "id": "p006",
+          "sha256": "a73f71e9b49bc1b3ee989c4d3ab1b270fcbf2ec6d8019c9badc736513764b5cc"
+        },
+        {
+          "id": "p007",
+          "sha256": "e64eaa3aa1351d56cd16ff758e10640b9590bd86ed401101dcd1d2377d29c5ed"
+        },
+        {
+          "id": "p008",
+          "sha256": "b89dcb82d9008c84901805f5c6564085dde423479235ab1831a14ccbee561aba"
+        },
+        {
+          "id": "p009",
+          "sha256": "ff54e34aedc41128a2e5c8e31e12513058016d83c426c2da03b22c8d81b78e67"
+        },
+        {
+          "id": "p010",
+          "sha256": "ebae9d567b7f35653a943e368f4c529204d092be75ee36d074ac00aefef6ffd9"
+        },
+        {
+          "id": "p011",
+          "sha256": "097b6833fa295c535ffc399dbb4e895990952cc2532417d821066e5645be69d1"
+        },
+        {
+          "id": "p012",
+          "sha256": "131daa0fcc9428ca78127922b6918c2f2e9dd621e01ca498d6fda538aca51283"
+        },
+        {
+          "id": "p013",
+          "sha256": "6e276957395b91e0e392c9630d508b8abc986f108b5eae6ee33f544a3cb2f17d"
+        },
+        {
+          "id": "p014",
+          "sha256": "386d4cf707644eb9a669c89d6edb2faa5698adda53aeeb060920c3b111eef2f6"
+        },
+        {
+          "id": "p015",
+          "sha256": "4079d4b60c4ec651295d5b7222d6048880d34dc3d84631d8a2e1812bba973a9f"
+        },
+        {
+          "id": "p016",
+          "sha256": "6b8ec95fed283d9238ae9305db58a40ccc98ceb280c22378c96e28252c57e9a3"
+        },
+        {
+          "id": "p017",
+          "sha256": "4655da491a22b10691b8a4303bca9adde433db1afe49f705a41dd762db092ef1"
+        },
+        {
+          "id": "p018",
+          "sha256": "5d9785765dd830c95b6194058616f97cdd02bcadec41af1ccbe457ad7074654f"
+        },
+        {
+          "id": "p019",
+          "sha256": "c0496aa6e6e87fd604dbbe725869c243411af3f01f1b3fab3b0fdd3de1a4dd55"
+        },
+        {
+          "id": "p020",
+          "sha256": "7bfaf0548367ae5b8a95ca08e4bfd2c1a7d48f41e37885a33ec7ad4427afbb10"
+        },
+        {
+          "id": "p021",
+          "sha256": "bc754784e9df9d56fa7f0c108a8c77d9266625a4dd85499647166d91e95438d4"
+        },
+        {
+          "id": "p022",
+          "sha256": "2a9459e3bad841d123033bd3d3be22ca8417eb39e4c8758ce2e496e2f796508e"
+        },
+        {
+          "id": "p023",
+          "sha256": "6f2edbe5c1ec64b0b81b8cb4edc647420aea8ee0b586205c1fc23990d2112cfc"
+        },
+        {
+          "id": "p024",
+          "sha256": "8cc9547afdcd05ebadeef7d0a16038edc2a6b5a963e0015b51b3a62bd7a917ab"
+        },
+        {
+          "id": "p025",
+          "sha256": "2ed70b65393695b26c8d198d0e540633815afc432407e26bcfd50b2d759720df"
+        },
+        {
+          "id": "p026",
+          "sha256": "d92e073996e6ecf5aaf4caacc1e3a344ede2747d9c674ccf323e4a362f2c8f6e"
+        },
+        {
+          "id": "p027",
+          "sha256": "fbc6236c21d5a61a5c076393af6fa1e8a911072190722b4a9d8429257bff1e73"
+        },
+        {
+          "id": "p028",
+          "sha256": "a3c7f09aa54f9bb7913bb6e073b5f1995853fa17dbd4d8dccfcbfd51e7dede99"
+        },
+        {
+          "id": "p029",
+          "sha256": "5b850c43770181573db48b6e6ec3002f6d356ca07e9e6abe1ea89859daa9c336"
+        },
+        {
+          "id": "p030",
+          "sha256": "fe30bf9b78787e3e91f878c75c959a0eb3a3f2a1f44e1d14cecf90b9a668352f"
+        },
+        {
+          "id": "p031",
+          "sha256": "6c158bc041a0057912d6c0866e66f23cc09be3b3dddeab7f8e8c287d25b83809"
+        },
+        {
+          "id": "p032",
+          "sha256": "185de1dae6eb072b28967fbba7a7d7effa535fb26ba30e62c11a27c13b1e4700"
+        },
+        {
+          "id": "p033",
+          "sha256": "bae6d3c5b6c69a3eb881c9ab1e8416d121de4f15585dcb758f1edba576e0f415"
+        },
+        {
+          "id": "p034",
+          "sha256": "da17e0c0c3c419296d126ffe62850587d715996e84d1525579ab7abe428f6085"
+        },
+        {
+          "id": "p035",
+          "sha256": "00a31fc4e883b6f972b8cf914108d77a1bac320647a0f89130420eb11f8a6045"
+        },
+        {
+          "id": "p036",
+          "sha256": "bd593b6cd9fd7da1cbab0aeb7d662b49a41395ca3ef4c75a3216730d6d6841ac"
+        },
+        {
+          "id": "p037",
+          "sha256": "8c6039fc6a4831bf45f035d71e78dffa8cf2d4b375cb85cc9debe70052651657"
+        },
+        {
+          "id": "p038",
+          "sha256": "e9e0af64020f2e8b3923a4521b10415f9196e40de4145582529e9bf07a0725d5"
+        },
+        {
+          "id": "p039",
+          "sha256": "d278ea3a6049e87272e158d5d9237f3171f4422a7fcebc602662f3ac4bb7d4a2"
+        }
+      ]
+    },
+    {
+      "id": "szu-1988",
+      "title": "深圳大学本科大类招生学生专业分流管理办法（试行）",
+      "url": "https://jwb.szu.edu.cn/info/1356/1988.htm",
+      "textSha256": "7ae9f8362e43972306884da9e5adf5b54ea4d5b64679314d2f19d574002f4701",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "a26ef2b0709dacf65406ffb46802506b7423af7af4e491925d88df06928caeaa"
+        },
+        {
+          "id": "p002",
+          "sha256": "9f3ab16b2fdb5a78b2276a725432c7261d553879a3adfcd14c0910b4305c1eac"
+        },
+        {
+          "id": "p003",
+          "sha256": "1784a72215022632d2ec1a4a436c056c67e047b994a8607a9a71f94044bb0964"
+        },
+        {
+          "id": "p004",
+          "sha256": "55a3109be8f2f9fa8c41590f596a4971fca742b3680abf624393fa2b751d99e6"
+        },
+        {
+          "id": "p005",
+          "sha256": "7096dab06498cc320eaead50ffb47abcc27f67f30efa74a8ed2022d013d88c65"
+        },
+        {
+          "id": "p006",
+          "sha256": "07edf9976f00000182a2f5a4965040dd6f0fab745f2bdea1340548136ddf1677"
+        },
+        {
+          "id": "p007",
+          "sha256": "3fbe7cff3949ac6a5cc0fbc068d59ea63bbfbc047ae423a736c9e586bd41831e"
+        },
+        {
+          "id": "p008",
+          "sha256": "266883fb29d5a714f14ffaeabad27164c7c8f43ba9505b6db29db24340a2d5cc"
+        },
+        {
+          "id": "p009",
+          "sha256": "dfa1905ec8b4705f02652da3c00a02e4bb667d8cf2e98b5246785f228b301705"
+        },
+        {
+          "id": "p010",
+          "sha256": "99cca8139fd8ab914d763f8e64aad5739d90258fd13cfce39ea2e2a132ec738a"
+        },
+        {
+          "id": "p011",
+          "sha256": "04c62081e9237374be530db772b99564dc1da55cabed37240db470d94fa37b8a"
+        },
+        {
+          "id": "p012",
+          "sha256": "8f953deeb643cb2d9b21e8b880551c8632f6eac2254925f936931e23195447a2"
+        },
+        {
+          "id": "p013",
+          "sha256": "8a7bffefe6b54490ac1d2b4c3174a62aa6328b1e5401c7b9e4ff1d29eaf28fb4"
+        },
+        {
+          "id": "p014",
+          "sha256": "08d52bb13fffe7148c4d45c4d67e034a37d416454509a745d4255cfe0e7687cb"
+        },
+        {
+          "id": "p015",
+          "sha256": "a87666856b3aab6dba797dbb7cd1da986fbe19fc2a8b533b56c91e7a79d2cc5a"
+        },
+        {
+          "id": "p016",
+          "sha256": "756c4fb546b55517af26431e468b7ac5e22edc7f18cc3fd057159d42ca1a6ce8"
+        },
+        {
+          "id": "p017",
+          "sha256": "85b1b3cca75412b8946971adcc512f1a373ef4a1c566c00e4d8f75821a08f03c"
+        },
+        {
+          "id": "p018",
+          "sha256": "f0e4b5f343b75f2006fc878e5f0f2396f97f88aef772bce39a42acf5d65ea54f"
+        },
+        {
+          "id": "p019",
+          "sha256": "588918d6d84579298b6796fe83ade3567f26a57b44ffb51ddbce283be53d254f"
+        },
+        {
+          "id": "p020",
+          "sha256": "2e22b47ac6c5477c50f7f904461eefeb43f95cbf6fac58d64ff2836c8f3da0c5"
+        },
+        {
+          "id": "p021",
+          "sha256": "91f5428a0158f87cf2e57e347eabefe8c83a3524389e6f404883d68dcda24950"
+        }
+      ]
+    },
+    {
+      "id": "szu-1989",
+      "title": "深圳大学本科生转专业管理办法（试行）",
+      "url": "https://jwb.szu.edu.cn/info/1356/1989.htm",
+      "textSha256": "b899d83eb69daabe0ebd1d6cc130f2e3a105bf5805f43224af0adb896bd30543",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "a26ef2b0709dacf65406ffb46802506b7423af7af4e491925d88df06928caeaa"
+        },
+        {
+          "id": "p002",
+          "sha256": "8664566081537bdef5f74dd2e8f2308b90b3e5452ff43e038c68c96544cd8ac5"
+        },
+        {
+          "id": "p003",
+          "sha256": "9b4dc9c8ea023c4700cab89baa3a990ac84eb82322b3fcefcbecbee5a729ff38"
+        },
+        {
+          "id": "p004",
+          "sha256": "9dc998acc49777783c8d9f37bf56dd8085d36cd84d71c157cbaff45876d21dff"
+        },
+        {
+          "id": "p005",
+          "sha256": "5d89d5d7f424e98146e6096c160e796f183ad86b1099941497ee8b1d436f23b3"
+        },
+        {
+          "id": "p006",
+          "sha256": "5f12baf6049834705e4d3fc999bb51f5378536faee45621a8ff8e31e402e5b17"
+        },
+        {
+          "id": "p007",
+          "sha256": "dc3216545a93d3cca7d680b4d524cb3c58965505fa567ed39e8c1ee33db942da"
+        },
+        {
+          "id": "p008",
+          "sha256": "13d7573712da5bb4dc0e5487eefb1ececd8245d167467de508950365d8a9453a"
+        },
+        {
+          "id": "p009",
+          "sha256": "f8cbb9bf00ab894b82bbce648a08ad10ec3a9553f79741e7533a6cff7bd7bd8e"
+        },
+        {
+          "id": "p010",
+          "sha256": "673efb50aaf11b9a87db5b6e5f34baa11fb54a9c84a2cbb32c97514519211a4a"
+        },
+        {
+          "id": "p011",
+          "sha256": "d482975a75e98ddf2812700307d1b528a6d91b4511cfd284f606f95ce70adfa6"
+        },
+        {
+          "id": "p012",
+          "sha256": "c0f98d1da396d5e421037f7247aae02d59cbad1518514a2651446d3c902f9fbb"
+        },
+        {
+          "id": "p013",
+          "sha256": "adb88a184db16a67a054df7069d2f3b6a1af94bc2e06997b02f4427a4ff70c29"
+        },
+        {
+          "id": "p014",
+          "sha256": "49a7c4974d87832139e091216c295b84a32ca8df0a162951e5e459616a2a1f41"
+        },
+        {
+          "id": "p015",
+          "sha256": "a0eec17087416254c95e785639f815716d7944a28747a58648df59853473b1a8"
+        },
+        {
+          "id": "p016",
+          "sha256": "02b59369cde27a1beeb1cefd570c813836beb44347cb92ee330ec13ef5660dc7"
+        },
+        {
+          "id": "p017",
+          "sha256": "54a9bb55aeb45ddac5dd1f801f3a3fc5c094d29e2bddb99eea60082db00ada4e"
+        },
+        {
+          "id": "p018",
+          "sha256": "968e6adaaa7e917f200acfdb9952110a02e8d821f7a8026aa70505c67e578c59"
+        },
+        {
+          "id": "p019",
+          "sha256": "2e5f2d593acf62b5dc7782c8435a399441bf3de396f17a014296c473f5b2c258"
+        },
+        {
+          "id": "p020",
+          "sha256": "b0784dbc3a806c8dcfc3ab06f55740f8c8247b2f7bdde5e50e20d13f4835ee81"
+        },
+        {
+          "id": "p021",
+          "sha256": "f6c1803f83915ff01192b8dac76169e4d3a23e38da1c68d5a586464b6688655d"
+        },
+        {
+          "id": "p022",
+          "sha256": "dcd4f1310c80ab24186674e9b48b7dee5e352e435d0260a30c7db9c1b83f56f3"
+        },
+        {
+          "id": "p023",
+          "sha256": "30275eb96a12422e5603586706c04595769485439cdbf81489665e2c0a64f62b"
+        },
+        {
+          "id": "p024",
+          "sha256": "1d56c33479ad01d5b55f92762da8203cef9a87dc8f2f3fc03ea06531c448620f"
+        },
+        {
+          "id": "p025",
+          "sha256": "5327436ee7f34956196fb0179f816763f4340ecf9add119460179870a2d9e150"
+        },
+        {
+          "id": "p026",
+          "sha256": "720882b710c399ce3d71ed35e9bd6b40996fd2830f769d11dc40c00eadd71dec"
+        },
+        {
+          "id": "p027",
+          "sha256": "be7e184530598fe1a5dd93b768130240e668887845ec2eb30488cd9e9cb74885"
+        },
+        {
+          "id": "p028",
+          "sha256": "a830b53918a2058a0d56cec428ac7d8159ea9863ebf11246b9c6a0aa1cb4bae9"
+        },
+        {
+          "id": "p029",
+          "sha256": "3fac8acfb95ebecaed9559a06322a9c706b510bb1e785d9bc835b65d5066d631"
+        },
+        {
+          "id": "p030",
+          "sha256": "53287f73409e62af8b3d89f2027757bd62191f4dc7bfaad8efdfdd687b13e16b"
+        },
+        {
+          "id": "p031",
+          "sha256": "39e6addfcd51b5498a625987dd60955480c400489fc78e7cdc7fda8f057d5064"
+        },
+        {
+          "id": "p032",
+          "sha256": "14781a2356d4b06662ac3485e198878c676c8c3173b025f7a783ff110992b153"
+        },
+        {
+          "id": "p033",
+          "sha256": "e75691adfe3e07f03f44801f6b285bcb878926dd27eadd0f987746ebf0a97ec2"
+        },
+        {
+          "id": "p034",
+          "sha256": "3b48bfb5872c0654de70ab7ad62daf6a71d095eb47a68b9fa824ce3ca063adaf"
+        },
+        {
+          "id": "p035",
+          "sha256": "76ee78f54896ad71918da6ba80ab5d069bb5233dad4ae946ff81b54291de9d5f"
+        },
+        {
+          "id": "p036",
+          "sha256": "4c4829bf3b56e4b2351f96186ac33656a6133c0a12c652e7f0695db48c32630c"
+        },
+        {
+          "id": "p037",
+          "sha256": "f1b17ac65a5eb9301886901bf1e99d062f1b65df686137074c74b2f5b5002582"
+        },
+        {
+          "id": "p038",
+          "sha256": "d1f62d538ad15df0a413f6d6fefa86a5852de64f2ccc0a15fbcd835173f60a1e"
+        },
+        {
+          "id": "p039",
+          "sha256": "3cc22cb56798cd1651bb6a24fb4d8c8e4a95f72fc45bd22edee314f8122b5ed5"
+        },
+        {
+          "id": "p040",
+          "sha256": "2fce6eb8cd28f19d9fe62e7e44afe100efef54865f6f4a286877bcfedbc8b7e6"
+        },
+        {
+          "id": "p041",
+          "sha256": "01d8a6ddcb0499b15a441b10beb4af1ce20e3a6e3057b74fb331f58938d966b0"
+        },
+        {
+          "id": "p042",
+          "sha256": "77cfb2b5803799afd6992d530a7c68a38868c4b90e1642d812e386a74e922421"
+        },
+        {
+          "id": "p043",
+          "sha256": "101416f44b9f98572aad12dab29b18ff11defef76faf9b9c7a2280d9f8d46219"
+        },
+        {
+          "id": "p044",
+          "sha256": "3c38d824cf549c69bca65d6065869b203c3294e7d444cc4e212c30e061ae1be3"
+        },
+        {
+          "id": "p045",
+          "sha256": "c4f2630a61a6e3af6b2b2249867b5c88320a2eaae203730ac9951f6831f5520e"
+        },
+        {
+          "id": "p046",
+          "sha256": "256b7c6efe62f95265a1f7368abc5295f338068d648326c1e9c5778d3de9dd60"
+        },
+        {
+          "id": "p047",
+          "sha256": "60bfcbdda571da344e62ca38584addd2e18bf7fb62b4086a76f0512d79a9f6c6"
+        }
+      ]
+    },
+    {
+      "id": "szu-1990",
+      "title": "深圳大学本科生学业预警及学业退学管理规定",
+      "url": "https://jwb.szu.edu.cn/info/1356/1990.htm",
+      "textSha256": "4b240097255c6aea6f2f670ae7da553c2afb5c15b46b60401846ae4ffad66dc1",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "feac5e163f18615752bdef57bbeda26c345015d30566f45401c8eec1c8f07904"
+        },
+        {
+          "id": "p002",
+          "sha256": "b05786fe87013f9feb0917bb508efadd359c33d7631464388a74b4cf7941ccee"
+        },
+        {
+          "id": "p003",
+          "sha256": "2a13343cc3b2be4a5a8602967319a400a67f031ac27dacefcf502a83533cd83e"
+        },
+        {
+          "id": "p004",
+          "sha256": "90c93f162b79a9e7f13377fecd64e8885c0591a4d7586cf2f2252bccf0c1e2b6"
+        },
+        {
+          "id": "p005",
+          "sha256": "28c54781424353dfc5ec2778fd44984748b78c21e67104c00f41b99d0d1bc755"
+        },
+        {
+          "id": "p006",
+          "sha256": "1b7fba4308e47f700a3519fa9a563de1460925d7cd5d4f23120bdb2eeb376675"
+        },
+        {
+          "id": "p007",
+          "sha256": "5c5439a632d9d4d9bad9485f739f206d53269535de9148ffbe2ebbfd556ca034"
+        },
+        {
+          "id": "p008",
+          "sha256": "1eb53dc8f1a917ead15ab7a7b0c26a9c1c6792b85826bf87def8e76d4b979226"
+        },
+        {
+          "id": "p009",
+          "sha256": "2b190ef3ae6898d6799f38d6b4b946973e3b8650580d42f416eb042710dffb69"
+        },
+        {
+          "id": "p010",
+          "sha256": "efb4baf45ee3661296e09defc11b9f53362507c75a23f8b5b191c79e757521e0"
+        },
+        {
+          "id": "p011",
+          "sha256": "58010bf6be587cf3d738d68ab64df3158165ff4571cb11432156faf01957ba1e"
+        },
+        {
+          "id": "p012",
+          "sha256": "9a3f5c14246d65573978b47758f3ed348afde82fcb852dc28cc3a8e78014ab40"
+        },
+        {
+          "id": "p013",
+          "sha256": "1c04dd3ec7f77285d0002820dbc5d94ab7a409f6cac5b6d599852c2500799b50"
+        },
+        {
+          "id": "p014",
+          "sha256": "d572619332b5a8b8f7f580f76017af7ca0019ea1f1dca6e45210d65d7745be9f"
+        },
+        {
+          "id": "p015",
+          "sha256": "7962dcc545908aff2a197979444c45a1bd1d10da1043be600d53de1298079477"
+        },
+        {
+          "id": "p016",
+          "sha256": "c828aeaa97f6f9187c7cf4897f3c97675f03c81f3c58bc59c6189a0e226e46d5"
+        },
+        {
+          "id": "p017",
+          "sha256": "1faabf05714b496efdc543bfd5b96eb3d8699033815891f34833911f855f95e7"
+        },
+        {
+          "id": "p018",
+          "sha256": "2ee3ade4daa252f3f2ab5c39f19c725d331cc182c5cb585f5c28e96bb204c44b"
+        },
+        {
+          "id": "p019",
+          "sha256": "9766c2bfe9528466861084c4b501cb1aca134e5d364ea5d36eead5c40c4d44d1"
+        },
+        {
+          "id": "p020",
+          "sha256": "c609b3c45cfa8204984e8aeda5d958a85d93411f27fa718e503ce276441f3132"
+        },
+        {
+          "id": "p021",
+          "sha256": "2b5a53de04668ffa7e97ed48ff059950e8f1d31459abbf07a56e3ddbcc8d6049"
+        },
+        {
+          "id": "p022",
+          "sha256": "8a9cad4ecc35b2a351dd18d99374a2f2fa2e0919720c485d32e049471ae60d4e"
+        },
+        {
+          "id": "p023",
+          "sha256": "b5d0f1945f9bf07a363bdc34eb53d113735544fb99500e91d8aa7ba0a89fa6b3"
+        },
+        {
+          "id": "p024",
+          "sha256": "2bc0a56588738f4ded19965642e8c8c032e3ea316ece849e6ef14455cfd0781d"
+        },
+        {
+          "id": "p025",
+          "sha256": "1bdcd4f8cff7c17ce7bf408ea12256bfcf2afc2903a0ed6f473491375f56f30d"
+        },
+        {
+          "id": "p026",
+          "sha256": "15b0849e83025517791d359431eececb56961018808fd138c64c7eb019a52e85"
+        },
+        {
+          "id": "p027",
+          "sha256": "66ade0e5797815ec7c32d2e73d56c69f62c5afd5bbd2ccc2fa658afad30a9e84"
+        },
+        {
+          "id": "p028",
+          "sha256": "84bea6ea65947d5c1207bba90196999b318a54c04cfcfe4b25a78ea9592c0ba0"
+        },
+        {
+          "id": "p029",
+          "sha256": "5fb43a1b0af81b49274856d1a533f9cba14fa26d67e00027eaadf6da30892ede"
+        },
+        {
+          "id": "p030",
+          "sha256": "4e802d3a99a11257530e6de01c3f7d909e7d81637ab56b1d87a6adf347075de2"
+        },
+        {
+          "id": "p031",
+          "sha256": "a72fc6c95a6f8e30eed5360a9ef53e3a54275868f348d6663c2c00f8f67f310e"
+        },
+        {
+          "id": "p032",
+          "sha256": "4d6b12f838083d19aaedfc26cae7f3b3b29fec649ef48f7737065f7b7a3289f0"
+        },
+        {
+          "id": "p033",
+          "sha256": "6a9fa0c348ead46113070235f134155b3b9419f098b062cd913d7e44b9170040"
+        },
+        {
+          "id": "p034",
+          "sha256": "150557a668f765c1df49a68b6261d18624f57dfd03e5e92b04f2ee1b1c191370"
+        },
+        {
+          "id": "p035",
+          "sha256": "09a30132a2601dd96d444d63d8066e0f3f032f3373ecdf802a7ca8e2022bda69"
+        },
+        {
+          "id": "p036",
+          "sha256": "241ea708c8a242df5b71244de8a03b43851cb59cbd5640d1f614c53dc01ac799"
+        },
+        {
+          "id": "p037",
+          "sha256": "013ad0f74099213942c6bf1db0058ef0180f5dd53f5fc81654e620ab3dd6ae18"
+        },
+        {
+          "id": "p038",
+          "sha256": "acb6d7275a96570c870274e73680e7d3846e3b1a6d70959f786f78159a5f2819"
+        },
+        {
+          "id": "p039",
+          "sha256": "7057df23f6aabac9ee0a58af552c5da61dac3d48c6fdaf8a369f04f5f5ad52ea"
+        },
+        {
+          "id": "p040",
+          "sha256": "68e4e5a15633b43080102967d4ca59bd94fb0be38c521b0ca9f988b189c3aa15"
+        },
+        {
+          "id": "p041",
+          "sha256": "4f5c3768ed71c1cec3ba52935f87fe29d6f5f93b651222a03358c76f64aa0d4e"
+        },
+        {
+          "id": "p042",
+          "sha256": "1f433dc5b3dd3163442957fc2c534e28b010d57203617b7a9f2a73bdb92c01c1"
+        }
+      ]
+    },
+    {
+      "id": "szu-1991",
+      "title": "深圳大学全日制本科生学籍信息变更管理办法（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1356/1991.htm",
+      "textSha256": "5378ad0c3c5e0b61c7bbde3e558739b627e5146e4c10f292b9ee2cadfff9a439",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "e2eb2ad33e42affdd098566532384041dff17b60b1b940ff9e66ba77a2334eae"
+        },
+        {
+          "id": "p002",
+          "sha256": "4220990223a31614c09945a4fba2f9abdd38e41b9a50298e8d6c309103eca652"
+        },
+        {
+          "id": "p003",
+          "sha256": "f9b798d2e3698c2432acb7a5ad9737fe5cf48ceb5cc4e229b0b27f63789ca9ab"
+        },
+        {
+          "id": "p004",
+          "sha256": "e3988766a983cd2d9e68f95587b22f3e5dcf998cfecfa44274e1362c12525520"
+        },
+        {
+          "id": "p005",
+          "sha256": "741dd229c991dff2371e603e03d587b2886e1896cda49aa8216536970f8da026"
+        },
+        {
+          "id": "p006",
+          "sha256": "22ae45ba05cc543c9ef96046d0b9ca2586c88d04ca27ac5cc8b2cedbc2bb50c0"
+        },
+        {
+          "id": "p007",
+          "sha256": "5215ddb8a35eba2adbf793e8eb30bd720a75fa43d2a622eb8c5620a4db24b209"
+        },
+        {
+          "id": "p008",
+          "sha256": "52cc3d7d60b4eb01898dc691bfb30c2f3b3e234206d92328a71d92c310aa629d"
+        },
+        {
+          "id": "p009",
+          "sha256": "c607902e9119cfb8690e01ce6d2be5250f929e8a15fbeaf30c2ac69b9a437f3b"
+        },
+        {
+          "id": "p010",
+          "sha256": "2c7d2e54d98ce3494c1a9f55e00f0319ac454451f50e597767f643e9e283c943"
+        },
+        {
+          "id": "p011",
+          "sha256": "d8e395de14e3c7840310a778df318e269261d3f9606af5addb175d5643751684"
+        },
+        {
+          "id": "p012",
+          "sha256": "8331abe848bfeca4d932fde4eebd267142d167f4bdd503d6ea244f56108244d7"
+        },
+        {
+          "id": "p013",
+          "sha256": "4c8455f1e3cc8ba178702b096e6f6cd98ceaccc5a856960addd19adcac1e255d"
+        },
+        {
+          "id": "p014",
+          "sha256": "ce5c1b754be02fe3a75fe0bf2040a1dbd4d50f1bbedce5e2fbd46985d4c5bbbc"
+        },
+        {
+          "id": "p015",
+          "sha256": "415e432694ee1ca3fdb6f61cc3b45c8fd7b0bfe57f4b5afc5e6eb802087d2cfd"
+        },
+        {
+          "id": "p016",
+          "sha256": "368bfd81f6fe8ac1b8b66cf5500ebe24cbd5720ae09bdccafff97399c9a18eaf"
+        },
+        {
+          "id": "p017",
+          "sha256": "7569c3a7bb7197dbfef2833b2fe88e54aab7c33977dec8c4c1d78bcf5eb3d199"
+        },
+        {
+          "id": "p018",
+          "sha256": "e8cb402e95498fba44022539fccd07b953bb7eda666cec664dad56ecdeb3aa71"
+        },
+        {
+          "id": "p019",
+          "sha256": "6fca87cffb3605799121d8d78b5a033eeb1107a2280dedf3b2696d544272ceb0"
+        },
+        {
+          "id": "p020",
+          "sha256": "91ec8bc5d53458d0c77b7ca11056c6a9e55b9097e7d3f32b658db521b511c2c0"
+        },
+        {
+          "id": "p021",
+          "sha256": "5e3cfe9b1f57e62805bc591005ce373a0f8dc4df16a8481ab5c0afdd60cf43ad"
+        },
+        {
+          "id": "p022",
+          "sha256": "a0fa2915d07ba6639819a454951d6fa9a202399e751c8acc9376a392f442e100"
+        },
+        {
+          "id": "p023",
+          "sha256": "03c022ed37203b02025ea95ebcdece065ac1f78a38e9502b5f923c9a317d14a7"
+        },
+        {
+          "id": "p024",
+          "sha256": "77255cc7447e8c5023ebb12336805e86dce404abf514b77c28e770e4cde3ba37"
+        },
+        {
+          "id": "p025",
+          "sha256": "d1e2fbf4d37c070d11fe4041f5fba31fb241fc0c1cd9322e93a4e2fc110f36e3"
+        },
+        {
+          "id": "p026",
+          "sha256": "53907334f45cecc5837ed719dba116630b59e5098a3b2330df0d96c22798e93c"
+        },
+        {
+          "id": "p027",
+          "sha256": "eb19df4958cecf6aef01862bd9f8d89d1b545a56871d5fcf71697ffa7bd8a396"
+        }
+      ]
+    },
+    {
+      "id": "szu-1992",
+      "title": "深圳大学学生选课管理规定（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1356/1992.htm",
+      "textSha256": "abde6a17320794c35899c0cdef382f517e46ad1bccf98b6a2de2b1a0de97efb2",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "e2eb2ad33e42affdd098566532384041dff17b60b1b940ff9e66ba77a2334eae"
+        },
+        {
+          "id": "p002",
+          "sha256": "49b4e340210390bfd84d022c9428142cf0edfa1c54e43aa9906a833adebba26c"
+        },
+        {
+          "id": "p003",
+          "sha256": "d28a031630bfd341b692708891f955c6207798e477486a3a2e17284129d6079c"
+        },
+        {
+          "id": "p004",
+          "sha256": "2efe381e18b745b9a4b8722bea73ca4319469efab884962304af0fb7d487edcf"
+        },
+        {
+          "id": "p005",
+          "sha256": "c866c9cae304e7d6484a6ce86dd716c7f4deb56f797ece0474cb19e8f64fd2d9"
+        },
+        {
+          "id": "p006",
+          "sha256": "939b98470fddaf81a31f8c986a3174faef928e501afdea05c098cf21a2fd3004"
+        },
+        {
+          "id": "p007",
+          "sha256": "868f2821137657c44a89b0aa976a9fc45037688bfa5d8cb5bbf8977826bbf6f1"
+        },
+        {
+          "id": "p008",
+          "sha256": "02d74d192aa37295a3c7c95a7ca7fc7c08c635363c1a415af248a82bcc59e9fa"
+        },
+        {
+          "id": "p009",
+          "sha256": "ec64a62ca50dd2c6e7a49f42fb3fcd4a0494f2941440c3055bb5d73132235af4"
+        },
+        {
+          "id": "p010",
+          "sha256": "a2f49a3bf10fd6e348cc6f1930e583f30aa7dcd8200c983c831620ff0a87baa1"
+        },
+        {
+          "id": "p011",
+          "sha256": "f9f32ad6a3229db49f82774c9690e00f95eeb4fe5a110d2385edecdfe73dd54d"
+        },
+        {
+          "id": "p012",
+          "sha256": "6de5b8a47f52e1573c183bdbddf2fdb26545ca16d029ecf449891fd9fd96fe39"
+        },
+        {
+          "id": "p013",
+          "sha256": "71d3f657b3fbb419a7d4508cc95455a90d36d1bb419dc6751497e6a7b33e07cb"
+        },
+        {
+          "id": "p014",
+          "sha256": "e4a874662b9b17ee19b6abb6586ba03a521453bd49c12a37957d05a920f0cfed"
+        },
+        {
+          "id": "p015",
+          "sha256": "25870798b9bf6a5dde3d9ecaa125cb9ee80e02fc6765a287dc41cdd0514bc09d"
+        },
+        {
+          "id": "p016",
+          "sha256": "856601cda460d312b7d747add214ebd53e0205399323ba312097cfe62da8dae6"
+        },
+        {
+          "id": "p017",
+          "sha256": "6712f46341932ba9889404f4a1716403a0a722511321e2acb0ceb0807f67f01d"
+        },
+        {
+          "id": "p018",
+          "sha256": "8ae65dc4a01f827b96fa4196053824702d4dd9068a5ff3460cbd88fef28be86e"
+        },
+        {
+          "id": "p019",
+          "sha256": "9333bdb93d50280c12d02bcd32b73c7cd6cbce4745a5c6b076bd8547c55cc087"
+        },
+        {
+          "id": "p020",
+          "sha256": "ea686fcb6d326cd02ddebdf9c580393a75d2bc397aad27e08dee8a98800823fe"
+        },
+        {
+          "id": "p021",
+          "sha256": "5b24133eb4aaf6ce6eb13fe6d73f96b10fd22e7ec1f0a66ff06d54710d4c07da"
+        },
+        {
+          "id": "p022",
+          "sha256": "6a9760973a50f7cf0bdad626c730822b9842a8ae0c6a159dd73a716eb4907d97"
+        },
+        {
+          "id": "p023",
+          "sha256": "c7f0e107409723588e2749dad6a223ff7a14a0e23e4cfc4c5f7373c0d010514a"
+        },
+        {
+          "id": "p024",
+          "sha256": "80b04bfa4695cadef66c33518b4a9d5f5d22963ad469a913526dec54299c6e9a"
+        }
+      ]
+    },
+    {
+      "id": "szu-1993",
+      "title": "深圳大学课程免听免修的规定",
+      "url": "https://jwb.szu.edu.cn/info/1356/1993.htm",
+      "textSha256": "7e9e8857c74224314ef8e1ec124800b0702bd64690ddca11f0dc09c86694d3c0",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "e2eb2ad33e42affdd098566532384041dff17b60b1b940ff9e66ba77a2334eae"
+        },
+        {
+          "id": "p002",
+          "sha256": "3f9a5b9e820bfcba7293291bd267b7153ef8c49aaf2049fc8bd8ac3f00bfef25"
+        },
+        {
+          "id": "p003",
+          "sha256": "152f6edd5de2e8e542dbc38697337166044ea2b8c3d220cb85b549c0cf15b353"
+        },
+        {
+          "id": "p004",
+          "sha256": "41f5fc0f7cbc7dccc910a203e17d5ee90a1952afac7dee51ec91719cc023c7ac"
+        },
+        {
+          "id": "p005",
+          "sha256": "2b21d2e3a4629cc98a1d807fac374b3800f6e033b4aa20a44a577dfb21dd76a1"
+        },
+        {
+          "id": "p006",
+          "sha256": "f9bc4c677501f028f560aaf28f640d27a58410d4e82fcddaf12e5e8d68673aab"
+        },
+        {
+          "id": "p007",
+          "sha256": "de2cdd39b05f84fc6643699a92826be6a87c07024cea074b04ca54dabf3dce09"
+        },
+        {
+          "id": "p008",
+          "sha256": "14f7e4c5358362eb539b9f694b0c4127edd3e76b9a504f46cdefc099be4e6ce7"
+        },
+        {
+          "id": "p009",
+          "sha256": "828a67ae108d2f9a0fec2576680e91c159c7dcd7bb4fd3f9bea04fc6e3962d35"
+        },
+        {
+          "id": "p010",
+          "sha256": "c1164709e267051b5c812cd5dde6e6ab4947f2c1611251cd7ad50c17d507f420"
+        },
+        {
+          "id": "p011",
+          "sha256": "66a4c17cd2bb6ead181cab6f3485017a0a1f0fd417e171318ea8372aae57a11f"
+        },
+        {
+          "id": "p012",
+          "sha256": "4c2f81a557d2fc6d154b4bd9a14f2440434ca74c197050f8d117082536948fc6"
+        },
+        {
+          "id": "p013",
+          "sha256": "9cc91c46d389362f12f678a3900a32abeac3377d662cafa36c04fc191f2caff5"
+        },
+        {
+          "id": "p014",
+          "sha256": "4174cee345b3726e8aba50bfcbc46b98412f5f82b177b63f8817104d1f2bccf8"
+        },
+        {
+          "id": "p015",
+          "sha256": "8e3003b31ccf9324596a33b73cd5d5ab5e340f9761fc7cd51ce8c5ff6f0d483a"
+        },
+        {
+          "id": "p016",
+          "sha256": "51dcb91318224605a571411d947c96b1ad0c891f0e8b5a08951b4e3ec80a1339"
+        },
+        {
+          "id": "p017",
+          "sha256": "0c2bd41999d0efcc201480e654a0370c728482d1eaa237111d9e3175a37ddd28"
+        },
+        {
+          "id": "p018",
+          "sha256": "5bd76da515ab3fec9ea7b4275830046711fcb7a91d44ef13ff31f03660828241"
+        },
+        {
+          "id": "p019",
+          "sha256": "b7d392504f9669e0dd05ab5444cf13c2489855cca84ae3039cc48b3fa99a00f0"
+        },
+        {
+          "id": "p020",
+          "sha256": "0712b527f3c3ed58dd5a6c1c5cb9fa0017ee86c408d52a229892cf5ee5e08ffd"
+        },
+        {
+          "id": "p021",
+          "sha256": "727e76d6fa29309c415ee0cd3087c8b71edecbfec6443002c3ddeea4f7962c14"
+        },
+        {
+          "id": "p022",
+          "sha256": "aaf20c05cbb065950e68a13b73671580c8c8d919908e3ede1660dcb57791f563"
+        },
+        {
+          "id": "p023",
+          "sha256": "216a0c098d419d3461e18dc1c684e8b7cc9711086785f9125018b1a5c0ad6018"
+        },
+        {
+          "id": "p024",
+          "sha256": "02cc40685ea14377c49adf727b1f501201fe4ce2097539a097e00133eebb3a32"
+        },
+        {
+          "id": "p025",
+          "sha256": "758093762ecf20f5a4505bb34f9b23781db43cca1e6883f839994f721843c890"
+        },
+        {
+          "id": "p026",
+          "sha256": "ff52e5f13e99981ea96525daac7a4b8dc29f5dfb2a2db94156c9b05cd6e7f14b"
+        },
+        {
+          "id": "p027",
+          "sha256": "fd70a2c826e6a6835cc2f8c4fb29a8b2708de199d2f11ad1845ab5041242c64a"
+        },
+        {
+          "id": "p028",
+          "sha256": "971a79ab38733c7e4c3b1a1b30059cb544e225764d04d8c2fddb8ca222c3158f"
+        },
+        {
+          "id": "p029",
+          "sha256": "86a39a2f4d40995eb10b7d57939b5abafc1c7f41da421b7a56d2a00b028ed5df"
+        },
+        {
+          "id": "p030",
+          "sha256": "066e6be450348efd7cd0148f5747770cad6873dad50b9fe7957adce1ee720e0b"
+        }
+      ]
+    },
+    {
+      "id": "szu-1994",
+      "title": "深圳大学本科学生转学管理实施细则（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1356/1994.htm",
+      "textSha256": "fe062fa0d990763ae230d489a8e4b03a910c6ad1c66573d84d2414aefb21967a",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "e2eb2ad33e42affdd098566532384041dff17b60b1b940ff9e66ba77a2334eae"
+        },
+        {
+          "id": "p002",
+          "sha256": "4eb9ecddb666444b295e2dc34603374a2cb83907fe1fe9b54d9927a17e81863a"
+        },
+        {
+          "id": "p003",
+          "sha256": "36a0b4e501aca3756102ae32c1533c966fc3da09cb7106930165fad2a85ce765"
+        },
+        {
+          "id": "p004",
+          "sha256": "7ea4da99b7a52677c1f1a5562e47c5475fd66294a82c6fa4c0ee338f42fc5476"
+        },
+        {
+          "id": "p005",
+          "sha256": "86f7881e79b7e67795b96826f5c98c7186d52e81c9596e866138e8ea6eb524ef"
+        },
+        {
+          "id": "p006",
+          "sha256": "348f053118102f3e005a0a2acaa2b0cccfe9a1bd699f9e3a7123b456dc788226"
+        },
+        {
+          "id": "p007",
+          "sha256": "3e191b95438aedf225647055b03a5fae988e3f668cbbb57835863e4c49cf8871"
+        },
+        {
+          "id": "p008",
+          "sha256": "16a56014224629a018492461fdd697e02bb812a1c5e5cb841dff22b74fbdabc8"
+        },
+        {
+          "id": "p009",
+          "sha256": "cba9ecc11d37456d3933fbc1630f8362eb4abc253dd4b191db53ae3eb66ca4c8"
+        },
+        {
+          "id": "p010",
+          "sha256": "06382d7fed2580bb2103aee560cc4b3f1882413003ff3dcbbaf796adeab7061e"
+        },
+        {
+          "id": "p011",
+          "sha256": "8e5791d2295c1fd2c2bc79ba20b865d01218667d83b2dafc81754e3598423de9"
+        },
+        {
+          "id": "p012",
+          "sha256": "397e4716b252fe0bc5475020c2afc232e2c0be215374673fa9a202d8fbe94323"
+        },
+        {
+          "id": "p013",
+          "sha256": "2f5e33a853714e45182d58b0b2a16c8d2f4b1ac4cbc7151bb7e163a51b7650fc"
+        },
+        {
+          "id": "p014",
+          "sha256": "ba680f9ebacceb51906797f57905f6b5054a3a9912f836ffc29f55516fadc12c"
+        },
+        {
+          "id": "p015",
+          "sha256": "2a45dab02d9978e7d17601fc120466092c7e07f1713b31d63d1c6c848524a2c1"
+        },
+        {
+          "id": "p016",
+          "sha256": "4431a3150c2a2b5995440c56f18b943efdc4d0cb588f2e14f1a15957c76641a8"
+        },
+        {
+          "id": "p017",
+          "sha256": "02d8ef0be0665a4805ad94d7ad69273e38894bf700a1109d7345ef9a0c68004c"
+        },
+        {
+          "id": "p018",
+          "sha256": "8316a481cd6e3c4ce156bcf1b5618eae95d47616338607fcad15057e0aa24fc0"
+        },
+        {
+          "id": "p019",
+          "sha256": "7f8a78888635c2f4d7bb96249a109c5780e5a198edbab50ca9bb4a22c805abb7"
+        },
+        {
+          "id": "p020",
+          "sha256": "3d1ccfb67809f96efd60c4c5b874859aa3fe1c2aca1032a8687d5a14fada0a08"
+        },
+        {
+          "id": "p021",
+          "sha256": "314be00ff448101e815ef1c35ccd00f5da6d299d7898f990a0442078faca9d6b"
+        },
+        {
+          "id": "p022",
+          "sha256": "a7b0f33d401a3718bfeac65192723f9de9af4a6c16b0f112a95d3a9003d2c5e4"
+        },
+        {
+          "id": "p023",
+          "sha256": "73eaad93bd8b82be3b03da0b4d5bf926d73441e1ea5c2a9eb0f52900c2e7ba37"
+        },
+        {
+          "id": "p024",
+          "sha256": "37ada40c49282aad118a9c4c9687f059cc70a42a744eb64f296a8901bc8c78a6"
+        },
+        {
+          "id": "p025",
+          "sha256": "7a8af03fd424d8d953d246796a14b0404358b4563023cea6dbb0e9b67c8bb524"
+        },
+        {
+          "id": "p026",
+          "sha256": "9d003599198162426d29e02748a2c1acfc999fa14a484ce2efea264679784117"
+        },
+        {
+          "id": "p027",
+          "sha256": "15a00709d043dc42a80ce743b0382b7ee4d6b51c42c8141125849df0ddb4bf72"
+        },
+        {
+          "id": "p028",
+          "sha256": "514be1c735f64903429b5ae36751b6193fb00ca687caf8bee29cf814f308ed54"
+        }
+      ]
+    },
+    {
+      "id": "szu-1995",
+      "title": "深圳大学本科生赴校外学习学籍学分管理细则（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1356/1995.htm",
+      "textSha256": "9c230921c2fbb8c0ac198b44cd5b7b5434f998af576a51e63b8e59d36ff5760a",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "e2eb2ad33e42affdd098566532384041dff17b60b1b940ff9e66ba77a2334eae"
+        },
+        {
+          "id": "p002",
+          "sha256": "2818364a1129508527fa23f0cfc89b96b1905605a33d362704697d7d99cee93d"
+        },
+        {
+          "id": "p003",
+          "sha256": "b7f14a0a0875152ef14c3aa807e3f975fdc1aa5b60a3d9ff4e61c57a6e5e323f"
+        },
+        {
+          "id": "p004",
+          "sha256": "1a22f1be2fdf152384ca7ad56bc237271842ec76ce55e17792a353fc6201060c"
+        },
+        {
+          "id": "p005",
+          "sha256": "504ea9c264999b1192571a212833cdc80ed9d8c4f049a9850a8a121177f06992"
+        },
+        {
+          "id": "p006",
+          "sha256": "2d28b2bff4c058f65d2d1fcc595638eb30dc8a8526c472bc1e905d51a999e62e"
+        },
+        {
+          "id": "p007",
+          "sha256": "b020b29b1c1a09722170ebf34b5ab95d6e9ed7526d9a36672aaf0271371bd44a"
+        },
+        {
+          "id": "p008",
+          "sha256": "a398b9344290b2af713d7913b0d596b5318b9d7adfb2359a969966890cfc0b3d"
+        },
+        {
+          "id": "p009",
+          "sha256": "fe6aa4c34feffeadc8e61e590f04f22786ad39ba6475c73219c3e03970c9af05"
+        },
+        {
+          "id": "p010",
+          "sha256": "35530a8de2229888ae6abff83707c485b4ff89a50b4a9152187b21268638f314"
+        },
+        {
+          "id": "p011",
+          "sha256": "5510e7390d8bbdf5c66b422dc0fa35fac2791755c79ac408ecfda4d479c0f19a"
+        },
+        {
+          "id": "p012",
+          "sha256": "491d2bbda565ee9ddf9d857edae71643f5da6e95d2b42badfe31895f9f374df6"
+        },
+        {
+          "id": "p013",
+          "sha256": "9c2810e023af1c3489bd8ee71a50dc5c0b493964a064b5a4e41cb8df83257ea3"
+        },
+        {
+          "id": "p014",
+          "sha256": "f7e9487768a9871a521a4f1d3d0c605bbda3c421b28eb5ac8cc0292f44cfe3e6"
+        },
+        {
+          "id": "p015",
+          "sha256": "470bf4cc85305bc574c803a6e61a16c7531683fd52c3cdfcc1f0e614702812bc"
+        },
+        {
+          "id": "p016",
+          "sha256": "99eeb93db79556b72ec495a73007a2994998fa52f3dad89b2259ac9c737bde8c"
+        },
+        {
+          "id": "p017",
+          "sha256": "433dda819b7fcd7a5aa2d0f59749f65d96ea1e2b58e2bf6c122225c7fd313baa"
+        },
+        {
+          "id": "p018",
+          "sha256": "82f3dc9e6655044bc1983b24835d6528bcae39016065e0b46ef79fbf3870651a"
+        },
+        {
+          "id": "p019",
+          "sha256": "f25b8308ad7faa2048e312be4ed1d7290c47166c19281e3b9dd833526d2e8f58"
+        },
+        {
+          "id": "p020",
+          "sha256": "4ecdb6e32512335beb75cad4f3db31675a322b1d109cb4369710bfa1e4d311bf"
+        },
+        {
+          "id": "p021",
+          "sha256": "1702d5cc6b70af72cafd6b9b73549518702f49ba544bf0e764ef53badc8f1eb6"
+        },
+        {
+          "id": "p022",
+          "sha256": "0c8fd6682beb69bf5cc2d82a71e10d22ed23457bc3dcdb4ad0506bcc4f0daecc"
+        },
+        {
+          "id": "p023",
+          "sha256": "f843bcd55b95af34033d48143c6d2b7d4edb7c14831311b60acfc64076742f5a"
+        },
+        {
+          "id": "p024",
+          "sha256": "53df5934b5a2575eb4bff061190125fbe4dd1c3d380fb30c15551ceb48b794e5"
+        },
+        {
+          "id": "p025",
+          "sha256": "ec8bea4f337ba199a1b28937fb2a24d49cc44a85b205ee4b4174b6fdf787f491"
+        },
+        {
+          "id": "p026",
+          "sha256": "a462855f05ea7de8bf3abaa77693cc8dd584ce65c05e9c9788fc666150df3bc9"
+        },
+        {
+          "id": "p027",
+          "sha256": "393f725ac1d5d07be6af9e8cb379e6755b64c011a504efe9b38eb0214135863e"
+        },
+        {
+          "id": "p028",
+          "sha256": "3e184400399b94006b3b620c0da5575d8e91802c05b179afad815143d1d02711"
+        },
+        {
+          "id": "p029",
+          "sha256": "86a7f53128065c8f000f25fcba2731bb51385bf84dffcb7488210e7896cfb71c"
+        },
+        {
+          "id": "p030",
+          "sha256": "9a8af1042aa1a9da97a3dd6d4fbdeb2f469185a5e37662d005b7c9ba634f6354"
+        },
+        {
+          "id": "p031",
+          "sha256": "e567b7a10d5a5ad1d92c9e9fcaeba1919b9e8275d000e1184ea48f5f9ba9b8f8"
+        },
+        {
+          "id": "p032",
+          "sha256": "7c647c07b06f06b94a0952e9fa03abe513bc61afa819b69f333481c1d0db2f7e"
+        },
+        {
+          "id": "p033",
+          "sha256": "9db29a7d7fb5dd16932477153ef675df9099175278647b2707beff1fd73d7c89"
+        }
+      ]
+    },
+    {
+      "id": "szu-1996",
+      "title": "深圳大学港澳台学生管理规定",
+      "url": "https://jwb.szu.edu.cn/info/1356/1996.htm",
+      "textSha256": "7e44cc8b73adabbea41bb5e1dbebd10ff18cf640d6bdf88015e3681601764ab7",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "670f9c715b6702aafec7b3d91c0115bfefccaf9efdb02638f76b2e94e8040a9e"
+        },
+        {
+          "id": "p002",
+          "sha256": "0d91479f29681284687098941090c2e2d8f1a4f465788aa3ecce6e1c35dbfab4"
+        },
+        {
+          "id": "p003",
+          "sha256": "4ae3bd2fbf6d347d69f989d973576943bfd03e4281e0e5d142f9cfe31be32a9d"
+        },
+        {
+          "id": "p004",
+          "sha256": "1df686cf501abd76e9cb61f5f1dec05b75150081d25d3225ee89a451231fb43e"
+        },
+        {
+          "id": "p005",
+          "sha256": "3d7dab2a96e393ec2ecfc7f9b6d6ab438d8568e04706003e662de4ad99d31e0b"
+        },
+        {
+          "id": "p006",
+          "sha256": "8552e115f627f924c8931870a141730dfdc1deb088c50fd5bbf7ff75f18e9e87"
+        },
+        {
+          "id": "p007",
+          "sha256": "a4518e40c7c7116d090dc090fe6a6e0fac51b35330bfb46d36dbd3992bb6e1c9"
+        },
+        {
+          "id": "p008",
+          "sha256": "ba83120ebfc71c678a6d9705beac228cb31e4f8d0a75def8c0edd67f397e1c8f"
+        },
+        {
+          "id": "p009",
+          "sha256": "18530cc1e6cd5399014b285c479ee3df90ce06ebab529561831c81e3bee1cdb1"
+        },
+        {
+          "id": "p010",
+          "sha256": "8fb23529869506b8d737e77934e6b4b8dbe0284ff57a97738379a98efcc05afa"
+        },
+        {
+          "id": "p011",
+          "sha256": "7dc617df4fd366143ef846ab9557cff8edca3fcf6dae12cf72d3cea724150d7e"
+        },
+        {
+          "id": "p012",
+          "sha256": "04227cc88500ea961c41d034469268d388136514bbb247dd16d22c409070e4ab"
+        },
+        {
+          "id": "p013",
+          "sha256": "19fb70489a3bf1a775caab7117d2893ef4986fcde67f41ee4eb77acde870c2ef"
+        },
+        {
+          "id": "p014",
+          "sha256": "8fd44894507848c413a5f42b28e29026f7f7e1848eb17b07aed4cd8b52f4bd9c"
+        },
+        {
+          "id": "p015",
+          "sha256": "f5082b4609649ba655498c6e4cf5832cd2faa4645169df558fefbeafe84d76b1"
+        },
+        {
+          "id": "p016",
+          "sha256": "2182c1ce3640c1cafb7cf600950428d61b1703e7e492424f0a4d9955f1f0ea2d"
+        },
+        {
+          "id": "p017",
+          "sha256": "74d818eb2348f5558f5c55eac1463fb6fbd01ac9df3feb3a03f0ed276bebee04"
+        },
+        {
+          "id": "p018",
+          "sha256": "b2da70af4ea77406d6240480ff69da1872758611308e202bc8233874d98960ee"
+        },
+        {
+          "id": "p019",
+          "sha256": "dfa06bd2c042eb5aeed82b8bd60469cfea365ceb0071218253feda6915c47f3e"
+        },
+        {
+          "id": "p020",
+          "sha256": "1df692ccf200b65a62838f44344175da424fefe5af4af4b04f4e4e175e2772bb"
+        },
+        {
+          "id": "p021",
+          "sha256": "e65d75474a968e8d72d5ef40c2f464a66da936eafc1718e40663b501bfb2e546"
+        },
+        {
+          "id": "p022",
+          "sha256": "8f1f7234c6df8e671f454d82723812e7527ff2714d78a1203dd9509bcf8c6cf0"
+        }
+      ]
+    },
+    {
+      "id": "szu-1997",
+      "title": "深圳大学本科生学生证管理规定",
+      "url": "https://jwb.szu.edu.cn/info/1356/1997.htm",
+      "textSha256": "8b752a1ac16ec79c385539a63663bc7ddf66cebf03a3a0bef36328f903fc4302",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "3321e636e5fc2df4d2e0892e58b04a813d9525e90c6550277b10d8c7760544d2"
+        },
+        {
+          "id": "p002",
+          "sha256": "9d324892d270609c69cffd89527d62a1b9314eebd4d7c8dcc5abe8a6242b2f2d"
+        },
+        {
+          "id": "p003",
+          "sha256": "9c66b501851c1eccffba156531b658273cd3c9f39face235e1cd87ad2eeb1861"
+        },
+        {
+          "id": "p004",
+          "sha256": "94fe6f0811dedd0eff04b169b12b196d06fb27e4fe552a87c35491f1ea7cbe66"
+        },
+        {
+          "id": "p005",
+          "sha256": "7a1a18346ef24392438e32d99a3f460f7591572e591903d75f5882bf8af0b03e"
+        },
+        {
+          "id": "p006",
+          "sha256": "b2456e6079c2a3e738a72baad84ee9689b1251d2cd9a69569ac7290028e3cda0"
+        },
+        {
+          "id": "p007",
+          "sha256": "1d6e31c5db2ed388ad16df671a5c9d1e8cb3af251eed38d0d53bd02601ce6a2b"
+        },
+        {
+          "id": "p008",
+          "sha256": "ca487a28773ad91caa68103ef4f4804a837cd50d14ae78029dc0ac26ea15c4df"
+        },
+        {
+          "id": "p009",
+          "sha256": "35cd38c000f3154dd2e184864396be6ba620da19c208f40eb4d13c31e8bda459"
+        },
+        {
+          "id": "p010",
+          "sha256": "ff841eef72c00338c695a9aab164196c88a93719c8ae6010abff58dcb1e5d30d"
+        }
+      ]
+    },
+    {
+      "id": "szu-3377",
+      "title": "深圳大学本科毕业生免试攻读研究生 推荐办法（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1356/3377.htm",
+      "textSha256": "b45b4240497e37c322a9b947cf4012a850d302c26161c6ffb8676bdaac00a3c4",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "f85a29dedb616ec906507c58c45cd2d44d967daad3204013f00af39d790c0a03"
+        },
+        {
+          "id": "p002",
+          "sha256": "76c6f9facd16a33d360b9a017670b6b5559d1694b2d0ae346363176b5719af21"
+        },
+        {
+          "id": "p003",
+          "sha256": "231d9d79c7223b6e1207f64deb581ac9711254c7c3b6180208e2b20f8bd7dec1"
+        },
+        {
+          "id": "p004",
+          "sha256": "676566d565b2afb8327baf77fb70be964c9465e064721b74f9b095524d15b3a6"
+        },
+        {
+          "id": "p005",
+          "sha256": "9cb98de64a9c52dee9a7616cf3d3677ec64e974ba7a0036cb58b0d8bf914b498"
+        },
+        {
+          "id": "p006",
+          "sha256": "3d16723afa1f84fbcf11084520602c535b14fddf403f23c2321146899a6033a2"
+        },
+        {
+          "id": "p007",
+          "sha256": "e74e3e481bd3044ca86526b79e043e60f7ea56769d559e3d04a431091a348e24"
+        },
+        {
+          "id": "p008",
+          "sha256": "7fbf1bef15f96530c978bd686eca4a74185d94e211d96251acb1532f34083906"
+        },
+        {
+          "id": "p009",
+          "sha256": "01acb4bc4e1840fb99eb39dbcc405f072ca7101e7de6d4a9b7975fa2a451f262"
+        },
+        {
+          "id": "p010",
+          "sha256": "56078b4b72cdeca31a31dd698d77559b2bf9c6b128912e232d5ea555f7f62e99"
+        },
+        {
+          "id": "p011",
+          "sha256": "5e49d3a0813e50a69c25027f3c721dda477bd301cbd31bc71aeaa5e721f4d466"
+        },
+        {
+          "id": "p012",
+          "sha256": "2582ddc478865669f2daaaa50a3940145ba0e8278dcb0c7ac3475ea450efbf06"
+        },
+        {
+          "id": "p013",
+          "sha256": "77ab9dce2f44fef5e4580324cef133849ae8b49688ab316002f36e006923d596"
+        },
+        {
+          "id": "p014",
+          "sha256": "75bf6d5780e0c092a57cba7fb8c64e8dd2a92d148ba714b71158e79f36f50f2b"
+        },
+        {
+          "id": "p015",
+          "sha256": "720e2a55f35ebac3024ddf2d3226d67dcdff90c8c69a921507b28e91c7142710"
+        },
+        {
+          "id": "p016",
+          "sha256": "d2451cb524b54235ad4da20cbc05043ff6398a94ee9dd2c00d209d7142234638"
+        },
+        {
+          "id": "p017",
+          "sha256": "ceb438a84a62f63c5ea623799ab761ae4e883afa01c44b898248eb9b566d2520"
+        },
+        {
+          "id": "p018",
+          "sha256": "5286df195a100649a6a93c4c3255fb3fccddac7dd7ef03c4aa0dd5be64182ac8"
+        },
+        {
+          "id": "p019",
+          "sha256": "3d4bc08efe45bda60b374b342a8021095f6d3c9df7985a363849084c7b041899"
+        },
+        {
+          "id": "p020",
+          "sha256": "04377e3af475ca57361d01e9fd5d66b5dfc09141af758d63184dea0df7c32320"
+        },
+        {
+          "id": "p021",
+          "sha256": "ce983b1a4d976c6c030ad6a6d04e5c8aa8f3d38a23ad59368774bec6bca1ed2f"
+        },
+        {
+          "id": "p022",
+          "sha256": "e4433dd85576e32970c4733f9c6f8ff8719106954116749bdecda09a33e592b6"
+        },
+        {
+          "id": "p023",
+          "sha256": "96047205ea9f34bc8061191ea82c007e20b798fc26da7cd7691611354312d82f"
+        },
+        {
+          "id": "p024",
+          "sha256": "78f9697f51e44396a5f282e7653d33d76837f00ab18926d06db6c1ae572c22bb"
+        },
+        {
+          "id": "p025",
+          "sha256": "03c32958e9d059478e573d77d84047fb4b844faebbc4e0d6b5859baa799dc599"
+        },
+        {
+          "id": "p026",
+          "sha256": "17903929e51d9ee057dd087bf6dbca632eba6fe8fed7ffa836ce4efe7813c4d5"
+        },
+        {
+          "id": "p027",
+          "sha256": "66309bbab9f1bf136c9580baf0a8d6d1f629151bbc3199690c995b9609c8cd92"
+        },
+        {
+          "id": "p028",
+          "sha256": "d6a3f567756775c5252bebb2d51ef95e1bfce23b7e5b110771d315b93de1bf23"
+        },
+        {
+          "id": "p029",
+          "sha256": "535d0d7207ad77eb4a88ad05475bcb00d29fda92c663d7c49f84aa0312dc7893"
+        },
+        {
+          "id": "p030",
+          "sha256": "84dc984aa4c64a1703db8ce56bb92aba09522bd0c3cf1551f675dfece929f89a"
+        },
+        {
+          "id": "p031",
+          "sha256": "a716f68d47d7f0492624f3008d652c052cee83b606535a3014d8121a416e1fe8"
+        },
+        {
+          "id": "p032",
+          "sha256": "9f794eb5a09825645edcdd78a6fe042a2a50d292a33354b473c5ce639503b140"
+        },
+        {
+          "id": "p033",
+          "sha256": "d61ddc0c5c9778bc74eccb428f1351235e1b8e8f026904f6f1c4a73ca3b679c9"
+        },
+        {
+          "id": "p034",
+          "sha256": "77caa8f6e42be87d7f2e6156d9eadb34eb531156cac58ffd2fc0c99356cabdac"
+        },
+        {
+          "id": "p035",
+          "sha256": "780b5569ec870830f70a158fe00bc153d05fedef987e834950dab5ac5ff275b0"
+        },
+        {
+          "id": "p036",
+          "sha256": "d4aaa9ae3a0ed2c8ba6a8476dd3af9afc85f576568fad6920e9913a3c1b3dc82"
+        },
+        {
+          "id": "p037",
+          "sha256": "63cc35eba5fc56e259a8f27f7b4f3745642625ab26ccc20cebb2153d1baa10d4"
+        },
+        {
+          "id": "p038",
+          "sha256": "af23ff8ffe42fd39ef749411a067221638f5b638ef1d964bfa89e0fafc80e078"
+        },
+        {
+          "id": "p039",
+          "sha256": "aa6194452c30c7264645957cf1a3b2d756660fffcb31f4f3039f34ac0f422a8d"
+        },
+        {
+          "id": "p040",
+          "sha256": "853992d991282b251e1bf32951bf140d8d6a32eb4edf125ee2e24e4ae6693fda"
+        },
+        {
+          "id": "p041",
+          "sha256": "b281473b4d3ecc85dd8c41730c16a168c6d4c85ea8fa3ca42ed79278a91f76cb"
+        },
+        {
+          "id": "p042",
+          "sha256": "a47f3bc5b103befbcd55d9ba9d69504877ea7e3c4de03d9538c251046babf989"
+        },
+        {
+          "id": "p043",
+          "sha256": "9cedeab3c0d84a685112fe7839cc0227cd88916e5578d9c92b582dcb413d7765"
+        },
+        {
+          "id": "p044",
+          "sha256": "a7b619a40cdae9a39798c076d66d27340ac0c178f340e54b49da4f9af31183d4"
+        },
+        {
+          "id": "p045",
+          "sha256": "4fccf7b4bbf69f212bdd90783cfe4cd40c99c898a242037e9c0d88b7d22ee245"
+        },
+        {
+          "id": "p046",
+          "sha256": "ffd4aa878b4c35d3f5e3f2d3e2eefc84194f0c8222ec99a14ff9ef338e29c697"
+        },
+        {
+          "id": "p047",
+          "sha256": "8fb7e14bcd45cbd52d9d662e9212b4651930cc69a3cf7f32b9f54ce7d66dc2ae"
+        },
+        {
+          "id": "p048",
+          "sha256": "331264d5db680c74ac59ad7e8cb442297f31a9042851aa236d80f74900ddaf79"
+        },
+        {
+          "id": "p049",
+          "sha256": "30c7e259d4f9878dc0794d27a00f122788eda9eae30dd579c1366db8241e5de1"
+        },
+        {
+          "id": "p050",
+          "sha256": "12391536ebbef91fc3a1cf77066d10273da5c68a75f1c294a390a61440ecd71b"
+        },
+        {
+          "id": "p051",
+          "sha256": "6d6a2157bb4539fc9da1fbcb24690e43d1c6bd19ec49c76ef7b7d813ba026051"
+        },
+        {
+          "id": "p052",
+          "sha256": "48f8c675baf864d728f6209496563ba5f2ba8a4a2c879079cd93664a68de0d46"
+        }
+      ]
+    },
+    {
+      "id": "szu-1999",
+      "title": "深圳大学本科证书管理规定",
+      "url": "https://jwb.szu.edu.cn/info/1356/1999.htm",
+      "textSha256": "f62d99e7ebe26423258421622ea187b2ad138f3d4d8bc88b1cd7af52b6b039f3",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "e2eb2ad33e42affdd098566532384041dff17b60b1b940ff9e66ba77a2334eae"
+        },
+        {
+          "id": "p002",
+          "sha256": "f5267e64141e37f421ed5f5fa382e3f2f3efe986d10e549505d8a59a610ec18d"
+        },
+        {
+          "id": "p003",
+          "sha256": "d263009b707ecdae70d28f97a4eb90514c62c4565ae8f85ca878e739e1702dc7"
+        },
+        {
+          "id": "p004",
+          "sha256": "982ef44366956a993a7716791172b96fbcb920969edf5688800d585550c847d4"
+        },
+        {
+          "id": "p005",
+          "sha256": "ddb528eb95a1c01ac983eb4043a8971654cc4200ef08cd464996c038f50cdd82"
+        },
+        {
+          "id": "p006",
+          "sha256": "54ded633d9195719773f248f9b30f54fd083986a459ffbd9c3b6f825a705ab26"
+        },
+        {
+          "id": "p007",
+          "sha256": "03d1774ece820c4871ccff25542595222485b4da6dfc3280ca7ea7f5813e70ed"
+        },
+        {
+          "id": "p008",
+          "sha256": "6a2567bb6e227d24b7897e81a793a14789090e57b13fdef64f46c3f980c4bc42"
+        },
+        {
+          "id": "p009",
+          "sha256": "1ae3e74ebe2e7e127adc1020bc1fbd08d17477b1443632ffcf5eba40838ce5eb"
+        },
+        {
+          "id": "p010",
+          "sha256": "6e109a991e778f4251bb3b375756e8c3de045de3e994ab5b59e3f52dc839b937"
+        },
+        {
+          "id": "p011",
+          "sha256": "136c8a19cf1939044190f89ead739030e70eeee70e3f32f7636c651127b22bd0"
+        },
+        {
+          "id": "p012",
+          "sha256": "73fbcce2396507c57c10e82f21e867030e934dd8a5d5e667f138215f480e3b0e"
+        },
+        {
+          "id": "p013",
+          "sha256": "1070d71cf6a03e49e1c4391817062b7d3c5b0db1e99d586f348697fdd0134521"
+        },
+        {
+          "id": "p014",
+          "sha256": "84559cb1e4d8952696bb8c5b066f6dd8913f6bb8e9c5b85cdbd0e4fc8415fd74"
+        },
+        {
+          "id": "p015",
+          "sha256": "b499cb16fe4ba7e6bb752f1acfcef7ac3584bf9dce5d83ad9d12cf5a1586eb22"
+        },
+        {
+          "id": "p016",
+          "sha256": "bf5f193dd9b82693790b837ea372067fbc454831fceacf7f26574028cc7cfe27"
+        },
+        {
+          "id": "p017",
+          "sha256": "ac15c60fd7b00799b88429dedfc17695564770b8c7e074102d3a13c4d346b230"
+        },
+        {
+          "id": "p018",
+          "sha256": "eb86920a33bbab3e62388173ba8db94ed1b48f8694bd46730a1c2de89361fc64"
+        },
+        {
+          "id": "p019",
+          "sha256": "a7679cb4795daeb5bf88292f9f5684c9f00cdc73edc0bf7155bf5d98ebbd964e"
+        },
+        {
+          "id": "p020",
+          "sha256": "a2379dee5df6656cb9a0265d0b4c7ce38d09a36a09b1b89dad236fa82594dcb8"
+        },
+        {
+          "id": "p021",
+          "sha256": "95283d438e37bd1a6306bfe724b75c090965ea5ae38b016fdb0151732ab1ecf2"
+        },
+        {
+          "id": "p022",
+          "sha256": "190f9c0da5e7be8538771abbbfe414350467fd8afe808e7e75fbaa45e8b9859e"
+        },
+        {
+          "id": "p023",
+          "sha256": "f78ece9454aba37f3a63fbe5ea2583098e49d68bdbc00a58d9d8edd00c28310c"
+        },
+        {
+          "id": "p024",
+          "sha256": "ac15c60fd7b00799b88429dedfc17695564770b8c7e074102d3a13c4d346b230"
+        },
+        {
+          "id": "p025",
+          "sha256": "eb86920a33bbab3e62388173ba8db94ed1b48f8694bd46730a1c2de89361fc64"
+        },
+        {
+          "id": "p026",
+          "sha256": "94746aa00ebf327535e94f5655e8a3113de7567712e585d1ca320a380ab5cf3c"
+        },
+        {
+          "id": "p027",
+          "sha256": "73fbcce2396507c57c10e82f21e867030e934dd8a5d5e667f138215f480e3b0e"
+        },
+        {
+          "id": "p028",
+          "sha256": "8157eca50df00950431f2b472294fc500ee98bb746cffbc4cea3cdbbea085b01"
+        },
+        {
+          "id": "p029",
+          "sha256": "190f9c0da5e7be8538771abbbfe414350467fd8afe808e7e75fbaa45e8b9859e"
+        },
+        {
+          "id": "p030",
+          "sha256": "bf5f193dd9b82693790b837ea372067fbc454831fceacf7f26574028cc7cfe27"
+        },
+        {
+          "id": "p031",
+          "sha256": "2df2f2bd94e88fce2c935d9decb3715c7a68ec8266e5fc3b99393b912b9df7c5"
+        },
+        {
+          "id": "p032",
+          "sha256": "b7119dad7e4e050960e1bc28746281389e5d7588360b348fc2f14a2ea8bfc132"
+        },
+        {
+          "id": "p033",
+          "sha256": "3dc13f42cd6b5121488172d7b494729875915810666fa350dd9c7a0d995c326e"
+        },
+        {
+          "id": "p034",
+          "sha256": "93f5b0f7120389dba6b3b90fe505de7ec7e9e25c42368e61ea8057ce1cfd19ff"
+        },
+        {
+          "id": "p035",
+          "sha256": "10e1f3949418c0f4a5285d73a41ab154748ed7b9169f3f9336f4f2e01958bcda"
+        },
+        {
+          "id": "p036",
+          "sha256": "438b4b318fa3c80cda0eeb4b101411ca55e44c827245b6acc732b3d8379aa6c7"
+        }
+      ]
+    },
+    {
+      "id": "szu-2597",
+      "title": "深圳大学非英语语种替代大学英语管理办法（试行）",
+      "url": "https://jwb.szu.edu.cn/info/1356/2597.htm",
+      "textSha256": "3f7acbdc521f407dca45289ed95df424907969a717d977c2d1ca1b23366e31e3",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "62d6902c32a1ababca86132f3bc4fa3cdee5a0ca6e9b4f7b1ec656d57fa68ac2"
+        },
+        {
+          "id": "p002",
+          "sha256": "e4133bfd302c6ade8b878785881170d32ca93682e4b0d48fbd27dbe0cf19868c"
+        },
+        {
+          "id": "p003",
+          "sha256": "83ab56fdf3f70b188212e52236d3981ef16f724cfde3e849d8263d0b285cf734"
+        },
+        {
+          "id": "p004",
+          "sha256": "99b8af382d7ce403b4a8312e18f5ee9def7c90620c73581f6382f897953455d9"
+        },
+        {
+          "id": "p005",
+          "sha256": "37a08a6342ecbfc8412be8b4fc3211edfa2591e2567ee4640b57f6d24fe37696"
+        },
+        {
+          "id": "p006",
+          "sha256": "5756179ebe43e981cda68c4668c06a34c62e93092e7d646cf430c2a6f84c8dcf"
+        },
+        {
+          "id": "p007",
+          "sha256": "844e28af026c6f5cfdee4df030f82e009468015d8b03f579a10ba5ef7b8dfdae"
+        },
+        {
+          "id": "p008",
+          "sha256": "3a944ddb3868f4b21ed515205ad6a7e0177451af2549a6f55f1996fc5a3d7045"
+        },
+        {
+          "id": "p009",
+          "sha256": "60e48a22b194c225bb33ca587de8815ae51def3c9123c65165dc8ec23a4a03b5"
+        },
+        {
+          "id": "p010",
+          "sha256": "99cdf164a8140865a706489a5fe02f38319be7d8dd030963575f5b568a800bca"
+        },
+        {
+          "id": "p011",
+          "sha256": "1d8cc8d391c7ff73c6afb3b2cb6b120f07f21b6cd7a69c96b5b95f6310c23d20"
+        },
+        {
+          "id": "p012",
+          "sha256": "6c872d27f8359dc7a5aba0230d9dbbbe2b9288c019638711664f9674b2a87635"
+        },
+        {
+          "id": "p013",
+          "sha256": "d1a5f480cf7f7621cfc08ebc5cb0eac3dde90c23c7ba55ba8de488fafb85ab29"
+        },
+        {
+          "id": "p014",
+          "sha256": "7566092dce7261d0feb9f7987b8d9ac297b352b81f5f74c5de37e3370cf20b8f"
+        },
+        {
+          "id": "p015",
+          "sha256": "a16d9dfda0a86a876558bd781abd4bd493ef322787945f4d638cdd1355ab3077"
+        },
+        {
+          "id": "p016",
+          "sha256": "f23d8e229ca61af1047ba65cdfdd87713c7aae0576e9e2a38b1f0f34b965b0e6"
+        },
+        {
+          "id": "p017",
+          "sha256": "b2aa7d87d117db790916d56628fa9ad0ec7bc86be050cfc157399fc46fd30a62"
+        },
+        {
+          "id": "p018",
+          "sha256": "bc2bd60304caa357768793afba3ef43823029aac2693e239a327a04f11c38fd7"
+        },
+        {
+          "id": "p019",
+          "sha256": "ba6067eda46f0aa145ba681398a861639757edfa937501da1f52e3a5aea0ff56"
+        },
+        {
+          "id": "p020",
+          "sha256": "7ff3af500895e9217fc12314fdf28d9fb314e3337e9a3cfa42695371bce78ed2"
+        },
+        {
+          "id": "p021",
+          "sha256": "35cd38c000f3154dd2e184864396be6ba620da19c208f40eb4d13c31e8bda459"
+        },
+        {
+          "id": "p022",
+          "sha256": "bc3832b1ff83a62992d99e3c43815be7a1aea8194485ceb93811a3e9e500e20a"
+        }
+      ]
+    },
+    {
+      "id": "szu-2001",
+      "title": "深圳大学普高本科生托福雅思成绩转换认定办法",
+      "url": "https://jwb.szu.edu.cn/info/1356/2001.htm",
+      "textSha256": "bea7e1809cbede18a2388b9027a135e42ac0c45a2dd13c0c68e086dc2d45df38",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "8890b6a9a9e1a38ab4e9ba1982783b1e3fdd6b2857c1fb610fbd093c9802c9d8"
+        },
+        {
+          "id": "p002",
+          "sha256": "41602af055c2ffe9d586c48c3fa5a88b07030e00cf82bad2afc71c871f921250"
+        },
+        {
+          "id": "p003",
+          "sha256": "2ac584d0b41fdda3753c58e9925ae5fbd0d04e78a780ce0e5a425c4187dfd8c8"
+        },
+        {
+          "id": "p004",
+          "sha256": "c6646e2d21f0b1d91208ac968326f0fc00b2e02aaa98c91ac6a098e258aacd3c"
+        },
+        {
+          "id": "p005",
+          "sha256": "7ed676d790429fef8b2fb56414cae6e4206d0f492a128bcba9d42e8e55edf570"
+        },
+        {
+          "id": "p006",
+          "sha256": "fdcd1bd074c9e5ddff5189fbc10c7d0748a43064dd7296d8b8c3f8a9d8232b37"
+        },
+        {
+          "id": "p007",
+          "sha256": "1109c9e14e268bbb13a11628d8c618e049b201f919b52420cbf1475890d3e000"
+        },
+        {
+          "id": "p008",
+          "sha256": "734e1f0e39f7b873e8efadfd6a30ba3e05f08066d704cc27fe0f78a4243dbafa"
+        },
+        {
+          "id": "p009",
+          "sha256": "9b2aff78c71c92e61a3c946b246efe11e720b9a96c5c5a06c7b9ac75ad89444f"
+        },
+        {
+          "id": "p010",
+          "sha256": "a7e6adea4f6f7e962f6766e79fd9b28872c09cd524b5bd9c92ae6e28e72972f2"
+        },
+        {
+          "id": "p011",
+          "sha256": "8d79e64a95ec7466edd414a179b32f036a173551557d8c8a45010e61272a79d6"
+        },
+        {
+          "id": "p012",
+          "sha256": "b4b252d0e073f6bf294b3ddb6c0ea442f605570fe8acd1f0802463c82f89c8d2"
+        },
+        {
+          "id": "p013",
+          "sha256": "4819f5315cb49422b0b21be64e48bb69c9c157cf41c6631994f931ab9fba86bd"
+        },
+        {
+          "id": "p014",
+          "sha256": "aee8736c2b78925066991632c3a5fc38b2a79cf7b083146654ca958b2a99b7ca"
+        },
+        {
+          "id": "p015",
+          "sha256": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451"
+        },
+        {
+          "id": "p016",
+          "sha256": "e03c62b06bd912211c160fb6c28d85f8c38d402bd5bc84d1304657bcf2817b90"
+        },
+        {
+          "id": "p017",
+          "sha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d"
+        },
+        {
+          "id": "p018",
+          "sha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+        },
+        {
+          "id": "p019",
+          "sha256": "a22eea496bce0154f2e2dc5e652100cd8a0f9571b95ed89dd48599e76d339657"
+        },
+        {
+          "id": "p020",
+          "sha256": "1fdd50bf5da6ed920fa0edd61cb5980ca3940a578cab2923daa44189023fcd32"
+        },
+        {
+          "id": "p021",
+          "sha256": "32209ccbf8a8e509b9027698cc173343a2695e8ecdbe899bf5335a3100c956fc"
+        },
+        {
+          "id": "p022",
+          "sha256": "4211f2cc8e2bb21e8cdb3b02a144b829d52c0995bbacc830469707265c89df69"
+        },
+        {
+          "id": "p023",
+          "sha256": "1faa0c6d1c21c8ea8abb76b22cb5b676cfb5302176124a48666db49e4a1bfc3c"
+        },
+        {
+          "id": "p024",
+          "sha256": "41c3c3dfab56d3a127b5517517ab4d62785fc19d9a5944368773333de504b229"
+        },
+        {
+          "id": "p025",
+          "sha256": "bc46daadd598aebe853f46318317d47ea3608e951db9171a9e2c7f24038d4bf7"
+        },
+        {
+          "id": "p026",
+          "sha256": "1f8a4846f4bcea6a5440f0df41a0b44afe1fe098e81cf0b65122319d804e74b2"
+        },
+        {
+          "id": "p027",
+          "sha256": "c1bbc16560e1f80b6e86f873a154b042c7d9eb14703734d8171588d8615b6478"
+        },
+        {
+          "id": "p028",
+          "sha256": "cdbbf49cc70e71d04e15fee62191ac96fd9c8007047fc5da1d2beb486b4e46f7"
+        },
+        {
+          "id": "p029",
+          "sha256": "b004168fe1054a8c519fdadf9f85ba1724328893e2e6690d1cd77a3c1c1eb741"
+        },
+        {
+          "id": "p030",
+          "sha256": "2c24e64020ce8855be304be11b5cff55826399d8e9a295c7872f1b5faeeb8ae2"
+        },
+        {
+          "id": "p031",
+          "sha256": "939382609648d92881b9681cb36bb02ade2a1c224162aee89a2eea73c328070e"
+        },
+        {
+          "id": "p032",
+          "sha256": "281f9af6bfade8e8ded4f79e092046a66282f323bedf58a78975f9f71250db1f"
+        },
+        {
+          "id": "p033",
+          "sha256": "3e4a556592e2edf92280f262dd4d72011fa88d30b508b750a9743a2185e54870"
+        },
+        {
+          "id": "p034",
+          "sha256": "2fca50fa57b07accdcd2a4df8db425922ff29c42ed74cc1603cd3f036ebba88b"
+        },
+        {
+          "id": "p035",
+          "sha256": "91e59c71912752af1f33dab89ad63ef64bfd6d1c40bde3426119a85de06a8c0b"
+        },
+        {
+          "id": "p036",
+          "sha256": "0fbd38d4322edbbb978d9c3999770df0174ea3cf3cdfb906c1968756643cc217"
+        },
+        {
+          "id": "p037",
+          "sha256": "c97db2ff00254de2b62a864feccd93f586f4fafad34a4db71ca8c0d96cf61acd"
+        },
+        {
+          "id": "p038",
+          "sha256": "9bf6bf96e2a23a0e25d7c5c29d36704f9eeeafaa1e4b479e9bb46f60fb9c41ee"
+        },
+        {
+          "id": "p039",
+          "sha256": "8f7d997f22e98015531ca00dd1cfbf958233a59c6b4c6aab81b4c601abd451ad"
+        },
+        {
+          "id": "p040",
+          "sha256": "28a45f24f9d6911d8346ec5c76ed371c138c24792828f3375f68e6070a48fce8"
+        },
+        {
+          "id": "p041",
+          "sha256": "f6aee2d3695a43eb89f25fe15872fa904bc83f90d104dfa2da8a8a581e0d83a3"
+        },
+        {
+          "id": "p042",
+          "sha256": "1601b9de5faaea6f8dd1f83e56555d072829bcb58752e470d8dfe6b9d66cc3c1"
+        },
+        {
+          "id": "p043",
+          "sha256": "35cd38c000f3154dd2e184864396be6ba620da19c208f40eb4d13c31e8bda459"
+        },
+        {
+          "id": "p044",
+          "sha256": "09cb3d737dc4af5113470931a54efc2d8810b9e350fa9533bbe6453af3d773dc"
+        }
+      ]
+    },
+    {
+      "id": "szu-2002",
+      "title": "深圳大学全日制本科新生入学资格复查办法",
+      "url": "https://jwb.szu.edu.cn/info/1356/2002.htm",
+      "textSha256": "22d3f44ddd85f886f820c6a149ef6e24cad9edb8363e32b60d3a66d2526bcbc5",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "0e775ac4fa6e4aaf3a8a2f334324828a69507b98208bf4151a4e2e1f50ae77c3"
+        },
+        {
+          "id": "p002",
+          "sha256": "99d4b6a661089550291651811d516a27c3fd11fa9148903437147798a7ddde11"
+        },
+        {
+          "id": "p003",
+          "sha256": "b4c941e83019c1c6a9db09fa1f8633b8d9c7a873f4d95d66ac2fbf426ba36f07"
+        },
+        {
+          "id": "p004",
+          "sha256": "154f0bbaab84ca706a42b28ed0f485bc9504df5a818c571e7193663d615faa42"
+        },
+        {
+          "id": "p005",
+          "sha256": "d4c5e8551b5bad8cd4375603b19fdcb56e30c37d0ba28b092fea041f855690c6"
+        },
+        {
+          "id": "p006",
+          "sha256": "c8b5ebbffce7bf5c743add538a1e6e4f6af02a9761138dbf4907db9c05b74f0f"
+        },
+        {
+          "id": "p007",
+          "sha256": "5dd556845249a9619e0279ab150f4e2fe80081646300e08d254771f8fd1407ec"
+        },
+        {
+          "id": "p008",
+          "sha256": "1b44541891e5a8563f8272619a46b464cf327646477181e5d0d84cde90517272"
+        },
+        {
+          "id": "p009",
+          "sha256": "13c98cb35c1e8f1487f6a7be2567f6acf1e9d044446e65c3725225a014879445"
+        },
+        {
+          "id": "p010",
+          "sha256": "28fa49d2a3a48024dbc3512b592b6d4ac5ae3559ff1a5ea04af7c1905b6c369e"
+        },
+        {
+          "id": "p011",
+          "sha256": "8933554b1dba9e93506b492952c8d41e9d95e28d0ab593c3252333610a751dd8"
+        },
+        {
+          "id": "p012",
+          "sha256": "1cfc96156569091b82786498a866fa76d8ced7eeda2966517136bc820d15db1b"
+        },
+        {
+          "id": "p013",
+          "sha256": "ab0377df7a79ac358c14172f6182dc8a288743010b23ef614ed8d5759dd26435"
+        },
+        {
+          "id": "p014",
+          "sha256": "103c5e1ea5fe51ce74baefc19ec61ecec0f6dda60a0f618e6dcef6c0123063dc"
+        },
+        {
+          "id": "p015",
+          "sha256": "3b449ac26607ca8d8bf2c5a8c91d4e1357ca13758625802c695583366de50f29"
+        },
+        {
+          "id": "p016",
+          "sha256": "c72dba18153b7f41047e40c5be1741987bb511247c3017f3bae3d1eab8a2f1f7"
+        },
+        {
+          "id": "p017",
+          "sha256": "bda0a9ba51e005dea3bca4481df2378dcbe93ba5f26bc5e90d2bee7c06a5a0c6"
+        },
+        {
+          "id": "p018",
+          "sha256": "353a58bf6e3875eab2423eeccb9cc9bd50b8c1bb00d19903e4cda3b2cf46da40"
+        },
+        {
+          "id": "p019",
+          "sha256": "d9740749e27b14141a9d7bb56f457f4dae82a83bc52b5d204dc9f7e4bd0cf52e"
+        },
+        {
+          "id": "p020",
+          "sha256": "6d478cce9f86ceae50d6b144a48b76fe76768af4f6e2d2e3d0b02bff587bc2a6"
+        },
+        {
+          "id": "p021",
+          "sha256": "99549e1d7d973ff3c7a829718024e3820e31f3cbcf903fd752172a1fc997120c"
+        },
+        {
+          "id": "p022",
+          "sha256": "a6860830a94ee9377b891ae31bc06fd800e38ac45dbf41d0b181304bbf98d331"
+        },
+        {
+          "id": "p023",
+          "sha256": "dd82134b18a02e26ce08965256c59be7650fe848bdc3b1104c17360929f74b3f"
+        },
+        {
+          "id": "p024",
+          "sha256": "05c608b5d160b31f1e7b816b19cae5b8171177e87c153f4b40d72780f34b1239"
+        },
+        {
+          "id": "p025",
+          "sha256": "a3ace6fa08c8f26c35a6cdb0ab6d51281e75949739765dc422cbb4c530f52787"
+        },
+        {
+          "id": "p026",
+          "sha256": "674bed5517a9fa3fe686fbd3a7fa4f7faf0f9d3e4b04d0309dbd884b9b2a7fda"
+        },
+        {
+          "id": "p027",
+          "sha256": "251bcf6a2f3a7d5f3664a565977f3ac87e7e9fe1a1f1505e9510f56b21c18d58"
+        }
+      ]
+    },
+    {
+      "id": "szu-2003",
+      "title": "深圳大学本科课程考核办法（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1357/2003.htm",
+      "textSha256": "ad2c816d1f7ada4a7d1837fb061871ea534da65e27eaff06a2172d3e1ae7b0b0",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "a099140c6ab59b439c19784904aff96a5006d4ced56cdf9074e532a40fe8b3e7"
+        },
+        {
+          "id": "p002",
+          "sha256": "57815d689f1183580487e457d884969f33cedf2bb9aba5cf92885b71b875c912"
+        },
+        {
+          "id": "p003",
+          "sha256": "dcb68f03ed62f00f0780d3dfbec968245625f48b39bc526584012e5fa436134e"
+        },
+        {
+          "id": "p004",
+          "sha256": "8f8dbdf4dd9658fcabf8c435692e693bcd16bf533492a760bbd644de98c9d8d3"
+        },
+        {
+          "id": "p005",
+          "sha256": "c14e03244122cadf911959ebeea828c0db4f59de4dd652c312e25b9de6e9bd78"
+        },
+        {
+          "id": "p006",
+          "sha256": "59f2ec388bc1c7b94a100c8d8354189f2c002a738d35ce08e3f10cfa4ba72adc"
+        },
+        {
+          "id": "p007",
+          "sha256": "9057d511fc0d3ec03e1b293801f4131e205fd03c82b127ba7b3e3bac9c7f1d70"
+        },
+        {
+          "id": "p008",
+          "sha256": "ae57ce0f038db26d684dcd82987367181ba39de501a3c14ce6b874f2b6927801"
+        },
+        {
+          "id": "p009",
+          "sha256": "47ef3ce34b382a3a6bd5b2560c7e059f4b7f98fc811488b1f1f7e684a220e31c"
+        },
+        {
+          "id": "p010",
+          "sha256": "919312bc4370ae7b2df1633438816cebf28a8dd95ffbf6820b7bc68d1cfc7e37"
+        },
+        {
+          "id": "p011",
+          "sha256": "76380d3469374948935a996b4b331e24005df7245a1afe8dbfd047ee7a5c219f"
+        },
+        {
+          "id": "p012",
+          "sha256": "e645defba8822d2fe358e0c785d9b46ad71b0259c95effa24969730f11304b63"
+        },
+        {
+          "id": "p013",
+          "sha256": "5cf768ebefce6c7c283a641672548f2dded54a536710050a732bf29b15d5e8ac"
+        },
+        {
+          "id": "p014",
+          "sha256": "465f72640ab95eca72f996d98cc89222cbe6769b666340f14652d4b3dc4862e2"
+        },
+        {
+          "id": "p015",
+          "sha256": "bf040ae66220df826cdeb05f0117617e19490bda525cb5bb3e6a55b9f2ff4c9e"
+        },
+        {
+          "id": "p016",
+          "sha256": "35ca57bfc633219111e461b5c5d9211101067d1645400014d4f06bd7a2c693c9"
+        },
+        {
+          "id": "p017",
+          "sha256": "452703b5163ab343f7eac034be21ee507e19d4766e3b1ddea4a85af1fe47f391"
+        },
+        {
+          "id": "p018",
+          "sha256": "385aab22f8a3aad29ffd6b7244d41a9f1ce324faba84d6617dbfad14c1688f7d"
+        },
+        {
+          "id": "p019",
+          "sha256": "5828f8ff08016c8c994cf8581828cb4ad8ea96d433e3a5042704e16c13c881ee"
+        },
+        {
+          "id": "p020",
+          "sha256": "2fe47362754a5cb5840f93855ab4a40cf6283084d1c6aafa1ffb9df2dfa7acb1"
+        },
+        {
+          "id": "p021",
+          "sha256": "a5327eac147c7f1f1e651ffc4a949d60f60748bf8869b9393e357a58fbe05608"
+        },
+        {
+          "id": "p022",
+          "sha256": "f9dec05e1fd23f4ba2690021c311858cd2c880ad0aa5f0d93c4ad1014ae0233d"
+        },
+        {
+          "id": "p023",
+          "sha256": "c6c4f05ff33f2faf0ababb3e144bbee8be66100979c34c0cc57a9879a1c46655"
+        },
+        {
+          "id": "p024",
+          "sha256": "46fda1287e47139b95075076dbb1cbb4b0c3a0db3d34d42ddd3c95804bc3cfb1"
+        },
+        {
+          "id": "p025",
+          "sha256": "ef35cf773dcb576fafd5c1bb79e9b4f01b61b0a3ff77bbab9727a92767e383e9"
+        },
+        {
+          "id": "p026",
+          "sha256": "b97337889760f22301d0b13b1fb4c36af5c91e6d230a12a5d2e77935f372a177"
+        },
+        {
+          "id": "p027",
+          "sha256": "222f79b8a808c3321b72297e765fa2e0321e38b52093c9e4b53ae3ca510ab316"
+        },
+        {
+          "id": "p028",
+          "sha256": "1b6098eabc7b3811aff04a4d677b88f5c2a2ad73c7141ce8e563be924b150f8b"
+        },
+        {
+          "id": "p029",
+          "sha256": "478c7c8b3c75a0579500b4a2f7e830480fbf3e38f41d018c1f48e2feead97911"
+        },
+        {
+          "id": "p030",
+          "sha256": "c96bd80226a7d2515dc8dca6300108cb25b1029c204a0ac74353d05fb4031fd1"
+        },
+        {
+          "id": "p031",
+          "sha256": "4b7e164f772ac0bb9532e6fa7a3fbf8ebd03ce2127dde1ed7471c921aca9ec07"
+        },
+        {
+          "id": "p032",
+          "sha256": "52a00c8bd3a59ec02c9942e8b0217118af170f0bbfe19337665cdfcf08830665"
+        },
+        {
+          "id": "p033",
+          "sha256": "c9e1035847d735bb8d42f301eb17e9de662047ab76d790bc883d1d63f5a61caf"
+        },
+        {
+          "id": "p034",
+          "sha256": "dee5ec0d7ff3b16dc38d9f7108399c4eb442793b628ee201a13b1f1850fd7875"
+        },
+        {
+          "id": "p035",
+          "sha256": "1e7499333d2710ca16e72a60f6696c885c242cc890b34a9bda292148aa0e2d40"
+        },
+        {
+          "id": "p036",
+          "sha256": "d52cd4a4a53c51f02f2ffed750a676beb57fafcaf0a4c4c7f6c84329edc7a113"
+        },
+        {
+          "id": "p037",
+          "sha256": "1c0987c51d0f54232f220135f5db9baa9c7cdea4ff0cd5306320cfbc8626069a"
+        },
+        {
+          "id": "p038",
+          "sha256": "269fdbd17c33eea0c563656244824ada0e37b350f9ed3704b6b785006a548f5c"
+        },
+        {
+          "id": "p039",
+          "sha256": "448bf77d017a8739b04071ecc321183256b7bd62bd231e2be6d0f6e1df5279bb"
+        },
+        {
+          "id": "p040",
+          "sha256": "af4ff04e8e0e796bcdebcd4cd11cd1c47d804a8390ee1253489d165e68b435bb"
+        },
+        {
+          "id": "p041",
+          "sha256": "cb5439f9d6d1f8521d2642c4efc3a779bb13dc7c47a1095fd8a00e2dc79dd59d"
+        },
+        {
+          "id": "p042",
+          "sha256": "404c939f91fa88d8ffa6b48414bf1431df5a80789f3671f046b0cf249c5a0b03"
+        },
+        {
+          "id": "p043",
+          "sha256": "4ab72a146a85a134880cc8ab058dc1ef9e0cf6f931ca2aa4f701d615523c7715"
+        },
+        {
+          "id": "p044",
+          "sha256": "5f32457263d0d1a992fd393e78a024ce0834da848934ea7b15451f1b2bd95ed4"
+        },
+        {
+          "id": "p045",
+          "sha256": "8ccb20cfa22fe1cb9395e24f267b48b1e19df5ee01c15c610039202f8043a506"
+        },
+        {
+          "id": "p046",
+          "sha256": "f77f744ecaf9807876845fb1420453cf3832b81627468f246f8c3028b6d44e67"
+        },
+        {
+          "id": "p047",
+          "sha256": "e4a98ccf225abeea6d82143aee97bd33cca7c93681cbd2a06dd02a6c02f1d975"
+        },
+        {
+          "id": "p048",
+          "sha256": "43900545bbacd06c709b1cd4ff9bfa626303d26cc664daf1ef8b67f355e2a1b8"
+        },
+        {
+          "id": "p049",
+          "sha256": "f19ff1b8ae3f6d9deef71ec10e61d8e04483571f61051494698c906cebafd46d"
+        },
+        {
+          "id": "p050",
+          "sha256": "d4a46ab6ed25ded7e5e7360cd9c74a6dfee50288566db8d2880d885c523c6d38"
+        },
+        {
+          "id": "p051",
+          "sha256": "e7386a80b47723b8da0f35f7a7f24d52fc9b9f9f566af227248049bb8a766069"
+        },
+        {
+          "id": "p052",
+          "sha256": "840c7b53ce4752da99256c5d0f314369e27aacf24693701aebbcfcf98f96b2f7"
+        },
+        {
+          "id": "p053",
+          "sha256": "91c557eb42770aa71f9a48e97b733b64d40d38556e38c58d84b9fd2539fa9753"
+        },
+        {
+          "id": "p054",
+          "sha256": "5aebec74fb4d18c21882a5f04fda8e3211a27de161d7ae3f43b376f54be2a5d8"
+        },
+        {
+          "id": "p055",
+          "sha256": "621715a19b68a7828b06c68579ee66209193bdcd2e00a37183fd7085ef81caa7"
+        },
+        {
+          "id": "p056",
+          "sha256": "1a0c725b0856be33137833759247531901abcf840b558c0f3df0726e282faa89"
+        },
+        {
+          "id": "p057",
+          "sha256": "621715a19b68a7828b06c68579ee66209193bdcd2e00a37183fd7085ef81caa7"
+        },
+        {
+          "id": "p058",
+          "sha256": "aee8736c2b78925066991632c3a5fc38b2a79cf7b083146654ca958b2a99b7ca"
+        },
+        {
+          "id": "p059",
+          "sha256": "32209ccbf8a8e509b9027698cc173343a2695e8ecdbe899bf5335a3100c956fc"
+        },
+        {
+          "id": "p060",
+          "sha256": "214f9b62b0257cfb05ac01ec07ce2cda1b85943774990cfbf454c4906e0d6e95"
+        },
+        {
+          "id": "p061",
+          "sha256": "c2cce7c40aba74926245b1d01f0706b3141082a6676c488068ef2e19dbd55a7a"
+        },
+        {
+          "id": "p062",
+          "sha256": "214f9b62b0257cfb05ac01ec07ce2cda1b85943774990cfbf454c4906e0d6e95"
+        },
+        {
+          "id": "p063",
+          "sha256": "cab5b78165299d8acef56be446473e7de9f0afe9a2ed97ed5fc61922a6ef70f8"
+        },
+        {
+          "id": "p064",
+          "sha256": "513b84abcc225aab5c1428d949f48e2a78406364cd225128faf36a579cec36ef"
+        },
+        {
+          "id": "p065",
+          "sha256": "80b4190268bfb1f06856463abdc0bd84d2af07bbaf2140a52f56629ad6cbe50f"
+        },
+        {
+          "id": "p066",
+          "sha256": "9f3ca1cb8e4fefb66ebf4a9e5e4327db9923f3845550b1e2b3d085c9fea86c2b"
+        },
+        {
+          "id": "p067",
+          "sha256": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+        },
+        {
+          "id": "p068",
+          "sha256": "fbd04e1aae9ce0b11a8946e2c9ac2619f7428a64d32d01eff61d809dcb70ee8e"
+        },
+        {
+          "id": "p069",
+          "sha256": "cab5b78165299d8acef56be446473e7de9f0afe9a2ed97ed5fc61922a6ef70f8"
+        },
+        {
+          "id": "p070",
+          "sha256": "297571c1cca9ad4c6049f71d9e4e12aec05f7b6251828d433539152eda2c5160"
+        },
+        {
+          "id": "p071",
+          "sha256": "cab5b78165299d8acef56be446473e7de9f0afe9a2ed97ed5fc61922a6ef70f8"
+        },
+        {
+          "id": "p072",
+          "sha256": "80b4190268bfb1f06856463abdc0bd84d2af07bbaf2140a52f56629ad6cbe50f"
+        },
+        {
+          "id": "p073",
+          "sha256": "3c70bec62734b5ca9fed43d9037f06189a41134a1da3bbf437012ccc9ded92ee"
+        },
+        {
+          "id": "p074",
+          "sha256": "4211f2cc8e2bb21e8cdb3b02a144b829d52c0995bbacc830469707265c89df69"
+        },
+        {
+          "id": "p075",
+          "sha256": "8a199b120cf400d69c300e1dd6eacdc8b0002353e3044bbab21e0125b32c9fd6"
+        },
+        {
+          "id": "p076",
+          "sha256": "80b4190268bfb1f06856463abdc0bd84d2af07bbaf2140a52f56629ad6cbe50f"
+        },
+        {
+          "id": "p077",
+          "sha256": "297571c1cca9ad4c6049f71d9e4e12aec05f7b6251828d433539152eda2c5160"
+        },
+        {
+          "id": "p078",
+          "sha256": "80b4190268bfb1f06856463abdc0bd84d2af07bbaf2140a52f56629ad6cbe50f"
+        },
+        {
+          "id": "p079",
+          "sha256": "df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c"
+        },
+        {
+          "id": "p080",
+          "sha256": "a416ea84421fa7e1351582da48235bac88380a337ec5cb5a9239dc7d57908b4b"
+        },
+        {
+          "id": "p081",
+          "sha256": "2e505f92a4c28d50341906177f904a34b3aba2d924c716f178fa99a9d7c45784"
+        },
+        {
+          "id": "p082",
+          "sha256": "f92332a0eeab35f643fc2920dea06785b37bdc0f9e0bc83c01aaa9a6402ce9fa"
+        },
+        {
+          "id": "p083",
+          "sha256": "2e505f92a4c28d50341906177f904a34b3aba2d924c716f178fa99a9d7c45784"
+        },
+        {
+          "id": "p084",
+          "sha256": "a99effbf3936a2ad1185430487511a2fbf1c2b715098d2679d3ff2873d388cca"
+        },
+        {
+          "id": "p085",
+          "sha256": "b8736b999909049671d0ea075a42b308a5fbe2df1854899123fe09eb0ee9de61"
+        },
+        {
+          "id": "p086",
+          "sha256": "a182f8aa9105c842c3319f36481f5b61655300586a9b31b4b0d998e0b5f2016c"
+        },
+        {
+          "id": "p087",
+          "sha256": "f92332a0eeab35f643fc2920dea06785b37bdc0f9e0bc83c01aaa9a6402ce9fa"
+        },
+        {
+          "id": "p088",
+          "sha256": "a182f8aa9105c842c3319f36481f5b61655300586a9b31b4b0d998e0b5f2016c"
+        },
+        {
+          "id": "p089",
+          "sha256": "6b23c0d5f35d1b11f9b683f0b0a617355deb11277d91ae091d399c655b87940d"
+        },
+        {
+          "id": "p090",
+          "sha256": "d84bdb34d4eeef4034d77e5403f850e35bc4a51b1143e3a83510e1aaad839748"
+        },
+        {
+          "id": "p091",
+          "sha256": "57753b57813098edf9bddbecb6f09a1b0d96371b0b4b83bdc362a83aa461824f"
+        },
+        {
+          "id": "p092",
+          "sha256": "f92332a0eeab35f643fc2920dea06785b37bdc0f9e0bc83c01aaa9a6402ce9fa"
+        },
+        {
+          "id": "p093",
+          "sha256": "57753b57813098edf9bddbecb6f09a1b0d96371b0b4b83bdc362a83aa461824f"
+        },
+        {
+          "id": "p094",
+          "sha256": "3f39d5c348e5b79d06e842c114e6cc571583bbf44e4b0ebfda1a01ec05745d43"
+        },
+        {
+          "id": "p095",
+          "sha256": "d0ff5974b6aa52cf562bea5921840c032a860a91a3512f7fe8f768f6bbe005f6"
+        },
+        {
+          "id": "p096",
+          "sha256": "8b5729ceb89a2e75226ded55ba7fb545d04c54bd22658646456ae31324c16a93"
+        },
+        {
+          "id": "p097",
+          "sha256": "f92332a0eeab35f643fc2920dea06785b37bdc0f9e0bc83c01aaa9a6402ce9fa"
+        },
+        {
+          "id": "p098",
+          "sha256": "8b5729ceb89a2e75226ded55ba7fb545d04c54bd22658646456ae31324c16a93"
+        },
+        {
+          "id": "p099",
+          "sha256": "f67ab10ad4e4c53121b6a5fe4da9c10ddee905b978d3788d2723d7bfacbe28a9"
+        },
+        {
+          "id": "p100",
+          "sha256": "8aed642bf5118b9d3c859bd4be35ecac75b6e873cce34e7b6f554b06f75550d7"
+        },
+        {
+          "id": "p101",
+          "sha256": "4fba4d5930dd52cc4e8b5652e7f9ffde217e6c50aff05073a17314ecd5d7cf9d"
+        },
+        {
+          "id": "p102",
+          "sha256": "4fba4d5930dd52cc4e8b5652e7f9ffde217e6c50aff05073a17314ecd5d7cf9d"
+        },
+        {
+          "id": "p103",
+          "sha256": "a814e899a0823b4c5dc85a45ddc0f9cd6552fcbf56bd60ed546b551ad564bf44"
+        },
+        {
+          "id": "p104",
+          "sha256": "ea292b7449252e68431d8e72dae909eae4f0bc51da91f35efe1de92eaed70370"
+        },
+        {
+          "id": "p105",
+          "sha256": "07fe43f190461ac63aad166fff47c6a14b4c262f1aef13a88bf542c8f6d8e2d0"
+        },
+        {
+          "id": "p106",
+          "sha256": "cc972cb42542159649340524d569ff066aeffbc198d6eb0e28d4a37b69a242a0"
+        },
+        {
+          "id": "p107",
+          "sha256": "64ce22ab08dec8748fbc19f68e6ea0dd103b535d4b6d3381b8564b398e37e394"
+        },
+        {
+          "id": "p108",
+          "sha256": "03c50166b9d267198b1430ff306dcfc89bb3481449ed5e6507e8ee77c7f11251"
+        },
+        {
+          "id": "p109",
+          "sha256": "e37fb771e67363d4c93c0c59c7743fd4868685b07822763d945282a09cbabdce"
+        },
+        {
+          "id": "p110",
+          "sha256": "8eeaa8ab39ed0734548a67e35a1a4863c028a2f5e98aa77844b355198031bb35"
+        },
+        {
+          "id": "p111",
+          "sha256": "af23f681072ce2a689ee092cf99cbe359a5a0eb5c7671c4605df3dd46dd8ec5d"
+        },
+        {
+          "id": "p112",
+          "sha256": "c69e89dea6c7b014f3f4948ce23f05487343b9a723a97a512f9bddb044b778b3"
+        },
+        {
+          "id": "p113",
+          "sha256": "1aaf3c4c40e5b5d610cd9b6698ebe7abdeb841ded3036147108445044f1e5e7f"
+        }
+      ]
+    },
+    {
+      "id": "szu-2004",
+      "title": "深圳大学本科生补考管理规定（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1357/2004.htm",
+      "textSha256": "94ad13414d7394ceadb9f053c1a42c18d4133467f69750b4680860417baffc25",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "177de54e7032e0d189941a5959fd2957b19fa96e3795f4e9e02e8c38b7c58542"
+        },
+        {
+          "id": "p002",
+          "sha256": "0eea5de9ff376fabe3e18de3b89745291270a8cd3bf4e6fe2dfcabb96a282f35"
+        },
+        {
+          "id": "p003",
+          "sha256": "4b26826b15ca19b2c9658e79f2089ea0f302bb51c3eef197c07b8832a2801ed6"
+        },
+        {
+          "id": "p004",
+          "sha256": "60bde40d46f03d2b903396e434680ae7e7c971411334523af83c8a5e0bdb2f84"
+        },
+        {
+          "id": "p005",
+          "sha256": "9ef3aeedb2bcc05e2bca11349cc37dceb5ee25e20e740628a260c5901c17e6b6"
+        },
+        {
+          "id": "p006",
+          "sha256": "aa010d7aed274f89e49160531d5f33aa84739c553d820276c240f560aa80d00e"
+        },
+        {
+          "id": "p007",
+          "sha256": "1f2e68a770290c3a4913f4ead80ba53de2f138f1a19a77799730b927e51d6cc0"
+        },
+        {
+          "id": "p008",
+          "sha256": "be051ad691e2a8657cb4481ae50ff3fb605063a710a20f0c4088af7af03b28a4"
+        },
+        {
+          "id": "p009",
+          "sha256": "6fd6deeaa1179afc353fe048df6ebb1ec01f3d9fe19c405982fd478e7f4b109a"
+        },
+        {
+          "id": "p010",
+          "sha256": "f3dd7676d6a5c9923029d7fa7d1d55681ad1676e6740a2f7747afedd526b9ef3"
+        },
+        {
+          "id": "p011",
+          "sha256": "e444aa14e169b2c0e8e6bba3a05a7b3a10bc906ae7cea01868f74a4c4e46281a"
+        },
+        {
+          "id": "p012",
+          "sha256": "cfac21fbdd96a71f32578d4838a888401610ae43b091d4fcaec79b1b727e5ecc"
+        },
+        {
+          "id": "p013",
+          "sha256": "9cfa9b47f45a7c18fcc83470a486eb11674e7f4fce8170c3608a289070061f45"
+        },
+        {
+          "id": "p014",
+          "sha256": "8d6f686c4f3d819924f170ed900a48efe7f42e91ef3143be2ab17fec45c85f1e"
+        },
+        {
+          "id": "p015",
+          "sha256": "57814ee27de87d604d1705af48076cd1c53829416785737b591f8109498295e6"
+        },
+        {
+          "id": "p016",
+          "sha256": "ee043b3ab3d6d6da137fac281dbd2fd806f1df5f10c6186bb60876519c1d7d90"
+        },
+        {
+          "id": "p017",
+          "sha256": "80fff9aa88ccda07406842707cba0160a5674f0e2b8e5f0fe106f1112aa93097"
+        },
+        {
+          "id": "p018",
+          "sha256": "480679fa8dfc13bcdb2703b960ace0e5f29c33183bbbeafe6b1110355214b178"
+        },
+        {
+          "id": "p019",
+          "sha256": "1a64d94fd3e74b9131bea345f131cdfebef0b67c17d5150fd10686dadb1f916e"
+        },
+        {
+          "id": "p020",
+          "sha256": "ec55101deacfad73755759da44c599c8c36f6c7cddf6f0694ecb8393537b21b4"
+        },
+        {
+          "id": "p021",
+          "sha256": "9ae135eb00bc39d9431e3af9f728d7f66e8037f4c16d947ba017f1b66cab443b"
+        }
+      ]
+    },
+    {
+      "id": "szu-2005",
+      "title": "深圳大学本科考试考场纪律（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1357/2005.htm",
+      "textSha256": "3ddbe6420489a6c0cace05e07fef8932814b199516072e96e148fd44721fe5e8",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "a099140c6ab59b439c19784904aff96a5006d4ced56cdf9074e532a40fe8b3e7"
+        },
+        {
+          "id": "p002",
+          "sha256": "57815d689f1183580487e457d884969f33cedf2bb9aba5cf92885b71b875c912"
+        },
+        {
+          "id": "p003",
+          "sha256": "6157496f55cf6378b6376ebb9a7a8d58543d73f579aa27ba2af8efc87d045646"
+        },
+        {
+          "id": "p004",
+          "sha256": "5c8a1be1ecc7788a7fd62e3cbfa7fcc1aaf8bb49b63f7d088145041360c418b5"
+        },
+        {
+          "id": "p005",
+          "sha256": "cbd56c719c4c50505f6493f14c9d487db498e828d943a5b7d792f777b55d43e8"
+        },
+        {
+          "id": "p006",
+          "sha256": "9a541ebff7c784b99d82b86ac0d164caff3d2e02b41e2d83c75874e31a0f90f7"
+        },
+        {
+          "id": "p007",
+          "sha256": "e7d3fa3343efad638bba57be23c77f6d85e12d1e4c5457c56aa7ef5303bf7bae"
+        },
+        {
+          "id": "p008",
+          "sha256": "fe8dc25398ae5fe7c7aaded82a311d2fe31d3c96a45372e35564d7e016d4b8a2"
+        },
+        {
+          "id": "p009",
+          "sha256": "fcad711fb447d381a904de021e144f5b1b4f5178b4814f05fe58f1d7294e4e69"
+        },
+        {
+          "id": "p010",
+          "sha256": "594595d31de1ce1b3a9ab683e68ffb27c29655dc24054ccdc407850a9f772b61"
+        },
+        {
+          "id": "p011",
+          "sha256": "41116edd987e86b82663e9951e55fc95e928af727c994d64e3e86ed0375ee3db"
+        },
+        {
+          "id": "p012",
+          "sha256": "7425411b5917d08aa059092f8ffcf52e72d11b380fd309c317d400594e8c3d8a"
+        },
+        {
+          "id": "p013",
+          "sha256": "4a29bb5299fbb71a513d1e290071a42ff8f6f6e4e22be39acaac99a0a177914b"
+        },
+        {
+          "id": "p014",
+          "sha256": "eca41eee9e67749151174ef319b1affc8107ca3c2d1fbc8718530b424d99b2f3"
+        },
+        {
+          "id": "p015",
+          "sha256": "a144c3f443c722dfe2b661b19a0dccfce67ce9837a91e4cf5ea292d28716d53f"
+        },
+        {
+          "id": "p016",
+          "sha256": "e30480bce5edc7d4b950712044339159aba2a15a21e237b7bb7368fd160a848d"
+        },
+        {
+          "id": "p017",
+          "sha256": "a7240561433de9e5ec2df2f9079faf2a18ece4f23f7f2aa1868d10beb7e5007d"
+        },
+        {
+          "id": "p018",
+          "sha256": "06826e8926a98f92145ec0e040b3df610d0cbb266d5e71b3fa341e117ffa9f5d"
+        },
+        {
+          "id": "p019",
+          "sha256": "154cf1d4ed05a55ccf2ba7d894efcf904309546d11eb1ef0ab478864bb4868fa"
+        },
+        {
+          "id": "p020",
+          "sha256": "bbb5de2b46280061896130d698d0a5af351bf341519a81581e19da3e9c1534f3"
+        },
+        {
+          "id": "p021",
+          "sha256": "95c1e92f57208fb3d8559c8509033fb4de1a8cab12a2fdb72c75b4d01b422b27"
+        },
+        {
+          "id": "p022",
+          "sha256": "925afc7999e5d447f3361b579b282f65cbbdff372b10f445329bb2efef600728"
+        },
+        {
+          "id": "p023",
+          "sha256": "ce14af864f11687cd8bd6cfb5bba8b01aef2038c07c7a5bd329744901b9267c4"
+        },
+        {
+          "id": "p024",
+          "sha256": "e8e48cb140f187eaa8d0d6a07b6c2490a571108609fb79a6f867e06967375f76"
+        },
+        {
+          "id": "p025",
+          "sha256": "a3a997001bb69364d9fcc7345fae6385b4a42b21ee1d0b9959e6436f402e8a09"
+        },
+        {
+          "id": "p026",
+          "sha256": "7c4b662b01619c16a61e38889e34ccdea5dd7e6501972d52e1da651317ca417b"
+        },
+        {
+          "id": "p027",
+          "sha256": "8212d31bf69c37011854b6e8eeca4cd81d9d764c455805b20466524a1dec86d9"
+        },
+        {
+          "id": "p028",
+          "sha256": "f83129b306f02450df227e2f2a80dddb5d869c799e9090f63ae5e42026cd4650"
+        },
+        {
+          "id": "p029",
+          "sha256": "7ad5d2a4611f6c8146a1cda530934eeaafc5b4534b3bd1d217a166949978e9df"
+        },
+        {
+          "id": "p030",
+          "sha256": "2eed1bad5eb803d5901c99f0b7346bee59c3f6614a7be776de34248de82c8176"
+        },
+        {
+          "id": "p031",
+          "sha256": "1a8c5bbaab064b04a40fe4842748be28abccdcca894580eb813ac9ef0f7cf972"
+        },
+        {
+          "id": "p032",
+          "sha256": "f4653a859ed6738063961d299feda83aa4a7b10e521d64a4ce3c8c5826c6689a"
+        },
+        {
+          "id": "p033",
+          "sha256": "62177240ce10feac8510f078862f347bb8959330224e79e1d77812e846140f86"
+        },
+        {
+          "id": "p034",
+          "sha256": "c16c6e663ab62c1db8d9c64899b8426a782567810e66ca86c4d6184f179ecbd5"
+        },
+        {
+          "id": "p035",
+          "sha256": "482960e47f8ee9ac256abf5c27074a9696caf885f7c13e59269bce1b4dd88a1f"
+        },
+        {
+          "id": "p036",
+          "sha256": "4d391694be3da5a6dc2028bc5ab86674f683a06cd6e1ad2f3549d61e1d9da074"
+        },
+        {
+          "id": "p037",
+          "sha256": "179ab5bde19bfd25432f9337085c903a55cc624d9ac81f58dc91d6704389f257"
+        },
+        {
+          "id": "p038",
+          "sha256": "51fb260c466d6c0c374a02e26334e4820ddc2744dd4f94dcda781fb933091356"
+        },
+        {
+          "id": "p039",
+          "sha256": "d8f3168c3a687f6efb45c94cb3649124543c5e34a18a768f336855326b64f139"
+        },
+        {
+          "id": "p040",
+          "sha256": "a790c707d027df2955af028a5e4c059a2daf3a84e6710aea05bd344906666181"
+        },
+        {
+          "id": "p041",
+          "sha256": "cab0ea93089a7d9a2c66cec0af4ef0e69953b6728b7ff472b568e40d2c53b963"
+        },
+        {
+          "id": "p042",
+          "sha256": "492aafc0613664d0c69fd783fd7c5ef8fa5da98771ed6f7ccb9ec24ac467c42b"
+        },
+        {
+          "id": "p043",
+          "sha256": "0a49413609be0a6ea1d928d74ae3eaa0b33407bc4fad77cd1dc8dfe85c82bc4f"
+        },
+        {
+          "id": "p044",
+          "sha256": "cdabb673c01986103ccf788b7176ea9c7e500676870d9df35f6014683ae31aed"
+        },
+        {
+          "id": "p045",
+          "sha256": "5355e428780474448972ceae7af65f6c475cf2f6a8d3957d58fe089f0b1e777a"
+        },
+        {
+          "id": "p046",
+          "sha256": "23b1366a1c0d22cfcb941b19b0e8bdfc8ea3a22ad96e406493ee493d338bc56b"
+        },
+        {
+          "id": "p047",
+          "sha256": "885defb274737191f029506d1ebca68f50eebe2253e3cad31c941f69a58a38ba"
+        },
+        {
+          "id": "p048",
+          "sha256": "d6cc13ea16c84d8a3efe2e298aa3062a5888d9fa0d4f3c6e2e5fcbb5e681bfef"
+        },
+        {
+          "id": "p049",
+          "sha256": "7cfb510dc08111a40330d9d0fe4f38560493e5903157ba646d12b57e074c0e67"
+        },
+        {
+          "id": "p050",
+          "sha256": "e47820903c0aad95f5f2fba2d2e1cf439ae86e8b40c2fcce086dfe85a7fd3f62"
+        },
+        {
+          "id": "p051",
+          "sha256": "022909bec4010218d9c577092089d89580cd168e772c2f90382aa69a5fb8ea5d"
+        },
+        {
+          "id": "p052",
+          "sha256": "b2fb9d5e60a6f055d4b4a41f956b63ccf45ecea7df78087f346d848869863174"
+        },
+        {
+          "id": "p053",
+          "sha256": "516fce78c441e2fca91ad817c1ee407a5f02efa51430c0cc5efe9cf9605162fd"
+        },
+        {
+          "id": "p054",
+          "sha256": "3d2af665cbf0a00525f00545be48466a482b3cd1e1567b1b6342e5423b874dee"
+        },
+        {
+          "id": "p055",
+          "sha256": "3132caec914b104aaffdab9dfc8db9c1d6666097e8dbcd523f0afcba27008d33"
+        },
+        {
+          "id": "p056",
+          "sha256": "3f9bf904c46c5ae4df2b1abb67f95016b2ed224da6377693abfecc9871cd23d7"
+        },
+        {
+          "id": "p057",
+          "sha256": "81fa22ab275edda0508a6fb40c75e6548a91bda14f324c4ada0876abae47eb74"
+        },
+        {
+          "id": "p058",
+          "sha256": "58cb6f3018a57d919ad9a2ceeba9a70bdff2c7c90a940cb16637e972bac40f0f"
+        },
+        {
+          "id": "p059",
+          "sha256": "09baf4022e403d73f929cf2a676cec8bb639c17f606d3b68d3aab11b69869d54"
+        },
+        {
+          "id": "p060",
+          "sha256": "bd0421859edd5402a683b7f93785c6ae3ed797919765d375e320f3a9adfc149c"
+        },
+        {
+          "id": "p061",
+          "sha256": "f543518a8cff9e3861b0c8cafefbe4fd05d80b817f405ac6d74e1f46a0cee690"
+        },
+        {
+          "id": "p062",
+          "sha256": "4f6833f7b7168582de342dc723cc49abf99876daa6768da81c9cb1f5d4408146"
+        },
+        {
+          "id": "p063",
+          "sha256": "56d33d888bbcaf1823a9580b3441ba5b805b25826ad9195284a0dda4b7d75fd8"
+        },
+        {
+          "id": "p064",
+          "sha256": "e9da0b4b7b74e2252d1381612ed275034f609cc4e6560592b937217b07ab0fe6"
+        },
+        {
+          "id": "p065",
+          "sha256": "2cc7e44670635f07aaaadc39b52714c8e7a93862cdf25fe383ddf4ed6ba5124d"
+        },
+        {
+          "id": "p066",
+          "sha256": "547bf149af22bac6232b2d471268757f98ea99b45a6df9cefbbc2d53bec97329"
+        },
+        {
+          "id": "p067",
+          "sha256": "bf49162fee8139e3f81179b5acfa662ab7cbc7ac06cfe6aaeec455541c69c706"
+        },
+        {
+          "id": "p068",
+          "sha256": "8b6dc646c2684345019d262e5bcdf165e7c49384aae726e983bcb8b0ee6ffba3"
+        },
+        {
+          "id": "p069",
+          "sha256": "1b37835a77289e45a434977cae1048aac47f0c26e3b67345ad0326ddd3b2802d"
+        },
+        {
+          "id": "p070",
+          "sha256": "2f0044762e66960a8850773ecf7fef954effd0fb01c45a4a8d482b9c06523d75"
+        },
+        {
+          "id": "p071",
+          "sha256": "2e60c9a353e9121b502ff43d6a5247e2895f43a93ab1e574ed748675172919c0"
+        },
+        {
+          "id": "p072",
+          "sha256": "e3d16313227f95a513ee8717193bdb0356b3756b51e6f899ce6136cd1f0ab075"
+        },
+        {
+          "id": "p073",
+          "sha256": "c029f10ae79bb0247b26bb89619bc17a02f4278480f73133f6a584f682279aac"
+        },
+        {
+          "id": "p074",
+          "sha256": "fa0b2001a82f34512bee49900287a2d345045bfd4f6bb0c2aafb8e208c1f75cc"
+        },
+        {
+          "id": "p075",
+          "sha256": "0fc2a38a97a2b87f5970d35cf9fb27fd58015a96793e11ed7a07bf91c22055cd"
+        }
+      ]
+    },
+    {
+      "id": "szu-2006",
+      "title": "深圳大学本科期末考试缓考规定（修订）",
+      "url": "https://jwb.szu.edu.cn/info/1357/2006.htm",
+      "textSha256": "79c3d6946195a1d837bbab9c94d5b3d7a6500b79acc1ddf6f9d563ce68b3c3b4",
+      "paragraphs": [
+        {
+          "id": "p001",
+          "sha256": "76c6f9facd16a33d360b9a017670b6b5559d1694b2d0ae346363176b5719af21"
+        },
+        {
+          "id": "p002",
+          "sha256": "43d9ad62f0d0b1d6963bd699898d99b626640d42e0da2abbc5d560ce4e2e135b"
+        },
+        {
+          "id": "p003",
+          "sha256": "1f239f38ddf75e0b86cf2fedd4dd16a50454ffbf58939effbb36d280165a7c34"
+        },
+        {
+          "id": "p004",
+          "sha256": "e1d48f7d75af89c8cd595fc9a967859b1570f766ab1c9a8dc7fe7cb6e6c2aff9"
+        },
+        {
+          "id": "p005",
+          "sha256": "770a89f7b8ca23bae31ab1748c28e9bcaafeaac454769da2c70f43fcccf836d1"
+        },
+        {
+          "id": "p006",
+          "sha256": "cf3c4633c768bf9bf89e45cd186a043cacbd3957acafd47241bacdc6d70e8ed4"
+        },
+        {
+          "id": "p007",
+          "sha256": "3c01d0e83a20f993df811c07a758f6c2fd2499f5568b80b85fc2d9861a1ee8b0"
+        },
+        {
+          "id": "p008",
+          "sha256": "c1f772bf669ff1c35f76a57b9e97aa8bb1946bc4755388e9f80b9b354135866b"
+        },
+        {
+          "id": "p009",
+          "sha256": "2313dedfcc13798cc4a104726d45b8781f33aed838edfe31179cc2b812b917a9"
+        },
+        {
+          "id": "p010",
+          "sha256": "7ef7f23b26c2b41abf69393285df2a451a2c0c66ce74fa9981c195c1044c441c"
+        },
+        {
+          "id": "p011",
+          "sha256": "a6672a2592521eddaed2cad8d9dd1f31565a875cf837035424586a16ea523c70"
+        },
+        {
+          "id": "p012",
+          "sha256": "4edb345ff78a326f5cdd21e4bf7b8bdd25fe7a0e167f3ba4a9612f934c933148"
+        },
+        {
+          "id": "p013",
+          "sha256": "d3db38dfe33d9188b5a737dca34923d6cbd755a6462c3ad89b00fb1c2f0582b9"
+        },
+        {
+          "id": "p014",
+          "sha256": "e9639018040cbc5ffb37db6c1b8db6e86789e2f93823dd0094d89f91f39bef78"
+        },
+        {
+          "id": "p015",
+          "sha256": "aa5a3506c08a57d6b75089db234fc48f5344868554df224451b89c9a9cd1a4dd"
+        },
+        {
+          "id": "p016",
+          "sha256": "cbc15f60c0669e3760898e7ad88b6b799aedc10ad346deaf96ab937b98f6677a"
+        },
+        {
+          "id": "p017",
+          "sha256": "7ea08d75730949c0701892e919bf6cec884672d6e2e8745ce66a3251c0478028"
+        },
+        {
+          "id": "p018",
+          "sha256": "40a7792fc72aa0dbbbc3046be7640f5a1f53ac6778ab3f4a136f6d8b06f55bbc"
+        },
+        {
+          "id": "p019",
+          "sha256": "a27bbfa88a5a21df15436d56d050ef286f6ad7ac0b92a275dcce8631460b9551"
+        },
+        {
+          "id": "p020",
+          "sha256": "3ebf1642cf46518e0f54354bb0f5e773475c91d7ca0cc0099c0b4d4094d54a9f"
+        },
+        {
+          "id": "p021",
+          "sha256": "504c13d200e5b1892c20815e1d31b76089871c97ba6eabf4702072e88504792f"
+        },
+        {
+          "id": "p022",
+          "sha256": "1723ebb26209655743d1c2974d41b07b55277929c1f13c454f7807844d4490f1"
+        },
+        {
+          "id": "p023",
+          "sha256": "984627dbe4dce6808518e4d50cc2bd80cfcc4346b2b062168d2bb7b739cedaa1"
+        },
+        {
+          "id": "p024",
+          "sha256": "b31a5b790c0db062e5b648f3fe838f496d12a5d1a9704ca8621fe2c243c613a1"
+        },
+        {
+          "id": "p025",
+          "sha256": "7bb579e9aca145dc7de50283184953b215d0c77cd47323681c9238230d09afef"
+        },
+        {
+          "id": "p026",
+          "sha256": "69a3ef7a37e706d1eb2b60d34156e3f21624e99d7ac330d20c1c96153bd222c7"
+        },
+        {
+          "id": "p027",
+          "sha256": "157d751d51aa26da54a97ef77ea3db4fe5ecd3ceb746ff699bf83b9cf43a1827"
+        },
+        {
+          "id": "p028",
+          "sha256": "360bf25829af776157752d5cec01e59d85fed156d4888c887e6ef492ba828c27"
+        },
+        {
+          "id": "p029",
+          "sha256": "111e1bf9dc5f847aeb80444ba2de87ce26224620ad079f0375f2518bae677146"
+        },
+        {
+          "id": "p030",
+          "sha256": "8c10cf8265866fab3039f138da83dae8634f96d605b8ace65c2138b6703a8903"
+        },
+        {
+          "id": "p031",
+          "sha256": "e208aab1c7b6d452d96a6e64a8dc041e6de422be0669de3c67ce5a6c48e47f39"
+        },
+        {
+          "id": "p032",
+          "sha256": "2ec50721ef7e8d19713f200226b92f33f82e0477f4654b67db7c392850306c97"
+        },
+        {
+          "id": "p033",
+          "sha256": "f49e43805105b9e16e7f4aec60b58122eebfd5222fa071162db9e5ba747e01cd"
+        },
+        {
+          "id": "p034",
+          "sha256": "e4c2a19c92c9549fc088c95bbf122d5ad9f48adb70b569a1819ab47b7d7d3b38"
+        },
+        {
+          "id": "p035",
+          "sha256": "f74b1336dd07f65c27bcda7a2d4e47ff3e41caf2612586a1a8cccc110f6a1e00"
+        },
+        {
+          "id": "p036",
+          "sha256": "10b7be3fe1bf3293780f57b229fa3b59bf9cab8e426212e786c864a455eb2f72"
+        },
+        {
+          "id": "p037",
+          "sha256": "a90669e8be9d0f8463d583e45dacee3acb0e20b310fd415550eafb25543ab079"
+        },
+        {
+          "id": "p038",
+          "sha256": "bb3c959ec9388ed117d8890f1d6a8da1de1812bdaecfb03743938b627d24f24b"
+        },
+        {
+          "id": "p039",
+          "sha256": "ffb28fb2ca23b06b4a1c52be44a3fc04ba6f0e93a2030a578d6f4acd43720f81"
+        },
+        {
+          "id": "p040",
+          "sha256": "731fbd32749b80844174337701cfe818b4a1e4ddcb44d471717303ad4779f37f"
+        },
+        {
+          "id": "p041",
+          "sha256": "c99d25fc58ec605f9b55ef7311dc3afda479c1d5103fb9c1d2258a61b9f2e866"
+        },
+        {
+          "id": "p042",
+          "sha256": "16c240e911b488a0289a3ccfab14b359a80c0eb8bba6b1b832c9327404f529be"
+        },
+        {
+          "id": "p043",
+          "sha256": "0b3f72a7d656d370450e3f7bd3c9fe11bd18a5843e3402a3adde77b06039bfb9"
+        },
+        {
+          "id": "p044",
+          "sha256": "55793002241fb71574aa6122b13824e9c590c8168df5e892f2f29f593495f6b0"
+        },
+        {
+          "id": "p045",
+          "sha256": "064c2bf8b79df678515430179d9c085d6ebb368729541cb6abecfa519879082e"
+        },
+        {
+          "id": "p046",
+          "sha256": "7dd7b3993fdfec58daa169b7c4491219268502c72ae4394efcca1d6c00f4ad70"
+        },
+        {
+          "id": "p047",
+          "sha256": "61fa8fc8a76544364bdb4dcbf3e54e5d9ded097ca69b03792fa370553d853868"
+        },
+        {
+          "id": "p048",
+          "sha256": "ccdfe464a9ac9cdae9fcfc02a0822dfd44250949f9db0395928b0044c3e9c5ff"
+        },
+        {
+          "id": "p049",
+          "sha256": "e8db0898357b23abcda21fe8e23b2a8ebd8e8b9a82c6c0e1e8d98d1cb6d4b3b7"
+        },
+        {
+          "id": "p050",
+          "sha256": "2bb66f1c884163ffb4344e968171af915598d8566f90b7484844d378e1a36b25"
+        },
+        {
+          "id": "p051",
+          "sha256": "35cd38c000f3154dd2e184864396be6ba620da19c208f40eb4d13c31e8bda459"
+        },
+        {
+          "id": "p052",
+          "sha256": "feaa1711030470570bd50603fcdaf074b5f558a44a7038e81fc944abff05928b"
+        }
+      ]
+    }
+  ]
+}

@@ -112,6 +112,29 @@ class KnowledgeRetrievalServiceTest {
         assertThat(response.results().getFirst().metadata().businessVersion()).isEqualTo("v2");
     }
 
+    /** 评测接口保留被普通 Top-K 截断的候选，且仍按相同参数调用检索与准入复核。 */
+    @Test
+    @DisplayName("完整候选查询保留单路结果且不改变普通检索上限")
+    void candidatesKeepBothListsWithoutChangingNormalLimit() {
+        var service = new KnowledgeRetrievalService(knowledgeBaseService, embeddingModelProvider, chunkStore,
+                eligibilityService, clock);
+        when(knowledgeBaseService.getRetrievalSettings(3L))
+                .thenReturn(new KnowledgeRetrievalSettingsResponse(3L, 2, BigDecimal.ZERO, 1, 0));
+        when(eligibilityService.findEligible(eq(3L), eq("ALL"), any())).thenReturn(Map.of(3L, document(3L)));
+        float[] vector = {1F, 0F};
+        when(embeddingModelProvider.get()).thenReturn(new ResolvedEmbeddingModel(8L, "embedding-model", 2, embeddingModel));
+        when(embeddingModel.embed("选课")).thenReturn(vector);
+        when(chunkStore.search(eq(3L), eq(8L), eq("embedding-model"), eq("选课"), eq(vector),
+                eq(2), eq(4), eq(0D), any())).thenReturn(new KnowledgeChunkSearchResults(
+                List.of(hit("3-1", 1, "选课", 10), hit("3-2", 2, "课程", 9)),
+                List.of(hit("3-3", 3, "学分", .9), hit("3-4", 4, "重修", .8))));
+        var candidates = service.searchCandidates(3L, new KnowledgeSearchRequest("选课"));
+        assertThat(candidates.results()).hasSize(4);
+        assertThat(candidates.bm25CandidateCount()).isEqualTo(2);
+        assertThat(candidates.vectorCandidateCount()).isEqualTo(2);
+        assertThat(service.search(3L, new KnowledgeSearchRequest("选课")).results()).hasSize(1);
+    }
+
     /**
      * 没有有效文档时提前返回，不调用付费向量模型，也不向 ES 发送无限制查询。
      */
