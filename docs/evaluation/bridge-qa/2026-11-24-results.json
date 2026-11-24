@@ -1,0 +1,3800 @@
+{
+  "status": "COMPLETED",
+  "annotation": "SYNTHETIC_ASSISTANT_AUTHORED",
+  "review": "DEVELOPER_ASSISTANT_CHECKED_NOT_INDEPENDENT_HUMAN_REVIEW",
+  "summary": {
+    "SINGLE": {
+      "planned": 20,
+      "executed": 20,
+      "completeAnswers": 10,
+      "completeEvidence": 10,
+      "delivered": 19,
+      "errors": {
+        "KNOWLEDGE_REVIEW_UNSUPPORTED_CLAIM": 1
+      },
+      "searchCalls": 20,
+      "planningCalls": 0
+    },
+    "MULTIHOP": {
+      "planned": 20,
+      "executed": 20,
+      "completeAnswers": 20,
+      "completeEvidence": 20,
+      "delivered": 20,
+      "errors": {},
+      "searchCalls": 44,
+      "planningCalls": 31
+    }
+  },
+  "byKind": {
+    "two_document": {
+      "SINGLE": 10,
+      "MULTIHOP": 10
+    },
+    "three_document": {
+      "SINGLE": 0,
+      "MULTIHOP": 10
+    }
+  },
+  "model": {
+    "modelConfigId": 9,
+    "taskPlanningEnabled": false,
+    "workers": 2,
+    "modelName": "deepseek-flash",
+    "sharedFirstSearch": true,
+    "schedulingBudgetSeconds": 90,
+    "mode": "LIVE_RETRIEVAL_AND_PRODUCTION_ANSWER_SERVICE"
+  },
+  "environmentStable": true,
+  "modelConfigurations": [
+    {
+      "id": 8,
+      "modelType": "EMBEDDING",
+      "modelName": "qwen3.7-text-embedding",
+      "embeddingDimensions": 1024,
+      "updatedAt": "2026-10-21T20:51:43.500253"
+    },
+    {
+      "id": 9,
+      "modelType": "CHAT",
+      "modelName": "deepseek-flash",
+      "embeddingDimensions": null,
+      "updatedAt": "2026-10-21T13:03:38.585331"
+    }
+  ],
+  "datasetSha256": "7294929db0bc775cb22c6dae15f38f6528eff6c9a6fb91d911f89aa3783a4494",
+  "sourceSha256": "085cf172e47ffc645fc7254d8f79c206c09f794a7f6e5f5710c548e7cca32787",
+  "gitHead": "e63fc87f710163f903eeb77f4588c6c8033e4864",
+  "rawSha256": {
+    "input.json": "29869b1e0a69f74414c4382e02004344c369ec7fe4d41ec28ece55046d0e0008",
+    "calls.jsonl": "44b377beebc6ffbbe4d5438e002e082ff356acf285d5ffd5089e8eb690ad1c6d",
+    "environment.json": "d4d2700a0fa77387b8cde21431ef7d60e0435dc754be9d894baa9734bfc6324b"
+  },
+  "sharedInitialResultsVerified": true,
+  "quoteSubstringsVerified": true,
+  "results": [
+    {
+      "id": "b01",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "星河拓展是本公司登记的项目，该项目的出差事务统一执行差旅方案K3839，具体标准以K3839执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "星河拓展是本公司登记的项目，该项目的出差事务统一执行差旅方案K3839。具体标准以K3839执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "差旅方案K3839的住宿上限为530元/晚。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "差旅方案K3839适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为530元/晚；报销提交期限为12个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "差旅方案K3839的报销提交期限为12个自然日。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "差旅方案K3839适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为530元/晚；报销提交期限为12个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b01-rule",
+        "E2": "bridge:b01-entry",
+        "E3": "bridge:b04-rule",
+        "E4": "bridge:b03-rule",
+        "E5": "bridge:b02-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "星河拓展适用的住宿上限和报销提交期限分别是多少？",
+          "sources": [
+            "bridge:b01-rule",
+            "bridge:b01-entry",
+            "bridge:b04-rule",
+            "bridge:b03-rule",
+            "bridge:b02-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b01",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "星河拓展是本公司登记的项目，该项目的出差事务统一执行差旅方案K3839，具体标准以K3839执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "星河拓展是本公司登记的项目，该项目的出差事务统一执行差旅方案K3839。具体标准以K3839执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "差旅方案K3839的住宿上限为530元/晚，报销提交期限为12个自然日。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "差旅方案K3839适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为530元/晚；报销提交期限为12个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b01-rule",
+        "E2": "bridge:b01-entry",
+        "E3": "bridge:b04-rule",
+        "E4": "bridge:b03-rule",
+        "E5": "bridge:b02-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "星河拓展适用的住宿上限和报销提交期限分别是多少？",
+          "sources": [
+            "bridge:b01-rule",
+            "bridge:b01-entry",
+            "bridge:b04-rule",
+            "bridge:b03-rule",
+            "bridge:b02-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b02",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "云杉交付的出差事务归入业务组M2239，应先查询业务组映射表确定适用的差旅方案；档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "云杉交付是本公司登记的项目。该项目的出差事务归入业务组M2239，应先查询业务组映射表确定适用的差旅方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M2239的出差事务统一执行差旅方案K1056，本映射适用于该组全部已登记项目，具体标准以K1056执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M2239的出差事务统一执行差旅方案K1056。本映射适用于该组全部已登记项目，无需用户额外选择级别。具体标准以K1056执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "差旅方案K1056的住宿上限为680元/晚，报销提交期限为17个自然日；此为本方案全部条件，无需另行确认地区、职级或日期。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "差旅方案K1056适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为680元/晚；报销提交期限为17个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b02-entry",
+        "E2": "bridge:b01-rule",
+        "E3": "bridge:b03-rule",
+        "E4": "bridge:b04-rule",
+        "E5": "bridge:b02-rule",
+        "E6": "bridge:b02-mapping",
+        "E7": "bridge:b04-mapping",
+        "E8": "bridge:b04-entry",
+        "E9": "bridge:b06-mapping"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "云杉交付适用的住宿上限和报销提交期限分别是多少？",
+          "sources": [
+            "bridge:b02-entry",
+            "bridge:b01-rule",
+            "bridge:b03-rule",
+            "bridge:b04-rule",
+            "bridge:b02-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M2239 差旅方案 映射",
+          "sources": [
+            "bridge:b02-mapping",
+            "bridge:b02-entry",
+            "bridge:b04-mapping",
+            "bridge:b04-entry",
+            "bridge:b06-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "M2239 业务组 适用方案 住宿上限 报销期限",
+          "sources": [
+            "bridge:b01-rule",
+            "bridge:b03-rule",
+            "bridge:b02-mapping",
+            "bridge:b02-rule",
+            "bridge:b04-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "云杉交付已明确归入业务组M2239，但缺少业务组M2239到差旅方案的映射关系（如K3839、K1056等），因此无法确定适用哪一方案，也无法核实住宿上限与报销期限。",
+              "需检查业务组M2239映射到的方案是否存在同一条件下其他规则冲突，或是否有多个并列方案需同时适用。"
+            ],
+            "queries": [
+              "业务组M2239 差旅方案 映射",
+              "M2239 业务组 适用方案 住宿上限 报销期限"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b02",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "NEEDS_CLARIFICATION",
+        "claims": [
+          {
+            "text": "云杉交付是本公司登记的项目，该项目的出差事务归入业务组M2239，应先查询业务组映射表确定适用的差旅方案；该档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "云杉交付是本公司登记的项目。该项目的出差事务归入业务组M2239，应先查询业务组映射表确定适用的差旅方案。档案不规定具体执行标准。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [
+          "业务组M2239对应适用哪个差旅方案（如K3839、K1729、K3257或K1056）？"
+        ],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b02-entry",
+        "E2": "bridge:b01-rule",
+        "E3": "bridge:b03-rule",
+        "E4": "bridge:b04-rule",
+        "E5": "bridge:b02-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "云杉交付适用的住宿上限和报销提交期限分别是多少？",
+          "sources": [
+            "bridge:b02-entry",
+            "bridge:b01-rule",
+            "bridge:b03-rule",
+            "bridge:b04-rule",
+            "bridge:b02-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b03",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "海棠调研是本公司登记的项目，该项目的出差事务统一执行差旅方案K1729，具体标准以K1729执行细则为准，档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "海棠调研是本公司登记的项目，该项目的出差事务统一执行差旅方案K1729。具体标准以K1729执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "差旅方案K1729适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为740元/晚；报销提交期限为23个自然日。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "差旅方案K1729适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为740元/晚；报销提交期限为23个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b03-rule",
+        "E2": "bridge:b03-entry",
+        "E3": "bridge:b04-rule",
+        "E4": "bridge:b01-rule",
+        "E5": "bridge:b02-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "海棠调研适用的住宿上限和报销提交期限分别是多少？",
+          "sources": [
+            "bridge:b03-rule",
+            "bridge:b03-entry",
+            "bridge:b04-rule",
+            "bridge:b01-rule",
+            "bridge:b02-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b03",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "海棠调研是本公司登记的项目，该项目的出差事务统一执行差旅方案K1729，具体标准以K1729执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "海棠调研是本公司登记的项目，该项目的出差事务统一执行差旅方案K1729。具体标准以K1729执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "差旅方案K1729适用于所有明确绑定本方案的项目，住宿上限为740元/晚。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "差旅方案K1729适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为740元/晚；报销提交期限为23个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "差旅方案K1729的报销提交期限为23个自然日。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "差旅方案K1729适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为740元/晚；报销提交期限为23个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b03-rule",
+        "E2": "bridge:b03-entry",
+        "E3": "bridge:b04-rule",
+        "E4": "bridge:b01-rule",
+        "E5": "bridge:b02-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "海棠调研适用的住宿上限和报销提交期限分别是多少？",
+          "sources": [
+            "bridge:b03-rule",
+            "bridge:b03-entry",
+            "bridge:b04-rule",
+            "bridge:b01-rule",
+            "bridge:b02-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b04",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "远帆部署的出差事务归入业务组M5162，应先查询业务组映射表确定适用的差旅方案。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "远帆部署是本公司登记的项目。该项目的出差事务归入业务组M5162，应先查询业务组映射表确定适用的差旅方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M5162的出差事务统一执行差旅方案K3257；该映射适用于该组全部已登记项目，具体标准以K3257执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M5162的出差事务统一执行差旅方案K3257。本映射适用于该组全部已登记项目，无需用户额外选择级别。具体标准以K3257执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "差旅方案K3257的住宿上限为890元/晚。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "差旅方案K3257适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为890元/晚；报销提交期限为28个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "差旅方案K3257的报销提交期限为28个自然日。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "差旅方案K3257适用于所有明确绑定本方案的项目，两个标准同时适用：住宿上限为890元/晚；报销提交期限为28个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b04-entry",
+        "E2": "bridge:b02-rule",
+        "E3": "bridge:b01-rule",
+        "E4": "bridge:b03-rule",
+        "E5": "bridge:b04-rule",
+        "E6": "bridge:b04-mapping",
+        "E7": "bridge:b02-mapping",
+        "E8": "bridge:b02-entry",
+        "E9": "bridge:b06-mapping"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "远帆部署适用的住宿上限和报销提交期限分别是多少？",
+          "sources": [
+            "bridge:b04-entry",
+            "bridge:b02-rule",
+            "bridge:b01-rule",
+            "bridge:b03-rule",
+            "bridge:b04-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M5162 差旅方案 映射表",
+          "sources": [
+            "bridge:b04-mapping",
+            "bridge:b04-entry",
+            "bridge:b02-mapping",
+            "bridge:b02-entry",
+            "bridge:b06-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "M5162 适用方案 住宿上限 报销期限",
+          "sources": [
+            "bridge:b02-rule",
+            "bridge:b03-rule",
+            "bridge:b01-rule",
+            "bridge:b04-rule",
+            "bridge:b04-mapping"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "远帆部署归属业务组M5162，尚未查到M5162对应的差旅方案映射（如K1056、K3839、K1729、K3257中哪一个），因此无法确定应采用的住宿上限和报销提交期限",
+              "需要确认业务组映射表中M5162是否唯一绑定某一差旅方案，以及该映射是否指明具体方案编号"
+            ],
+            "queries": [
+              "业务组M5162 差旅方案 映射表",
+              "M5162 适用方案 住宿上限 报销期限"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b04",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [
+          {
+            "text": "远帆部署是公司登记的项目，其出差事务归入业务组M5162，应先查询业务组映射表确定适用的差旅方案；档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "远帆部署是本公司登记的项目。该项目的出差事务归入业务组M5162，应先查询业务组映射表确定适用的差旅方案。档案不规定具体执行标准。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b04-entry",
+        "E2": "bridge:b02-rule",
+        "E3": "bridge:b01-rule",
+        "E4": "bridge:b03-rule",
+        "E5": "bridge:b04-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "远帆部署适用的住宿上限和报销提交期限分别是多少？",
+          "sources": [
+            "bridge:b04-entry",
+            "bridge:b02-rule",
+            "bridge:b01-rule",
+            "bridge:b03-rule",
+            "bridge:b04-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b05",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "东辰冷机是本公司登记的设备，其运维事务统一执行保障方案K8621，具体标准以K8621执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "东辰冷机是本公司登记的设备，该设备的运维事务统一执行保障方案K8621。具体标准以K8621执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "保障方案K8621同时适用响应时限3小时和到场时限14小时。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "保障方案K8621适用于所有明确绑定本方案的设备，两个标准同时适用：响应时限为3小时；到场时限为14小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b05-entry",
+        "E2": "bridge:b05-rule",
+        "E3": "bridge:b06-rule",
+        "E4": "bridge:b08-rule",
+        "E5": "bridge:b07-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "东辰冷机适用的响应时限和到场时限分别是多少？",
+          "sources": [
+            "bridge:b05-entry",
+            "bridge:b05-rule",
+            "bridge:b06-rule",
+            "bridge:b08-rule",
+            "bridge:b07-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b05",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "东辰冷机的运维事务统一执行保障方案K8621，具体标准以K8621执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "东辰冷机是本公司登记的设备，该设备的运维事务统一执行保障方案K8621。具体标准以K8621执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "保障方案K8621适用于所有明确绑定本方案的设备，两个标准同时适用：响应时限为3小时；到场时限为14小时。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "保障方案K8621适用于所有明确绑定本方案的设备，两个标准同时适用：响应时限为3小时；到场时限为14小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b05-entry",
+        "E2": "bridge:b05-rule",
+        "E3": "bridge:b06-rule",
+        "E4": "bridge:b08-rule",
+        "E5": "bridge:b07-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "东辰冷机适用的响应时限和到场时限分别是多少？",
+          "sources": [
+            "bridge:b05-entry",
+            "bridge:b05-rule",
+            "bridge:b06-rule",
+            "bridge:b08-rule",
+            "bridge:b07-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b06",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "北岭空压机是本公司登记的设备，其运维事务归入业务组M8372；应先查询业务组映射表确定适用的保障方案。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "北岭空压机是本公司登记的设备。该设备的运维事务归入业务组M8372，应先查询业务组映射表确定适用的保障方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M8372的运维事务统一执行保障方案K9021，本映射适用于该组全部已登记设备，无需用户额外选择级别，具体标准以K9021执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M8372的运维事务统一执行保障方案K9021。本映射适用于该组全部已登记设备，无需用户额外选择级别。具体标准以K9021执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "保障方案K9021同时适用两个标准：响应时限为5小时，到场时限为22小时。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "保障方案K9021适用于所有明确绑定本方案的设备，两个标准同时适用：响应时限为5小时；到场时限为22小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b06-entry",
+        "E2": "bridge:b06-rule",
+        "E3": "bridge:b05-rule",
+        "E4": "bridge:b08-rule",
+        "E5": "bridge:b07-rule",
+        "E6": "bridge:b06-mapping",
+        "E7": "bridge:b08-mapping",
+        "E8": "bridge:b08-entry",
+        "E9": "bridge:b04-mapping",
+        "E10": "bridge:b11-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "北岭空压机适用的响应时限和到场时限分别是多少？",
+          "sources": [
+            "bridge:b06-entry",
+            "bridge:b06-rule",
+            "bridge:b05-rule",
+            "bridge:b08-rule",
+            "bridge:b07-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M8372 保障方案 映射表",
+          "sources": [
+            "bridge:b06-mapping",
+            "bridge:b06-entry",
+            "bridge:b08-mapping",
+            "bridge:b08-entry",
+            "bridge:b04-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "M8372 绑定的保障方案",
+          "sources": [
+            "bridge:b06-mapping",
+            "bridge:b05-rule",
+            "bridge:b06-entry",
+            "bridge:b08-rule",
+            "bridge:b11-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "北岭空压机归属业务组M8372，需要业务组映射表中M8372所绑定的保障方案；当前证据只有K9021、K8621、K8181、K3665等方案细则，尚未确定北岭空压机适用哪一个方案，故响应时限和到场时限还无法确认"
+            ],
+            "queries": [
+              "业务组M8372 保障方案 映射表",
+              "M8372 绑定的保障方案"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b06",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "NEEDS_CLARIFICATION",
+        "claims": [
+          {
+            "text": "北岭空压机是本公司登记的设备；该设备的运维事务归入业务组M8372，应先查询业务组映射表确定适用的保障方案，档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "北岭空压机是本公司登记的设备。该设备的运维事务归入业务组M8372，应先查询业务组映射表确定适用的保障方案。档案不规定具体执行标准。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [
+          "北岭空压机经业务组映射表确定的保障方案是哪一个（例如K9021、K8621、K8181或K3665）？"
+        ],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b06-entry",
+        "E2": "bridge:b06-rule",
+        "E3": "bridge:b05-rule",
+        "E4": "bridge:b08-rule",
+        "E5": "bridge:b07-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "北岭空压机适用的响应时限和到场时限分别是多少？",
+          "sources": [
+            "bridge:b06-entry",
+            "bridge:b06-rule",
+            "bridge:b05-rule",
+            "bridge:b08-rule",
+            "bridge:b07-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b07",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "南川泵组是本公司登记的设备，其运维事务统一执行保障方案K3665，具体标准以K3665执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "南川泵组是本公司登记的设备，该设备的运维事务统一执行保障方案K3665。具体标准以K3665执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "保障方案K3665适用于所有明确绑定本方案的设备，响应时限为7小时，到场时限为30小时。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "保障方案K3665适用于所有明确绑定本方案的设备，两个标准同时适用：响应时限为7小时；到场时限为30小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b07-entry",
+        "E2": "bridge:b07-rule",
+        "E3": "bridge:b05-rule",
+        "E4": "bridge:b06-rule",
+        "E5": "bridge:b08-rule",
+        "E6": "bridge:b14-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "南川泵组适用的响应时限和到场时限分别是多少？",
+          "sources": [
+            "bridge:b07-entry",
+            "bridge:b07-rule",
+            "bridge:b05-rule",
+            "bridge:b06-rule",
+            "bridge:b08-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "南川泵组 K3665 响应时限 到场时限",
+          "sources": [
+            "bridge:b07-entry",
+            "bridge:b07-rule",
+            "bridge:b05-rule",
+            "bridge:b06-rule",
+            "bridge:b08-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "K3665 响应时限 7小时 到场时限 30小时 冲突",
+          "sources": [
+            "bridge:b07-rule",
+            "bridge:b05-rule",
+            "bridge:b06-rule",
+            "bridge:b08-rule",
+            "bridge:b14-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "已确认南川泵组绑定保障方案K3665，K3665执行细则给出响应时限7小时、到场时限30小时；尚需检查是否有其他文件对南川泵组或K3665规定不同时限而形成冲突。"
+            ],
+            "queries": [
+              "南川泵组 K3665 响应时限 到场时限",
+              "K3665 响应时限 7小时 到场时限 30小时 冲突"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b07",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "南川泵组是本公司登记的设备，其运维事务统一执行保障方案K3665，具体标准以K3665执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "南川泵组是本公司登记的设备，该设备的运维事务统一执行保障方案K3665。具体标准以K3665执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "保障方案K3665适用于所有明确绑定本方案的设备，两个标准同时适用：响应时限为7小时；到场时限为30小时。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "保障方案K3665适用于所有明确绑定本方案的设备，两个标准同时适用：响应时限为7小时；到场时限为30小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b07-entry",
+        "E2": "bridge:b07-rule",
+        "E3": "bridge:b05-rule",
+        "E4": "bridge:b06-rule",
+        "E5": "bridge:b08-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "南川泵组适用的响应时限和到场时限分别是多少？",
+          "sources": [
+            "bridge:b07-entry",
+            "bridge:b07-rule",
+            "bridge:b05-rule",
+            "bridge:b06-rule",
+            "bridge:b08-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b08",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "西湾风机的运维事务归入业务组M6289，应先查询业务组映射表确定适用的保障方案；档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "西湾风机是本公司登记的设备。该设备的运维事务归入业务组M6289，应先查询业务组映射表确定适用的保障方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M6289的运维事务统一执行保障方案K8181，本映射适用于该组全部已登记设备，无需用户额外选择级别，具体标准以K8181执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M6289的运维事务统一执行保障方案K8181。本映射适用于该组全部已登记设备，无需用户额外选择级别。具体标准以K8181执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "保障方案K8181适用于所有明确绑定本方案的设备，响应时限为9小时，到场时限为38小时，两个标准同时适用。",
+            "references": [
+              {
+                "evidenceId": "E4",
+                "quote": "保障方案K8181适用于所有明确绑定本方案的设备，两个标准同时适用：响应时限为9小时；到场时限为38小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b08-entry",
+        "E2": "bridge:b05-rule",
+        "E3": "bridge:b06-rule",
+        "E4": "bridge:b08-rule",
+        "E5": "bridge:b07-rule",
+        "E6": "bridge:b08-mapping",
+        "E7": "bridge:b06-mapping",
+        "E8": "bridge:b06-entry",
+        "E9": "bridge:b02-mapping"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "西湾风机适用的响应时限和到场时限分别是多少？",
+          "sources": [
+            "bridge:b08-entry",
+            "bridge:b05-rule",
+            "bridge:b06-rule",
+            "bridge:b08-rule",
+            "bridge:b07-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M6289 保障方案 映射表",
+          "sources": [
+            "bridge:b08-mapping",
+            "bridge:b06-mapping",
+            "bridge:b08-entry",
+            "bridge:b06-entry",
+            "bridge:b02-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "M6289 西湾风机 绑定 保障方案",
+          "sources": [
+            "bridge:b08-entry",
+            "bridge:b08-mapping",
+            "bridge:b05-rule",
+            "bridge:b06-entry",
+            "bridge:b06-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "西湾风机的运维事务归入业务组M6289，但业务组映射表中M6289对应的保障方案尚未查得",
+              "尚未确认K8621、K9021、K8181、K3665中哪个方案绑定西湾风机，因此无法确定应采用的响应时限和到场时限"
+            ],
+            "queries": [
+              "业务组M6289 保障方案 映射表",
+              "M6289 西湾风机 绑定 保障方案"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b08",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "NEEDS_CLARIFICATION",
+        "claims": [
+          {
+            "text": "西湾风机的运维事务归入业务组M6289，应先查询业务组映射表确定适用的保障方案；档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "西湾风机是本公司登记的设备。该设备的运维事务归入业务组M6289，应先查询业务组映射表确定适用的保障方案。档案不规定具体执行标准。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [
+          "业务组M6289对应哪个保障方案（K8621、K9021、K8181或K3665）？请提供业务组映射表中的映射结果，以便确定适用的响应时限和到场时限。"
+        ],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b08-entry",
+        "E2": "bridge:b05-rule",
+        "E3": "bridge:b06-rule",
+        "E4": "bridge:b08-rule",
+        "E5": "bridge:b07-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "西湾风机适用的响应时限和到场时限分别是多少？",
+          "sources": [
+            "bridge:b08-entry",
+            "bridge:b05-rule",
+            "bridge:b06-rule",
+            "bridge:b08-rule",
+            "bridge:b07-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b09",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "蓝晶传感器是本公司登记的物料，其采购事务统一执行验收方案K7955，具体标准以K7955执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "蓝晶传感器是本公司登记的物料，该物料的采购事务统一执行验收方案K7955。具体标准以K7955执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "验收方案K7955适用于所有明确绑定本方案的物料，验收期限为4个工作日，质保期为15个月。",
+            "references": [
+              {
+                "evidenceId": "E4",
+                "quote": "验收方案K7955适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为4个工作日；质保期为15个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b09-entry",
+        "E2": "bridge:b10-rule",
+        "E3": "bridge:b11-rule",
+        "E4": "bridge:b09-rule",
+        "E5": "bridge:b12-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "蓝晶传感器适用的验收期限和质保期分别是多少？",
+          "sources": [
+            "bridge:b09-entry",
+            "bridge:b10-rule",
+            "bridge:b11-rule",
+            "bridge:b09-rule",
+            "bridge:b12-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b09",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "蓝晶传感器采购事务统一执行验收方案K7955，具体验收标准以K7955执行细则为准，档案不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "蓝晶传感器是本公司登记的物料，该物料的采购事务统一执行验收方案K7955。具体标准以K7955执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "验收方案K7955适用于所有明确绑定本方案的物料，验收期限为4个工作日，质保期为15个月。",
+            "references": [
+              {
+                "evidenceId": "E4",
+                "quote": "验收方案K7955适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为4个工作日；质保期为15个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b09-entry",
+        "E2": "bridge:b10-rule",
+        "E3": "bridge:b11-rule",
+        "E4": "bridge:b09-rule",
+        "E5": "bridge:b12-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "蓝晶传感器适用的验收期限和质保期分别是多少？",
+          "sources": [
+            "bridge:b09-entry",
+            "bridge:b10-rule",
+            "bridge:b11-rule",
+            "bridge:b09-rule",
+            "bridge:b12-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b10",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "赤岩连接器的采购事务归入业务组M5248，应先查询业务组映射表确定适用的验收方案；该物料的档案不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "赤岩连接器是本公司登记的物料。该物料的采购事务归入业务组M5248，应先查询业务组映射表确定适用的验收方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M5248的采购事务统一执行验收方案K5035，该映射适用于该组全部已登记物料；具体标准以K5035执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M5248的采购事务统一执行验收方案K5035。本映射适用于该组全部已登记物料，无需用户额外选择级别。具体标准以K5035执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "验收方案K5035适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为6个工作日，质保期为21个月。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "验收方案K5035适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为6个工作日；质保期为21个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b10-entry",
+        "E2": "bridge:b11-rule",
+        "E3": "bridge:b10-rule",
+        "E4": "bridge:b12-rule",
+        "E5": "bridge:b09-rule",
+        "E6": "bridge:b10-mapping",
+        "E7": "bridge:b12-mapping",
+        "E8": "bridge:b12-entry",
+        "E9": "bridge:b16-mapping"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "赤岩连接器适用的验收期限和质保期分别是多少？",
+          "sources": [
+            "bridge:b10-entry",
+            "bridge:b11-rule",
+            "bridge:b10-rule",
+            "bridge:b12-rule",
+            "bridge:b09-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M5248 验收方案 映射表",
+          "sources": [
+            "bridge:b10-mapping",
+            "bridge:b10-entry",
+            "bridge:b12-mapping",
+            "bridge:b12-entry",
+            "bridge:b16-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "M5248 验收方案",
+          "sources": [
+            "bridge:b10-mapping",
+            "bridge:b10-entry",
+            "bridge:b11-rule",
+            "bridge:b10-rule",
+            "bridge:b09-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "赤岩连接器归入业务组M5248，但尚未查到业务组M5248与验收方案的映射关系，因此无法确定其适用的验收期限和质保期。"
+            ],
+            "queries": [
+              "业务组M5248 验收方案 映射表",
+              "M5248 验收方案"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b10",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "NEEDS_CLARIFICATION",
+        "claims": [
+          {
+            "text": "赤岩连接器的采购事务归入业务组M5248，应先查询业务组映射表确定适用的验收方案；档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "赤岩连接器是本公司登记的物料。该物料的采购事务归入业务组M5248，应先查询业务组映射表确定适用的验收方案。档案不规定具体执行标准。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [
+          "赤岩连接器在业务组映射表中被明确绑定的是哪个验收方案（如K2241、K5035、K1017或K7955）？"
+        ],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b10-entry",
+        "E2": "bridge:b11-rule",
+        "E3": "bridge:b10-rule",
+        "E4": "bridge:b12-rule",
+        "E5": "bridge:b09-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "赤岩连接器适用的验收期限和质保期分别是多少？",
+          "sources": [
+            "bridge:b10-entry",
+            "bridge:b11-rule",
+            "bridge:b10-rule",
+            "bridge:b12-rule",
+            "bridge:b09-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b11",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "绿洲控制板是本公司登记的物料，该物料的采购事务统一执行验收方案K2241，具体标准以K2241执行细则为准，档案不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "绿洲控制板是本公司登记的物料，该物料的采购事务统一执行验收方案K2241。具体标准以K2241执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "验收方案K2241适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为8个工作日；质保期为27个月。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "验收方案K2241适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为8个工作日；质保期为27个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b11-entry",
+        "E2": "bridge:b10-rule",
+        "E3": "bridge:b11-rule",
+        "E4": "bridge:b12-rule",
+        "E5": "bridge:b09-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "绿洲控制板适用的验收期限和质保期分别是多少？",
+          "sources": [
+            "bridge:b11-entry",
+            "bridge:b10-rule",
+            "bridge:b11-rule",
+            "bridge:b12-rule",
+            "bridge:b09-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b11",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "绿洲控制板的采购事务统一执行验收方案K2241，具体标准以K2241执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "绿洲控制板是本公司登记的物料，该物料的采购事务统一执行验收方案K2241。具体标准以K2241执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "验收方案K2241适用于所有明确绑定本方案的物料，验收期限为8个工作日。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "验收方案K2241适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为8个工作日；质保期为27个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "验收方案K2241适用于所有明确绑定本方案的物料，质保期为27个月。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "验收方案K2241适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为8个工作日；质保期为27个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b11-entry",
+        "E2": "bridge:b10-rule",
+        "E3": "bridge:b11-rule",
+        "E4": "bridge:b12-rule",
+        "E5": "bridge:b09-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "绿洲控制板适用的验收期限和质保期分别是多少？",
+          "sources": [
+            "bridge:b11-entry",
+            "bridge:b10-rule",
+            "bridge:b11-rule",
+            "bridge:b12-rule",
+            "bridge:b09-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b12",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "银桦阀门是本公司登记的物料，该物料的采购事务归入业务组M5409。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "银桦阀门是本公司登记的物料。该物料的采购事务归入业务组M5409，应先查询业务组映射表确定适用的验收方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M5409的采购事务统一执行验收方案K1017；该映射适用于该组全部已登记物料，具体标准以K1017执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M5409的采购事务统一执行验收方案K1017。本映射适用于该组全部已登记物料，无需用户额外选择级别。具体标准以K1017执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "验收方案K1017：验收期限为10个工作日，质保期为33个月。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "验收方案K1017适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为10个工作日；质保期为33个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b12-entry",
+        "E2": "bridge:b11-rule",
+        "E3": "bridge:b10-rule",
+        "E4": "bridge:b09-rule",
+        "E5": "bridge:b12-rule",
+        "E6": "bridge:b12-mapping",
+        "E7": "bridge:b10-mapping",
+        "E8": "bridge:b10-entry",
+        "E9": "bridge:b06-mapping"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "银桦阀门适用的验收期限和质保期分别是多少？",
+          "sources": [
+            "bridge:b12-entry",
+            "bridge:b11-rule",
+            "bridge:b10-rule",
+            "bridge:b09-rule",
+            "bridge:b12-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M5409 验收方案 映射表",
+          "sources": [
+            "bridge:b12-mapping",
+            "bridge:b10-mapping",
+            "bridge:b12-entry",
+            "bridge:b10-entry",
+            "bridge:b06-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "银桦阀门 物料 验收方案 绑定",
+          "sources": [
+            "bridge:b12-entry",
+            "bridge:b11-rule",
+            "bridge:b09-rule",
+            "bridge:b10-rule",
+            "bridge:b10-entry"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "银桦阀门属于业务组M5409，需查业务组映射表确定其绑定的验收方案（可能为K2241、K5035、K7955、K1017之一），尚未核实具体方案",
+              "确定方案后需核对该方案的验收期限和质保期，并检查是否存在同条件冲突规定"
+            ],
+            "queries": [
+              "业务组M5409 验收方案 映射表",
+              "银桦阀门 物料 验收方案 绑定"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b12",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "NEEDS_CLARIFICATION",
+        "claims": [
+          {
+            "text": "银桦阀门是公司登记的物料，其采购事务归入业务组M5409；应先查询业务组映射表确定适用的验收方案，档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "银桦阀门是本公司登记的物料。该物料的采购事务归入业务组M5409，应先查询业务组映射表确定适用的验收方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "各验收方案分别规定：K2241为验收期限8个工作日、质保期27个月；K5035为验收期限6个工作日、质保期21个月；K7955为验收期限4个工作日、质保期15个月；K1017为验收期限10个工作日、质保期33个月。各方案仅适用于明确绑定本方案的物料。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "验收方案K2241适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为8个工作日；质保期为27个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              },
+              {
+                "evidenceId": "E3",
+                "quote": "验收方案K5035适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为6个工作日；质保期为21个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              },
+              {
+                "evidenceId": "E4",
+                "quote": "验收方案K7955适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为4个工作日；质保期为15个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              },
+              {
+                "evidenceId": "E5",
+                "quote": "验收方案K1017适用于所有明确绑定本方案的物料，两个标准同时适用：验收期限为10个工作日；质保期为33个月。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [
+          "银桦阀门（业务组M5409）在业务组映射表中绑定的验收方案是哪一个？"
+        ],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b12-entry",
+        "E2": "bridge:b11-rule",
+        "E3": "bridge:b10-rule",
+        "E4": "bridge:b09-rule",
+        "E5": "bridge:b12-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "银桦阀门适用的验收期限和质保期分别是多少？",
+          "sources": [
+            "bridge:b12-entry",
+            "bridge:b11-rule",
+            "bridge:b10-rule",
+            "bridge:b09-rule",
+            "bridge:b12-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b13",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "晨光门户的权限事务统一执行权限方案K1946，具体标准以K1946执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "晨光门户是本公司登记的应用，该应用的权限事务统一执行权限方案K1946。具体标准以K1946执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K1946适用于所有明确绑定本方案的应用，权限复核周期为25天，离岗权限回收时限为3小时。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "权限方案K1946适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为25天；离岗权限回收时限为3小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b13-rule",
+        "E2": "bridge:b16-rule",
+        "E3": "bridge:b13-entry",
+        "E4": "bridge:b15-rule",
+        "E5": "bridge:b14-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "晨光门户适用的权限复核周期和离岗权限回收时限分别是多少？",
+          "sources": [
+            "bridge:b13-rule",
+            "bridge:b16-rule",
+            "bridge:b13-entry",
+            "bridge:b15-rule",
+            "bridge:b14-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b13",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "晨光门户的权限事务统一执行权限方案K1946。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "晨光门户是本公司登记的应用，该应用的权限事务统一执行权限方案K1946。具体标准以K1946执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K1946适用于所有明确绑定本方案的应用，权限复核周期为25天。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "权限方案K1946适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为25天；离岗权限回收时限为3小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K1946适用于所有明确绑定本方案的应用，离岗权限回收时限为3小时。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "权限方案K1946适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为25天；离岗权限回收时限为3小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b13-rule",
+        "E2": "bridge:b16-rule",
+        "E3": "bridge:b13-entry",
+        "E4": "bridge:b15-rule",
+        "E5": "bridge:b14-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "晨光门户适用的权限复核周期和离岗权限回收时限分别是多少？",
+          "sources": [
+            "bridge:b13-rule",
+            "bridge:b16-rule",
+            "bridge:b13-entry",
+            "bridge:b15-rule",
+            "bridge:b14-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b14",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "暮雨账务的权限事务归入业务组M3291，查询业务组映射表以确定适用的权限方案。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "暮雨账务是本公司登记的应用。该应用的权限事务归入业务组M3291，应先查询业务组映射表确定适用的权限方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M3291的权限事务统一执行权限方案K3320，适用于该组全部已登记应用。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M3291的权限事务统一执行权限方案K3320。本映射适用于该组全部已登记应用，无需用户额外选择级别。具体标准以K3320执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K3320适用于所有明确绑定本方案的应用，权限复核周期为35天，离岗权限回收时限为5小时。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "权限方案K3320适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为35天；离岗权限回收时限为5小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b13-rule",
+        "E2": "bridge:b14-entry",
+        "E3": "bridge:b14-rule",
+        "E4": "bridge:b16-rule",
+        "E5": "bridge:b15-rule",
+        "E6": "bridge:b14-mapping",
+        "E7": "bridge:b16-mapping",
+        "E8": "bridge:b16-entry",
+        "E9": "bridge:b04-mapping",
+        "E10": "bridge:b08-entry"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "暮雨账务适用的权限复核周期和离岗权限回收时限分别是多少？",
+          "sources": [
+            "bridge:b13-rule",
+            "bridge:b14-entry",
+            "bridge:b14-rule",
+            "bridge:b16-rule",
+            "bridge:b15-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M3291 权限方案映射表",
+          "sources": [
+            "bridge:b14-mapping",
+            "bridge:b14-entry",
+            "bridge:b16-mapping",
+            "bridge:b16-entry",
+            "bridge:b04-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "暮雨账务 业务组M3291 权限方案",
+          "sources": [
+            "bridge:b14-entry",
+            "bridge:b14-mapping",
+            "bridge:b16-entry",
+            "bridge:b16-mapping",
+            "bridge:b08-entry"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "暮雨账务所属业务组M3291到具体权限方案的映射关系未知，无法确定应适用的方案编号",
+              "确定方案后，尚需核对该方案执行细则中的权限复核周期与离岗权限回收时限"
+            ],
+            "queries": [
+              "业务组M3291 权限方案映射表",
+              "暮雨账务 业务组M3291 权限方案"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b14",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "NEEDS_CLARIFICATION",
+        "claims": [
+          {
+            "text": "暮雨账务是本公司登记的应用，该应用的权限事务归入业务组M3291，应先查询业务组映射表确定适用的权限方案；该档案不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "暮雨账务是本公司登记的应用。该应用的权限事务归入业务组M3291，应先查询业务组映射表确定适用的权限方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K1946……权限复核周期为25天；离岗权限回收时限为3小时。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "权限方案K1946适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为25天；离岗权限回收时限为3小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K3320……权限复核周期为35天；离岗权限回收时限为5小时。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "权限方案K3320适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为35天；离岗权限回收时限为5小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K8422……权限复核周期为45天；离岗权限回收时限为7小时。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "权限方案K8422适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为45天；离岗权限回收时限为7小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K5775……权限复核周期为55天；离岗权限回收时限为9小时。",
+            "references": [
+              {
+                "evidenceId": "E4",
+                "quote": "权限方案K5775适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为55天；离岗权限回收时限为9小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [
+          "暮雨账务在业务组映射表中对应哪个权限方案（K1946、K3320、K8422或K5775）？"
+        ],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b13-rule",
+        "E2": "bridge:b14-entry",
+        "E3": "bridge:b14-rule",
+        "E4": "bridge:b16-rule",
+        "E5": "bridge:b15-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "暮雨账务适用的权限复核周期和离岗权限回收时限分别是多少？",
+          "sources": [
+            "bridge:b13-rule",
+            "bridge:b14-entry",
+            "bridge:b14-rule",
+            "bridge:b16-rule",
+            "bridge:b15-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b15",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "清泉审批应用的权限事务统一执行权限方案K8422，具体标准以K8422执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "清泉审批是本公司登记的应用，该应用的权限事务统一执行权限方案K8422。具体标准以K8422执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K8422适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为45天；离岗权限回收时限为7小时。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "权限方案K8422适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为45天；离岗权限回收时限为7小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b15-rule",
+        "E2": "bridge:b13-rule",
+        "E3": "bridge:b16-rule",
+        "E4": "bridge:b14-rule",
+        "E5": "bridge:b15-entry"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "清泉审批适用的权限复核周期和离岗权限回收时限分别是多少？",
+          "sources": [
+            "bridge:b15-rule",
+            "bridge:b13-rule",
+            "bridge:b16-rule",
+            "bridge:b14-rule",
+            "bridge:b15-entry"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b15",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "清泉审批应用的权限事务统一执行权限方案K8422，具体标准以K8422执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "清泉审批是本公司登记的应用，该应用的权限事务统一执行权限方案K8422。具体标准以K8422执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K8422适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为45天，离岗权限回收时限为7小时。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "权限方案K8422适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为45天；离岗权限回收时限为7小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b15-rule",
+        "E2": "bridge:b13-rule",
+        "E3": "bridge:b16-rule",
+        "E4": "bridge:b14-rule",
+        "E5": "bridge:b15-entry"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "清泉审批适用的权限复核周期和离岗权限回收时限分别是多少？",
+          "sources": [
+            "bridge:b15-rule",
+            "bridge:b13-rule",
+            "bridge:b16-rule",
+            "bridge:b14-rule",
+            "bridge:b15-entry"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b16",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "长风分析的权限事务归入业务组M6492，应先查询业务组映射表确定适用的权限方案；其档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "长风分析是本公司登记的应用。该应用的权限事务归入业务组M6492，应先查询业务组映射表确定适用的权限方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M6492的权限事务统一执行权限方案K5775，适用于该组全部已登记应用，具体标准以K5775执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M6492的权限事务统一执行权限方案K5775。本映射适用于该组全部已登记应用，无需用户额外选择级别。具体标准以K5775执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "权限方案K5775适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为55天；离岗权限回收时限为9小时。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "权限方案K5775适用于所有明确绑定本方案的应用，两个标准同时适用：权限复核周期为55天；离岗权限回收时限为9小时。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b16-rule",
+        "E2": "bridge:b15-rule",
+        "E3": "bridge:b13-rule",
+        "E4": "bridge:b14-rule",
+        "E5": "bridge:b16-entry",
+        "E6": "bridge:b16-mapping",
+        "E7": "bridge:b14-mapping",
+        "E8": "bridge:b14-entry",
+        "E9": "bridge:b04-mapping",
+        "E10": "bridge:b08-entry"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "长风分析适用的权限复核周期和离岗权限回收时限分别是多少？",
+          "sources": [
+            "bridge:b16-rule",
+            "bridge:b15-rule",
+            "bridge:b13-rule",
+            "bridge:b14-rule",
+            "bridge:b16-entry"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M6492 权限方案 映射表",
+          "sources": [
+            "bridge:b16-mapping",
+            "bridge:b14-mapping",
+            "bridge:b16-entry",
+            "bridge:b14-entry",
+            "bridge:b04-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "长风分析 M6492 适用权限方案",
+          "sources": [
+            "bridge:b16-entry",
+            "bridge:b16-mapping",
+            "bridge:b15-rule",
+            "bridge:b13-rule",
+            "bridge:b08-entry"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "证据仅说明长风分析的权限事务归入业务组M6492，并需查询业务组映射表确定适用权限方案；尚未取得M6492到具体权限方案（如K5775/K8422/K1946/K3320）的映射关系。",
+              "尚未确定长风分析最终适用的权限方案中权限复核周期和离岗权限回收时限的具体数值。"
+            ],
+            "queries": [
+              "业务组M6492 权限方案 映射表",
+              "长风分析 M6492 适用权限方案"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b16",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "claims": [
+          {
+            "text": "长风分析是本公司登记的应用，其权限事务归入业务组M6492；应先查询业务组映射表确定适用的权限方案。该档案不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "长风分析是本公司登记的应用。该应用的权限事务归入业务组M6492，应先查询业务组映射表确定适用的权限方案。档案不规定具体执行标准。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b16-rule",
+        "E2": "bridge:b15-rule",
+        "E3": "bridge:b13-rule",
+        "E4": "bridge:b14-rule",
+        "E5": "bridge:b16-entry"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "长风分析适用的权限复核周期和离岗权限回收时限分别是多少？",
+          "sources": [
+            "bridge:b16-rule",
+            "bridge:b15-rule",
+            "bridge:b13-rule",
+            "bridge:b14-rule",
+            "bridge:b16-entry"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b17",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "明湖安全课是本公司登记的课程，该课程的培训事务统一执行考核方案K1444，具体标准以K1444执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "# 明湖安全课档案"
+              },
+              {
+                "evidenceId": "E3",
+                "quote": "明湖安全课是本公司登记的课程，该课程的培训事务统一执行考核方案K1444。具体标准以K1444执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "考核方案K1444的合格分数为67分。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "# K1444执行细则"
+              },
+              {
+                "evidenceId": "E1",
+                "quote": "考核方案K1444适用于所有明确绑定本方案的课程，两个标准同时适用：合格分数为67分；补考申请期限为8个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "考核方案K1444的补考申请期限为8个自然日。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "# K1444执行细则"
+              },
+              {
+                "evidenceId": "E1",
+                "quote": "考核方案K1444适用于所有明确绑定本方案的课程，两个标准同时适用：合格分数为67分；补考申请期限为8个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b17-rule",
+        "E2": "bridge:b18-rule",
+        "E3": "bridge:b17-entry",
+        "E4": "bridge:b20-rule",
+        "E5": "bridge:b19-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "明湖安全课适用的合格分数和补考申请期限分别是多少？",
+          "sources": [
+            "bridge:b17-rule",
+            "bridge:b18-rule",
+            "bridge:b17-entry",
+            "bridge:b20-rule",
+            "bridge:b19-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b17",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "明湖安全课是本公司登记的课程，其培训事务统一执行考核方案K1444；具体标准以K1444执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E3",
+                "quote": "# 明湖安全课档案"
+              },
+              {
+                "evidenceId": "E3",
+                "quote": "明湖安全课是本公司登记的课程，该课程的培训事务统一执行考核方案K1444。具体标准以K1444执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "考核方案K1444的合格分数为67分，补考申请期限为8个自然日，两项标准同时适用。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "考核方案K1444适用于所有明确绑定本方案的课程，两个标准同时适用：合格分数为67分；补考申请期限为8个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b17-rule",
+        "E2": "bridge:b18-rule",
+        "E3": "bridge:b17-entry",
+        "E4": "bridge:b20-rule",
+        "E5": "bridge:b19-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "明湖安全课适用的合格分数和补考申请期限分别是多少？",
+          "sources": [
+            "bridge:b17-rule",
+            "bridge:b18-rule",
+            "bridge:b17-entry",
+            "bridge:b20-rule",
+            "bridge:b19-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b18",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 3,
+        "successfulSearchCalls": 3,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "青松合规课的培训事务归入业务组M5935，应先查询业务组映射表确定适用的考核方案；该档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "青松合规课是本公司登记的课程。该课程的培训事务归入业务组M5935，应先查询业务组映射表确定适用的考核方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M5935的培训事务统一执行考核方案K9895，该映射适用于该组全部已登记课程，无需用户额外选择级别。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M5935的培训事务统一执行考核方案K9895。本映射适用于该组全部已登记课程，无需用户额外选择级别。具体标准以K9895执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "考核方案K9895的合格分数为73分，补考申请期限为13个自然日。",
+            "references": [
+              {
+                "evidenceId": "E2",
+                "quote": "考核方案K9895适用于所有明确绑定本方案的课程，两个标准同时适用：合格分数为73分；补考申请期限为13个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b18-entry",
+        "E2": "bridge:b18-rule",
+        "E3": "bridge:b17-rule",
+        "E4": "bridge:b20-rule",
+        "E5": "bridge:b19-rule",
+        "E6": "bridge:b18-mapping",
+        "E7": "bridge:b20-mapping",
+        "E8": "bridge:b02-mapping",
+        "E9": "bridge:b06-mapping"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "青松合规课适用的合格分数和补考申请期限分别是多少？",
+          "sources": [
+            "bridge:b18-entry",
+            "bridge:b18-rule",
+            "bridge:b17-rule",
+            "bridge:b20-rule",
+            "bridge:b19-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M5935 考核方案 映射",
+          "sources": [
+            "bridge:b18-mapping",
+            "bridge:b20-mapping",
+            "bridge:b18-entry",
+            "bridge:b02-mapping",
+            "bridge:b06-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "M5935 适用考核方案 合格分数 补考申请期限",
+          "sources": [
+            "bridge:b18-rule",
+            "bridge:b17-rule",
+            "bridge:b20-rule",
+            "bridge:b19-rule",
+            "bridge:b18-mapping"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "青松合规课归入业务组M5935，但业务组映射表中M5935对应的考核方案尚未查到，因此无法确定合格分数和补考申请期限。",
+              "需核实M5935映射到的考核方案，并检查同条件下是否存在冲突的适用规则。"
+            ],
+            "queries": [
+              "业务组M5935 考核方案 映射",
+              "M5935 适用考核方案 合格分数 补考申请期限"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b18",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": "KNOWLEDGE_REVIEW_UNSUPPORTED_CLAIM",
+      "answer": null,
+      "evidenceSources": {
+        "E1": "bridge:b18-entry",
+        "E2": "bridge:b18-rule",
+        "E3": "bridge:b17-rule",
+        "E4": "bridge:b20-rule",
+        "E5": "bridge:b19-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "青松合规课适用的合格分数和补考申请期限分别是多少？",
+          "sources": [
+            "bridge:b18-entry",
+            "bridge:b18-rule",
+            "bridge:b17-rule",
+            "bridge:b20-rule",
+            "bridge:b19-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": false,
+          "reason": "INCOMPLETE_ANSWER",
+          "checklist": null,
+          "issues": [
+            {
+              "path": "status",
+              "evidenceIds": [
+                "E1"
+              ],
+              "detail": "E1明确记载该课程的考核方案须先查业务组映射表确定，而本轮证据未包含该表，无法确定青松合规课适用的方案。草案不应要求用户直接提供M5935对应方案号，而应说明缺少业务组映射表、暂时无法给出具体分数和期限。"
+            },
+            {
+              "path": "coverage",
+              "evidenceIds": [
+                "E2",
+                "E3",
+                "E4",
+                "E5"
+              ],
+              "detail": "草案列出K9895、K1444、K5106、K6775，但E2至E5均只写“适用于所有明确绑定本方案的课程”，未表明这些方案与M5935的绑定关系。因此草案把这些方案作为候选，属于没有证据支持的推断。"
+            },
+            {
+              "path": "clarification",
+              "evidenceIds": [
+                "E1"
+              ],
+              "detail": "E1已明确告知应“先查询业务组映射表”；答复应保留这一限制，指明缺少该映射表导致无法判断，而非把追问转成让用户填报具体方案编号。"
+            }
+          ]
+        },
+        {
+          "approved": false,
+          "reason": "UNSUPPORTED_CLAIM",
+          "checklist": null,
+          "issues": [
+            {
+              "path": "claims/1",
+              "evidenceIds": [
+                "E2",
+                "E3",
+                "E4",
+                "E5"
+              ],
+              "detail": "草案称“执行细则规定，其所列考核方案仅适用于明确绑定该方案的课程”，但被引用的E2至E5仅是四份各自独立的方案细则，每份只声明本方案适用于绑定本方案的课程、其他方案标准不能用于本方案，并未形成一条通用于“执行细则所列所有方案”的总则；该概括超出了原文范围。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b19",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "白鹭操作课登记的培训事务统一执行考核方案K6775，具体标准以K6775执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "白鹭操作课是本公司登记的课程，该课程的培训事务统一执行考核方案K6775。具体标准以K6775执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "考核方案K6775执行细则规定：合格分数为81分；补考申请期限为18个自然日。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "考核方案K6775适用于所有明确绑定本方案的课程，两个标准同时适用：合格分数为81分；补考申请期限为18个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b19-entry",
+        "E2": "bridge:b18-rule",
+        "E3": "bridge:b17-rule",
+        "E4": "bridge:b20-rule",
+        "E5": "bridge:b19-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "白鹭操作课适用的合格分数和补考申请期限分别是多少？",
+          "sources": [
+            "bridge:b19-entry",
+            "bridge:b18-rule",
+            "bridge:b17-rule",
+            "bridge:b20-rule",
+            "bridge:b19-rule"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SUFFICIENT",
+            "gaps": [],
+            "queries": [],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "SUFFICIENT",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b19",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "白鹭操作课的培训事务统一执行考核方案K6775，具体标准以K6775执行细则为准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "白鹭操作课是本公司登记的课程，该课程的培训事务统一执行考核方案K6775。具体标准以K6775执行细则为准。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "考核方案K6775的合格分数为81分。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "考核方案K6775适用于所有明确绑定本方案的课程，两个标准同时适用：合格分数为81分；补考申请期限为18个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          },
+          {
+            "text": "考核方案K6775的补考申请期限为18个自然日。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "考核方案K6775适用于所有明确绑定本方案的课程，两个标准同时适用：合格分数为81分；补考申请期限为18个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b19-entry",
+        "E2": "bridge:b18-rule",
+        "E3": "bridge:b17-rule",
+        "E4": "bridge:b20-rule",
+        "E5": "bridge:b19-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "白鹭操作课适用的合格分数和补考申请期限分别是多少？",
+          "sources": [
+            "bridge:b19-entry",
+            "bridge:b18-rule",
+            "bridge:b17-rule",
+            "bridge:b20-rule",
+            "bridge:b19-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b20",
+      "arm": "MULTIHOP",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          true,
+          true
+        ],
+        "completeAnswer": true,
+        "searchCalls": 5,
+        "successfulSearchCalls": 5,
+        "planningCalls": 2
+      },
+      "error": null,
+      "answer": {
+        "status": "ANSWERABLE",
+        "claims": [
+          {
+            "text": "红枫管理课的培训事务归入业务组M3488，应先查询业务组映射表确定适用的考核方案；档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "红枫管理课是本公司登记的课程。该课程的培训事务归入业务组M3488，应先查询业务组映射表确定适用的考核方案。档案不规定具体执行标准。"
+              }
+            ]
+          },
+          {
+            "text": "业务组M3488的培训事务统一执行考核方案K5106，适用于该组全部已登记课程，无需用户额外选择级别。",
+            "references": [
+              {
+                "evidenceId": "E6",
+                "quote": "业务组M3488的培训事务统一执行考核方案K5106。本映射适用于该组全部已登记课程，无需用户额外选择级别。具体标准以K5106执行细则为准。"
+              }
+            ]
+          },
+          {
+            "text": "考核方案K5106的合格分数为89分，补考申请期限为24个自然日，两个标准同时适用。",
+            "references": [
+              {
+                "evidenceId": "E5",
+                "quote": "考核方案K5106适用于所有明确绑定本方案的课程，两个标准同时适用：合格分数为89分；补考申请期限为24个自然日。其他方案的标准不能用于本方案。以上为本方案全部条件，无需另行确认地区、职级或日期。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b20-entry",
+        "E2": "bridge:b17-rule",
+        "E3": "bridge:b19-rule",
+        "E4": "bridge:b18-rule",
+        "E5": "bridge:b20-rule",
+        "E6": "bridge:b20-mapping",
+        "E7": "bridge:b18-mapping",
+        "E8": "bridge:b18-entry",
+        "E9": "bridge:b08-mapping"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "红枫管理课适用的合格分数和补考申请期限分别是多少？",
+          "sources": [
+            "bridge:b20-entry",
+            "bridge:b17-rule",
+            "bridge:b19-rule",
+            "bridge:b18-rule",
+            "bridge:b20-rule"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M3488 考核方案 映射表",
+          "sources": [
+            "bridge:b20-mapping",
+            "bridge:b18-mapping",
+            "bridge:b20-entry",
+            "bridge:b18-entry",
+            "bridge:b08-mapping"
+          ]
+        },
+        {
+          "round": 2,
+          "query": "业务组M3488 绑定 考核方案 K1444 K6775 K9895 K5106",
+          "sources": [
+            "bridge:b20-mapping",
+            "bridge:b17-rule",
+            "bridge:b18-mapping",
+            "bridge:b19-rule",
+            "bridge:b20-entry"
+          ]
+        },
+        {
+          "round": 3,
+          "query": "考核方案K5106 执行细则 合格分数 补考申请期限",
+          "sources": [
+            "bridge:b20-rule",
+            "bridge:b17-rule",
+            "bridge:b19-rule",
+            "bridge:b18-rule",
+            "bridge:b20-mapping"
+          ]
+        },
+        {
+          "round": 3,
+          "query": "K5106 合格分数 补考期限 标准",
+          "sources": [
+            "bridge:b20-rule",
+            "bridge:b17-rule",
+            "bridge:b19-rule",
+            "bridge:b18-rule",
+            "bridge:b20-mapping"
+          ]
+        }
+      ],
+      "plans": [
+        {
+          "afterRound": 1,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "红枫管理课归入业务组M3488，但证据尚未给出业务组M3488对应的考核方案（可能为K1444、K6775、K9895或K5106之一），需查业务组映射表确定；确定后还须核对所绑方案的标准是否与其他同条件规定冲突。"
+            ],
+            "queries": [
+              "业务组M3488 考核方案 映射表",
+              "业务组M3488 绑定 考核方案 K1444 K6775 K9895 K5106"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        },
+        {
+          "afterRound": 2,
+          "plan": {
+            "decision": "SEARCH",
+            "gaps": [
+              "已确认红枫管理课归入业务组M3488并映射至考核方案K5106，但尚未检索到K5106执行细则中合格分数与补考申请期限的具体数值",
+              "需检查是否存在与K5106执行细则标准相冲突的同条件规定"
+            ],
+            "queries": [
+              "考核方案K5106 执行细则 合格分数 补考申请期限",
+              "K5106 合格分数 补考期限 标准"
+            ],
+            "ruleChecks": [],
+            "userConditions": []
+          }
+        }
+      ],
+      "stopReason": "NO_NEW_EVIDENCE",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "id": "b20",
+      "arm": "SINGLE",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      },
+      "error": null,
+      "answer": {
+        "status": "NEEDS_CLARIFICATION",
+        "claims": [
+          {
+            "text": "红枫管理课的培训事务归入业务组M3488，应先查询业务组映射表确定适用的考核方案；该课程档案本身不规定具体执行标准。",
+            "references": [
+              {
+                "evidenceId": "E1",
+                "quote": "红枫管理课是本公司登记的课程。该课程的培训事务归入业务组M3488，应先查询业务组映射表确定适用的考核方案。档案不规定具体执行标准。"
+              }
+            ]
+          }
+        ],
+        "missingConditions": [
+          "业务组M3488对应的考核方案是哪一个？"
+        ],
+        "conflicts": []
+      },
+      "evidenceSources": {
+        "E1": "bridge:b20-entry",
+        "E2": "bridge:b17-rule",
+        "E3": "bridge:b19-rule",
+        "E4": "bridge:b18-rule",
+        "E5": "bridge:b20-rule"
+      },
+      "searches": [
+        {
+          "round": 1,
+          "query": "红枫管理课适用的合格分数和补考申请期限分别是多少？",
+          "sources": [
+            "bridge:b20-entry",
+            "bridge:b17-rule",
+            "bridge:b19-rule",
+            "bridge:b18-rule",
+            "bridge:b20-rule"
+          ]
+        }
+      ],
+      "plans": [],
+      "stopReason": "SINGLE_PASS",
+      "reviews": [
+        {
+          "approved": true,
+          "reason": "NONE",
+          "checklist": null,
+          "issues": []
+        }
+      ]
+    }
+  ]
+}
