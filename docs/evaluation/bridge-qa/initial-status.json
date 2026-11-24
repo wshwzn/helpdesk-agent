@@ -1,0 +1,687 @@
+{
+  "status": "BLOCKED_MODEL_BALANCE",
+  "httpStatus": 402,
+  "providerReason": "Insufficient Balance",
+  "usableForEffectClaims": false,
+  "summary": {
+    "SINGLE": {
+      "planned": 20,
+      "executed": 20,
+      "completeAnswers": 0,
+      "completeEvidence": 10,
+      "delivered": 0,
+      "errors": {
+        "KNOWLEDGE_DRAFT_CALL_FAILED": 20
+      },
+      "searchCalls": 20,
+      "planningCalls": 0
+    },
+    "MULTIHOP": {
+      "planned": 20,
+      "executed": 20,
+      "completeAnswers": 0,
+      "completeEvidence": 10,
+      "delivered": 0,
+      "errors": {
+        "KNOWLEDGE_PLANNING_CALL_FAILED": 20
+      },
+      "searchCalls": 20,
+      "planningCalls": 20
+    }
+  },
+  "model": {
+    "mode": "LIVE_RETRIEVAL_AND_PRODUCTION_ANSWER_SERVICE",
+    "modelConfigId": 9,
+    "taskPlanningEnabled": false,
+    "workers": 2,
+    "modelName": "deepseek-flash",
+    "sharedFirstSearch": true,
+    "schedulingBudgetSeconds": 90
+  },
+  "environmentStable": true,
+  "datasetSha256": "7294929db0bc775cb22c6dae15f38f6528eff6c9a6fb91d911f89aa3783a4494",
+  "sourceSha256": "9a8125bbb64d89f49a44b91e49d6edc2ff799db97afbb142e80e3fffe7868a65",
+  "rawCallsSha256": "c4948ef41a7d9cf6c566c6209449e532c6f74d6ecd2157f4415cd7a684e2e793",
+  "cases": [
+    {
+      "id": "b01",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b02",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b02",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b01",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b03",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b04",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b03",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b04",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b05",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b06",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b05",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b06",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b07",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b08",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b07",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b08",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b09",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b10",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b09",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b10",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b11",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b12",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b11",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b12",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b13",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b14",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b13",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b14",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b15",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b16",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b15",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b16",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b17",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b18",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b17",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b18",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b19",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    },
+    {
+      "id": "b20",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b19",
+      "arm": "MULTIHOP",
+      "error": "KNOWLEDGE_PLANNING_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": true,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 1
+      }
+    },
+    {
+      "id": "b20",
+      "arm": "SINGLE",
+      "error": "KNOWLEDGE_DRAFT_CALL_FAILED",
+      "metrics": {
+        "evidenceComplete": false,
+        "facts": [
+          false,
+          false
+        ],
+        "completeAnswer": false,
+        "searchCalls": 1,
+        "successfulSearchCalls": 1,
+        "planningCalls": 0
+      }
+    }
+  ]
+}

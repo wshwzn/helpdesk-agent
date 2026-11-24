@@ -273,6 +273,8 @@ Content-Type: application/json
 
 检索后的正确交付、引用支持与无答案拒答对照见 [问答质量评测](docs/evaluation/public-campus/ANSWERS.md)。80 题首轮实验保留所有失败及同模型辅助评分，不将其作为人工准确率或质量提升证明。
 
+单次检索与受控补查的20题自建场景对照见 [跨文档关联问答](docs/evaluation/bridge-qa/README.md)。资料与工具已就绪；首次文本调用因余额不足失败，尚无可用效果结论。
+
 管理员可以维护固定检索评测集。每道问题支持选择 1～20 个 `READY` 状态的期望文档，单次最多批量运行 100 道问题：
 
 ```http
