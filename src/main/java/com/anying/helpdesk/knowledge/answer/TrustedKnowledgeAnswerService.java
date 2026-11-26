@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.function.Supplier;
 import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*;
 
 @Service
@@ -84,7 +83,7 @@ public class TrustedKnowledgeAnswerService {
         var verified = verifyAnswer(model, question, scope, scopes, retrieved, trace);
         LocalDateTime checkedAt = trace.stage(EVIDENCE_RECHECK, () -> {
             LocalDateTime now = LocalDateTime.now(knowledgeClock);
-            var current = atStage(KNOWLEDGE_EVIDENCE_CHECK_FAILED,
+            var current = KnowledgeAnswerFailure.wrap(KNOWLEDGE_EVIDENCE_CHECK_FAILED,
                     () -> scopes.size() == 1 ? eligibilityService.findEligible(retrieved.baseId(), scope, now)
                             : eligibilityService.findEligibleScopes(retrieved.baseId(), scopes, now));
             for (var item : evidence) {
@@ -110,7 +109,7 @@ public class TrustedKnowledgeAnswerService {
     private VerifiedAnswer verifyAnswer(ResolvedChatModel model, String question, String scope, List<String> scopes,
                                         Retrieved retrieved, KnowledgeAnswerTrace trace) {
         var selection = trace.stage(DRAFT, () -> {
-            var result = atStage(KNOWLEDGE_DRAFT_CALL_FAILED,
+            var result = KnowledgeAnswerFailure.wrap(KNOWLEDGE_DRAFT_CALL_FAILED,
                     () -> modelClient.draft(model, question, scope, retrieved.catalog(), retrieved.context()));
             trace.selected(result);
             return result;
@@ -121,7 +120,7 @@ public class TrustedKnowledgeAnswerService {
         if (Boolean.TRUE.equals(review.value().approved())) return new VerifiedAnswer(draft, usage);
 
         var revised = trace.stage(REVISION, () -> {
-            var result = atStage(KNOWLEDGE_REVISION_CALL_FAILED, () -> modelClient.revise(model, question, scope,
+            var result = KnowledgeAnswerFailure.wrap(KNOWLEDGE_REVISION_CALL_FAILED, () -> modelClient.revise(model, question, scope,
                     retrieved.catalog(), selection.value(), review.value(), retrieved.context()));
             trace.selected(result);
             return result;
@@ -148,7 +147,7 @@ public class TrustedKnowledgeAnswerService {
             ResolvedChatModel model, String question, String scope, List<KnowledgeAnswerReport.Evidence> evidence,
             KnowledgeAnswerDraft draft, KnowledgeAnswerTrace trace, boolean finalAttempt) {
         return trace.stage(REVIEW, () -> {
-            var result = atStage(KNOWLEDGE_REVIEW_CALL_FAILED,
+            var result = KnowledgeAnswerFailure.wrap(KNOWLEDGE_REVIEW_CALL_FAILED,
                     () -> modelClient.review(model, question, scope, evidence, draft));
             trace.reviewed(result);
             var decision = result.value();
@@ -178,7 +177,7 @@ public class TrustedKnowledgeAnswerService {
     /** 只在缺少范围时进行主题路由；续答绑定原知识库并复核配置，不再次猜测主题。 */
     private ApplicabilityPreparation prepareApplicability(ResolvedChatModel model, KnowledgeAnswerInput input,
                                                          KnowledgeAnswerTrace trace) {
-        var base = atStage(KNOWLEDGE_RETRIEVAL_FAILED, () -> input.knowledgeBaseId() == null
+        var base = KnowledgeAnswerFailure.wrap(KNOWLEDGE_RETRIEVAL_FAILED, () -> input.knowledgeBaseId() == null
                 ? knowledgeBaseService.findDefault().orElse(null) : knowledgeBaseService.getById(input.knowledgeBaseId()));
         if (base == null) return new ApplicabilityPreparation(null, null, null, List.of());
         var policy = applicabilityService.get(base.id());
@@ -189,7 +188,7 @@ public class TrustedKnowledgeAnswerService {
         }
         if (policy.topics().isEmpty()) return new ApplicabilityPreparation(base, policy, null, List.of());
         trace.applicability(policy, null, null, true);
-        var route = atStage(KNOWLEDGE_APPLICABILITY_CALL_FAILED, () -> modelClient.route(model, input.question(), policy));
+        var route = KnowledgeAnswerFailure.wrap(KNOWLEDGE_APPLICABILITY_CALL_FAILED, () -> modelClient.route(model, input.question(), policy));
         trace.applicability(policy, route, null, true);
         var options = applicabilityService.requiredOptions(policy, route.value());
         return new ApplicabilityPreparation(base, policy, route, options);
@@ -234,7 +233,7 @@ public class TrustedKnowledgeAnswerService {
     /** 固定知识库后累计受控检索证据，再一次性建立最终可引用目录。 */
     private Retrieved retrieve(ResolvedChatModel model, String question, List<String> scopes, KnowledgeAnswerTrace trace,
                                ApplicabilityPreparation preparation) {
-        var base = preparation == null ? atStage(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault)
+        var base = preparation == null ? KnowledgeAnswerFailure.wrap(KNOWLEDGE_RETRIEVAL_FAILED, knowledgeBaseService::findDefault)
                 : java.util.Optional.ofNullable(preparation.base());
         if (base.isEmpty()) return new Retrieved(null, null, KnowledgeAnswerReport.Reason.NOT_CONFIGURED, List.of(), null, null, null);
         var knowledgeBase = base.get();
@@ -270,17 +269,6 @@ public class TrustedKnowledgeAnswerService {
                 case NONE -> throw new IllegalStateException("unreachable approved reason");
             };
             throw new KnowledgeAnswerFailure(code, "knowledge answer review rejected");
-        }
-    }
-
-    /** 外部依赖失败只记录当前阶段，已有确定性错误保留精确分类，避免暴露敏感异常正文。 */
-    private <T> T atStage(KnowledgeAnswerFailure.Code code, Supplier<T> action) {
-        try {
-            return action.get();
-        } catch (KnowledgeAnswerFailure failure) {
-            throw failure;
-        } catch (RuntimeException exception) {
-            throw new KnowledgeAnswerFailure(code, code.name());
         }
     }
 

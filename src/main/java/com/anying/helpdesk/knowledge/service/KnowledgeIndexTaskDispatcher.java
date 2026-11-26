@@ -49,7 +49,7 @@ public class KnowledgeIndexTaskDispatcher {
             try {
                 tasks.renew(claim);
             } catch (RuntimeException exception) {
-                log.warn("Knowledge index lease renewal failed ({})", exception.getClass().getSimpleName());
+                log.warn("Knowledge index lease renewal failed for document {}", claim.documentId(), exception);
             }
         }
         if (!slot.busy.compareAndSet(false, true)) {
@@ -59,7 +59,7 @@ public class KnowledgeIndexTaskDispatcher {
             executor.execute(() -> runNext(slot));
         } catch (RuntimeException exception) {
             slot.busy.set(false);
-            log.warn("Knowledge index executor unavailable ({})", exception.getClass().getSimpleName());
+            log.warn("Knowledge index executor unavailable", exception);
         }
     }
 
@@ -71,7 +71,7 @@ public class KnowledgeIndexTaskDispatcher {
                 worker.index(slot.running);
             }
         } catch (RuntimeException exception) {
-            log.warn("Knowledge index dispatch failed ({})", exception.getClass().getSimpleName());
+            log.warn("Knowledge index dispatch failed", exception);
         } finally {
             slot.running = null;
             slot.busy.set(false);

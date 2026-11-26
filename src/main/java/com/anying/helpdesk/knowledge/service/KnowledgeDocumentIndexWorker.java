@@ -65,12 +65,9 @@ public class KnowledgeDocumentIndexWorker {
             log.info("Knowledge index ownership expired for document {}", claim.documentId());
         } catch (RuntimeException exception) {
             // 不按 documentId 删除：过期执行者的补偿可能破坏新批次，提交结果不确定时也保留数据。
-            taskStore.fail(claim, failureCode(exception), !(exception instanceof KnowledgeDocumentParsingException));
-            log.warn(
-                    "Knowledge document indexing failed for document {} ({})",
-                    claim.documentId(),
-                    exception.getClass().getSimpleName()
-            );
+            String code = failureCode(exception);
+            taskStore.fail(claim, code, !(exception instanceof KnowledgeDocumentParsingException));
+            log.warn("Knowledge document indexing failed for document {} (code={})", claim.documentId(), code, exception);
         }
     }
 

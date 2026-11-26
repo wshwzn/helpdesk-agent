@@ -33,6 +33,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,6 +53,7 @@ public class ConversationServiceImpl implements ConversationService {
     private final TrustedKnowledgeAnswerService trustedKnowledgeAnswerService;
     private final KnowledgeAnswerRunService knowledgeAnswerRunService;
     private final KnowledgeAnswerModelClient knowledgeModelClient;
+    private final Clock knowledgeClock;
 
     @Override
     public ConversationResponse create(CreateConversationRequest request, Long customerId) {
@@ -198,7 +201,7 @@ public class ConversationServiceImpl implements ConversationService {
                 var draft = new KnowledgeAnswerDraft(KnowledgeAnswerDraft.Status.NEEDS_CLARIFICATION,
                         List.of(), List.of(question), List.of());
                 var report = new KnowledgeAnswerReport(3, KnowledgeAnswerReport.Reason.CONTEXT_REQUIRED,
-                        null, null, input.scope(), java.time.LocalDateTime.now(), draft, List.of(), null, null, input.scopes());
+                        null, null, input.scope(), LocalDateTime.now(knowledgeClock), draft, List.of(), null, null, input.scopes());
                 trace.answerReason(report.reason());
                 trace.resolved(draft);
                 return new ChatCompletionResult(question, context.promptTokens(), context.completionTokens(), context.totalTokens(), report);
@@ -261,10 +264,16 @@ public class ConversationServiceImpl implements ConversationService {
         } catch (RuntimeException persistenceException) {
             cause.addSuppressed(persistenceException);
         }
+        if (STREAM_CANCELLED.equals(errorCode)) {
+            log.info("AI response generation cancelled for conversation {} (messageId={})", conversationId, messageId);
+            return;
+        }
         log.warn(
-                "AI response generation failed for conversation {} ({})",
+                "AI response generation failed for conversation {} (messageId={}, errorCode={})",
                 conversationId,
-                cause.getClass().getSimpleName()
+                messageId,
+                errorCode,
+                cause
         );
     }
 

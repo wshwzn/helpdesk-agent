@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Pattern;
 import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*;
 
 @Service
 @RequiredArgsConstructor
 public class KnowledgeApplicabilityService {
+    private static final Pattern EXCLUSION_PATTERN = Pattern.compile("不是|不要|不含|除了|除外|而非|不包括");
+    private static final Pattern COMPARISON_PATTERN = Pattern.compile("比较|对比|相比|差异|区别");
+
     private final KnowledgeBaseMapper bases;
     private final ObjectMapper json;
     private final Validator validator;
@@ -27,7 +31,7 @@ public class KnowledgeApplicabilityService {
         try {
             return json.readValue(base.getClarificationPolicy(), KnowledgeApplicabilityPolicy.class);
         } catch (JsonProcessingException error) {
-            throw new IllegalStateException("invalid stored applicability policy");
+            throw new IllegalStateException("invalid stored applicability policy", error);
         }
     }
 
@@ -41,7 +45,7 @@ public class KnowledgeApplicabilityService {
         if (request.revision() != revision) throw new KnowledgeClarificationException(true, "applicability policy has changed");
         var next = new KnowledgeApplicabilityPolicy(revision + 1, request.topics());
         try { base.setClarificationPolicy(json.writeValueAsString(next)); }
-        catch (JsonProcessingException error) { throw new IllegalStateException("cannot serialize applicability policy"); }
+        catch (JsonProcessingException error) { throw new IllegalStateException("cannot serialize applicability policy", error); }
         base.setClarificationRevision(next.revision());
         base.setUpdatedAt(LocalDateTime.now());
         if (bases.updateById(base) != 1) throw new KnowledgeClarificationException(true, "applicability policy has changed");
@@ -88,12 +92,12 @@ public class KnowledgeApplicabilityService {
 
     /** 只识别配置名称在原问题中的明确出现，不让模型生成未经配置的地区代码。 */
     public List<String> namedScopes(String question, List<KnowledgeApplicabilityPolicy.ScopeOption> options) {
-        if (java.util.regex.Pattern.compile("不是|不要|不含|除了|除外|而非|不包括").matcher(question).find())
+        if (EXCLUSION_PATTERN.matcher(question).find())
             return List.of();
         var named = options.stream().filter(option -> question.contains(option.label()))
                 .map(KnowledgeApplicabilityPolicy.ScopeOption::value).distinct().toList();
         // 过多范围保留澄清，让用户缩小范围，禁止静默截断前三项。
-        boolean comparison = java.util.regex.Pattern.compile("比较|对比|相比|差异|区别").matcher(question).find();
+        boolean comparison = COMPARISON_PATTERN.matcher(question).find();
         return named.size() <= KnowledgeScopes.MAX_SCOPES && (!comparison || named.size() >= 2) ? named : List.of();
     }
 

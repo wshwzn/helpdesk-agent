@@ -14,7 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.LongSupplier;
-import java.util.function.Supplier;
 
 import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*;
 import static com.anying.helpdesk.knowledge.answer.KnowledgeRetrievalRun.StopReason.*;
@@ -67,21 +66,8 @@ public class KnowledgeEvidenceCollector {
         if (!enabled) return stop(trace, SINGLE_PASS, evidence, usage, assessment, queries);
         for (int round = 2; round <= 3; round++) {
             if (expired(started, budgetMs)) return stop(trace, TIME_BUDGET, evidence, usage, assessment, queries);
-            int afterRound = round - 1;
-            var planned = trace.stage(PLANNING, () -> {
-                var result = external(KNOWLEDGE_PLANNING_CALL_FAILED,
-                        () -> taskPlanningEnabled
-                                ? client.plan(model, question, scope, List.copyOf(evidence.values()), List.copyOf(queries))
-                                : client.planLegacy(model, question, scope, List.copyOf(evidence.values()), List.copyOf(queries)));
-                if (result == null || result.value() == null)
-                    throw new KnowledgeAnswerFailure(taskPlanningEnabled ? KNOWLEDGE_PLAN_PAYLOAD_INVALID : KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
-                trace.planned(afterRound, result);
-                if (taskPlanningEnabled) result.value().validate();
-                else result.value().validateLegacy();
-                return result;
-            });
-            usage = new KnowledgeAnswerModelClient.TokenUsage(sum(usage.promptTokens(), planned.promptTokens()),
-                    sum(usage.completionTokens(), planned.completionTokens()), sum(usage.totalTokens(), planned.totalTokens()));
+            var planned = planNext(model, question, scope, evidence, queries, round - 1, taskPlanningEnabled, trace);
+            usage = addUsage(usage, planned);
             var plan = planned.value();
             assessment.accept(plan, queries.size());
             if (plan.decision() != KnowledgeRetrievalPlan.Decision.SEARCH)
@@ -133,18 +119,8 @@ public class KnowledgeEvidenceCollector {
             if (!missing.isEmpty()) {
                 for (var scope : missing) tasks.add(new ScopeSearch(question, List.of(scope)));
             } else {
-                int afterRound = round - 1;
-                var planned = trace.stage(PLANNING, () -> {
-                    var result = external(KNOWLEDGE_PLANNING_CALL_FAILED, () -> client.planLegacy(model, question,
-                            KnowledgeScopes.describe(scopes), List.copyOf(evidence.values()), List.copyOf(queries)));
-                    if (result == null || result.value() == null)
-                        throw new KnowledgeAnswerFailure(KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
-                    trace.planned(afterRound, result);
-                    result.value().validateLegacy();
-                    return result;
-                });
-                usage = new KnowledgeAnswerModelClient.TokenUsage(sum(usage.promptTokens(), planned.promptTokens()),
-                        sum(usage.completionTokens(), planned.completionTokens()), sum(usage.totalTokens(), planned.totalTokens()));
+                var planned = planNext(model, question, KnowledgeScopes.describe(scopes), evidence, queries, round - 1, false, trace);
+                usage = addUsage(usage, planned);
                 if (planned.value().decision() != KnowledgeRetrievalPlan.Decision.SEARCH)
                     return stop(trace, KnowledgeRetrievalRun.StopReason.valueOf(planned.value().decision().name()),
                             evidence, usage, assessment, queries);
@@ -170,13 +146,45 @@ public class KnowledgeEvidenceCollector {
 
     private record ScopeSearch(String query, List<String> scopes) { }
 
+    /** 执行单次规划模型调用、协议校验与诊断记录，统一单范围与多范围的规划入口。 */
+    private KnowledgeAnswerModelClient.ModelResult<KnowledgeRetrievalPlan> planNext(
+            ResolvedChatModel model, String question, String scopeDescription,
+            LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence, List<String> queries,
+            int afterRound, boolean taskPlanningEnabled, KnowledgeAnswerTrace trace) {
+        return trace.stage(PLANNING, () -> {
+            var result = KnowledgeAnswerFailure.wrap(KNOWLEDGE_PLANNING_CALL_FAILED,
+                    () -> taskPlanningEnabled
+                            ? client.plan(model, question, scopeDescription, List.copyOf(evidence.values()), List.copyOf(queries))
+                            : client.planLegacy(model, question, scopeDescription, List.copyOf(evidence.values()), List.copyOf(queries)));
+            if (result == null || result.value() == null)
+                throw new KnowledgeAnswerFailure(taskPlanningEnabled ? KNOWLEDGE_PLAN_PAYLOAD_INVALID : KNOWLEDGE_PROTOCOL_INVALID, "missing retrieval plan");
+            trace.planned(afterRound, result);
+            if (taskPlanningEnabled) result.value().validate();
+            else result.value().validateLegacy();
+            return result;
+        });
+    }
+
     /** 联合查询仍只调用一次混合检索，实际过滤集合写入逐次诊断。 */
     private void searchScopes(Long baseId, List<String> scopes, int round, String query, KnowledgeAnswerTrace trace,
             LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence) {
         trace.searchStarted(round, query, scopes);
+        executeSearch(baseId, scopes, new KnowledgeSearchRequest(query, null, scopes), trace, evidence);
+    }
+
+    /** 每次搜索都绑定同一身份，保存实际召回并按文档与块序号累计完整原文。 */
+    private void search(Long baseId, String scope, int round, String query, KnowledgeAnswerTrace trace,
+                        LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence) {
+        trace.searchStarted(round, query);
+        executeSearch(baseId, List.of(scope), new KnowledgeSearchRequest(query, scope), trace, evidence);
+    }
+
+    /** 统一执行一次混合检索并合并累计证据，失败时仍将有效检索摘要写入诊断。 */
+    private void executeSearch(Long baseId, List<String> scopes, KnowledgeSearchRequest request,
+            KnowledgeAnswerTrace trace, LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence) {
         trace.stage(RETRIEVAL, () -> {
-            var response = external(KNOWLEDGE_RETRIEVAL_FAILED,
-                    () -> retrieval.search(baseId, new KnowledgeSearchRequest(query, null, scopes)));
+            var response = KnowledgeAnswerFailure.wrap(KNOWLEDGE_RETRIEVAL_FAILED,
+                    () -> retrieval.search(baseId, request));
             List<String> added = List.of();
             try {
                 added = mergeScopes(baseId, scopes, response, evidence, trace);
@@ -186,30 +194,6 @@ public class KnowledgeEvidenceCollector {
                 if (response != null && response.results() != null) trace.searchFinished(response, added);
             }
         });
-    }
-
-    /** 每次搜索都绑定同一身份，保存实际召回并按文档与块序号累计完整原文。 */
-    private void search(Long baseId, String scope, int round, String query, KnowledgeAnswerTrace trace,
-                        LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence) {
-        trace.searchStarted(round, query);
-        trace.stage(RETRIEVAL, () -> {
-            var response = external(KNOWLEDGE_RETRIEVAL_FAILED,
-                    () -> retrieval.search(baseId, new KnowledgeSearchRequest(query, scope)));
-            List<String> added = List.of();
-            try {
-                added = merge(baseId, scope, response, evidence, trace);
-                trace.evidence(List.copyOf(evidence.values()));
-                return response;
-            } finally {
-                if (response != null && response.results() != null) trace.searchFinished(response, added);
-            }
-        });
-    }
-
-    /** 整批校验再合并，不能静默截掉超预算的后续证据或用变化原文替换已有来源。 */
-    private List<String> merge(Long baseId, String scope, KnowledgeSearchResponse response,
-            LinkedHashMap<Key, KnowledgeAnswerReport.Evidence> evidence, KnowledgeAnswerTrace trace) {
-        return mergeScopes(baseId, List.of(scope), response, evidence, trace);
     }
 
     /** 每个候选都核对本次实际过滤集合，保持稳定编号及累计证据预算。 */
@@ -290,19 +274,15 @@ public class KnowledgeEvidenceCollector {
         return (ticker.getAsLong() - started) / 1_000_000 >= budgetMs;
     }
 
+    /** 累加单次规划模型调用的已知用量，任一字段缺失保持未知。 */
+    private KnowledgeAnswerModelClient.TokenUsage addUsage(KnowledgeAnswerModelClient.TokenUsage current,
+            KnowledgeAnswerModelClient.ModelResult<?> next) {
+        return new KnowledgeAnswerModelClient.TokenUsage(sum(current.promptTokens(), next.promptTokens()),
+                sum(current.completionTokens(), next.completionTokens()), sum(current.totalTokens(), next.totalTokens()));
+    }
+
     /** 任一调用缺少用量则保持未知，避免将未知成本误记为零。 */
     private Integer sum(Integer first, Integer second) {
         return first == null || second == null ? null : first + second;
-    }
-
-    /** 外部异常仅映射固定分类，已知协议错误和用量保持原样。 */
-    private <T> T external(KnowledgeAnswerFailure.Code code, Supplier<T> action) {
-        try {
-            return action.get();
-        } catch (KnowledgeAnswerFailure failure) {
-            throw failure;
-        } catch (RuntimeException failure) {
-            throw new KnowledgeAnswerFailure(code, code.name());
-        }
     }
 }

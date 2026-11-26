@@ -353,16 +353,17 @@ class TrustedKnowledgeAnswerServiceTest {
         assertThat(service.answer(model, QUESTION, "SH").totalTokens()).isNull();
     }
 
-    /** 分开记录草案调用与复核调用故障，不泄露厂商异常携带的信息。 */
+    /** 分开记录草案调用与复核调用故障，对外错误消息脱敏，同时保留服务端排障根因。 */
     @Test
-    @DisplayName("外部模型故障按阶段分类并丢弃原始异常正文")
+    @DisplayName("外部模型故障按阶段分类，消息脱敏且保留服务端根因")
     void classifiesExternalModelFailures() {
-        when(client.draft(any(), any(), any(), any(), any())).thenThrow(new IllegalStateException("private provider secret"));
+        var rootCause = new IllegalStateException("private provider secret");
+        when(client.draft(any(), any(), any(), any(), any())).thenThrow(rootCause);
         assertThatThrownBy(() -> service.answer(model, QUESTION, "SH"))
                 .isInstanceOfSatisfying(KnowledgeAnswerFailure.class, failure -> {
                     assertThat(failure.errorCode()).isEqualTo("KNOWLEDGE_DRAFT_CALL_FAILED");
                     assertThat(failure.getMessage()).doesNotContain("private provider secret");
-                    assertThat(failure.getCause()).isNull();
+                    assertThat(failure.getCause()).isSameAs(rootCause);
                 });
         doAnswer(invocation -> new KnowledgeAnswerModelClient.ModelResult<>(
                 selection(draft(KnowledgeAnswerDraft.Status.ANSWERABLE), invocation.getArgument(3)), 1, 1, 2))

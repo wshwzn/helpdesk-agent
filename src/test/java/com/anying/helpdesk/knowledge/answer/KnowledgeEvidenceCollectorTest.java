@@ -184,12 +184,15 @@ class KnowledgeEvidenceCollectorTest {
         assertThat(trace.snapshot().evidence()).extracting(KnowledgeAnswerReport.Evidence::content).containsExactly("旧内容");
     }
 
-    /** 后续检索服务异常不得伪装成搜索穷尽，诊断须保留失败查询。 */
-    @Test @DisplayName("补查失败保留阶段和查询且不泄露异常正文")
+    /** 后续检索服务异常不得伪装成搜索穷尽，诊断须保留失败查询且服务端异常链保留根因。 */
+    @Test @DisplayName("补查失败保留阶段、查询与服务端根因且消息不泄露正文")
     void technicalFailureIsNotExhaustion() {
-        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "资料"))).thenThrow(new IllegalStateException("secret"));
+        var rootCause = new IllegalStateException("secret");
+        when(retrieval.search(any(), any())).thenReturn(response(hit(1, "资料"))).thenThrow(rootCause);
         when(client.plan(any(), any(), any(), any(), any())).thenReturn(searchPlan("规则"));
-        assertThatThrownBy(this::collect).hasMessage("KNOWLEDGE_RETRIEVAL_FAILED");
+        assertThatThrownBy(this::collect)
+                .hasMessage("KNOWLEDGE_RETRIEVAL_FAILED")
+                .hasCause(rootCause);
         assertThat(trace.snapshot().retrievalRun().stopReason()).isEqualTo(TECHNICAL_FAILURE);
         assertThat(trace.snapshot().retrievalRun().searches().getLast().query()).isEqualTo("规则");
         assertThat(trace.snapshot().retrievalRun().searches().getLast().response()).isNull();

@@ -359,7 +359,7 @@ public final class KnowledgeAnswerTrace {
             writer.accept(snapshot());
         } catch (RuntimeException failure) {
             writeFailures++;
-            log.warn("Knowledge diagnostic write failed for run {} ({})", runId, failure.getClass().getSimpleName());
+            log.warn("Knowledge diagnostic write failed for run {}", runId, failure);
         }
     }
 }

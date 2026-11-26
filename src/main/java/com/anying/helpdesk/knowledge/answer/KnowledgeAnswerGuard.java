@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*;
 
@@ -12,9 +13,11 @@ import static com.anying.helpdesk.knowledge.answer.KnowledgeAnswerFailure.Code.*
 @Component
 public class KnowledgeAnswerGuard {
 
+    private static final Pattern EVIDENCE_TAG = Pattern.compile("\\[E[0-9]+]");
+
     /** 不同地区的独立金额不是制度冲突；ALL 与具体范围仍可能构成同条件冲突。 */
     public void validateScopeConflicts(KnowledgeAnswerDraft draft, List<KnowledgeAnswerReport.Evidence> evidence) {
-        var byId = evidence.stream().collect(Collectors.toMap(KnowledgeAnswerReport.Evidence::id, item -> item));
+        var byId = indexEvidence(evidence);
         for (var conflict : draft.conflicts()) {
             var first = conflict.first().references().stream().map(r -> byId.get(r.evidenceId()).metadata().applicabilityScope())
                     .collect(Collectors.toSet());
@@ -25,7 +28,7 @@ public class KnowledgeAnswerGuard {
         }
     }
 
-    /** 将模型片段选择解析为服务端原文，并继续执行原有状态和逐字引用校验。 */
+    /** 将模型片段选择解析为服务端原文，再校验状态与冲突结构，避免对已截取原文重复子串扫描。 */
     public KnowledgeAnswerDraft resolve(KnowledgeAnswerSelection selection, KnowledgeCitationCatalog catalog,
                                         List<KnowledgeAnswerReport.Evidence> evidence) {
         require(selection != null, "missing answer selection");
@@ -34,21 +37,25 @@ public class KnowledgeAnswerGuard {
         }
         require(selection.claims() != null && selection.claims().size() <= 8, "invalid claims");
         require(selection.conflicts() != null && selection.conflicts().size() <= 3, "invalid conflicts");
-        var claims = selection.claims().stream().map(claim -> resolveClaim(claim, catalog, evidence)).toList();
+        Map<String, KnowledgeCitationCatalog.Source> sourcesById = catalog.sources().stream()
+                .collect(Collectors.toMap(KnowledgeCitationCatalog.Source::id, item -> item));
+        Map<String, KnowledgeAnswerReport.Evidence> evidenceById = indexEvidence(evidence);
+        var claims = selection.claims().stream().map(claim -> resolveClaim(claim, sourcesById, evidenceById)).toList();
         var conflicts = selection.conflicts().stream().map(conflict -> {
             require(conflict != null, "invalid conflict issue");
             return new KnowledgeAnswerDraft.Conflict(conflict.issue(),
-                    resolveClaim(conflict.first(), catalog, evidence), resolveClaim(conflict.second(), catalog, evidence));
+                    resolveClaim(conflict.first(), sourcesById, evidenceById),
+                    resolveClaim(conflict.second(), sourcesById, evidenceById));
         }).toList();
         var draft = new KnowledgeAnswerDraft(selection.status(), claims, selection.missingConditions(), conflicts);
-        validate(draft, evidence);
+        validateStructure(draft, evidenceById);
         return draft;
     }
 
     /** 仅接受对应证据内可选择的片段；按原始快照下标取文，禁止拼接或归一化引文。 */
     private KnowledgeAnswerDraft.Claim resolveClaim(KnowledgeAnswerSelection.Claim claim,
-                                                     KnowledgeCitationCatalog catalog,
-                                                     List<KnowledgeAnswerReport.Evidence> evidence) {
+                                                     Map<String, KnowledgeCitationCatalog.Source> sourcesById,
+                                                     Map<String, KnowledgeAnswerReport.Evidence> evidenceById) {
         require(claim != null && validText(claim.text(), 1000), "invalid claim");
         require(claim.references() != null && !claim.references().isEmpty()
                 && claim.references().size() <= 5, "claim requires references");
@@ -56,12 +63,16 @@ public class KnowledgeAnswerGuard {
             if (reference == null || reference.evidenceId() == null || reference.paragraphId() == null) {
                 throw new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "missing paragraph reference");
             }
-            var source = catalog.sources().stream().filter(item -> item.id().equals(reference.evidenceId()))
-                    .findFirst().orElseThrow(() -> new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "unknown evidence id"));
+            var source = sourcesById.get(reference.evidenceId());
+            if (source == null) {
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "unknown evidence id");
+            }
             var paragraph = source.paragraphs().stream().filter(item -> item.id().equals(reference.paragraphId()))
                     .findFirst().orElseThrow(() -> new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "unknown paragraph id"));
-            var original = evidence.stream().filter(item -> item.id().equals(reference.evidenceId())).findFirst()
-                    .orElseThrow(() -> new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "unknown evidence id"));
+            var original = evidenceById.get(reference.evidenceId());
+            if (original == null) {
+                throw new KnowledgeAnswerFailure(KNOWLEDGE_CITATION_INVALID, "unknown evidence id");
+            }
             if (!paragraph.selectable() || paragraph.startOffset() < 0 || paragraph.endOffset() > original.content().length()
                     || paragraph.startOffset() >= paragraph.endOffset()
                     || !original.content().substring(paragraph.startOffset(), paragraph.endOffset()).equals(paragraph.text())) {
@@ -75,18 +86,26 @@ public class KnowledgeAnswerGuard {
 
     /** 拒绝非法状态、无依据结论以及伪造的引用，防止草案绕过证据约束。 */
     public void validate(KnowledgeAnswerDraft draft, List<KnowledgeAnswerReport.Evidence> evidence) {
-        require(draft != null && draft.status() != null, "missing answer status");
+        require(draft != null, "missing answer status");
         require(draft.claims() != null && draft.claims().size() <= 8, "invalid claims");
-        require(draft.missingConditions() != null && draft.missingConditions().size() <= 5, "invalid conditions");
         require(draft.conflicts() != null && draft.conflicts().size() <= 3, "invalid conflicts");
-        Map<String, KnowledgeAnswerReport.Evidence> byId = evidence.stream()
-                .collect(Collectors.toMap(KnowledgeAnswerReport.Evidence::id, item -> item));
+        Map<String, KnowledgeAnswerReport.Evidence> byId = indexEvidence(evidence);
         draft.claims().forEach(claim -> validateClaim(claim, byId));
+        for (var conflict : draft.conflicts()) {
+            require(conflict != null, "invalid conflict issue");
+            validateClaim(conflict.first(), byId);
+            validateClaim(conflict.second(), byId);
+        }
+        validateStructure(draft, byId);
+    }
+
+    /** 校验草案状态、条件文本以及冲突双方来自不同文档。 */
+    private void validateStructure(KnowledgeAnswerDraft draft, Map<String, KnowledgeAnswerReport.Evidence> byId) {
+        require(draft.status() != null, "missing answer status");
+        require(draft.missingConditions() != null && draft.missingConditions().size() <= 5, "invalid conditions");
         draft.missingConditions().forEach(condition -> require(validText(condition, 300), "invalid condition"));
         for (var conflict : draft.conflicts()) {
             require(conflict != null && validText(conflict.issue(), 300), "invalid conflict issue");
-            validateClaim(conflict.first(), byId);
-            validateClaim(conflict.second(), byId);
             var firstDocuments = conflict.first().references().stream()
                     .map(ref -> byId.get(ref.evidenceId()).documentId()).collect(Collectors.toSet());
             var secondDocuments = conflict.second().references().stream()
@@ -101,6 +120,11 @@ public class KnowledgeAnswerGuard {
         if (draft.status() == KnowledgeAnswerDraft.Status.ANSWERABLE) {
             require(!draft.claims().isEmpty(), "answer requires supported claims");
         }
+    }
+
+    /** 建立证据编号索引，避免校验多条引用时反复线性扫描。 */
+    private Map<String, KnowledgeAnswerReport.Evidence> indexEvidence(List<KnowledgeAnswerReport.Evidence> evidence) {
+        return evidence.stream().collect(Collectors.toMap(KnowledgeAnswerReport.Evidence::id, item -> item));
     }
 
     /** 每个结论必须引用本次检索分配的标识，并提供来源 Chunk 中连续存在的原文。 */
@@ -125,7 +149,7 @@ public class KnowledgeAnswerGuard {
     /** 限制用户可见模型文本的长度，引用标签由服务端统一生成。 */
     private boolean validText(String text, int max) {
         return text != null && !text.isBlank() && text.length() <= max
-                && !text.matches("(?s).*\\[E[0-9]+].*");
+                && !EVIDENCE_TAG.matcher(text).find();
     }
 
     /** 核验不通过时终止生成，禁止把技术失败伪装为证据不足。 */

@@ -12,6 +12,7 @@ public record KnowledgeCitationCatalog(String citationSetId, List<Source> source
     private static final String NEWLINE = "(?:\\r?\\n|\\r(?!\\n))";
     private static final Pattern PARAGRAPH_BREAK = Pattern.compile(NEWLINE + "[\\t ]*" + NEWLINE
             + "(?:[\\t ]*" + NEWLINE + ")*");
+    private static final Pattern EVIDENCE_TAG = Pattern.compile("\\[E[0-9]+]");
 
     public record Source(String id, Long documentId, int chunkSequence, String sourceName,
                          KnowledgeDocumentMetadata metadata, List<Paragraph> paragraphs) { }
@@ -40,7 +41,7 @@ public record KnowledgeCitationCatalog(String citationSetId, List<Source> source
         String text = evidence.content().substring(start, end);
         if (text.isBlank()) return;
         boolean selectable = text.length() <= 1500 && text.strip().length() >= 4
-                && !text.matches("(?s).*\\[E[0-9]+].*");
+                && !EVIDENCE_TAG.matcher(text).find();
         paragraphs.add(new Paragraph(evidence.id() + "-P" + (paragraphs.size() + 1), start, end, text, selectable));
     }
 }
